@@ -32,8 +32,8 @@ DROP TABLE IF EXISTS address;
 CREATE TABLE address (
     id INT PRIMARY KEY AUTO_INCREMENT,
     street VARCHAR(255) NOT NULL,
-    streetnr VARCHAR(10) NOT NULL,
-    zipcode VARCHAR(10) NOT NULL,
+    streetnr VARCHAR(50) NOT NULL,
+    zipcode VARCHAR(50) NOT NULL,
     city VARCHAR(255) NOT NULL,
     country VARCHAR(255) NOT NULL
 );
@@ -51,7 +51,7 @@ CREATE TABLE theatres (
 CREATE TABLE cinema_halls (
     id INT PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(255) NOT NULL,
-    capacity INT NOT NULL,
+    capacity INT,
     theatre_id INT NOT NULL,
     FOREIGN KEY (theatre_id) REFERENCES theatres(id)
 );
@@ -66,8 +66,8 @@ CREATE TABLE seat_category (
 -- Create the seats table with foreign keys to the cinema_halls table and the seat_category table
 CREATE TABLE seats (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    row_nr INT NOT NULL,
-    column_nr INT NOT NULL,
+    row_nr VARCHAR(10) NOT NULL,
+    column_nr VARCHAR(10) NOT NULL,
     seat_category_id INT NOT NULL,
     cinema_hall_id INT NOT NULL,
     FOREIGN KEY (seat_category_id) REFERENCES seat_category(id),
@@ -138,11 +138,13 @@ CREATE TABLE user_types (
 -- Create the users table with a foreign key to the address table and a foreign key to the user_types table
 CREATE TABLE users (
     id INT PRIMARY KEY AUTO_INCREMENT,
+    username VARCHAR(255) NOT NULL,
     firstname VARCHAR(255) NOT NULL,
     lastname VARCHAR(255) NOT NULL,
     email VARCHAR(255) NOT NULL,
-    age INT NOT NULL,
+    age INT,
     password VARCHAR(255) NOT NULL,
+    phone_number VARCHAR(100),
     address_id INT NOT NULL,
     user_type_id INT NOT NULL,
     FOREIGN KEY (address_id) REFERENCES address(id),
@@ -208,19 +210,3 @@ CREATE TABLE movie_producers (
     FOREIGN KEY (movie_id) REFERENCES movies(id),
     FOREIGN KEY (producer_id) REFERENCES producers(id)
 );
-
-
--- Insert the seat categories
-INSERT INTO seat_category (category_name) VALUES ('Standard'), ('Premium'), ('Couple'), ('Disabled');
-
--- Insert the user types
-INSERT INTO user_types (type_name) VALUES ('customer'), ('admin'), ('casher');
-
--- Insert the fsk values
-INSERT INTO fsk (age) VALUES (0), (6), (12), (16), (18);
-
--- Insert the payment methods
-INSERT INTO payment_methods (method_name) VALUES ('MasterCard'), ('PayPal'), ('ApplePay'), ('Visa'), ('Cash');
-
--- Insert the price categories
-INSERT INTO price_category (category_name, price) VALUES ('StudentDiscount', 7.00), ('ChildDiscount', 10.00), ('ElderlyDiscount', 5.00), ('regular_price', 20.00);
