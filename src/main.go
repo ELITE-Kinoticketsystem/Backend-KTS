@@ -17,7 +17,7 @@ func main() {
 	}
 	defer dbConnection.Close()
 
-	router := createRouter()
+	router := createRouter(dbConnection)
 
 	const port = "8080"
 

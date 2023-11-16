@@ -1,13 +1,21 @@
 package main
 
 import (
+	"database/sql"
 	"net/http"
 
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/controllers"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/handlers"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/managers"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/repositories"
 	"github.com/gin-gonic/gin"
 )
 
-func createRouter() *gin.Engine {
+type Controllers struct {
+	UserController controllers.UserControllerI
+}
+
+func createRouter(dbConnection *sql.DB) *gin.Engine {
 	router := gin.Default()
 
 	// Attach Middleware
@@ -15,11 +23,25 @@ func createRouter() *gin.Engine {
 	// Create api groups, with special middleware
 
 	// Create managers and repositories
+	databaseManager := &managers.DatabaseManager{
+		Connection: dbConnection,
+	}
+
+	userRepo := &repositories.UserRepository{
+		DatabaseManager: databaseManager,
+	}
 
 	// Create controllers
+	controller := Controllers{
+		UserController: &controllers.UserController{
+			UserRepo: userRepo,
+		},
+	}
 
 	// Set routes
 	router.Handle(http.MethodGet, "/lifecheck", handlers.LifeCheckHandler())
+
+	router.Handle(http.MethodPost, "/auth/register", handlers.RegisterUserHandler(controller.UserController))
 
 	return router
 }
