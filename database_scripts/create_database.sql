@@ -3,21 +3,17 @@
 Create database if not EXISTS KinoTicketSystem;
 Use KinoTicketSystem;
 
+-- Order of dropping matters because of foreign keys
 DROP TABLE IF EXISTS movie_actors;
 DROP TABLE IF EXISTS movie_producers;
 DROP TABLE IF EXISTS actors;
 DROP TABLE IF EXISTS producers;
-
 DROP TABLE IF EXISTS user_movies;
-
 DROP TABLE IF EXISTS showings;
-
 DROP TABLE IF EXISTS movies;
 DROP TABLE IF EXISTS fsk;
-
 DROP TABLE IF EXISTS users;
 DROP TABLE IF EXISTS user_types;
-
 DROP TABLE IF EXISTS events;
 DROP TABLE IF EXISTS orders;
 DROP TABLE IF EXISTS payment_methods;
@@ -25,8 +21,6 @@ DROP TABLE IF EXISTS tickets;
 DROP TABLE IF EXISTS price_category;
 DROP TABLE IF EXISTS seats;
 DROP TABLE IF EXISTS seat_category;
-
-
 DROP TABLE IF EXISTS cinema_halls;
 DROP TABLE IF EXISTS theatres;
 DROP TABLE IF EXISTS address;
