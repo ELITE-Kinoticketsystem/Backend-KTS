@@ -12,6 +12,7 @@ DROP TABLE IF EXISTS user_movies;
 DROP TABLE IF EXISTS showings;
 DROP TABLE IF EXISTS movies;
 DROP TABLE IF EXISTS fsk;
+DROP TABLE IF EXISTS genres;
 DROP TABLE IF EXISTS users;
 DROP TABLE IF EXISTS user_types;
 DROP TABLE IF EXISTS events;
@@ -118,6 +119,12 @@ CREATE TABLE fsk (
     age INT NOT NULL
 );
 
+-- Create the genres table
+CREATE TABLE genres (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    genre VARCHAR(100) NOT NULL
+);
+
 -- Create the movies table with a foreign key to the fsk table
 CREATE TABLE movies (
     id INT PRIMARY KEY AUTO_INCREMENT,
@@ -126,7 +133,9 @@ CREATE TABLE movies (
     releasedDate DATE NOT NULL,
     timeInMin INT NOT NULL,
     fsk_id INT NOT NULL,
-    FOREIGN KEY (fsk_id) REFERENCES fsk(id)
+    genre_id INT NOT NULL,
+    FOREIGN KEY (fsk_id) REFERENCES fsk(id),
+    FOREIGN KEY (genre_id) REFERENCES genres(id)
 );
 
 -- Create the user_types table
