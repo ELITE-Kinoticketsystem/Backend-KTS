@@ -122,7 +122,7 @@ CREATE TABLE fsk (
 -- Create the genres table
 CREATE TABLE genres (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    genre VARCHAR(100) NOT NULL
+    name VARCHAR(100) NOT NULL
 );
 
 -- Create the movies table with a foreign key to the fsk table
