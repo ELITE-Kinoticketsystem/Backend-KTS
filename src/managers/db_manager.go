@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/go-sql-driver/mysql"
+	_ "github.com/go-sql-driver/mysql" // Temporary solution for local development
 )
 
 type DatabaseManagerI interface {
@@ -38,18 +38,25 @@ func InitializeDB() (*sql.DB, error) {
 		dbHost = os.Getenv("DB_HOST")
 		dbPort = os.Getenv("DB_PORT")
 		dbUser = os.Getenv("DB_USER")
-		dbPass = os.Getenv("DB_PASSWORD")
+		//dbPass = os.Getenv("DB_PASSWORD") - Temporary not needed for local development
 		dbName = os.Getenv("DB_NAME")
 	)
 
-	config := mysql.Config{
-		User:   dbUser,
-		Passwd: dbPass,
-		Net:    "tcp",
-		Addr:   fmt.Sprintf("%s:%s", dbHost, dbPort),
-		DBName: dbName,
-	}
-	db, _ := sql.Open("mysql", config.FormatDSN())
+	/*
+		config := mysql.Config{
+			User:   dbUser,
+			Passwd: dbPass,
+			Net:    "tcp",
+			Addr:   fmt.Sprintf("%s:%s", dbHost, dbPort),
+			DBName: dbName,
+		}
+		db, _ := sql.Open("mysql", config.FormatDSN())
+	*/
+
+	// Temporary solution for local development
+	connectionString := fmt.Sprintf("%s@tcp(%s:%s)/%s", dbUser, dbHost, dbPort, dbName)
+
+	db, _ := sql.Open("mysql", connectionString)
 
 	return db, nil
 }
