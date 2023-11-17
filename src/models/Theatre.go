@@ -1,4 +1,4 @@
-package main
+package models
 
 type Theatre struct {
 	ID                   int                   `json:"id"`

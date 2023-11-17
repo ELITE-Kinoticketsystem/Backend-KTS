@@ -1,4 +1,4 @@
-package main
+package models
 
 type CinemaHall struct {
 	ID       int    `json:"id"`

@@ -1,4 +1,4 @@
-package main
+package models
 
 type Address struct {
 	ID       int    `json:"id"`
