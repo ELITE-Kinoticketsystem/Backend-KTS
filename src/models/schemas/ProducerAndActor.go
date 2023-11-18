@@ -1,9 +1,15 @@
 package schemas
 
+import "github.com/google/uuid"
+
 type Producer struct {
-	// TODO
+	Id   *uuid.UUID `json:"id"`
+	Name string     `json:"name"`
+	Age  int        `json:"age"`
 }
 
 type Actor struct {
-	// TODO
+	Id   *uuid.UUID `json:"id"`
+	Name string     `json:"name"`
+	Age  int        `json:"age"`
 }

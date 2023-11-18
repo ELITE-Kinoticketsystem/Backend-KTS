@@ -1,16 +1,20 @@
 package schemas
 
+import (
+	"time"
+
+	"github.com/google/uuid"
+)
+
 type Ticket struct {
-	ID            int           `json:"id"`
-	Price         float64       `json:"price"`
-	Timestamp     string        `json:"timestamp"` //TODO: find better datatype
-	Validated     bool          `json:"validated"`
-	Paid          bool          `json:"paid"`
-	Reserved      bool          `json:"reserved"`
-	Seat          *Seat         `json:"seat"`
-	QrCode        string        `json:"qrCode"` // TODO: make maybe as Object, depending on how this works
-	PriceCategory PriceCategory `json:"priceCategory"`
-	Order         *Order        `json:"order"`
+	Id        *uuid.UUID `json:"id"`
+	Timestamp time.Time  `json:"timestamp"`
+	Validated bool       `json:"validated"`
+	Paid      bool       `json:"paid"`
+	Reserved  bool       `json:"reserved"`
+	Price     int        `json:"price"` // requires conversion
+	SeatId    *uuid.UUID `json:"seatId"`
+	PriceCategory PriceCategory `json:"priceCategory"` // should have own table
 }
 
 type PriceCategory string

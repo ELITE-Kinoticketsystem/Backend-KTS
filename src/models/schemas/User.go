@@ -1,31 +1,20 @@
 package schemas
 
+import "github.com/google/uuid"
+
 type User struct {
-	ID        int     `json:"id"`
-	FirstName string  `json:"firstName"`
-	LastName  string  `json:"LastName"`
-	Email     string  `json:"email"`
-	Password  string  `json:"password"` // TODO: hash or what?
-	Address   Address `json:"address"`
+	Id        *uuid.UUID `json:"id"`
+	FirstName string     `json:"firstName"`
+	LastName  string     `json:"lastName"`
+	Email     string     `json:"email"`
+	Age       int        `json:"age"`
+	Password  string     `json:"password"` // TODO: hash or what?
+	AddressId *uuid.UUID `json:"addressId"`
 }
 
-type Customer struct {
-	WatchedMovies   *[]Movie `json:"watchedMovies"`
-	SuggestedMovies *[]Movie `json:"suggestedMovies"`
-	SavedMovies     *[]Movie `json:"savedMovies"`
-	Orders          *[]Order `json:"orders"`
-	Cart            *[]Cart  `json:"card"`
-	User
-}
-
-type Employee struct {
-	Customer
-}
-
-type Admin struct {
-	Employee
-}
-
-type Cashier struct {
-	Employee
+type UserMovies struct {
+	Id       *uuid.UUID `json:"id"` // probably not needed
+	UserId   *uuid.UUID `json:"userId"`
+	MovieId  *uuid.UUID `json:"movieId"`
+	ListType string     `json:"listType"`
 }
