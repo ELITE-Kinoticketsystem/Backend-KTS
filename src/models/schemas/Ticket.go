@@ -1,4 +1,4 @@
-package models
+package schemas
 
 type Ticket struct {
 	ID            int           `json:"id"`

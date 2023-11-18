@@ -1,4 +1,4 @@
-package models
+package schemas
 
 type Theatre struct {
 	ID                   int                   `json:"id"`

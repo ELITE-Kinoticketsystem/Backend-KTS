@@ -1,4 +1,4 @@
-package models
+package schemas
 
 type Order struct {
 	ID           int           `json:"id"`

@@ -1,4 +1,4 @@
-package models
+package schemas
 
 type Movie struct {
 	Title       string      `json:"title"`

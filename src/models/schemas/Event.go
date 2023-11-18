@@ -1,4 +1,4 @@
-package models
+package schemas
 
 type Event struct {
 	Title   string    `json:"title"`

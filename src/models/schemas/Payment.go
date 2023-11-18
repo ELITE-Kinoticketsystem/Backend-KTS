@@ -1,4 +1,4 @@
-package models
+package schemas
 
 type Payment struct {
 	PaymentMethod *PaymentMethod `json:"paymentMethod"`

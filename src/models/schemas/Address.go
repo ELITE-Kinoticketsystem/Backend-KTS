@@ -1,4 +1,4 @@
-package models
+package schemas
 
 type Address struct {
 	ID       int    `json:"id"`
