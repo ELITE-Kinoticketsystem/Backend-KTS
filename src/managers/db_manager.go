@@ -9,27 +9,27 @@ import (
 )
 
 type DatabaseManagerI interface {
-	ExecuteStatement(query string) (sql.Result, error)
-	ExecuteQuery(query string) (*sql.Rows, error)
-	ExecuteQueryRow(query string) *sql.Row
+	ExecuteStatement(query string, args... any) (sql.Result, error)
+	ExecuteQuery(query string, args... any) (*sql.Rows, error)
+	ExecuteQueryRow(query string, args... any) *sql.Row
 }
 
 type DatabaseManager struct {
 	Connection *sql.DB
 }
 
-func (dm *DatabaseManager) ExecuteStatement(query string) (sql.Result, error) {
-	result, err := dm.Connection.Exec(query)
+func (dm *DatabaseManager) ExecuteStatement(query string, args... any) (sql.Result, error) {
+	result, err := dm.Connection.Exec(query, args...)
 	return result, err
 }
 
-func (dm *DatabaseManager) ExecuteQuery(query string) (*sql.Rows, error) {
-	result, err := dm.Connection.Query(query)
+func (dm *DatabaseManager) ExecuteQuery(query string, args... any) (*sql.Rows, error) {
+	result, err := dm.Connection.Query(query, args...)
 	return result, err
 }
 
-func (dm *DatabaseManager) ExecuteQueryRow(query string) *sql.Row {
-	result := dm.Connection.QueryRow(query)
+func (dm *DatabaseManager) ExecuteQueryRow(query string, args... any) *sql.Row {
+	result := dm.Connection.QueryRow(query, args...)
 	return result
 }
 
