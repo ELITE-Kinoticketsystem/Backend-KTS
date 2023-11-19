@@ -40,3 +40,16 @@ BEGIN
     where m.id = movieId;
 END //
 DELIMITER ;
+
+DELIMITER //
+CREATE PROCEDURE getProducersFromMovie (IN movieId int)
+BEGIN
+    select m.title, p.name 
+    from movie_producers as mp 
+    inner join movies m 
+      on mp.movie_id = m.id 
+    inner join producers p
+      on mp.producer_id = p.id 
+    where m.id = movieId;
+END //
+DELIMITER ;
