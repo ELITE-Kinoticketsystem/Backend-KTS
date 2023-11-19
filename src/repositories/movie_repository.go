@@ -136,6 +136,8 @@ func (mr *MovieRepository) GetProducersFromMovie(movieId *uuid.UUID) []*models.P
 	return rowsToProducerSchema(rows)
 }
 
+//// Helper functions
+
 // rowsToMovieSchema converts a set of rows to a slice of MovieSchema
 func rowsToMovieSchema(rows *sql.Rows) []*models.Movie {
 	movies := make([]*models.Movie, 0) // It is important to initialize the slice with 0 length so that it is serialized to [] instead of null
