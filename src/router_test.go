@@ -9,6 +9,7 @@ import (
 )
 
 func TestLifeCheckRoute(t *testing.T) {
+	// GIVEN
 	// Initialize the router
 	router := createRouter()
 
@@ -21,9 +22,11 @@ func TestLifeCheckRoute(t *testing.T) {
 	// Create a response recorder
 	w := httptest.NewRecorder()
 
+	// WHEN
 	// Test the lifecheck route
 	router.ServeHTTP(w, req)
 
+	// THEN
 	// Check the status code is what we expect
-	assert.Equal(t, http.StatusOK, w.Code)
+	assert.Equal(t, http.StatusOK, w.Code, "HTTP status code is not OK")
 }
