@@ -53,3 +53,12 @@ BEGIN
     where m.id = movieId;
 END //
 DELIMITER ;
+
+DELIMITER //
+CREATE PROCEDURE deleteMovie (IN movieId int)
+BEGIN
+    Delete from movie_actors where movie_id = movieId;
+    Delete from movie_producers where movie_id = movieId;
+    Delete from movies where id = movieId;
+END //
+DELIMITER ;
