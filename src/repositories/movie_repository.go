@@ -23,7 +23,7 @@ type MovieRepo interface {
 	ValidateIfMovieExists(movieId *uuid.UUID) bool
 
 	GetActorsFromMovie(movieId *uuid.UUID) []*models.Actor
-	GetProducerFromMovie(movieId *uuid.UUID) *models.Producer
+	GetProducerFromMovie(movieId *uuid.UUID) []*models.Producer
 }
 
 type MovieRepository struct {
@@ -88,15 +88,68 @@ func (mr *MovieRepository) DeleteMovie(movieId *uuid.UUID) {
 	result, err := mr.DatabaseMgr.ExecuteStatement(fmt.Sprintf("DELETE FROM movies WHERE id = %s", movieId))
 	if err != nil {
 		log.Printf("Error while deleting movie: %v", err)
-		return 
+		return
 	}
 
 	if rowsAffected, err := result.RowsAffected(); rowsAffected == 0 {
 		log.Printf("Error while deleting movie: %v", err)
-		return 
+		return
 	}
 
 	return
+}
+
+func (mr *MovieRepository) ValidateIfMovieExists(movieId *uuid.UUID) bool {
+	query := fmt.Sprintf("SELECT COUNT(*) FROM movies WHERE id = %s", movieId)
+	row := mr.DatabaseMgr.ExecuteQueryRow(query)
+
+	var count int
+	if err := row.Scan(&count); err != nil {
+		log.Printf("Error while scanning movie: %v", err)
+		return false
+	}
+
+	return count > 0
+}
+
+func (mr *MovieRepository) GetActorsFromMovie(movieId *uuid.UUID) []*models.Actor {
+	query := fmt.Sprintf("select m.title, a.name from movie_actors as ma inner join movies m on ma.movie_id = m.id inner join actors a on ma.actor_id = a.id where m.id = %s;", movieId)
+	rows, err := mr.DatabaseMgr.ExecuteQuery(query)
+	if err != nil {
+		log.Printf("Error while querying actors: %v", err)
+		return nil
+	}
+	defer rows.Close()
+
+	return rowsToActorSchema(rows)
+}
+
+func (mr *MovieRepository) GetProducersFromMovie(movieId *uuid.UUID) []*models.Producer {
+	query := fmt.Sprintf("select m.title, a.name from movie_producers as mp inner join movies m on mp.movie_id = m.id inner join producers p on mp.actor_id = p.id where m.id = %s;", movieId)
+	rows, err := mr.DatabaseMgr.ExecuteQuery(query)
+	if err != nil {
+		log.Printf("Error while querying producers: %v", err)
+		return nil
+	}
+	defer rows.Close()
+
+	return rowsToProducerSchema(rows)
+}
+
+// rowsToMovieSchema converts a set of rows to a slice of MovieSchema
+func rowsToMovieSchema(rows *sql.Rows) []*models.Movie {
+	movies := make([]*models.Movie, 0) // It is important to initialize the slice with 0 length so that it is serialized to [] instead of null
+	for rows.Next() {
+		var movie models.Movie
+		err := rows.Scan(&movie.Id, &movie.Title, &movie.Description, &movie.ReleaseDate, &movie.TimeInMin, &movie.FSK, &movie.Genre)
+		if err != nil {
+			log.Printf("Error while scanning movie: %v", err)
+			return nil
+		}
+		movies = append(movies, &movie)
+	}
+
+	return movies
 }
 
 // rowToMovieSchema converts a row to a MovieSchema
@@ -114,18 +167,34 @@ func rowToMovieSchema(row *sql.Row) *models.Movie {
 	return &movie
 }
 
-// rowsToMovieSchema converts a set of rows to a slice of MovieSchema
-func rowsToMovieSchema(rows *sql.Rows) []*models.Movie {
-	movies := make([]*models.Movie, 0) // It is important to initialize the slice with 0 length so that it is serialized to [] instead of null
+// Method will be moved to actor repository
+func rowsToActorSchema(rows *sql.Rows) []*models.Actor {
+	actors := make([]*models.Actor, 0)
 	for rows.Next() {
-		var movie models.Movie
-		err := rows.Scan(&movie.Id, &movie.Title, &movie.Description, &movie.ReleaseDate, &movie.TimeInMin, &movie.FSK, &movie.Genre)
+		var actor models.Actor
+		err := rows.Scan(&actor.ID, &actor.Name, &actor.Age)
 		if err != nil {
 			log.Printf("Error while scanning movie: %v", err)
 			return nil
 		}
-		movies = append(movies, &movie)
+		actors = append(actors, &actor)
 	}
 
-	return movies
+	return actors
+}
+
+// Method will be moved to actor repository
+func rowsToProducerSchema(rows *sql.Rows) []*models.Producer {
+	producers := make([]*models.Producer, 0)
+	for rows.Next() {
+		var producer models.Producer
+		err := rows.Scan(&producer.ID, &producer.Name, &producer.Age)
+		if err != nil {
+			log.Printf("Error while scanning movie: %v", err)
+			return nil
+		}
+		producers = append(producers, &producer)
+	}
+
+	return producers
 }
