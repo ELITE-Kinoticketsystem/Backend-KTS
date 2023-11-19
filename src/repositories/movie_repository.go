@@ -34,7 +34,7 @@ func (mr *MovieRepository) GetMovies() []*models.Movie {
 	query := `SELECT m.id, m.title, m.description, m.releasedDate, m.timeInMin, f.age , g.name from movies m inner join genres g on m.genre_id = g.id inner join fsk f on m.fsk_id = f.id;`
 	rows, err := mr.DatabaseMgr.ExecuteQuery(query)
 	if err != nil {
-		log.Printf("Error while querying trips: %v", err)
+		log.Printf("Error while querying movies: %v", err)
 		return nil
 	}
 	defer rows.Close()
@@ -55,12 +55,12 @@ func (mr *MovieRepository) CreateMovie(movie *models.Movie) {
 	query := "INSERT INTO movies (title, description, releasedDate, timeInMin, fsk_id, genre_id) VALUES (" + insert_values + ");"
 	result, err := mr.DatabaseMgr.ExecuteStatement(query)
 	if err != nil {
-		log.Printf("Error while inserting trip: %v", err)
+		log.Printf("Error while inserting movie: %v", err)
 		return
 	}
 
 	if rowsAffected, err := result.RowsAffected(); rowsAffected == 0 {
-		log.Printf("Error while inserting trip: %v", err)
+		log.Printf("Error while inserting movie: %v", err)
 		return
 	}
 	return
@@ -72,13 +72,28 @@ func (mr *MovieRepository) UpdateMovie(movie *models.Movie) {
 	updateString := fmt.Sprintf("UPDATE movies SET title = %s, description = %s, releasedDate = %s, timeInMin = %d, fsk_id = %s, genre_id = %s WHERE id = %s", movie.Title, movie.Description, movie.ReleaseDate, movie.TimeInMin, movie.FSK, movie.Genre, movie.Id)
 	result, err := mr.DatabaseMgr.ExecuteStatement(updateString)
 	if err != nil {
-		log.Printf("Error while updating trip: %v", err)
+		log.Printf("Error while updating movie: %v", err)
 		return
 	}
 
 	if rowsAffected, err := result.RowsAffected(); rowsAffected == 0 {
-		log.Printf("Error while updating trip: %v", err)
+		log.Printf("Error while updating movie: %v", err)
 		return
+	}
+
+	return
+}
+
+func (mr *MovieRepository) DeleteMovie(movieId *uuid.UUID) {
+	result, err := mr.DatabaseMgr.ExecuteStatement(fmt.Sprintf("DELETE FROM movies WHERE id = %s", movieId))
+	if err != nil {
+		log.Printf("Error while deleting movie: %v", err)
+		return 
+	}
+
+	if rowsAffected, err := result.RowsAffected(); rowsAffected == 0 {
+		log.Printf("Error while deleting movie: %v", err)
+		return 
 	}
 
 	return
