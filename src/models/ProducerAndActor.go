@@ -1,9 +1,13 @@
 package models
 
 type Producer struct {
-	// TODO
+	ID   int    `json:"id"`
+	Name string `json:"name"`
+	Age  int    `json:"age"`
 }
 
 type Actor struct {
-	// TODO
+	ID   int    `json:"id"`
+	Name string `json:"name"`
+	Age  int    `json:"age"`
 }
