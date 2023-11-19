@@ -14,3 +14,16 @@ BEGIN
     VALUES (movieTitle, movieDescription, movieReleaseDate, movieTimeInMin, m_fsk_id, m_genre_id);
 END //
 DELIMITER ;
+
+DELIMITER //
+CREATE PROCEDURE getMovieById (IN movieId int)
+BEGIN
+    SELECT m.id, m.title, m.description, m.releasedDate, m.timeInMin, f.age , g.name 
+    from movies m 
+    inner join genres g 
+        on m.genre_id = g.id 
+    inner join fsk f 
+        on m.fsk_id = f.id 
+    where m.id = movieId;
+END //
+DELIMITER ;
