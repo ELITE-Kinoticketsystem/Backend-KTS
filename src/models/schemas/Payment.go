@@ -1,34 +1,8 @@
 package schemas
 
-type Payment struct {
-	PaymentMethod *PaymentMethod `json:"paymentMethod"`
-	Invoice       Invoice        `json:"Invoice"`
-}
+import "github.com/google/uuid"
 
 type PaymentMethod struct {
-	// TODO: information
-}
-
-type Mastercard struct {
-	PaymentMethod
-}
-
-type PayPal struct {
-	PaymentMethod
-}
-
-type ApplePay struct {
-	PaymentMethod
-}
-
-type Visa struct {
-	PaymentMethod
-}
-
-type Cash struct {
-	PaymentMethod
-}
-
-type Invoice struct {
-	// TODO:
+	Id     *uuid.UUID `json:"id"`
+	Method string     `json:"method"`
 }

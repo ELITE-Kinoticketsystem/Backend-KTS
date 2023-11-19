@@ -1,18 +1,20 @@
 package schemas
 
+import "github.com/google/uuid"
+
 type CinemaHall struct {
-	ID       int    `json:"id"`
-	Name     string `json:"name"`
-	Capacity int    `json:"capacity"`
-	Seats    []Seat `json:"seats"`
+	Id        *uuid.UUID `json:"id"`
+	Name      string     `json:"name"`
+	Capacity  int        `json:"capacity"`
+	TheatreId *uuid.UUID `json:"theatreId"`
 }
 
-
 type Seat struct {
-	ID           int          `json:"id"`
+	Id           *uuid.UUID   `json:"id"`
 	Row          int          `json:"row"`
 	Column       int          `json:"column"`
 	SeatCategory SeatCategory `json:"seatCategory"`
+	CinemaHallId *uuid.UUID   `json:"cinemaHallId"`
 }
 
 type SeatCategory string

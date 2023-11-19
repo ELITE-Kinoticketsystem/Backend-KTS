@@ -1,18 +1,24 @@
 package schemas
 
+import (
+	"time"
+
+	"github.com/google/uuid"
+)
+
 type Event struct {
-	Title   string    `json:"title"`
-	Start   string    `json:"start"` //TODO: fix datatype
-	End     string    `json:"end"`   //TODO: fix datatype
-	Tickets *[]Ticket `json:"tickets"`
+	Id           *uuid.UUID `json:"id"`
+	Title        string     `json:"title"`
+	EventType    EventType  `json:"eventType"`
+	Start        time.Time  `json:"start"`
+	End          time.Time  `json:"end"`
+	Price        int        `json:"price"` // requires conversion
+	CinemaHallId *uuid.UUID `json:"cinemaHallId"`
 }
 
-type SpecialEvent struct {
-	Event
-	Movies *[]Movie `json:"movies"`
-}
+type EventType string
 
-type Showing struct {
-	Event
-	Movie Movie `json:"movie"`
-}
+const (
+	Showing      EventType = "Showing"
+	SpecialEvent EventType = "SpecialEvent"
+)

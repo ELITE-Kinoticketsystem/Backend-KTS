@@ -1,9 +1,9 @@
 package schemas
 
+import "github.com/google/uuid"
+
 type Theatre struct {
-	ID                   int                   `json:"id"`
-	Name                 string                `json:"name"`
-	Address              Address               `json:"address"`
-	Theatres             []CinemaHall          `json:"theatres"`
-	PresentationSchedule *PresentationSchedule `json:"presentationSchedule"`
+	Id        *uuid.UUID `json:"id"`
+	Name      string     `json:"name"`
+	AddressId *uuid.UUID `json:"addressId"`
 }
