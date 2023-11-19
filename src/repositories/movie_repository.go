@@ -3,6 +3,7 @@ package repositories
 import (
 	"context"
 	"database/sql"
+	"log"
 
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/managers"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
@@ -42,19 +43,15 @@ func (mr *MovieRepository) GetMovieById(ctx context.Context, movieId *uuid.UUID)
 }
 
 func rowToMovieSchema(row *sql.Row) *models.Movie {
-	/*
-		trips := make([]*models.TripSchema, 0) // It is important to initialize the slice with 0 length so that it is serialized to [] instead of null
-		for rows.Next() {
-			var trip models.TripSchema
-			err := rows.Scan(&trip.TripID, &trip.Name, &trip.Description, &trip.Location, &trip.StartDate, &trip.EndDate)
-			if err != nil {
-				log.Printf("Error while scanning trip: %v", err)
-				return nil, expense_errors.EXPENSE_INTERNAL_ERROR
-			}
-			trips = append(trips, &trip)
+	movie := models.Movie{}
+	if err := row.Scan(&movie.Id, &movie.Title, &movie.Description, &movie.ReleaseDate, &movie.TimeInMin, &movie.FSK, &movie.Genre); err != nil {
+		if err == sql.ErrNoRows {
+			return nil
 		}
 
-		return trips, nil
-	*/
-	return nil
+		log.Printf("Error while scanning movie: %v", err)
+		return nil
+	}
+
+	return &movie
 }
