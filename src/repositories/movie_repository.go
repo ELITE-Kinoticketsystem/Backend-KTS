@@ -66,6 +66,24 @@ func (mr *MovieRepository) CreateMovie(movie *models.Movie) {
 	return
 }
 
+func (mr *MovieRepository) UpdateMovie(movie *models.Movie) {
+	// Update movie
+	// TODO need procedure because of fsk and genre id's
+	updateString := fmt.Sprintf("UPDATE movies SET title = %s, description = %s, releasedDate = %s, timeInMin = %d, fsk_id = %s, genre_id = %s WHERE id = %s", movie.Title, movie.Description, movie.ReleaseDate, movie.TimeInMin, movie.FSK, movie.Genre, movie.Id)
+	result, err := mr.DatabaseMgr.ExecuteStatement(updateString)
+	if err != nil {
+		log.Printf("Error while updating trip: %v", err)
+		return
+	}
+
+	if rowsAffected, err := result.RowsAffected(); rowsAffected == 0 {
+		log.Printf("Error while updating trip: %v", err)
+		return
+	}
+
+	return
+}
+
 // rowToMovieSchema converts a row to a MovieSchema
 func rowToMovieSchema(row *sql.Row) *models.Movie {
 	movie := models.Movie{}
