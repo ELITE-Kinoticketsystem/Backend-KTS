@@ -42,6 +42,7 @@ func (mr *MovieRepository) GetMovieById(ctx context.Context, movieId *uuid.UUID)
 	return rowToMovieSchema(row)
 }
 
+// rowToMovieSchema converts a row to a MovieSchema
 func rowToMovieSchema(row *sql.Row) *models.Movie {
 	movie := models.Movie{}
 	if err := row.Scan(&movie.Id, &movie.Title, &movie.Description, &movie.ReleaseDate, &movie.TimeInMin, &movie.FSK, &movie.Genre); err != nil {
@@ -54,4 +55,20 @@ func rowToMovieSchema(row *sql.Row) *models.Movie {
 	}
 
 	return &movie
+}
+
+// rowsToMovieSchema converts a set of rows to a slice of MovieSchema
+func rowsToMovieSchema(rows *sql.Rows) []*models.Movie {
+	movies := make([]*models.Movie, 0) // It is important to initialize the slice with 0 length so that it is serialized to [] instead of null
+	for rows.Next() {
+		var movie models.Movie
+		err := rows.Scan(&movie.Id, &movie.Title, &movie.Description, &movie.ReleaseDate, &movie.TimeInMin, &movie.FSK, &movie.Genre)
+		if err != nil {
+			log.Printf("Error while scanning movie: %v", err)
+			return nil
+		}
+		movies = append(movies, &movie)
+	}
+
+	return movies
 }
