@@ -1,8 +1,8 @@
 package repositories
 
 import (
-	"context"
 	"database/sql"
+	"fmt"
 	"log"
 
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/managers"
@@ -11,35 +11,59 @@ import (
 )
 
 type MovieRepo interface {
-	GetMovies(ctx context.Context) []*models.Movie
+	GetMovies() []*models.Movie
 
 	// CRUD
-	GetMovieById(ctx context.Context, movieId *uuid.UUID) *models.Movie
-	CreateMovie(ctx context.Context, movie *models.Movie) *models.Movie
-	UpdateMovie(ctx context.Context, movie *models.Movie) *models.Movie
-	DeleteMovie(ctx context.Context, movieId *uuid.UUID) *models.Movie
+	GetMovieById(movieId *uuid.UUID) *models.Movie
+	CreateMovie(movie *models.Movie) *models.Movie
+	UpdateMovie(movie *models.Movie) *models.Movie
+	DeleteMovie(movieId *uuid.UUID) *models.Movie
 
 	// Validation
-	ValidateIfMovieExists(ctx context.Context, movieId *uuid.UUID) bool
+	ValidateIfMovieExists(movieId *uuid.UUID) bool
 
-	GetActorsFromMovie(ctx context.Context, movieId *uuid.UUID) []*models.Actor
-	GetProducerFromMovie(ctx context.Context, movieId *uuid.UUID) *models.Producer
+	GetActorsFromMovie(movieId *uuid.UUID) []*models.Actor
+	GetProducerFromMovie(movieId *uuid.UUID) *models.Producer
 }
 
 type MovieRepository struct {
 	DatabaseMgr managers.DatabaseManagerI
 }
 
-func (mr *MovieRepository) GetMovies(ctx context.Context) []*models.Movie {
-	return nil
+func (mr *MovieRepository) GetMovies() []*models.Movie {
+	query := `SELECT m.id, m.title, m.description, m.releasedDate, m.timeInMin, f.age , g.name from movies m inner join genres g on m.genre_id = g.id inner join fsk f on m.fsk_id = f.id;`
+	rows, err := mr.DatabaseMgr.ExecuteQuery(query)
+	if err != nil {
+		log.Printf("Error while querying trips: %v", err)
+		return nil
+	}
+	defer rows.Close()
+
+	return rowsToMovieSchema(rows)
 }
 
-func (mr *MovieRepository) GetMovieById(ctx context.Context, movieId *uuid.UUID) *models.Movie {
+func (mr *MovieRepository) GetMovieById(movieId *uuid.UUID) *models.Movie {
 	// Maybe use procedure
 	query := `SELECT m.id, m.title, m.description, m.releasedDate, m.timeInMin, f.age , g.name from movies m inner join genres g on m.genre_id = g.id inner join fsk f on m.fsk_id = f.id where m.id = ?;` + movieId.String()
 	row := mr.DatabaseMgr.ExecuteQueryRow(query)
-	// return rowToTripSchema(row)
 	return rowToMovieSchema(row)
+}
+
+func (mr *MovieRepository) CreateMovie(movie *models.Movie) {
+	// TODO need procedure because of fsk and genre id's
+	insert_values := fmt.Sprintf("%s, %s, %s, %d, %s, %s", movie.Title, movie.Description, movie.ReleaseDate, movie.TimeInMin, movie.FSK, movie.Genre)
+	query := "INSERT INTO movies (title, description, releasedDate, timeInMin, fsk_id, genre_id) VALUES (" + insert_values + ");"
+	result, err := mr.DatabaseMgr.ExecuteStatement(query)
+	if err != nil {
+		log.Printf("Error while inserting trip: %v", err)
+		return
+	}
+
+	if rowsAffected, err := result.RowsAffected(); rowsAffected == 0 {
+		log.Printf("Error while inserting trip: %v", err)
+		return
+	}
+	return
 }
 
 // rowToMovieSchema converts a row to a MovieSchema
