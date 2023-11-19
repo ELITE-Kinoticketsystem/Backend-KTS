@@ -29,6 +29,18 @@ END //
 DELIMITER ;
 
 DELIMITER //
+CREATE PROCEDURE getMovies ()
+BEGIN
+    SELECT m.id, m.title, m.description, m.releasedDate, m.timeInMin, f.age , g.name 
+    from movies m 
+    inner join genres g 
+        on m.genre_id = g.id 
+    inner join fsk f 
+        on m.fsk_id = f.id;
+END //
+DELIMITER ;
+
+DELIMITER //
 CREATE PROCEDURE getActorsFromMovie (IN movieId int)
 BEGIN
     select m.title, a.name 
