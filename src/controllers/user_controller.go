@@ -18,34 +18,33 @@ type UserController struct {
 }
 
 func (uc *UserController) RegisterUser(registrationData models.RegistrationRequest) *models.KTSError {
-	userId := uuid.New();
-
+	userId := uuid.New()
 
 	hash, err := utils.HashPassword(registrationData.Password)
 	if err != nil {
-		return errors.KTS_UPSTREAM_ERROR;	
+		return kts_errors.KTS_UPSTREAM_ERROR
 	}
 
 	exists, err := uc.UserRepo.CheckIfEmailExists(registrationData.Email)
 	if err != nil {
-		return errors.KTS_INTERNAL_ERROR;
+		return kts_errors.KTS_INTERNAL_ERROR
 	}
 	if exists {
-		return errors.KTS_EMAIL_EXISTS
+		return kts_errors.KTS_EMAIL_EXISTS
 	}
 
 	user := schemas.User{
-		Id: &userId,
+		Id:        &userId,
 		FirstName: "",
-		LastName: "",
-		Email: registrationData.Email,
-		Password: string(hash),
+		LastName:  "",
+		Email:     registrationData.Email,
+		Password:  string(hash),
 		/* Address */
 	}
 
-	err = uc.UserRepo.CreateUser(user);
+	err = uc.UserRepo.CreateUser(user)
 	if err != nil {
-		return errors.KTS_INTERNAL_ERROR
+		return kts_errors.KTS_INTERNAL_ERROR
 	}
-	return nil;
+	return nil
 }

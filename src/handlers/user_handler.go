@@ -19,8 +19,8 @@ func RegisterUserHandler(userCtrl controllers.UserControllerI) gin.HandlerFunc {
 		if err != nil ||
 			utils.ContainsEmptyString(
 				registrationData.Username, registrationData.Email, registrationData.Password,
-				) {
-			utils.HandleErrorAndAbort(c, *errors.KTS_BAD_REQUEST)
+			) {
+			utils.HandleErrorAndAbort(c, *kts_errors.KTS_BAD_REQUEST)
 			return
 		}
 		kts_err := userCtrl.RegisterUser(registrationData)
