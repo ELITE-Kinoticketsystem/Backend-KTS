@@ -1,6 +1,7 @@
 package main
 
 import (
+	"database/sql"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -11,7 +12,7 @@ import (
 func TestLifeCheckRoute(t *testing.T) {
 	// GIVEN
 	// Initialize the router
-	router := createRouter()
+	router := createRouter(new(sql.DB)) // sufficient for this case, as no db is used
 
 	// Create a new HTTP request
 	req, err := http.NewRequest(http.MethodGet, "/lifecheck", nil)
