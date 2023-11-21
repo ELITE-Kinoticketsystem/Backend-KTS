@@ -22,7 +22,7 @@ func main() {
 	const port = "8080"
 
 	server := &http.Server{
-		Addr:              "localhost:" + port,
+		Addr:              ":" + port,
 		Handler:           router,
 		ReadHeaderTimeout: 3 * time.Second,
 	}
