@@ -33,6 +33,5 @@ func (m UserMatcher) String() string {
 }
 
 func EqUserMatcher(u schemas.User, password string) UserMatcher {
-	fmt.Println(u)
 	return UserMatcher{user: u, password: password}
 }
