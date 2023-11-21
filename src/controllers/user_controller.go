@@ -35,10 +35,10 @@ func (uc *UserController) RegisterUser(registrationData models.RegistrationReque
 
 	user := schemas.User{
 		Id:        &userId,
-		FirstName: "",
-		LastName:  "",
 		Email:     registrationData.Email,
 		Password:  string(hash),
+		FirstName: registrationData.FirstName,
+		LastName:  registrationData.LastName,
 		/* Address */
 	}
 

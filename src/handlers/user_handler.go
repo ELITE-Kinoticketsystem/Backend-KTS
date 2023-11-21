@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"log"
 	"net/http"
 
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/controllers"
@@ -15,10 +14,10 @@ func RegisterUserHandler(userCtrl controllers.UserControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var registrationData models.RegistrationRequest
 		err := c.ShouldBind(&registrationData)
-		log.Println(registrationData)
 		if err != nil ||
 			utils.ContainsEmptyString(
 				registrationData.Username, registrationData.Email, registrationData.Password,
+				registrationData.FirstName, registrationData.LastName,
 			) {
 			utils.HandleErrorAndAbort(c, *kts_errors.KTS_BAD_REQUEST)
 			return
@@ -29,6 +28,6 @@ func RegisterUserHandler(userCtrl controllers.UserControllerI) gin.HandlerFunc {
 			return
 		}
 
-		c.AbortWithStatus(http.StatusCreated)
+		c.JSON(http.StatusCreated, "")
 	}
 }
