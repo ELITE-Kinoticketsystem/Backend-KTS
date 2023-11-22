@@ -34,11 +34,12 @@ func (uc *UserController) RegisterUser(registrationData models.RegistrationReque
 
 	user := schemas.User{
 		Id:        &userId,
+		Username: registrationData.Username,
 		Email:     registrationData.Email,
 		Password:  string(hash),
 		FirstName: registrationData.FirstName,
 		LastName:  registrationData.LastName,
-		/* Address */
+		/* AddressId */
 	}
 
 	err = uc.UserRepo.CreateUser(user)
