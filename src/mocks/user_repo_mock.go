@@ -11,6 +11,7 @@ package mocks
 import (
 	reflect "reflect"
 
+	models "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
 	schemas "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models/schemas"
 	gomock "go.uber.org/mock/gomock"
 )
@@ -39,12 +40,11 @@ func (m *MockUserRepositoryI) EXPECT() *MockUserRepositoryIMockRecorder {
 }
 
 // CheckIfEmailExists mocks base method.
-func (m *MockUserRepositoryI) CheckIfEmailExists(email string) (bool, error) {
+func (m *MockUserRepositoryI) CheckIfEmailExists(email string) *models.KTSError {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CheckIfEmailExists", email)
-	ret0, _ := ret[0].(bool)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
+	ret0, _ := ret[0].(*models.KTSError)
+	return ret0
 }
 
 // CheckIfEmailExists indicates an expected call of CheckIfEmailExists.
@@ -54,12 +54,11 @@ func (mr *MockUserRepositoryIMockRecorder) CheckIfEmailExists(email any) *gomock
 }
 
 // CheckIfUsernameExists mocks base method.
-func (m *MockUserRepositoryI) CheckIfUsernameExists(username string) (bool, error) {
+func (m *MockUserRepositoryI) CheckIfUsernameExists(username string) *models.KTSError {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CheckIfUsernameExists", username)
-	ret0, _ := ret[0].(bool)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
+	ret0, _ := ret[0].(*models.KTSError)
+	return ret0
 }
 
 // CheckIfUsernameExists indicates an expected call of CheckIfUsernameExists.

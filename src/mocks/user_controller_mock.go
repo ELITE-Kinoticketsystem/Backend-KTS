@@ -38,6 +38,34 @@ func (m *MockUserControllerI) EXPECT() *MockUserControllerIMockRecorder {
 	return m.recorder
 }
 
+// CheckEmail mocks base method.
+func (m *MockUserControllerI) CheckEmail(email string) *models.KTSError {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CheckEmail", email)
+	ret0, _ := ret[0].(*models.KTSError)
+	return ret0
+}
+
+// CheckEmail indicates an expected call of CheckEmail.
+func (mr *MockUserControllerIMockRecorder) CheckEmail(email any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CheckEmail", reflect.TypeOf((*MockUserControllerI)(nil).CheckEmail), email)
+}
+
+// CheckUsername mocks base method.
+func (m *MockUserControllerI) CheckUsername(username string) *models.KTSError {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CheckUsername", username)
+	ret0, _ := ret[0].(*models.KTSError)
+	return ret0
+}
+
+// CheckUsername indicates an expected call of CheckUsername.
+func (mr *MockUserControllerIMockRecorder) CheckUsername(username any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CheckUsername", reflect.TypeOf((*MockUserControllerI)(nil).CheckUsername), username)
+}
+
 // RegisterUser mocks base method.
 func (m *MockUserControllerI) RegisterUser(registrationData models.RegistrationRequest) *models.KTSError {
 	m.ctrl.T.Helper()

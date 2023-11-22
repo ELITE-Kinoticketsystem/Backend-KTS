@@ -9,155 +9,210 @@ import (
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models/schemas"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
+	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
 )
 
-func TestControllerRegisterEmailExists(t *testing.T) {
-	// GIVEN
-	// create mock user repo
-	mockCtrl := gomock.NewController(t)
-	defer mockCtrl.Finish()
-	userRepoMock := mocks.NewMockUserRepositoryI(mockCtrl)
-	userController := UserController{
-		UserRepo: userRepoMock,
+func TestControllerRegister(t *testing.T) {
+	testCases := []struct {
+		name             string
+		registrationData models.RegistrationRequest
+		setExpectations  func(mockRepo mocks.MockUserRepositoryI, registrationData models.RegistrationRequest)
+		expectedError    *models.KTSError
+	}{
+		{
+			name:             "Email exists",
+			registrationData: getSampleRegistratonData(),
+			setExpectations: func(mockRepo mocks.MockUserRepositoryI, registrationData models.RegistrationRequest) {
+				mockRepo.EXPECT().CheckIfEmailExists(registrationData.Email).Return(kts_errors.KTS_EMAIL_EXISTS)
+			},
+			expectedError: kts_errors.KTS_EMAIL_EXISTS,
+		},
+		{
+			name:             "Email internal error",
+			registrationData: getSampleRegistratonData(),
+			setExpectations: func(mockRepo mocks.MockUserRepositoryI, registrationData models.RegistrationRequest) {
+				mockRepo.EXPECT().CheckIfEmailExists(registrationData.Email).Return(kts_errors.KTS_INTERNAL_ERROR)
+			},
+			expectedError: kts_errors.KTS_INTERNAL_ERROR,
+		},
+		{
+			name:             "create user internal error",
+			registrationData: getSampleRegistratonData(),
+			setExpectations: func(mockRepo mocks.MockUserRepositoryI, registrationData models.RegistrationRequest) {
+				user := schemas.User{
+					/* Id */
+					Username: registrationData.Username,
+					Email:     registrationData.Email,
+					Password:  registrationData.Password,
+					FirstName: registrationData.FirstName,
+					LastName:  registrationData.LastName,
+					/* AddressId */
+				}
+
+				mockRepo.EXPECT().CheckIfEmailExists(registrationData.Email).Return(nil)
+				mockRepo.EXPECT().CreateUser(utils.EqUserMatcher(user, registrationData.Password)).Return(errors.New(""))
+
+			},
+			expectedError: kts_errors.KTS_INTERNAL_ERROR,
+		},
+		{
+			name:             "success",
+			registrationData: getSampleRegistratonData(),
+			setExpectations: func(mockRepo mocks.MockUserRepositoryI, registrationData models.RegistrationRequest) {
+				user := schemas.User{
+					/* Id */
+					Username: registrationData.Username,
+					Email:     registrationData.Email,
+					Password:  registrationData.Password,
+					FirstName: registrationData.FirstName,
+					LastName:  registrationData.LastName,
+					/* AddressId */
+				}
+
+				mockRepo.EXPECT().CheckIfEmailExists(registrationData.Email).Return(nil)
+				mockRepo.EXPECT().CreateUser(utils.EqUserMatcher(user, registrationData.Password)).Return(nil)
+			},
+			expectedError: nil,
+		},
 	}
 
-	// create mock data
-	var registrationData = models.RegistrationRequest{
-		Username: "Colllinho el niño",
-		Email:    "collin.forslund@gmail.com",
-		Password: "Passwort",
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			// GIVEN
+			// create mock user repo
+			mockCtrl := gomock.NewController(t)
+			defer mockCtrl.Finish()
+			userRepoMock := mocks.NewMockUserRepositoryI(mockCtrl)
+			userController := UserController{
+				UserRepo: userRepoMock,
+			}
+
+			// create mock data
+			registrationData := tc.registrationData
+
+			// define expectations
+			tc.setExpectations(*userRepoMock, registrationData)
+
+			// WHEN
+			// call RegisterUser with registrationData
+			err := userController.RegisterUser(registrationData)
+
+			// THEN
+			// check expected error
+			assert.Equal(t, err, tc.expectedError, "wrong error")
+		})
 	}
 
-	// define expectations
-	userRepoMock.EXPECT().CheckIfEmailExists("collin.forslund@gmail.com").Return(true, nil)
-
-	// WHEN
-	// call RegisterUser with registrationData
-	err := userController.RegisterUser(registrationData)
-
-	// THEN
-	// check expected error
-	if err != kts_errors.KTS_EMAIL_EXISTS {
-		t.Fail()
-	}
 }
 
-func TestControllerRegisterEmailError(t *testing.T) {
-	// GIVEN
-	// create mock user repo
-	mockCtrl := gomock.NewController(t)
-	defer mockCtrl.Finish()
-	userRepoMock := mocks.NewMockUserRepositoryI(mockCtrl)
-	userController := UserController{
-		UserRepo: userRepoMock,
+func TestControllerCheckEmail(t *testing.T) {
+	testCases := []struct {
+		name            string
+		email           string
+		setExpectations func(mockRepo mocks.MockUserRepositoryI, email string)
+		expectedError   *models.KTSError
+	}{
+		{
+			name:  "Email exists",
+			email: "collin.forslund@gmail.com",
+			setExpectations: func(mockRepo mocks.MockUserRepositoryI, email string) {
+				mockRepo.EXPECT().CheckIfEmailExists(email).Return(kts_errors.KTS_EMAIL_EXISTS)
+			},
+			expectedError: kts_errors.KTS_EMAIL_EXISTS,
+		},
+		{
+			name:  "Internal error",
+			email: "collin.forslund@gmail.com",
+			setExpectations: func(mockRepo mocks.MockUserRepositoryI, email string) {
+				mockRepo.EXPECT().CheckIfEmailExists(email).Return(kts_errors.KTS_INTERNAL_ERROR)
+			},
+			expectedError: kts_errors.KTS_INTERNAL_ERROR,
+		},
 	}
 
-	// create mock data
-	var registrationData = models.RegistrationRequest{
-		Username: "Colllinho el niño",
-		Email:    "collin.forslund@gmail.com",
-		Password: "Passwort",
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			// GIVEN
+			// create mock user repo
+			mockCtrl := gomock.NewController(t)
+			defer mockCtrl.Finish()
+			userRepoMock := mocks.NewMockUserRepositoryI(mockCtrl)
+			userController := UserController{
+				UserRepo: userRepoMock,
+			}
+
+			// define expectations
+			tc.setExpectations(*userRepoMock, tc.email)
+
+			// WHEN
+			// call RegisterUser with registrationData
+			err := userController.CheckEmail(tc.email)
+
+			// THEN
+			// check expected error
+			assert.Equal(t, err, tc.expectedError, "wrong error")
+		})
 	}
 
-	// define expectations
-	userRepoMock.EXPECT().CheckIfEmailExists("collin.forslund@gmail.com").Return(false, errors.New(""))
-
-	// WHEN
-	// call RegisterUser with registrationData
-	err := userController.RegisterUser(registrationData)
-
-	// THEN
-	// check expected error
-	if err != kts_errors.KTS_INTERNAL_ERROR {
-		t.Fail()
-	}
 }
 
-func TestControllerRegisterEmailDoesntExist(t *testing.T) {
-	// GIVEN
-	// create mock user repo
-	mockCtrl := gomock.NewController(t)
-	defer mockCtrl.Finish()
-	userRepoMock := mocks.NewMockUserRepositoryI(mockCtrl)
-	userController := &UserController{
-		UserRepo: userRepoMock,
+func TestControllerCheckUsername(t *testing.T) {
+	testCases := []struct {
+		name            string
+		username        string
+		setExpectations func(mockRepo mocks.MockUserRepositoryI, email string)
+		expectedError   *models.KTSError
+	}{
+		{
+			name:     "Email exists",
+			username: "Colllinho el niño",
+			setExpectations: func(mockRepo mocks.MockUserRepositoryI, email string) {
+				mockRepo.EXPECT().CheckIfUsernameExists(email).Return(kts_errors.KTS_EMAIL_EXISTS)
+			},
+			expectedError: kts_errors.KTS_EMAIL_EXISTS,
+		},
+		{
+			name:     "Internal error",
+			username: "Colllinho el niño",
+			setExpectations: func(mockRepo mocks.MockUserRepositoryI, email string) {
+				mockRepo.EXPECT().CheckIfUsernameExists(email).Return(kts_errors.KTS_INTERNAL_ERROR)
+			},
+			expectedError: kts_errors.KTS_INTERNAL_ERROR,
+		},
 	}
 
-	// create mock data
-	var registrationData = models.RegistrationRequest{
-		Username: "Colllinho el niño",
-		Email:    "collin.forslund@gmail.com",
-		Password: "Passwort",
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			// GIVEN
+			// create mock user repo
+			mockCtrl := gomock.NewController(t)
+			defer mockCtrl.Finish()
+			userRepoMock := mocks.NewMockUserRepositoryI(mockCtrl)
+			userController := UserController{
+				UserRepo: userRepoMock,
+			}
+
+			// define expectations
+			tc.setExpectations(*userRepoMock, tc.username)
+
+			// WHEN
+			// call RegisterUser with registrationData
+			err := userController.CheckUsername(tc.username)
+
+			// THEN
+			// check expected error
+			assert.Equal(t, err, tc.expectedError, "wrong error")
+		})
+	}
+
+}
+func getSampleRegistratonData() models.RegistrationRequest {
+	return models.RegistrationRequest{
+		Username:  "Colllinho el niño",
+		Email:     "collin.forslund@gmail.com",
+		Password:  "Passwort",
 		FirstName: "Collin",
-		LastName: "Forslund",
-	}
-
-	// define expectations
-	user := schemas.User{
-		/* Id */
-		FirstName: registrationData.FirstName,
-		LastName: registrationData.LastName,
-		Email: registrationData.Email,
-		Age: 0,
-		Password: registrationData.Password,
-		/* Address*/
-	}
-
-	userRepoMock.EXPECT().CheckIfEmailExists("collin.forslund@gmail.com").Return(false, nil)
-	userRepoMock.EXPECT().CreateUser(utils.EqUserMatcher(user, registrationData.Password)).Return(nil)
-
-	// WHEN
-	// call RegisterUser with registrationData
-	err := userController.RegisterUser(registrationData)
-
-	// THEN
-	// check expected error
-	if err == kts_errors.KTS_EMAIL_EXISTS {
-		t.Fail()
-	}
-}
-
-func TestControllerRegisterDBError(t *testing.T) {
-	// GIVEN
-	// create mock user repo
-	mockCtrl := gomock.NewController(t)
-	defer mockCtrl.Finish()
-	userRepoMock := mocks.NewMockUserRepositoryI(mockCtrl)
-	userController := &UserController{
-		UserRepo: userRepoMock,
-	}
-
-	// create mock data
-	var registrationData = models.RegistrationRequest{
-		Username: "Colllinho el niño",
-		Email:    "collin.forslund@gmail.com",
-		Password: "Passwort",
-		FirstName: "Collin",
-		LastName: "Forslund",
-	}
-
-	// define expectations
-	user := schemas.User{
-		/* Id */
-		FirstName: registrationData.FirstName,
-		LastName: registrationData.LastName,
-		Email: registrationData.Email,
-		Age: 0,
-		Password: registrationData.Password,
-		/* Address*/
-	}
-
-	userRepoMock.EXPECT().CheckIfEmailExists("collin.forslund@gmail.com").Return(false, nil)
-	userRepoMock.EXPECT().CreateUser(utils.EqUserMatcher(user, registrationData.Password)).Return(errors.New(""))
-
-	// WHEN
-	// call RegisterUser with registrationData
-	err := userController.RegisterUser(registrationData)
-
-	// THEN
-	// check expected error
-	if err != kts_errors.KTS_INTERNAL_ERROR {
-		t.Fail()
+		LastName:  "Forslund",
 	}
 }
