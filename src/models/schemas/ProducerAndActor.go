@@ -13,3 +13,13 @@ type Actor struct {
 	Name string     `json:"name"`
 	Age  int        `json:"age"`
 }
+
+type MovieActors struct {
+	MovieId *uuid.UUID `json:"movieId"`
+	ActorId *uuid.UUID `json:"actorId"`
+}
+
+type MovieProducers struct {
+	MovieId    *uuid.UUID `json:"movieId"`
+	ProducerId *uuid.UUID `json:"producerId"`
+}

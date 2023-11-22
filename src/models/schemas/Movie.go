@@ -1,17 +1,22 @@
 package schemas
 
-import "github.com/google/uuid"
+import (
+	"time"
+
+	"github.com/google/uuid"
+)
 
 type Movie struct {
 	Id          *uuid.UUID `json:"id"`
 	Title       string     `json:"title"`
 	Description string     `json:"description"`
-	ReleaseDate string     `json:"releaseDate"`
+	ReleaseDate time.Time  `json:"releaseDate"`
 	TimeInMin   int        `json:"timeInMin"`
-	FskId       *uuid.UUID `json:"fskId"`
+	Fsk         int        `json:"fsk"`
+	GenreId     *uuid.UUID `json:"genreId"`
 }
 
-type FSK struct {
-	Id  *uuid.UUID `json:"id"`
-	Age int        `json:"age"`
+type Genre struct {
+	Id        *uuid.UUID `json:"id"`
+	GenreName string     `json:"genreName"`
 }

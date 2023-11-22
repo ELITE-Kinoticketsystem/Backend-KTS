@@ -1,16 +1,18 @@
 package schemas
 
 import (
-	//"time"
-
 	"github.com/google/uuid"
 )
 
 type Order struct {
 	Id              *uuid.UUID `json:"id"`
-	Total           int        `json:"total"` // requires conversion
-	TicketId        *uuid.UUID `json:"ticketId"`
+	TotalPrice      int        `json:"total"` // requires conversion
+	IsPaid          bool       `json:"isPaid"`
 	PaymentMethodId *uuid.UUID `json:"paymentMethodId"`
-	Reservation     bool       `json:"reservation"` // orderType would be better
-	Booking         bool       `json:"booking"`
+	UserId          *uuid.UUID `json:"userId"`
+}
+
+type PaymentMethod struct {
+	Id         *uuid.UUID `json:"id"`
+	MethodName string     `json:"method"`
 }
