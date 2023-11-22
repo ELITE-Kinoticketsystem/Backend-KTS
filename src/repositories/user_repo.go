@@ -1,14 +1,16 @@
 package repositories
 
 import (
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/managers"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models/schemas"
 )
 
 type UserRepositoryI interface {
 	CreateUser(user schemas.User) error
-	CheckIfUsernameExists(username string) (bool, error)
-	CheckIfEmailExists(email string) (bool, error)
+	CheckIfUsernameExists(username string) *models.KTSError
+	CheckIfEmailExists(email string) *models.KTSError
 }
 
 type UserRepository struct {
@@ -23,30 +25,28 @@ func (ur *UserRepository) CreateUser(user schemas.User) error {
 	return err
 }
 
-func (ur *UserRepository) CheckIfUsernameExists(username string) (bool, error) {
-	// not implemented, no username in database schema
-	return false, nil
+func (ur *UserRepository) CheckIfUsernameExists(username string) *models.KTSError {
+	exists, err := ur.DatabaseManager.CheckIfExists(
+		"SELECT COUNT(*) FROM users WHERE username = ?", username,
+	)
+	if err != nil {
+		return kts_errors.KTS_INTERNAL_ERROR
+	}
+	if exists {
+		return kts_errors.KTS_USERNAME_EXISTS
+	}
+	return nil
 }
 
-func (ur *UserRepository) CheckIfEmailExists(email string) (bool, error) {
+func (ur *UserRepository) CheckIfEmailExists(email string) *models.KTSError {
 	exists, err := ur.DatabaseManager.CheckIfExists(
 		"SELECT COUNT(*) FROM users WHERE email = ?", email,
 	)
 	if err != nil {
-		return false, err
+		return kts_errors.KTS_INTERNAL_ERROR
 	}
-	return exists, nil
-}
-
-
-type UserRepositoryMock struct {
-	UserRepository
-}
-
-func (ur UserRepositoryMock) CheckIfEmailExists(email string) (bool, error) {
-	return email == "exists@email.com", nil
-}
-
-func (ur *UserRepositoryMock) CreateUser(user schemas.User) error {
+	if exists {
+		return kts_errors.KTS_EMAIL_EXISTS
+	}
 	return nil
 }

@@ -11,6 +11,8 @@ import (
 
 type UserControllerI interface {
 	RegisterUser(registrationData models.RegistrationRequest) *models.KTSError
+	CheckEmail(email string) *models.KTSError
+	CheckUsername(username string) *models.KTSError
 }
 
 type UserController struct {
@@ -25,12 +27,9 @@ func (uc *UserController) RegisterUser(registrationData models.RegistrationReque
 		return kts_errors.KTS_UPSTREAM_ERROR
 	}
 
-	exists, err := uc.UserRepo.CheckIfEmailExists(registrationData.Email)
-	if err != nil {
-		return kts_errors.KTS_INTERNAL_ERROR
-	}
-	if exists {
-		return kts_errors.KTS_EMAIL_EXISTS
+	kts_err := uc.UserRepo.CheckIfEmailExists(registrationData.Email)
+	if kts_err != nil {
+		return kts_err
 	}
 
 	user := schemas.User{
@@ -47,4 +46,12 @@ func (uc *UserController) RegisterUser(registrationData models.RegistrationReque
 		return kts_errors.KTS_INTERNAL_ERROR
 	}
 	return nil
+}
+
+func (uc *UserController) CheckEmail(email string) *models.KTSError {
+	return uc.UserRepo.CheckIfEmailExists(email)
+}
+
+func (uc *UserController) CheckUsername(username string) *models.KTSError {
+	return uc.UserRepo.CheckIfUsernameExists(username)
 }
