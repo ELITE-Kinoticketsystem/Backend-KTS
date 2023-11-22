@@ -25,3 +25,7 @@ go.work
 
 go.mod
 go.sum
+
+# editor/IDE directories
+.vscode
+.idea
