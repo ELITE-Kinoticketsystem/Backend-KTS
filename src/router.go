@@ -42,6 +42,8 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 	router.Handle(http.MethodGet, "/lifecheck", handlers.LifeCheckHandler())
 
 	router.Handle(http.MethodPost, "/auth/register", handlers.RegisterUserHandler(controller.UserController))
+	router.Handle(http.MethodPost, "/auth/check-email", handlers.CheckEmailHandler(controller.UserController))
+	router.Handle(http.MethodPost, "/auth/check-username", handlers.CheckUsernameHandler(controller.UserController))
 
 	return router
 }
