@@ -7,12 +7,13 @@ import (
 )
 
 type Event struct {
-	Id           *uuid.UUID `json:"id"`
-	Title        string     `json:"title"`
-	Start        time.Time  `json:"start"`
-	End          time.Time  `json:"end"`
-	EventTypeId  *uuid.UUID `json:"eventTypeId"`
-	CinemaHallId *uuid.UUID `json:"cinemaHallId"`
+	Id                  *uuid.UUID `json:"id"`
+	Title               string     `json:"title"`
+	Start               time.Time  `json:"start"`
+	End                 time.Time  `json:"end"`
+	EventTypeId         *uuid.UUID `json:"eventTypeId"`
+	CinemaHallId        *uuid.UUID `json:"cinemaHallId"`
+	EventSeatCategoryId *uuid.UUID `json:"eventMovieId"`
 }
 
 type EventType struct {
