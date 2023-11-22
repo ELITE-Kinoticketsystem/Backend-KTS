@@ -10,7 +10,6 @@ type User struct {
 	FirstName  string     `json:"firstName"`
 	LastName   string     `json:"lastName"`
 	AddressId  *uuid.UUID `json:"addressId"`
-	UserTypeId *uuid.UUID `json:"userTypeId"`
 }
 
 type UserMovies struct {
