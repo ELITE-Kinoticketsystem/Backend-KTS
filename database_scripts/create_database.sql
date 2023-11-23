@@ -51,7 +51,7 @@ CREATE TABLE movies
      id           BINARY(16) DEFAULT (Uuid_to_bin(Uuid(), 1)),
      title        VARCHAR(255) NOT NULL,
      description  VARCHAR(255) NOT NULL,
-     release_date DateTime NOT NULL,
+     release_date Date NOT NULL,
      time_in_min  INT NOT NULL,
      fsk          INT NOT NULL,
      PRIMARY KEY (id)
