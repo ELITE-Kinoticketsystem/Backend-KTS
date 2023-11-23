@@ -47,6 +47,7 @@ func CheckEmailHandler(userCtrl controllers.UserControllerI) gin.HandlerFunc {
 		err := userCtrl.CheckEmail(requestData.Email)
 		if err != nil {
 			utils.HandleErrorAndAbort(c, *err)
+			return
 		}
 
 		c.JSON(http.StatusOK, "")
@@ -68,6 +69,7 @@ func CheckUsernameHandler(userCtrl controllers.UserControllerI) gin.HandlerFunc 
 		err := userCtrl.CheckUsername(requestData.Username)
 		if err != nil {
 			utils.HandleErrorAndAbort(c, *err)
+			return
 		}
 
 		c.JSON(http.StatusOK, "")
