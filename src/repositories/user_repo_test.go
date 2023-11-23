@@ -24,7 +24,7 @@ func TestCreateUser(t *testing.T) {
 			data: getSampleUser(),
 			setExpectations: func(mock sqlmock.Sqlmock, user *schemas.User) {
 				mock.ExpectExec("INSERT INTO users").WithArgs(
-					user.Id, user.Username, user.Email, user.Password, user.FirstName, user.LastName, user.AddressId,
+					user.Id, user.Username, user.Email, user.Password, user.FirstName, user.LastName,
 				).WillReturnResult(sqlmock.NewResult(1, 1))
 			},
 			expectedError: nil,
@@ -34,7 +34,7 @@ func TestCreateUser(t *testing.T) {
 			data: getSampleUser(),
 			setExpectations: func(mock sqlmock.Sqlmock, user *schemas.User) {
 				mock.ExpectExec("INSERT INTO users").WithArgs(
-					user.Id, user.Username, user.Email, user.Password, user.FirstName, user.LastName, user.AddressId,
+					user.Id, user.Username, user.Email, user.Password, user.FirstName, user.LastName,
 				).WillReturnError(sqlmock.ErrCancelled)
 			},
 			expectedError: kts_errors.KTS_INTERNAL_ERROR,
