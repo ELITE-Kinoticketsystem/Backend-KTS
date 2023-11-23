@@ -13,10 +13,14 @@ type Movie struct {
 	ReleaseDate time.Time  `json:"releaseDate"`
 	TimeInMin   int        `json:"timeInMin"`
 	Fsk         int        `json:"fsk"`
-	GenreId     *uuid.UUID `json:"genreId"`
 }
 
 type Genre struct {
 	Id        *uuid.UUID `json:"id"`
 	GenreName string     `json:"genreName"`
+}
+
+type MovieGenre struct {
+	MovieId *uuid.UUID `json:"movieId"`
+	GenreId *uuid.UUID `json:"genreId"`
 }
