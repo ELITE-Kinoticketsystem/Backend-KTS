@@ -1,221 +1,256 @@
--- To access mysql through command-line: /Applications/xampp/xamppfiles/bin/mysql -u root
+DROP DATABASE IF EXISTS KinoTicketSystem;
+CREATE DATABASE IF NOT EXISTS KinoTicketSystem;
+USE KinoTicketSystem;
 
-Create database if not EXISTS KinoTicketSystem;
-Use KinoTicketSystem;
 
--- Order of dropping matters because of foreign keys
-DROP TABLE IF EXISTS movie_actors;
-DROP TABLE IF EXISTS movie_producers;
-DROP TABLE IF EXISTS actors;
-DROP TABLE IF EXISTS producers;
-DROP TABLE IF EXISTS user_movies;
-DROP TABLE IF EXISTS showings;
-DROP TABLE IF EXISTS movies;
-DROP TABLE IF EXISTS fsk;
-DROP TABLE IF EXISTS genres;
-DROP TABLE IF EXISTS users;
-DROP TABLE IF EXISTS user_types;
+DROP TABLE IF EXISTS tickets;
+DROP TABLE IF EXISTS event_seats;
+DROP TABLE IF EXISTS event_seat_categories;
+DROP TABLE IF EXISTS event_movies;
+DROP TABLE IF EXISTS event_types;
 DROP TABLE IF EXISTS events;
 DROP TABLE IF EXISTS orders;
 DROP TABLE IF EXISTS payment_methods;
-DROP TABLE IF EXISTS tickets;
-DROP TABLE IF EXISTS price_category;
 DROP TABLE IF EXISTS seats;
-DROP TABLE IF EXISTS seat_category;
+DROP TABLE IF EXISTS seat_categories;
 DROP TABLE IF EXISTS cinema_halls;
 DROP TABLE IF EXISTS theatres;
-DROP TABLE IF EXISTS address;
+DROP TABLE IF EXISTS user_movies;
+DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS movie_actors;
+DROP TABLE IF EXISTS movie_producers;
+DROP TABLE IF EXISTS producers;
+DROP TABLE IF EXISTS actors;
+DROP TABLE IF EXISTS movie_genres;
+DROP TABLE IF EXISTS movies;
+DROP TABLE IF EXISTS genres;
+DROP TABLE IF EXISTS price_categories;
+DROP TABLE IF EXISTS addressees;
 
 
+CREATE TABLE addressees
+  (
+     id       BINARY(16) DEFAULT (Uuid_to_bin(Uuid(), 1)),
+     street   VARCHAR(255) NOT NULL,
+     streetnr VARCHAR(10) NOT NULL,
+     zipcode  VARCHAR(10) NOT NULL,
+     city     VARCHAR(255) NOT NULL,
+     country  VARCHAR(255) NOT NULL,
+     PRIMARY KEY (id)
+  );
 
+CREATE TABLE genres
+  (
+     id         BINARY(16) DEFAULT (Uuid_to_bin(Uuid(), 1)),
+     genre_name VARCHAR(255) NOT NULL,
+     PRIMARY KEY (id)
+  );
 
--- Create the address table
-CREATE TABLE address (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    street VARCHAR(255) NOT NULL,
-    streetnr VARCHAR(50) NOT NULL,
-    zipcode VARCHAR(50) NOT NULL,
-    city VARCHAR(255) NOT NULL,
-    country VARCHAR(255) NOT NULL
-);
+CREATE TABLE movies
+  (
+     id           BINARY(16) DEFAULT (Uuid_to_bin(Uuid(), 1)),
+     title        VARCHAR(255) NOT NULL,
+     description  VARCHAR(255) NOT NULL,
+     release_date DATE NOT NULL,
+     time_in_min  INT NOT NULL,
+     fsk          INT NOT NULL,
+     PRIMARY KEY (id)
+  );
 
+CREATE TABLE movie_genres
+  (
+     movie_id BINARY(16) NOT NULL,
+     genre_id BINARY(16) NOT NULL,
+     PRIMARY KEY (movie_id, genre_id),
+     FOREIGN KEY (movie_id) REFERENCES movies(id),
+     FOREIGN KEY (genre_id) REFERENCES genres(id)
+  );
 
--- Create the theatre table with a foreign key to the address table
-CREATE TABLE theatres (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    name VARCHAR(255) NOT NULL,
-    address_id INT NOT NULL,
-    FOREIGN KEY (address_id) REFERENCES address(id)
-);
+CREATE TABLE producers
+  (
+     id   BINARY(16) DEFAULT (Uuid_to_bin(Uuid(), 1)),
+     name VARCHAR(255) NOT NULL,
+     age  INT NOT NULL,
+     PRIMARY KEY (id)
+  );
 
--- Create the cinema_halls table with a foreign key to the theatre table
-CREATE TABLE cinema_halls (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    name VARCHAR(255) NOT NULL,
-    capacity INT,
-    theatre_id INT NOT NULL,
-    FOREIGN KEY (theatre_id) REFERENCES theatres(id)
-);
+CREATE TABLE actors
+  (
+     id   BINARY(16) DEFAULT (Uuid_to_bin(Uuid(), 1)),
+     name VARCHAR(255) NOT NULL,
+     age  INT NOT NULL,
+     PRIMARY KEY (id)
+  );
 
--- Create the seat_category table
-CREATE TABLE seat_category (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    category_name VARCHAR(255) NOT NULL
-);
+CREATE TABLE movie_producers
+  (
+     movie_id    BINARY(16) NOT NULL,
+     producer_id BINARY(16) NOT NULL,
+     PRIMARY KEY (movie_id, producer_id),
+     FOREIGN KEY (movie_id) REFERENCES movies(id),
+     FOREIGN KEY (producer_id) REFERENCES producers(id)
+  );
 
+CREATE TABLE movie_actors
+  (
+     movie_id BINARY(16) NOT NULL,
+     actor_id BINARY(16) NOT NULL,
+     PRIMARY KEY (movie_id, actor_id),
+     FOREIGN KEY (movie_id) REFERENCES movies(id),
+     FOREIGN KEY (actor_id) REFERENCES actors(id)
+  );
 
--- Create the seats table with foreign keys to the cinema_halls table and the seat_category table
-CREATE TABLE seats (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    row_nr VARCHAR(10) NOT NULL,
-    column_nr VARCHAR(10) NOT NULL,
-    seat_category_id INT NOT NULL,
-    cinema_hall_id INT NOT NULL,
-    FOREIGN KEY (seat_category_id) REFERENCES seat_category(id),
-    FOREIGN KEY (cinema_hall_id) REFERENCES cinema_halls(id)
-);
+CREATE TABLE users
+  (
+     id         BINARY(16) DEFAULT (Uuid_to_bin(Uuid(), 1)),
+     username   VARCHAR(255) NOT NULL,
+     email      VARCHAR(255) NOT NULL,
+     password   VARCHAR(255) NOT NULL,
+     firstname  VARCHAR(255) NOT NULL,
+     lastname   VARCHAR(255) NOT NULL,
+     address_id BINARY(16),
+     PRIMARY KEY (id),
+     FOREIGN KEY (address_id) REFERENCES addressees(id)
+  );
 
--- Create the price_category table
-CREATE TABLE price_category (
-    category_name VARCHAR(255) PRIMARY KEY,
-    price DECIMAL(10,2) NOT NULL
-);
+CREATE TABLE user_movies
+  (
+     user_id   BINARY(16) NOT NULL,
+     movie_id  BINARY(16) NOT NULL,
+     list_type VARCHAR(255) NOT NULL,
+     PRIMARY KEY (user_id, movie_id, list_type),
+     FOREIGN KEY (user_id) REFERENCES users (id),
+     FOREIGN KEY (movie_id) REFERENCES movies (id)
+  );
 
--- Create the tickets table with foreign keys to the seats table and the price_category table
-CREATE TABLE tickets (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    validated BOOLEAN NOT NULL DEFAULT FALSE,
-    paid BOOLEAN NOT NULL DEFAULT FALSE,
-    reserved BOOLEAN NOT NULL DEFAULT FALSE,
-    price DECIMAL(10,2) NOT NULL,
-    seat_id INT NOT NULL,
-    price_category_name VARCHAR(255) NOT NULL,
-    FOREIGN KEY (seat_id) REFERENCES seats(id),
-    FOREIGN KEY (price_category_name) REFERENCES price_category(category_name)
-);
+CREATE TABLE theatres
+  (
+     id         BINARY(16) DEFAULT (Uuid_to_bin(Uuid(), 1)),
+     name       VARCHAR(255) NOT NULL,
+     address_id BINARY(16) NOT NULL,
+     PRIMARY KEY(id),
+     FOREIGN KEY (address_id) REFERENCES addressees(id)
+  );
 
--- Create the payment_methods table
-CREATE TABLE payment_methods (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    method_name VARCHAR(255) NOT NULL
-);
+CREATE TABLE cinema_halls
+  (
+     id         BINARY(16) DEFAULT (Uuid_to_bin(Uuid(), 1)),
+     name       VARCHAR(255) NOT NULL,
+     capacity   INT NOT NULL,
+     theatre_id BINARY(16) NOT NULL,
+     PRIMARY KEY (id),
+     FOREIGN KEY (theatre_id) REFERENCES theatres(id)
+  );
 
--- Create the orders table with a foreign key to the tickets table and a foreign key to the payment_methods table
-CREATE TABLE orders (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    total_price DECIMAL(10,2) NOT NULL,
-    ticket_id INT NOT NULL,
-    payment_method_id INT NOT NULL,
-    reservation BOOLEAN NOT NULL DEFAULT FALSE,
-    booking BOOLEAN NOT NULL DEFAULT FALSE,
-    FOREIGN KEY (ticket_id) REFERENCES tickets(id),
-    FOREIGN KEY (payment_method_id) REFERENCES payment_methods(id)
-);
+CREATE TABLE seat_categories
+  (
+     id            BINARY(16) DEFAULT (Uuid_to_bin(Uuid(), 1)),
+     category_name VARCHAR(255) NOT NULL,
+     PRIMARY KEY (id)
+  );
 
--- Create the fsk table
-CREATE TABLE fsk (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    age INT NOT NULL
-);
+CREATE TABLE seats
+  (
+     id               BINARY(16) DEFAULT (Uuid_to_bin(Uuid(), 1)),
+     row_nr           INT NOT NULL,
+     column_nr        INT NOT NULL,
+     seat_category_id BINARY(16) NOT NULL,
+     cinema_hall_id   BINARY(16) NOT NULL,
+     PRIMARY KEY (id),
+     FOREIGN KEY (seat_category_id) REFERENCES seat_categories(id),
+     FOREIGN KEY (cinema_hall_id) REFERENCES cinema_halls(id)
+  );
 
--- Create the genres table
-CREATE TABLE genres (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    name VARCHAR(100) NOT NULL
-);
+CREATE TABLE payment_methods
+  (
+     id         BINARY(16) DEFAULT (Uuid_to_bin(Uuid(), 1)),
+     methodname VARCHAR(255) NOT NULL,
+     PRIMARY KEY (id)
+  );
 
--- Create the movies table with a foreign key to the fsk table
-CREATE TABLE movies (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    title VARCHAR(255) NOT NULL,
-    description TEXT NOT NULL,
-    releasedDate DATE NOT NULL,
-    timeInMin INT NOT NULL,
-    fsk_id INT NOT NULL,
-    genre_id INT NOT NULL,
-    FOREIGN KEY (fsk_id) REFERENCES fsk(id),
-    FOREIGN KEY (genre_id) REFERENCES genres(id)
-);
+CREATE TABLE orders
+  (
+     id                BINARY(16) DEFAULT (Uuid_to_bin(Uuid(), 1)),
+     totalprice        INT NOT NULL,
+     is_paid           BOOLEAN NOT NULL,
+     payment_method_id BINARY(16) NOT NULL,
+     user_id           BINARY(16) NOT NULL,
+     PRIMARY KEY (id),
+     FOREIGN KEY (payment_method_id) REFERENCES payment_methods(id),
+     FOREIGN KEY (user_id) REFERENCES users(id)
+  );
 
--- Create the user_types table
-CREATE TABLE user_types (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    type_name VARCHAR(255) NOT NULL
-);
+CREATE TABLE event_types
+  (
+     id       BINARY(16) DEFAULT (Uuid_to_bin(Uuid(), 1)),
+     typename VARCHAR(255) NOT NULL,
+     PRIMARY KEY (id)
+  );
 
--- Create the users table with a foreign key to the address table and a foreign key to the user_types table
-CREATE TABLE users (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    username VARCHAR(255) NOT NULL,
-    firstname VARCHAR(255) NOT NULL,
-    lastname VARCHAR(255) NOT NULL,
-    email VARCHAR(255) NOT NULL,
-    age INT,
-    password VARCHAR(255) NOT NULL,
-    phone_number VARCHAR(100),
-    address_id INT NOT NULL,
-    user_type_id INT NOT NULL,
-    FOREIGN KEY (address_id) REFERENCES address(id),
-    FOREIGN KEY (user_type_id) REFERENCES user_types(id)
-);
+CREATE TABLE events
+  (
+     id             BINARY(16) DEFAULT (Uuid_to_bin(Uuid(), 1)),
+     title          VARCHAR(255) NOT NULL,
+     start          DATE NOT NULL,
+     end            DATE NOT NULL,
+     event_type_id  BINARY(16) NOT NULL,
+     cinema_hall_id BINARY(16) NOT NULL,
+     PRIMARY KEY (id),
+     FOREIGN KEY (event_type_id) REFERENCES event_types(id),
+     FOREIGN KEY (cinema_hall_id) REFERENCES cinema_halls(id)
+  );
 
--- Create the user_movies table with foreign keys to the users table and the movies table
-CREATE TABLE user_movies (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    user_id INT NOT NULL,
-    movie_id INT NOT NULL,
-    list_type VARCHAR(255) NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES users(id),
-    FOREIGN KEY (movie_id) REFERENCES movies(id)
-);
--- Create the events table
-CREATE TABLE events (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    title VARCHAR(255) NOT NULL,
-    start_time DATETIME NOT NULL,
-    end_time DATETIME NOT NULL,
-    price DECIMAL(10,2) NOT NULL,
-    cinema_hall_id INT NOT NULL,
-    FOREIGN KEY (cinema_hall_id) REFERENCES cinema_halls(id)
-);
+CREATE TABLE event_movies
+  (
+     event_id BINARY(16) NOT NULL,
+     movie_id BINARY(16) NOT NULL,
+     PRIMARY KEY (event_id, movie_id),
+     FOREIGN KEY (event_id) REFERENCES events(id),
+     FOREIGN KEY (movie_id) REFERENCES movies(id)
+  );
 
--- Create the showings table with foreign keys to the events table and the movies table
-CREATE TABLE showings (
-    movie_id INT NOT NULL,
-    event_id INT NOT NULL,
-    PRIMARY KEY (movie_id, event_id),
-    FOREIGN KEY (event_id) REFERENCES events(id),
-    FOREIGN KEY (movie_id) REFERENCES movies(id)
-);
--- Create the actors table
-CREATE TABLE actors (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    name VARCHAR(255) NOT NULL,
-    age INT NOT NULL
-);
+CREATE TABLE price_categories
+  (
+     id            BINARY(16) DEFAULT (Uuid_to_bin(Uuid(), 1)),
+     category_name VARCHAR(255) NOT NULL,
+     price         INT NOT NULL,
+     PRIMARY KEY (id)
+  );
 
--- Create the producers table
-CREATE TABLE producers (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    name VARCHAR(255) NOT NULL,
-    age INT NOT NULL
-);
+CREATE TABLE event_seat_categories
+  (
+     event_id         BINARY(16) NOT NULL,
+     seat_category_id BINARY(16) NOT NULL,
+     price            INT NOT NULL,
+     PRIMARY KEY (event_id, seat_category_id),
+     FOREIGN KEY (event_id) REFERENCES events(id),
+     FOREIGN KEY (seat_category_id) REFERENCES seat_categories(id)
+  );
 
--- Create the movie_actors table with foreign keys to the movies table and the actors table
-CREATE TABLE movie_actors (
-    movie_id INT NOT NULL,
-    actor_id INT NOT NULL,
-    PRIMARY KEY (movie_id, actor_id),
-    FOREIGN KEY (movie_id) REFERENCES movies(id),
-    FOREIGN KEY (actor_id) REFERENCES actors(id)
-);
+CREATE TABLE event_seats
+  (
+     id            BINARY(16) DEFAULT (Uuid_to_bin(Uuid(), 1)),
+     booked        BOOLEAN NOT NULL,
+     blocked_until TIMESTAMP,
+     user_id       BINARY(16) NOT NULL,
+     seat_id       BINARY(16) NOT NULL,
+     event_id      BINARY(16) NOT NULL,
+     PRIMARY KEY (id),
+     FOREIGN KEY (user_id) REFERENCES users(id),
+     FOREIGN KEY (seat_id) REFERENCES seats(id),
+     FOREIGN KEY (event_id) REFERENCES events(id)
+  );
 
--- Create the movie_producers table with foreign keys to the movies table and the producers table
-CREATE TABLE movie_producers (
-    movie_id INT NOT NULL,
-    producer_id INT NOT NULL,
-    PRIMARY KEY (movie_id, producer_id),
-    FOREIGN KEY (movie_id) REFERENCES movies(id),
-    FOREIGN KEY (producer_id) REFERENCES producers(id)
-);
+CREATE TABLE tickets
+  (
+     id                BINARY(16) DEFAULT (Uuid_to_bin(Uuid(), 1)),
+     validated         BOOLEAN NOT NULL,
+     price             INT NOT NULL,
+     price_category_id BINARY(16) NOT NULL,
+     order_id          BINARY(16) NOT NULL,
+     event_seat_id     BINARY(16) NOT NULL,
+     PRIMARY KEY (id),
+     FOREIGN KEY (price_category_id) REFERENCES price_categories(id),
+     FOREIGN KEY (order_id) REFERENCES orders(id),
+     FOREIGN KEY (event_seat_id) REFERENCES event_seats(id)
+  ); 
