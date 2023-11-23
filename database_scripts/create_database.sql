@@ -32,7 +32,7 @@ CREATE TABLE addressees
   (
      id       BINARY(16) DEFAULT (Uuid_to_bin(Uuid(), 1)),
      street   VARCHAR(255) NOT NULL,
-     streetnr VARCHAR(10) NOT NULL,
+     street_nr VARCHAR(10) NOT NULL,
      zipcode  VARCHAR(10) NOT NULL,
      city     VARCHAR(255) NOT NULL,
      country  VARCHAR(255) NOT NULL,
