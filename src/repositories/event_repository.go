@@ -74,7 +74,7 @@ type EventRepository struct {
 // }
 
 func (er *EventRepository) CreateEvent(event *schemas.Event) error {
-	_, err := er.DatabaseMgr.ExecuteStatement("INSERT INTO events (id, title, start, end, event_type_id, cinema_hall_id) VALUES ($1, $2, $3, $4, $5, $6)", event.Id, event.Title, event.Start, event.End, event.EventTypeId, event.CinemaHallId)
+	_, err := er.DatabaseMgr.ExecuteStatement("INSERT INTO events (id, title, start, end, event_type_id, cinema_hall_id) VALUES (?, ?, ?, ?, ?, ?)", event.Id, event.Title, event.Start, event.End, event.EventTypeId, event.CinemaHallId)
 	if err != nil {
 		log.Printf("Error while inserting event: %v", err)
 		return err
@@ -84,7 +84,7 @@ func (er *EventRepository) CreateEvent(event *schemas.Event) error {
 }
 
 func (er *EventRepository) UpdateEvent(event *schemas.Event) error {
-	result, err := er.DatabaseMgr.ExecuteStatement("UPDATE events SET title=$1, start=$2, end=$3, event_type_id=$4, cinema_hall_id=$5 WHERE id=$6", event.Title, event.Start, event.End, event.EventTypeId, event.CinemaHallId, event.Id)
+	result, err := er.DatabaseMgr.ExecuteStatement("UPDATE events SET title=?, start=?, end=?, event_type_id=?, cinema_hall_id=? WHERE id=?", event.Title, event.Start, event.End, event.EventTypeId, event.CinemaHallId, event.Id)
 	if err != nil {
 		log.Printf("Error while updating event: %v", err)
 		return err
@@ -99,7 +99,7 @@ func (er *EventRepository) UpdateEvent(event *schemas.Event) error {
 }
 
 func (er *EventRepository) DeleteEvent(id *uuid.UUID) error {
-	query := "DELETE FROM events WHERE id=$1"
+	query := "DELETE FROM events WHERE id=?"
 	result, err := er.DatabaseMgr.ExecuteStatement(query, id)
 	if err != nil {
 		log.Printf("Error while deleting event: %v", err)
@@ -113,7 +113,7 @@ func (er *EventRepository) DeleteEvent(id *uuid.UUID) error {
 }
 
 func (er *EventRepository) GetEvent(id *uuid.UUID) (*schemas.Event, error) {
-	query := "SELECT * FROM events where id=$1"
+	query := "SELECT * FROM events where id=?"
 	row := er.DatabaseMgr.ExecuteQueryRow(query, id)
 
 	event := schemas.Event{}
@@ -124,4 +124,26 @@ func (er *EventRepository) GetEvent(id *uuid.UUID) (*schemas.Event, error) {
 	}
 
 	return &event, nil
+}
+
+func (er *EventRepository) GetEventsForMovieId(movieId *uuid.UUID) ([]*schemas.Event, error) {
+	query := "SELECT * FROM events WHERE id IN (SELECT event_id FROM event_movie WHERE movie_id=?)"
+	rows, err := er.DatabaseMgr.ExecuteQuery(query, movieId)
+	if err != nil {
+		log.Printf("Error while getting events for movie id: %v", err)
+		return nil, err
+	}
+
+	events := make([]*schemas.Event, 0)
+	for rows.Next() {
+		event := schemas.Event{}
+		err := rows.Scan(&event.Id, &event.Title, &event.Start, &event.End, &event.EventTypeId, &event.CinemaHallId)
+		if err != nil {
+			log.Printf("Error while scanning events for movie id: %v", err)
+			return nil, err
+		}
+		events = append(events, &event)
+	}
+
+	return events, nil
 }

@@ -1,9 +1,7 @@
 package repositories
 
 import (
-	"encoding/json"
 	"errors"
-	"fmt"
 	"testing"
 	"time"
 
@@ -43,7 +41,7 @@ func TestCreateEvent(t *testing.T) {
 	eventTypeId := &uuid.UUID{}
 	title := "Test Event"
 
-	dbManager.EXPECT().ExecuteStatement("INSERT INTO events (id, title, start, end, event_type_id, cinema_hall_id) VALUES ($1, $2, $3, $4, $5, $6)", id, title, time, time, id, id).Return(nil, nil)
+	dbManager.EXPECT().ExecuteStatement("INSERT INTO events (id, title, start, end, event_type_id, cinema_hall_id) VALUES (?, ?, ?, ?, ?, ?)", id, title, time, time, id, id).Return(nil, nil)
 
 	EventRepository := EventRepository{DatabaseMgr: dbManager}
 
@@ -79,7 +77,7 @@ func TestCreateEventWithErrorInInsert(t *testing.T) {
 	eventTypeId := &uuid.UUID{}
 	title := "Test Event"
 
-	dbManager.EXPECT().ExecuteStatement("INSERT INTO events (id, title, start, end, event_type_id, cinema_hall_id) VALUES ($1, $2, $3, $4, $5, $6)", id, title, time, time, id, id).Return(nil, errors.New("Error"))
+	dbManager.EXPECT().ExecuteStatement("INSERT INTO events (id, title, start, end, event_type_id, cinema_hall_id) VALUES (?, ?, ?, ?, ?, ?)", id, title, time, time, id, id).Return(nil, errors.New("Error"))
 
 	EventRepository := EventRepository{DatabaseMgr: dbManager}
 
@@ -118,7 +116,7 @@ func TestUpdateEvent(t *testing.T) {
 	result := mocks.NewMockResult(mockCtrl)
 	result.EXPECT().RowsAffected().Return(int64(1), nil)
 
-	dbManager.EXPECT().ExecuteStatement("UPDATE events SET title=$1, start=$2, end=$3, event_type_id=$4, cinema_hall_id=$5 WHERE id=$6", title, time, time, id, id, id).Return(result, nil)
+	dbManager.EXPECT().ExecuteStatement("UPDATE events SET title=?, start=?, end=?, event_type_id=?, cinema_hall_id=? WHERE id=?", title, time, time, id, id, id).Return(result, nil)
 
 	EventRepository := EventRepository{DatabaseMgr: dbManager}
 
@@ -156,7 +154,7 @@ func TestUpdateEventWithErrorInUpdate(t *testing.T) {
 
 	result := mocks.NewMockResult(mockCtrl)
 
-	dbManager.EXPECT().ExecuteStatement("UPDATE events SET title=$1, start=$2, end=$3, event_type_id=$4, cinema_hall_id=$5 WHERE id=$6", title, time, time, id, id, id).Return(result, errors.New("Error"))
+	dbManager.EXPECT().ExecuteStatement("UPDATE events SET title=?, start=?, end=?, event_type_id=?, cinema_hall_id=? WHERE id=?", title, time, time, id, id, id).Return(result, errors.New("Error"))
 
 	EventRepository := EventRepository{DatabaseMgr: dbManager}
 
@@ -195,7 +193,7 @@ func TestUpdateEventWithNoRowsAffected(t *testing.T) {
 	result := mocks.NewMockResult(mockCtrl)
 	result.EXPECT().RowsAffected().Return(int64(0), errors.New("Error"))
 
-	dbManager.EXPECT().ExecuteStatement("UPDATE events SET title=$1, start=$2, end=$3, event_type_id=$4, cinema_hall_id=$5 WHERE id=$6", title, time, time, id, id, id).Return(result, nil)
+	dbManager.EXPECT().ExecuteStatement("UPDATE events SET title=?, start=?, end=?, event_type_id=?, cinema_hall_id=? WHERE id=?", title, time, time, id, id, id).Return(result, nil)
 
 	EventRepository := EventRepository{DatabaseMgr: dbManager}
 
@@ -229,7 +227,7 @@ func TestDeleteEvent(t *testing.T) {
 	result := mocks.NewMockResult(mockCtrl)
 	result.EXPECT().RowsAffected().Return(int64(1), nil)
 
-	dbManager.EXPECT().ExecuteStatement("DELETE FROM events WHERE id=$1", id).Return(result, nil)
+	dbManager.EXPECT().ExecuteStatement("DELETE FROM events WHERE id=?", id).Return(result, nil)
 
 	EventRepository := EventRepository{DatabaseMgr: dbManager}
 
@@ -252,7 +250,7 @@ func TestDeleteEventWithErrorInDelete(t *testing.T) {
 
 	result := mocks.NewMockResult(mockCtrl)
 
-	dbManager.EXPECT().ExecuteStatement("DELETE FROM events WHERE id=$1", id).Return(result, errors.New("Error"))
+	dbManager.EXPECT().ExecuteStatement("DELETE FROM events WHERE id=?", id).Return(result, errors.New("Error"))
 
 	EventRepository := EventRepository{DatabaseMgr: dbManager}
 
@@ -276,7 +274,7 @@ func TestDeleteEventWithNoRowsAffected(t *testing.T) {
 	result := mocks.NewMockResult(mockCtrl)
 	result.EXPECT().RowsAffected().Return(int64(0), errors.New("Error"))
 
-	dbManager.EXPECT().ExecuteStatement("DELETE FROM events WHERE id=$1", id).Return(result, nil)
+	dbManager.EXPECT().ExecuteStatement("DELETE FROM events WHERE id=?", id).Return(result, nil)
 
 	EventRepository := EventRepository{DatabaseMgr: dbManager}
 
@@ -347,15 +345,27 @@ func TestGetEventWithWrongId(t *testing.T) {
 	}
 }
 
-func TestMyTest(t *testing.T) {
-	event := &schemas.Event{
-		Title: "Test Event",
-	}
+func TestGetEventsForMovieId(t *testing.T) {
+	//GIVEN
+	db, mock, err := sqlmock.New()
 
-	// create a JSON form this event
-	eventJson, err := json.Marshal(event)
+	id := &uuid.UUID{}
+	id2 := &uuid.UUID{}
+
+	rows := sqlmock.NewRows([]string{"id", "title", "start", "end", "event_type_id", "cinema_hall_id"}).AddRow(id, "Test Event", time.Now(), time.Now(), id, id).AddRow(id2, "Test Event2", time.Now(), time.Now(), id2, id2)
+
+	mock.ExpectQuery("SELECT * FROM events WHERE id IN (SELECT event_id FROM event_movie WHERE movie_id=?)").WithArgs(id).WillReturnRows(rows, nil)
+	dbManager := &managers.DatabaseManager{Connection: db}
+	EventRepository := EventRepository{DatabaseMgr: dbManager}
+
+	//WHEN
+	events, err := EventRepository.GetEventsForMovieId(id)
+
+	//THEN
 	if err != nil {
 		t.Fail()
 	}
-	fmt.Println(eventJson)
+	if events == nil {
+		t.Fail()
+	}
 }
