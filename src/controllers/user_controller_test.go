@@ -46,7 +46,6 @@ func TestControllerRegister(t *testing.T) {
 					Password:  registrationData.Password,
 					FirstName: registrationData.FirstName,
 					LastName:  registrationData.LastName,
-					/* AddressId */
 				}
 
 				mockRepo.EXPECT().CheckIfEmailExists(registrationData.Email).Return(nil)
@@ -66,7 +65,6 @@ func TestControllerRegister(t *testing.T) {
 					Password:  registrationData.Password,
 					FirstName: registrationData.FirstName,
 					LastName:  registrationData.LastName,
-					/* AddressId */
 				}
 
 				mockRepo.EXPECT().CheckIfEmailExists(registrationData.Email).Return(nil)

@@ -39,7 +39,6 @@ func (uc *UserController) RegisterUser(registrationData models.RegistrationReque
 		Password:  string(hash),
 		FirstName: registrationData.FirstName,
 		LastName:  registrationData.LastName,
-		/* AddressId */
 	}
 
 	kts_err = uc.UserRepo.CreateUser(user)

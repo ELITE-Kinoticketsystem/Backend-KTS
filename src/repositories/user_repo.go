@@ -19,8 +19,8 @@ type UserRepository struct {
 
 func (ur *UserRepository) CreateUser(user schemas.User) *models.KTSError {
 	_, err := ur.DatabaseManager.ExecuteStatement(
-		"INSERT INTO users (id, username, email, password, firstname, lastname, address_id) VALUES (?, ?, ?, ?, ?, ?, ?);",
-		user.Id, user.Username, user.Email, user.Password, user.FirstName, user.LastName, user.AddressId,
+		"INSERT INTO users (id, username, email, password, firstname, lastname) VALUES (UUID_TO_BIN(?), ?, ?, ?, ?, ?);",
+		user.Id, user.Username, user.Email, user.Password, user.FirstName, user.LastName,
 	)
 	if err != nil {
 		return kts_errors.KTS_INTERNAL_ERROR
