@@ -23,10 +23,10 @@ Delete from movie_genres;
 Delete from movies;
 Delete from genres;
 Delete from price_categories;
-Delete from addressees;
+Delete from addresses;
 
 
-INSERT INTO addressees (id, street, street_nr, zipcode, city, country) 
+INSERT INTO addresses (id, street, street_nr, zipcode, city, country) 
 VALUES
     (UUID_TO_BIN('6ba7b810-9dad-11d1-80b4-00c04fd430c8'), '123 Main St', '1', '12345', 'New York', 'USA'), 
     (UUID_TO_BIN('6ba7b811-9dad-11d1-80b4-00c04fd430c8'), '456 Elm St', '2', '23456', 'Los Angeles', 'USA'), 

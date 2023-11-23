@@ -25,10 +25,10 @@ DROP TABLE IF EXISTS movie_genres;
 DROP TABLE IF EXISTS movies;
 DROP TABLE IF EXISTS genres;
 DROP TABLE IF EXISTS price_categories;
-DROP TABLE IF EXISTS addressees;
+DROP TABLE IF EXISTS addresses;
 
 
-CREATE TABLE addressees
+CREATE TABLE addresses
   (
      id       BINARY(16) DEFAULT (Uuid_to_bin(Uuid(), 1)),
      street   VARCHAR(255) NOT NULL,
@@ -110,7 +110,7 @@ CREATE TABLE users
      lastname   VARCHAR(255) NOT NULL,
      address_id BINARY(16),
      PRIMARY KEY (id),
-     FOREIGN KEY (address_id) REFERENCES addressees(id)
+     FOREIGN KEY (address_id) REFERENCES addresses(id)
   );
 
 CREATE TABLE user_movies
@@ -129,7 +129,7 @@ CREATE TABLE theatres
      name       VARCHAR(255) NOT NULL,
      address_id BINARY(16) NOT NULL,
      PRIMARY KEY(id),
-     FOREIGN KEY (address_id) REFERENCES addressees(id)
+     FOREIGN KEY (address_id) REFERENCES addresses(id)
   );
 
 CREATE TABLE cinema_halls
