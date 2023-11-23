@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"errors"
 	"testing"
 
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
@@ -42,7 +41,7 @@ func TestControllerRegister(t *testing.T) {
 			setExpectations: func(mockRepo mocks.MockUserRepositoryI, registrationData models.RegistrationRequest) {
 				user := schemas.User{
 					/* Id */
-					Username: registrationData.Username,
+					Username:  registrationData.Username,
 					Email:     registrationData.Email,
 					Password:  registrationData.Password,
 					FirstName: registrationData.FirstName,
@@ -51,7 +50,7 @@ func TestControllerRegister(t *testing.T) {
 				}
 
 				mockRepo.EXPECT().CheckIfEmailExists(registrationData.Email).Return(nil)
-				mockRepo.EXPECT().CreateUser(utils.EqUserMatcher(user, registrationData.Password)).Return(errors.New(""))
+				mockRepo.EXPECT().CreateUser(utils.EqUserMatcher(user, registrationData.Password)).Return(kts_errors.KTS_INTERNAL_ERROR)
 
 			},
 			expectedError: kts_errors.KTS_INTERNAL_ERROR,
@@ -62,7 +61,7 @@ func TestControllerRegister(t *testing.T) {
 			setExpectations: func(mockRepo mocks.MockUserRepositoryI, registrationData models.RegistrationRequest) {
 				user := schemas.User{
 					/* Id */
-					Username: registrationData.Username,
+					Username:  registrationData.Username,
 					Email:     registrationData.Email,
 					Password:  registrationData.Password,
 					FirstName: registrationData.FirstName,
@@ -166,7 +165,7 @@ func TestControllerCheckUsername(t *testing.T) {
 	}{
 		{
 			name:     "Email exists",
-			username: "Colllinho el niño",
+			username: "Collinho el niño",
 			setExpectations: func(mockRepo mocks.MockUserRepositoryI, email string) {
 				mockRepo.EXPECT().CheckIfUsernameExists(email).Return(kts_errors.KTS_EMAIL_EXISTS)
 			},
@@ -174,7 +173,7 @@ func TestControllerCheckUsername(t *testing.T) {
 		},
 		{
 			name:     "Internal error",
-			username: "Colllinho el niño",
+			username: "Collinho el niño",
 			setExpectations: func(mockRepo mocks.MockUserRepositoryI, email string) {
 				mockRepo.EXPECT().CheckIfUsernameExists(email).Return(kts_errors.KTS_INTERNAL_ERROR)
 			},
@@ -209,7 +208,7 @@ func TestControllerCheckUsername(t *testing.T) {
 }
 func getSampleRegistratonData() models.RegistrationRequest {
 	return models.RegistrationRequest{
-		Username:  "Colllinho el niño",
+		Username:  "Collinho el niño",
 		Email:     "collin.forslund@gmail.com",
 		Password:  "Passwort",
 		FirstName: "Collin",

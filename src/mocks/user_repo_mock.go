@@ -68,10 +68,10 @@ func (mr *MockUserRepositoryIMockRecorder) CheckIfUsernameExists(username any) *
 }
 
 // CreateUser mocks base method.
-func (m *MockUserRepositoryI) CreateUser(user schemas.User) error {
+func (m *MockUserRepositoryI) CreateUser(user schemas.User) *models.KTSError {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateUser", user)
-	ret0, _ := ret[0].(error)
+	ret0, _ := ret[0].(*models.KTSError)
 	return ret0
 }
 

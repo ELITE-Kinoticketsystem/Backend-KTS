@@ -8,7 +8,7 @@ import (
 )
 
 type UserRepositoryI interface {
-	CreateUser(user schemas.User) error
+	CreateUser(user schemas.User) *models.KTSError
 	CheckIfUsernameExists(username string) *models.KTSError
 	CheckIfEmailExists(email string) *models.KTSError
 }
@@ -17,12 +17,15 @@ type UserRepository struct {
 	DatabaseManager managers.DatabaseManagerI
 }
 
-func (ur *UserRepository) CreateUser(user schemas.User) error {
+func (ur *UserRepository) CreateUser(user schemas.User) *models.KTSError {
 	_, err := ur.DatabaseManager.ExecuteStatement(
-		"INSERT INTO users (id, firstname, lastname, email, age, password, address_id, user_type_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?);",
-		user.Id, user.FirstName, user.LastName, user.Email, 0 /* user.Age (missing in schema) */, user.Password, user.AddressId, 0 /* user.Age (missing in schema) */,
+		"INSERT INTO users (id, username, email, password, firstname, lastname, address_id) VALUES (?, ?, ?, ?, ?, ?, ?);",
+		user.Id, user.Username, user.Email, user.Password, user.FirstName, user.LastName, user.AddressId,
 	)
-	return err
+	if err != nil {
+		return kts_errors.KTS_INTERNAL_ERROR
+	}
+	return nil
 }
 
 func (ur *UserRepository) CheckIfUsernameExists(username string) *models.KTSError {
