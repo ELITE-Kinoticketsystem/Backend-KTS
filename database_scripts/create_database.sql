@@ -51,7 +51,7 @@ CREATE TABLE movies
      id           BINARY(16) DEFAULT (Uuid_to_bin(Uuid(), 1)),
      title        VARCHAR(255) NOT NULL,
      description  VARCHAR(255) NOT NULL,
-     release_date DATE NOT NULL,
+     release_date DateTime NOT NULL,
      time_in_min  INT NOT NULL,
      fsk          INT NOT NULL,
      PRIMARY KEY (id)
@@ -191,8 +191,8 @@ CREATE TABLE events
   (
      id             BINARY(16) DEFAULT (Uuid_to_bin(Uuid(), 1)),
      title          VARCHAR(255) NOT NULL,
-     start          DATE NOT NULL,
-     end            DATE NOT NULL,
+     start          DateTime NOT NULL,
+     end            DateTime NOT NULL,
      event_type_id  BINARY(16) NOT NULL,
      cinema_hall_id BINARY(16) NOT NULL,
      PRIMARY KEY (id),
