@@ -200,7 +200,7 @@ func TestHandlerCheckUsername(t *testing.T) {
 		{
 			name: "Exists",
 			body: models.CheckUsernameRequest{
-				Username: "Colllinho el niño",
+				Username: "Collinho el niño",
 			},
 			setExpectations: func(mockController *mocks.MockUserControllerI) {
 				mockController.EXPECT().CheckUsername(gomock.Any()).Return(kts_errors.KTS_USERNAME_EXISTS)
@@ -267,7 +267,7 @@ func TestHandlerCheckUsername(t *testing.T) {
 
 func getSampleRegistratonData() models.RegistrationRequest {
 	return models.RegistrationRequest{
-		Username:  "Colllinho el niño",
+		Username:  "Collinho el niño",
 		Email:     "collin.forslund@gmail.com",
 		Password:  "Passwort",
 		FirstName: "Collin",

@@ -1,0 +1,2 @@
+~/go/bin/mockgen -source=./src/controllers/user_controller.go -destination=./src/mocks/user_controller_mock.go -package=mocks
+~/go/bin/mockgen -source=./src/repositories/user_repo.go -destination=./src/mocks/user_repo_mock.go -package=mocks

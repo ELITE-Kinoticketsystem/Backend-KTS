@@ -34,7 +34,7 @@ func (uc *UserController) RegisterUser(registrationData models.RegistrationReque
 
 	user := schemas.User{
 		Id:        &userId,
-		Username: registrationData.Username,
+		Username:  registrationData.Username,
 		Email:     registrationData.Email,
 		Password:  string(hash),
 		FirstName: registrationData.FirstName,
@@ -42,9 +42,9 @@ func (uc *UserController) RegisterUser(registrationData models.RegistrationReque
 		/* AddressId */
 	}
 
-	err = uc.UserRepo.CreateUser(user)
-	if err != nil {
-		return kts_errors.KTS_INTERNAL_ERROR
+	kts_err = uc.UserRepo.CreateUser(user)
+	if kts_err != nil {
+		return kts_err
 	}
 	return nil
 }
