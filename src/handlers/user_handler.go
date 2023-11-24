@@ -72,7 +72,7 @@ func CheckEmailHandler(userCtrl controllers.UserControllerI) gin.HandlerFunc {
 			return
 		}
 
-		c.JSON(http.StatusOK, "")
+		c.Status(http.StatusOK)
 	}
 }
 
@@ -94,6 +94,6 @@ func CheckUsernameHandler(userCtrl controllers.UserControllerI) gin.HandlerFunc 
 			return
 		}
 
-		c.JSON(http.StatusOK, "")
+		c.Status(http.StatusOK)
 	}
 }
