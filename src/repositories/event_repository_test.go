@@ -398,3 +398,115 @@ func TestGetEventsForMovieIdWithWrongId(t *testing.T) {
 		t.Fail()
 	}
 }
+
+func TestGetEventsDateTimeIsBetween(t *testing.T) {
+	//GIVEN
+	db, mock, _ := sqlmock.New()
+
+	start := time.Now()
+	end := time.Now()
+
+	id := &uuid.UUID{}
+
+	rows := sqlmock.NewRows([]string{"id", "title", "start", "end", "event_type_id", "cinema_hall_id"}).AddRow(id, "Test Event", start, end, id, id).AddRow(id, "Test Event", start, end, id, id)
+
+	if rows == nil {
+		t.Fail()
+	}
+
+	mock.ExpectQuery("SELECT(.*)").WithArgs(start, end, start, end).WillReturnRows(rows)
+	dbManager := &managers.DatabaseManager{Connection: db}
+	eventRepository := EventRepository{DatabaseMgr: dbManager}
+
+	//WHEN
+	events, err := eventRepository.GetEventsDateTimeIsBetween(start, end)
+
+	//THEN
+	if err != nil {
+		t.Fail()
+	}
+	if events == nil {
+		t.Fail()
+	}
+	if len(events) != 2 {
+		t.Fail()
+	}
+}
+
+
+func TestGetEventsDateTimeIsBetweenWithWrongDates(t *testing.T) {
+	//GIVEN
+	db, mock, _ := sqlmock.New()
+
+	start := time.Now()
+	end := time.Now()
+
+	mock.ExpectQuery("SELECT(.*)").WithArgs(start, end, start, end).WillReturnError(errors.New("Error"))
+	dbManager := &managers.DatabaseManager{Connection: db}
+	eventRepository := EventRepository{DatabaseMgr: dbManager}
+
+	//WHEN
+	events, err := eventRepository.GetEventsDateTimeIsBetween(start, end)
+
+	//THEN
+	if err == nil {
+		t.Fail()
+	}
+	if events != nil {
+		t.Fail()
+	}
+}
+
+func TestGetEventsForCinemaHallId(t *testing.T) {
+	//GIVEN
+	db, mock, _ := sqlmock.New()
+
+	id := &uuid.UUID{}
+
+	rows := sqlmock.NewRows([]string{"id", "title", "start", "end", "event_type_id", "cinema_hall_id"}).AddRow(id, "Test Event", time.Now(), time.Now(), id, id).AddRow(id, "Test Event", time.Now(), time.Now(), id, id)
+
+	if rows == nil {
+		t.Fail()
+	}
+
+	mock.ExpectQuery("SELECT(.*)").WithArgs(id).WillReturnRows(rows)
+	dbManager := &managers.DatabaseManager{Connection: db}
+	eventRepository := EventRepository{DatabaseMgr: dbManager}
+
+	//WHEN
+	events, err := eventRepository.GetEventsForCinemaHallId(id)
+
+	//THEN
+	if err != nil {
+		t.Fail()
+	}
+	if events == nil {
+		t.Fail()
+	}
+	if len(events) != 2 {
+		t.Fail()
+	}
+}
+
+func TestGetEventsForCinemaHallIdWithWrongId(t *testing.T) {
+	//GIVEN
+	db, mock, _ := sqlmock.New()
+
+	id := &uuid.UUID{}
+
+	mock.ExpectQuery("SELECT(.*)").WithArgs(id).WillReturnError(errors.New("Error"))
+	dbManager := &managers.DatabaseManager{Connection: db}
+	eventRepository := EventRepository{DatabaseMgr: dbManager}
+
+	//WHEN
+	events, err := eventRepository.GetEventsForCinemaHallId(id)
+
+	//THEN
+	if err == nil {
+		t.Fail()
+	}
+	if events != nil {
+		t.Fail()
+	}
+}
+

@@ -35,8 +35,9 @@ type Ticket struct {
 }
 
 type PriceCategory struct {
-	CategoryName string `json:"categoryName"`
-	Price        int    `json:"price"`
+	Id           *uuid.UUID `json:"id"`
+	CategoryName string     `json:"categoryName"`
+	Price        int        `json:"price"`
 }
 
 type EventSeatCategory struct {

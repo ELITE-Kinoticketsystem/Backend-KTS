@@ -2,21 +2,34 @@ package repositories
 
 import (
 	"log"
+	"time"
 
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/managers"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models/schemas"
 	"github.com/google/uuid"
 )
 
-type EventRepositoryI interface {
-	CreateEvent(event *schemas.Event) error
+type EventRepo interface {
+	CreateEvent(event *schemas.Event) (*schemas.Event, error)
 	UpdateEvent(event *schemas.Event) error
 	DeleteEvent(event *schemas.Event) error
+
+	CreatePriceCategory(priceCategory *schemas.PriceCategory) (*schemas.PriceCategory, error)
+
+	AddEventMovie(eventId *uuid.UUID, movieId *uuid.UUID) error
+
+	CreateEventSeatCategory(eventSeatCategory *schemas.EventSeatCategory) (*schemas.EventSeatCategory, error)
+	CreateEventSeat(eventSeat *schemas.EventSeat) (*schemas.EventSeat, error)
 }
 
 type EventRepository struct {
 	DatabaseMgr managers.DatabaseManagerI
 }
+
+const (
+	event        = "event"
+	specialEvent = "special_event"
+)
 
 // THE STRUCTS REPRESENT THE TABLES IN THE DATABASE
 // type Event struct {
@@ -113,7 +126,7 @@ func (er *EventRepository) DeleteEvent(id *uuid.UUID) error {
 }
 
 func (er *EventRepository) GetEvent(id *uuid.UUID) (*schemas.Event, error) {
-	query := "SELECT * FROM events where id=?"
+	query := "SELECT * FROM events where id=? "
 	row := er.DatabaseMgr.ExecuteQueryRow(query, id)
 
 	event := schemas.Event{}
@@ -140,6 +153,50 @@ func (er *EventRepository) GetEventsForMovieId(movieId *uuid.UUID) ([]*schemas.E
 		err := rows.Scan(&event.Id, &event.Title, &event.Start, &event.End, &event.EventTypeId, &event.CinemaHallId)
 		if err != nil {
 			log.Printf("Error while scanning events for movie id: %v", err)
+			return nil, err
+		}
+		events = append(events, &event)
+	}
+
+	return events, nil
+}
+
+func (er *EventRepository) GetEventsDateTimeIsBetween(start time.Time, end time.Time) ([]*schemas.Event, error) {
+	query := "SELECT * FROM events WHERE start BETWEEN ? AND ? OR end BETWEEN ? AND ?"
+	rows, err := er.DatabaseMgr.ExecuteQuery(query, start, end, start, end)
+	if err != nil {
+		log.Printf("Error while getting events for movie id: %v", err)
+		return nil, err
+	}
+
+	events := make([]*schemas.Event, 0)
+	for rows.Next() {
+		event := schemas.Event{}
+		err := rows.Scan(&event.Id, &event.Title, &event.Start, &event.End, &event.EventTypeId, &event.CinemaHallId)
+		if err != nil {
+			log.Printf("Error while scanning events for movie id: %v", err)
+			return nil, err
+		}
+		events = append(events, &event)
+	}
+
+	return events, nil
+}
+
+func (er *EventRepository) GetEventsForCinemaHallId(cinemaHallId *uuid.UUID) ([]*schemas.Event, error) {
+	query := "SELECT * FROM events WHERE cinema_hall_id=?"
+	rows, err := er.DatabaseMgr.ExecuteQuery(query, cinemaHallId)
+	if err != nil {
+		log.Printf("Error while getting events for cinema hall id: %v", err)
+		return nil, err
+	}
+
+	events := make([]*schemas.Event, 0)
+	for rows.Next() {
+		event := schemas.Event{}
+		err := rows.Scan(&event.Id, &event.Title, &event.Start, &event.End, &event.EventTypeId, &event.CinemaHallId)
+		if err != nil {
+			log.Printf("Error while scanning events for cinema hall id: %v", err)
 			return nil, err
 		}
 		events = append(events, &event)
