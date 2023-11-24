@@ -244,28 +244,28 @@ VALUES
 
 
 -- Insert statement for Users table
-INSERT INTO users (id, username, email, password, firstname, lastname, address_id)
+INSERT INTO users (id, username, email, password, firstname, lastname)
 VALUES
     -- User 1
-    (UUID_TO_BIN('af7c1fe6-d669-414e-b066-e9733f0de7a8'), 'DoeJ', 'john.doe@example.com', 'pwd_john', 'John', 'Doe', UUID_TO_BIN('6ba7b810-9dad-11d1-80b4-00c04fd430c8')),
+    (UUID_TO_BIN('af7c1fe6-d669-414e-b066-e9733f0de7a8'), 'DoeJ', 'john.doe@example.com', 'pwd_john', 'John', 'Doe'),
     -- User 2
-    (UUID_TO_BIN('08c71152-c552-42e7-b094-f510ff44e9cb'), 'SmithJ', 'jane.smith@example.com', 'pwd_jane', 'Jane', 'Smith', UUID_TO_BIN('6ba7b811-9dad-11d1-80b4-00c04fd430c8')),
+    (UUID_TO_BIN('08c71152-c552-42e7-b094-f510ff44e9cb'), 'SmithJ', 'jane.smith@example.com', 'pwd_jane', 'Jane', 'Smith'),
     -- User 3
-    (UUID_TO_BIN('c558a80a-f319-4c10-95d4-4282ef745b4b'), 'JohnsonM', 'michael.johnson@example.com', 'pwd_michael', 'Michael', 'Johnson', UUID_TO_BIN('6ba7b812-9dad-11d1-80b4-00c04fd430c8')),
+    (UUID_TO_BIN('c558a80a-f319-4c10-95d4-4282ef745b4b'), 'JohnsonM', 'michael.johnson@example.com', 'pwd_michael', 'Michael', 'Johnson'),
     -- User 4
-    (UUID_TO_BIN('1ad1fccc-d279-46a0-8980-1d91afd6ba67'), 'BrownE', 'emily.brown@example.com', 'pwd_emily', 'Emily', 'Brown', UUID_TO_BIN('6ba7b813-9dad-11d1-80b4-00c04fd430c8')),
+    (UUID_TO_BIN('1ad1fccc-d279-46a0-8980-1d91afd6ba67'), 'BrownE', 'emily.brown@example.com', 'pwd_emily', 'Emily', 'Brown'),
     -- User 5
-    (UUID_TO_BIN('5108babc-bf35-44d5-a9ba-de08badfa80a'), 'WilsonD', 'david.wilson@example.com', 'pwd_david', 'David', 'Wilson', UUID_TO_BIN('6ba7b814-9dad-11d1-80b4-00c04fd430c8')),
+    (UUID_TO_BIN('5108babc-bf35-44d5-a9ba-de08badfa80a'), 'WilsonD', 'david.wilson@example.com', 'pwd_david', 'David', 'Wilson'),
     -- User 6
-    (UUID_TO_BIN('2d790a4d-7c9c-4e23-9c9c-5749c5fa7fdb'), 'TaylorS', 'sophia.taylor@example.com', 'pwd_sophia', 'Sophia', 'Taylor', UUID_TO_BIN('6ba7b815-9dad-11d1-80b4-00c04fd430c8')),
+    (UUID_TO_BIN('2d790a4d-7c9c-4e23-9c9c-5749c5fa7fdb'), 'TaylorS', 'sophia.taylor@example.com', 'pwd_sophia', 'Sophia', 'Taylor'),
     -- User 7
-    (UUID_TO_BIN('8304e5ff-6324-4863-ac51-8fcbc6812b13'), 'AndersonD', 'daniel.anderson@example.com', 'pwd_daniel', 'Daniel', 'Anderson', UUID_TO_BIN('6ba7b816-9dad-11d1-80b4-00c04fd430c8')),
+    (UUID_TO_BIN('8304e5ff-6324-4863-ac51-8fcbc6812b13'), 'AndersonD', 'daniel.anderson@example.com', 'pwd_daniel', 'Daniel', 'Anderson'),
     -- User 8
-    (UUID_TO_BIN('fd4a096f-93f5-4f2a-86c6-69a2d20365ff'), 'ThomasO', 'olivia.thomas@example.com', 'pwd_olivia', 'Olivia', 'Thomas', UUID_TO_BIN('6ba7b817-9dad-11d1-80b4-00c04fd430c8')),
+    (UUID_TO_BIN('fd4a096f-93f5-4f2a-86c6-69a2d20365ff'), 'ThomasO', 'olivia.thomas@example.com', 'pwd_olivia', 'Olivia', 'Thomas'),
     -- User 9
-    (UUID_TO_BIN('96fdc209-0551-4d67-b9ad-0e9067a44bc4'), 'RobinsonE', 'ethan.robinson@example.com', 'pwd_ethan', 'Ethan', 'Robinson', UUID_TO_BIN('6ba7b818-9dad-11d1-80b4-00c04fd430c8')),
+    (UUID_TO_BIN('96fdc209-0551-4d67-b9ad-0e9067a44bc4'), 'RobinsonE', 'ethan.robinson@example.com', 'pwd_ethan', 'Ethan', 'Robinson'),
     -- User 10
-    (UUID_TO_BIN('0a7d6250-0be5-4036-8f23-33dc1762bed0'), 'HarrisA', 'ava.harris@example.com', 'pwd_ava', 'Ava', 'Harris', UUID_TO_BIN('6ba7b819-9dad-11d1-80b4-00c04fd430c8'));
+    (UUID_TO_BIN('0a7d6250-0be5-4036-8f23-33dc1762bed0'), 'HarrisA', 'ava.harris@example.com', 'pwd_ava', 'Ava', 'Harris');
 
 
 
