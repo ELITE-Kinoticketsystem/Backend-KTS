@@ -12,6 +12,7 @@ var key = os.Getenv("JWT_SECRET")
 
 const tokenLifespan = 15 * 60                 // 15 minutes
 const refreshTokenLifeSpan = 3 * 24 * 60 * 60 // 3 days
+const leeway = 5 * 60                         // 5 minutes
 const issuer = "KTS"
 
 func GenerateJWT(userId *uuid.UUID) (string, string, error) {
@@ -45,4 +46,34 @@ func GenerateJWT(userId *uuid.UUID) (string, string, error) {
 	}
 
 	return signedToken, signedRefreshToken, err
+}
+
+func ValidateToken(tokenString string) error {
+	validMethodsOption := jwt.WithValidMethods([]string{jwt.SigningMethodHS256.Alg()})
+	leewayOption := jwt.WithLeeway(time.Duration(leeway) * time.Second)
+	issuerOption := jwt.WithIssuer(issuer)
+	issuedAtOption := jwt.WithIssuedAt()
+
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		return []byte(key), nil
+	}, validMethodsOption, leewayOption, issuerOption, issuedAtOption)
+
+	if err != nil {
+		return err
+	}
+
+	if !token.Valid {
+		return err
+	}
+
+	return nil
+}
+
+func ExtractToken(authHeader string) (string, error) {
+	if len(authHeader) < 7 {
+		return "", jwt.ErrInvalidKey
+	}
+
+	// Return token without "Bearer " prefix
+	return authHeader[7:], nil
 }

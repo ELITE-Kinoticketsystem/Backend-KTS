@@ -97,3 +97,7 @@ func CheckUsernameHandler(userCtrl controllers.UserControllerI) gin.HandlerFunc 
 		c.Status(http.StatusOK)
 	}
 }
+
+func TestJwtToken(c *gin.Context) {
+	c.Status(http.StatusOK)
+}
