@@ -347,25 +347,54 @@ func TestGetEventWithWrongId(t *testing.T) {
 
 func TestGetEventsForMovieId(t *testing.T) {
 	//GIVEN
-	db, mock, err := sqlmock.New()
+	db, mock, _ := sqlmock.New()
 
 	id := &uuid.UUID{}
-	id2 := &uuid.UUID{}
+	// id2 := &uuid.UUID{}
 
-	rows := sqlmock.NewRows([]string{"id", "title", "start", "end", "event_type_id", "cinema_hall_id"}).AddRow(id, "Test Event", time.Now(), time.Now(), id, id).AddRow(id2, "Test Event2", time.Now(), time.Now(), id2, id2)
+	rows := sqlmock.NewRows([]string{"id", "title", "start", "end", "event_type_id", "cinema_hall_id"}).AddRow(id, "Test Event", time.Now(), time.Now(), id, id).AddRow(id, "Test Event", time.Now(), time.Now(), id, id)
 
-	mock.ExpectQuery("SELECT * FROM events WHERE id IN (SELECT event_id FROM event_movie WHERE movie_id=?)").WithArgs(id).WillReturnRows(rows, nil)
+	if rows == nil {
+		t.Fail()
+	}
+
+	mock.ExpectQuery("SELECT(.*)").WithArgs(id).WillReturnRows(rows)
 	dbManager := &managers.DatabaseManager{Connection: db}
-	EventRepository := EventRepository{DatabaseMgr: dbManager}
+	eventRepository := EventRepository{DatabaseMgr: dbManager}
 
 	//WHEN
-	events, err := EventRepository.GetEventsForMovieId(id)
+	events, err := eventRepository.GetEventsForMovieId(id)
 
 	//THEN
 	if err != nil {
 		t.Fail()
 	}
 	if events == nil {
+		t.Fail()
+	}
+	if len(events) != 2 {
+		t.Fail()
+	}
+}
+
+func TestGetEventsForMovieIdWithWrongId(t *testing.T) {
+	//GIVEN
+	db, mock, _ := sqlmock.New()
+
+	id := &uuid.UUID{}
+
+	mock.ExpectQuery("SELECT(.*)").WithArgs(id).WillReturnError(errors.New("Error"))
+	dbManager := &managers.DatabaseManager{Connection: db}
+	eventRepository := EventRepository{DatabaseMgr: dbManager}
+
+	//WHEN
+	events, err := eventRepository.GetEventsForMovieId(id)
+
+	//THEN
+	if err == nil {
+		t.Fail()
+	}
+	if events != nil {
 		t.Fail()
 	}
 }
