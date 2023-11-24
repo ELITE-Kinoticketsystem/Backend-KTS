@@ -11,6 +11,7 @@ import (
 
 type UserControllerI interface {
 	RegisterUser(registrationData models.RegistrationRequest) *models.KTSError
+	LoginUser(loginData models.LoginRequest) (*models.LoginResponse, *models.KTSError)
 	CheckEmail(email string) *models.KTSError
 	CheckUsername(username string) *models.KTSError
 }
@@ -46,6 +47,32 @@ func (uc *UserController) RegisterUser(registrationData models.RegistrationReque
 		return kts_err
 	}
 	return nil
+}
+
+func (uc *UserController) LoginUser(loginData models.LoginRequest) (*models.LoginResponse, *models.KTSError) {
+
+	// get user from database
+	user, kts_err := uc.UserRepo.GetUserByUsername(loginData.Username)
+	if kts_err != nil {
+		return nil, kts_err
+	}
+
+	// check if password is correct
+	if ok := utils.ComparePasswordHash(loginData.Password, user.Password); !ok {
+		return nil, kts_errors.KTS_CREDENTIALS_INVALID
+	}
+
+	// generate JWT token
+	token, refreshToken, err := utils.GenerateJWT(user.Id)
+	if err != nil {
+		return nil, kts_errors.KTS_UPSTREAM_ERROR
+	}
+
+	return &models.LoginResponse{
+		User:         *user,
+		Token:        token,
+		RefreshToken: refreshToken,
+	}, nil
 }
 
 func (uc *UserController) CheckEmail(email string) *models.KTSError {

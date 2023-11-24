@@ -1,6 +1,8 @@
 package repositories
 
 import (
+	"database/sql"
+
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/managers"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
@@ -8,6 +10,8 @@ import (
 )
 
 type UserRepositoryI interface {
+	GetUserByUsername(username string) (*schemas.User, *models.KTSError)
+
 	CreateUser(user schemas.User) *models.KTSError
 	CheckIfUsernameExists(username string) *models.KTSError
 	CheckIfEmailExists(email string) *models.KTSError
@@ -15,6 +19,24 @@ type UserRepositoryI interface {
 
 type UserRepository struct {
 	DatabaseManager managers.DatabaseManagerI
+}
+
+func (ur *UserRepository) GetUserByUsername(username string) (*schemas.User, *models.KTSError) {
+	var user schemas.User
+	err := ur.DatabaseManager.ExecuteQueryRow(
+		"SELECT id, username, email, password, firstname, lastname FROM users WHERE username = ?",
+		username,
+	).Scan(
+		&user.Id, &user.Username, &user.Email, &user.Password, &user.FirstName, &user.LastName,
+	)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, kts_errors.KTS_USER_NOT_FOUND
+		}
+		return nil, kts_errors.KTS_INTERNAL_ERROR
+	}
+	return &user, nil
+
 }
 
 func (ur *UserRepository) CreateUser(user schemas.User) *models.KTSError {

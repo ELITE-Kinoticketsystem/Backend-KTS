@@ -1,6 +1,7 @@
 package repositories
 
 import (
+	"database/sql"
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
@@ -8,20 +9,100 @@ import (
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/managers"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models/schemas"
-	"github.com/google/uuid"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
 	"github.com/stretchr/testify/assert"
 )
+
+func TestGetUserByUsername(t *testing.T) {
+	sampleUser := utils.GetSampleUser()
+	testCases := []struct {
+		name            string
+		username        string
+		setExpectations func(mock sqlmock.Sqlmock, username string)
+		expectedUser    *schemas.User
+		expectedError   *models.KTSError
+	}{
+		{
+			name:     "No rows",
+			username: "Collinho el niño",
+			setExpectations: func(mock sqlmock.Sqlmock, username string) {
+				mock.ExpectQuery(
+					"SELECT id, username, email, password, firstname, lastname FROM users WHERE username = ?",
+				).WithArgs(username).WillReturnError(sql.ErrNoRows)
+			},
+			expectedUser:  nil,
+			expectedError: kts_errors.KTS_USER_NOT_FOUND,
+		},
+		{
+			name:     "Internal error",
+			username: "Collinho el niño",
+			setExpectations: func(mock sqlmock.Sqlmock, username string) {
+				mock.ExpectQuery(
+					"SELECT id, username, email, password, firstname, lastname FROM users WHERE username = ?",
+				).WithArgs(username).WillReturnError(sqlmock.ErrCancelled)
+			},
+			expectedUser:  nil,
+			expectedError: kts_errors.KTS_INTERNAL_ERROR,
+		},
+		{
+			name:     "Success",
+			username: "Collinho el niño",
+			setExpectations: func(mock sqlmock.Sqlmock, username string) {
+				mock.ExpectQuery(
+					"SELECT id, username, email, password, firstname, lastname FROM users WHERE username = ?",
+				).WithArgs(username).WillReturnRows(
+					sqlmock.NewRows([]string{
+						"id", "username", "email", "password", "firstname", "lastname",
+					}).AddRow(sampleUser.Id, sampleUser.Username, sampleUser.Email, sampleUser.Password, sampleUser.FirstName, sampleUser.LastName),
+				)
+			},
+			expectedUser:  &sampleUser,
+			expectedError: nil,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			// GIVEN
+			// create mock db manager
+			db, mock, err := sqlmock.New()
+			if err != nil {
+				t.Fatalf("error while setting up mock database: %s", err)
+			}
+			userRepo := UserRepository{
+				DatabaseManager: &managers.DatabaseManager{
+					Connection: db,
+				},
+			}
+
+			// define expectations
+			tc.setExpectations(mock, tc.username)
+
+			// WHEN
+			// call GetUserByUsername with username
+			user, kts_err := userRepo.GetUserByUsername(tc.username)
+
+			// THEN
+			// check expected error, user and expectations
+			assert.Equal(t, tc.expectedError, kts_err)
+			assert.Equal(t, tc.expectedUser, user)
+			if err = mock.ExpectationsWereMet(); err != nil {
+				t.Errorf("There were unfulfilled expectations: %s", err)
+			}
+		})
+	}
+}
 
 func TestCreateUser(t *testing.T) {
 	testCases := []struct {
 		name            string
-		data            *schemas.User
+		data            schemas.User
 		setExpectations func(mock sqlmock.Sqlmock, user *schemas.User)
 		expectedError   *models.KTSError
 	}{
 		{
 			name: "Success",
-			data: getSampleUser(),
+			data: utils.GetSampleUser(),
 			setExpectations: func(mock sqlmock.Sqlmock, user *schemas.User) {
 				mock.ExpectExec("INSERT INTO users").WithArgs(
 					user.Id, user.Username, user.Email, user.Password, user.FirstName, user.LastName,
@@ -31,7 +112,7 @@ func TestCreateUser(t *testing.T) {
 		},
 		{
 			name: "Internal error",
-			data: getSampleUser(),
+			data: utils.GetSampleUser(),
 			setExpectations: func(mock sqlmock.Sqlmock, user *schemas.User) {
 				mock.ExpectExec("INSERT INTO users").WithArgs(
 					user.Id, user.Username, user.Email, user.Password, user.FirstName, user.LastName,
@@ -56,11 +137,11 @@ func TestCreateUser(t *testing.T) {
 			}
 
 			// define expectations
-			tc.setExpectations(mock, tc.data)
+			tc.setExpectations(mock, &tc.data)
 
 			// WHEN
 			// call CreateUser with user data
-			kts_err := userRepo.CreateUser(*tc.data)
+			kts_err := userRepo.CreateUser(tc.data)
 
 			// THEN
 			// check expected error and expectations
@@ -224,17 +305,5 @@ func TestCheckIfEmailExists(t *testing.T) {
 			}
 
 		})
-	}
-}
-
-func getSampleUser() *schemas.User {
-	id, _ := uuid.Parse("550e8400-e29b-11d4-a716-446655440000")
-	return &schemas.User{
-		Id:        &id,
-		Username:  "Collinho el niño",
-		Email:     "collin.forslund@gmail.com",
-		Password:  "Passwort",
-		FirstName: "Collin",
-		LastName:  "Forslund",
 	}
 }

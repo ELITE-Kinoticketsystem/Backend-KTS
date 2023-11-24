@@ -11,12 +11,13 @@ import (
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
 
-	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
+	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/mocks"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
 )
 
-func TestHandlerCreateUser(t *testing.T) {
+func TestRegisterUser(t *testing.T) {
 	testCases := []struct {
 		name            string
 		body            interface{}
@@ -25,7 +26,7 @@ func TestHandlerCreateUser(t *testing.T) {
 	}{
 		{
 			name: "Success",
-			body: getSampleRegistratonData(),
+			body: utils.GetSampleRegistrationData(),
 			setExpectations: func(mockController *mocks.MockUserControllerI) {
 				mockController.EXPECT().RegisterUser(gomock.Any()).Return(nil)
 			},
@@ -33,7 +34,7 @@ func TestHandlerCreateUser(t *testing.T) {
 		},
 		{
 			name: "Internal Error",
-			body: getSampleRegistratonData(),
+			body: utils.GetSampleRegistrationData(),
 			setExpectations: func(mockController *mocks.MockUserControllerI) {
 				mockController.EXPECT().RegisterUser(gomock.Any()).Return(kts_errors.KTS_INTERNAL_ERROR)
 			},
@@ -41,7 +42,7 @@ func TestHandlerCreateUser(t *testing.T) {
 		},
 		{
 			name: "Email exists",
-			body: getSampleRegistratonData(),
+			body: utils.GetSampleRegistrationData(),
 			setExpectations: func(mockController *mocks.MockUserControllerI) {
 				mockController.EXPECT().RegisterUser(gomock.Any()).Return(kts_errors.KTS_EMAIL_EXISTS)
 			},
@@ -49,7 +50,7 @@ func TestHandlerCreateUser(t *testing.T) {
 		},
 		{
 			name: "Upstream Error",
-			body: getSampleRegistratonData(),
+			body: utils.GetSampleRegistrationData(),
 			setExpectations: func(mockController *mocks.MockUserControllerI) {
 				mockController.EXPECT().RegisterUser(gomock.Any()).Return(kts_errors.KTS_UPSTREAM_ERROR)
 			},
@@ -115,6 +116,91 @@ func TestHandlerCreateUser(t *testing.T) {
 	}
 }
 
+func TestLoginUser(t *testing.T) {
+	testCases := []struct {
+		name            string
+		body            models.LoginRequest
+		setExpectations func(mockController *mocks.MockUserControllerI, loginData models.LoginRequest)
+		expectedStatus  int
+	}{
+		{
+			name:            "Empty field",
+			body:            models.LoginRequest{Username: "", Password: "Passwort"},
+			setExpectations: func(mockController *mocks.MockUserControllerI, loginData models.LoginRequest) {},
+			expectedStatus:  http.StatusBadRequest,
+		},
+		{
+			name: "User not found",
+			body: utils.GetSampleLoginData(),
+			setExpectations: func(mockController *mocks.MockUserControllerI, loginData models.LoginRequest) {
+				mockController.EXPECT().LoginUser(loginData).Return(nil, kts_errors.KTS_USER_NOT_FOUND)
+			},
+			expectedStatus: http.StatusNotFound,
+		},
+		{
+			name: "Internal error",
+			body: utils.GetSampleLoginData(),
+			setExpectations: func(mockController *mocks.MockUserControllerI, loginData models.LoginRequest) {
+				mockController.EXPECT().LoginUser(loginData).Return(nil, kts_errors.KTS_INTERNAL_ERROR)
+			},
+			expectedStatus: http.StatusInternalServerError,
+		},
+		{
+			name: "Incorrect password",
+			body: utils.GetSampleLoginData(),
+			setExpectations: func(mockController *mocks.MockUserControllerI, loginData models.LoginRequest) {
+				mockController.EXPECT().LoginUser(loginData).Return(nil, kts_errors.KTS_CREDENTIALS_INVALID)
+			},
+			expectedStatus: http.StatusUnauthorized,
+		},
+		{
+			name: "Success",
+			body: utils.GetSampleLoginData(),
+			setExpectations: func(mockController *mocks.MockUserControllerI, loginData models.LoginRequest) {
+				user := utils.GetSampleUser()
+				mockController.EXPECT().LoginUser(loginData).Return(
+					&models.LoginResponse{
+						User: user,
+						/* Token */
+						/* RefreshToken */
+					}, nil)
+			},
+			expectedStatus: http.StatusOK,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			// GIVEN
+			// create mock context
+			w := httptest.NewRecorder()
+			gin.SetMode(gin.TestMode)
+			c, _ := gin.CreateTestContext(w)
+
+			// create mock controller
+			mockCtrl := gomock.NewController(t)
+			defer mockCtrl.Finish()
+			userController := mocks.NewMockUserControllerI(mockCtrl)
+
+			// create mock request
+			jsonData, _ := json.Marshal(tc.body)
+			req := httptest.NewRequest("POST", "/auth/login", bytes.NewBuffer(jsonData))
+			req.Header.Set("Content-Type", "application/json")
+			c.Request = req
+
+			// define expectations
+			tc.setExpectations(userController, tc.body)
+
+			// WHEN
+			// call LoginUserHandler with mock context
+			LoginUserHandler(userController)(c)
+
+			// THEN
+			// check the HTTP status code
+			assert.Equal(t, tc.expectedStatus, w.Code, "wrong HTTP status code")
+		})
+	}
+}
 func TestHandlerCheckEmail(t *testing.T) {
 	testCases := []struct {
 		name            string
@@ -262,15 +348,5 @@ func TestHandlerCheckUsername(t *testing.T) {
 			assert.Equal(t, tc.expectedStatus, w.Code, "wrong HTTP status code")
 
 		})
-	}
-}
-
-func getSampleRegistratonData() models.RegistrationRequest {
-	return models.RegistrationRequest{
-		Username:  "Collinho el niño",
-		Email:     "collin.forslund@gmail.com",
-		Password:  "Passwort",
-		FirstName: "Collin",
-		LastName:  "Forslund",
 	}
 }
