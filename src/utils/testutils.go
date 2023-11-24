@@ -6,6 +6,8 @@ import (
 
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models/schemas"
+	"github.com/google/go-cmp/cmp"
+	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/google/uuid"
 )
 
@@ -36,6 +38,11 @@ func GetSampleUser() schemas.User {
 		FirstName: "Collin",
 		LastName:  "Forslund",
 	}
+}
+
+// Compare two users while ignoring their ids and hashed passwords.
+func UserEqual(user1 schemas.User, user2 schemas.User) bool {
+	return cmp.Equal(user1, user2, cmpopts.IgnoreFields(schemas.User{}, "Id", "Password"))
 }
 
 type UserMatcher struct {

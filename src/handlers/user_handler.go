@@ -22,13 +22,14 @@ func RegisterUserHandler(userCtrl controllers.UserControllerI) gin.HandlerFunc {
 			utils.HandleErrorAndAbort(c, *kts_errors.KTS_BAD_REQUEST)
 			return
 		}
-		kts_err := userCtrl.RegisterUser(registrationData)
+		// user is logged in after registration
+		loginResponse, kts_err := userCtrl.RegisterUser(registrationData)
 		if kts_err != nil {
 			utils.HandleErrorAndAbort(c, *kts_err)
 			return
 		}
 
-		c.JSON(http.StatusCreated, "")
+		c.JSON(http.StatusCreated, loginResponse)
 	}
 }
 

@@ -21,38 +21,43 @@ func TestRegisterUser(t *testing.T) {
 	testCases := []struct {
 		name            string
 		body            interface{}
-		setExpectations func(mockController *mocks.MockUserControllerI)
+		setExpectations func(mockController *mocks.MockUserControllerI, registrationData interface{})
 		expectedStatus  int
 	}{
 		{
 			name: "Success",
 			body: utils.GetSampleRegistrationData(),
-			setExpectations: func(mockController *mocks.MockUserControllerI) {
-				mockController.EXPECT().RegisterUser(gomock.Any()).Return(nil)
+			setExpectations: func(mockController *mocks.MockUserControllerI, registrationData interface{}) {
+				mockController.EXPECT().RegisterUser(registrationData).Return(
+					&models.LoginResponse{
+						User: utils.GetSampleUser(),
+						/* Token */
+						/* RefreshToken */
+					}, nil)
 			},
 			expectedStatus: http.StatusCreated,
 		},
 		{
 			name: "Internal Error",
 			body: utils.GetSampleRegistrationData(),
-			setExpectations: func(mockController *mocks.MockUserControllerI) {
-				mockController.EXPECT().RegisterUser(gomock.Any()).Return(kts_errors.KTS_INTERNAL_ERROR)
+			setExpectations: func(mockController *mocks.MockUserControllerI, registrationData interface{}) {
+				mockController.EXPECT().RegisterUser(registrationData).Return(nil, kts_errors.KTS_INTERNAL_ERROR)
 			},
 			expectedStatus: http.StatusInternalServerError,
 		},
 		{
 			name: "Email exists",
 			body: utils.GetSampleRegistrationData(),
-			setExpectations: func(mockController *mocks.MockUserControllerI) {
-				mockController.EXPECT().RegisterUser(gomock.Any()).Return(kts_errors.KTS_EMAIL_EXISTS)
+			setExpectations: func(mockController *mocks.MockUserControllerI, registrationData interface{}) {
+				mockController.EXPECT().RegisterUser(registrationData).Return(nil, kts_errors.KTS_EMAIL_EXISTS)
 			},
 			expectedStatus: http.StatusConflict,
 		},
 		{
 			name: "Upstream Error",
 			body: utils.GetSampleRegistrationData(),
-			setExpectations: func(mockController *mocks.MockUserControllerI) {
-				mockController.EXPECT().RegisterUser(gomock.Any()).Return(kts_errors.KTS_UPSTREAM_ERROR)
+			setExpectations: func(mockController *mocks.MockUserControllerI, registrationData interface{}) {
+				mockController.EXPECT().RegisterUser(registrationData).Return(nil, kts_errors.KTS_UPSTREAM_ERROR)
 			},
 			expectedStatus: http.StatusInternalServerError,
 		},
@@ -65,19 +70,19 @@ func TestRegisterUser(t *testing.T) {
 				FirstName: "Collin",
 				LastName:  "Forslund",
 			},
-			setExpectations: func(mockController *mocks.MockUserControllerI) {},
+			setExpectations: func(mockController *mocks.MockUserControllerI, registrationData interface{}) {},
 			expectedStatus:  http.StatusBadRequest,
 		},
 		{
 			name:            "Malformatted data",
 			body:            map[string]string{},
-			setExpectations: func(mockController *mocks.MockUserControllerI) {},
+			setExpectations: func(mockController *mocks.MockUserControllerI, registrationData interface{}) {},
 			expectedStatus:  http.StatusBadRequest,
 		},
 		{
 			name:            "No data",
 			body:            nil,
-			setExpectations: func(mockController *mocks.MockUserControllerI) {},
+			setExpectations: func(mockController *mocks.MockUserControllerI, registrationData interface{}) {},
 			expectedStatus:  http.StatusBadRequest,
 		},
 	}
@@ -102,7 +107,7 @@ func TestRegisterUser(t *testing.T) {
 			c.Request = req
 
 			// define expectations
-			tc.setExpectations(userController)
+			tc.setExpectations(userController, tc.body)
 
 			// WHEN
 			// call RegisterUserHandler with mock context
@@ -201,7 +206,7 @@ func TestLoginUser(t *testing.T) {
 		})
 	}
 }
-func TestHandlerCheckEmail(t *testing.T) {
+func TestCheckEmail(t *testing.T) {
 	testCases := []struct {
 		name            string
 		body            interface{}
@@ -276,7 +281,7 @@ func TestHandlerCheckEmail(t *testing.T) {
 	}
 }
 
-func TestHandlerCheckUsername(t *testing.T) {
+func TestCheckUsername(t *testing.T) {
 	testCases := []struct {
 		name            string
 		body            interface{}

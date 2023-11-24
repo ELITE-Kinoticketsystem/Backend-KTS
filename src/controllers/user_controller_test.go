@@ -17,6 +17,7 @@ func TestRegisterUser(t *testing.T) {
 		name             string
 		registrationData models.RegistrationRequest
 		setExpectations  func(mockRepo mocks.MockUserRepositoryI, registrationData models.RegistrationRequest)
+		expectedResponse *models.LoginResponse
 		expectedError    *models.KTSError
 	}{
 		{
@@ -25,7 +26,8 @@ func TestRegisterUser(t *testing.T) {
 			setExpectations: func(mockRepo mocks.MockUserRepositoryI, registrationData models.RegistrationRequest) {
 				mockRepo.EXPECT().CheckIfEmailExists(registrationData.Email).Return(kts_errors.KTS_EMAIL_EXISTS)
 			},
-			expectedError: kts_errors.KTS_EMAIL_EXISTS,
+			expectedResponse: nil,
+			expectedError:    kts_errors.KTS_EMAIL_EXISTS,
 		},
 		{
 			name:             "Email internal error",
@@ -33,10 +35,11 @@ func TestRegisterUser(t *testing.T) {
 			setExpectations: func(mockRepo mocks.MockUserRepositoryI, registrationData models.RegistrationRequest) {
 				mockRepo.EXPECT().CheckIfEmailExists(registrationData.Email).Return(kts_errors.KTS_INTERNAL_ERROR)
 			},
-			expectedError: kts_errors.KTS_INTERNAL_ERROR,
+			expectedResponse: nil,
+			expectedError:    kts_errors.KTS_INTERNAL_ERROR,
 		},
 		{
-			name:             "create user internal error",
+			name:             "CreateUser internal error",
 			registrationData: utils.GetSampleRegistrationData(),
 			setExpectations: func(mockRepo mocks.MockUserRepositoryI, registrationData models.RegistrationRequest) {
 				user := schemas.User{
@@ -52,23 +55,29 @@ func TestRegisterUser(t *testing.T) {
 				mockRepo.EXPECT().CreateUser(utils.EqUserMatcher(user, registrationData.Password)).Return(kts_errors.KTS_INTERNAL_ERROR)
 
 			},
-			expectedError: kts_errors.KTS_INTERNAL_ERROR,
+			expectedResponse: nil,
+			expectedError:    kts_errors.KTS_INTERNAL_ERROR,
 		},
 		{
-			name:             "success",
+			name:             "Success",
 			registrationData: utils.GetSampleRegistrationData(),
 			setExpectations: func(mockRepo mocks.MockUserRepositoryI, registrationData models.RegistrationRequest) {
 				user := schemas.User{
 					/* Id */
 					Username:  registrationData.Username,
 					Email:     registrationData.Email,
-					Password:  registrationData.Password,
+					Password:  registrationData.Password, // unhashed password
 					FirstName: registrationData.FirstName,
 					LastName:  registrationData.LastName,
 				}
 
 				mockRepo.EXPECT().CheckIfEmailExists(registrationData.Email).Return(nil)
 				mockRepo.EXPECT().CreateUser(utils.EqUserMatcher(user, registrationData.Password)).Return(nil)
+			},
+			expectedResponse: &models.LoginResponse{
+				User: utils.GetSampleUser(),
+				/* Token */
+				/* RefreshToken */
 			},
 			expectedError: nil,
 		},
@@ -93,11 +102,15 @@ func TestRegisterUser(t *testing.T) {
 
 			// WHEN
 			// call RegisterUser with registrationData
-			err := userController.RegisterUser(registrationData)
+			loginResponse, err := userController.RegisterUser(registrationData)
 
 			// THEN
-			// check expected error
+			// check expected error and user
 			assert.Equal(t, err, tc.expectedError, "wrong error")
+			if tc.expectedResponse != nil {
+				assert.False(t, loginResponse == nil, "loginResponse should not be nil")
+				assert.True(t, utils.UserEqual(tc.expectedResponse.User, loginResponse.User))
+			}
 		})
 	}
 
@@ -180,6 +193,7 @@ func TestLoginUser(t *testing.T) {
 			// check expected error
 			assert.Equal(t, tc.expectedError, err, "wrong error")
 			if tc.expectedResponse != nil {
+				assert.False(t, loginResponse == nil, "loginResponse should not be nil")
 				assert.Equal(t, tc.expectedResponse.User, loginResponse.User, "wrong response")
 			}
 		})
@@ -187,7 +201,7 @@ func TestLoginUser(t *testing.T) {
 
 }
 
-func TestControllerCheckEmail(t *testing.T) {
+func TestCheckEmail(t *testing.T) {
 	testCases := []struct {
 		name            string
 		email           string
@@ -238,7 +252,7 @@ func TestControllerCheckEmail(t *testing.T) {
 
 }
 
-func TestControllerCheckUsername(t *testing.T) {
+func TestCheckUsername(t *testing.T) {
 	testCases := []struct {
 		name            string
 		username        string

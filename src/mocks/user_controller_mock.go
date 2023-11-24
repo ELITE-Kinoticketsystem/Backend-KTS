@@ -82,11 +82,12 @@ func (mr *MockUserControllerIMockRecorder) LoginUser(loginData any) *gomock.Call
 }
 
 // RegisterUser mocks base method.
-func (m *MockUserControllerI) RegisterUser(registrationData models.RegistrationRequest) *models.KTSError {
+func (m *MockUserControllerI) RegisterUser(registrationData models.RegistrationRequest) (*models.LoginResponse, *models.KTSError) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "RegisterUser", registrationData)
-	ret0, _ := ret[0].(*models.KTSError)
-	return ret0
+	ret0, _ := ret[0].(*models.LoginResponse)
+	ret1, _ := ret[1].(*models.KTSError)
+	return ret0, ret1
 }
 
 // RegisterUser indicates an expected call of RegisterUser.
