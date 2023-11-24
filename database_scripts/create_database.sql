@@ -108,9 +108,7 @@ CREATE TABLE users
      password   VARCHAR(255) NOT NULL,
      firstname  VARCHAR(255) NOT NULL,
      lastname   VARCHAR(255) NOT NULL,
-     address_id BINARY(16),
-     PRIMARY KEY (id),
-     FOREIGN KEY (address_id) REFERENCES addresses(id)
+     PRIMARY KEY (id)
   );
 
 CREATE TABLE user_movies
