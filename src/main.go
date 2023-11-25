@@ -2,19 +2,31 @@ package main
 
 import (
 	"context"
+	"log"
 	"net/http"
 	"os"
 	"os/signal"
 	"time"
 
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/managers"
+	"github.com/joho/godotenv"
 )
 
 func main() {
+	log.Println("Loading environment variables...")
+	err := godotenv.Load()
+	if err != nil {
+		log.Printf("error loading .env file: %v\n", err)
+	} else {
+		log.Println("Environment variables loaded successfully")
+	}
+	
+	log.Println("Initializing database connection...")
 	dbConnection, err := managers.InitializeDB()
 	if err != nil {
-		// TODO: Log proper information
+		panic(err)
 	}
+	log.Println("Database initialized successfully")
 	defer dbConnection.Close()
 
 	router := createRouter(dbConnection)
@@ -31,6 +43,7 @@ func main() {
 	signal.Notify(quit, os.Interrupt)
 
 	go func() {
+		log.Printf("Server listening on port %s", port)
 		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			// TODO: Log proper information
 		}

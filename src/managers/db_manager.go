@@ -5,7 +5,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/go-sql-driver/mysql"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
+	_ "github.com/go-sql-driver/mysql"
 )
 
 type DatabaseManagerI interface {
@@ -52,15 +53,20 @@ func InitializeDB() (*sql.DB, error) {
 		dbPass = os.Getenv("DB_PASSWORD")
 		dbName = os.Getenv("DB_NAME")
 	)
-
-	config := mysql.Config{
-		User:   dbUser,
-		Passwd: dbPass,
-		Net:    "tcp",
-		Addr:   fmt.Sprintf("%s:%s", dbHost, dbPort),
-		DBName: dbName,
+	if utils.ContainsEmptyString(dbHost, dbPort, dbUser, dbPass, dbName) {
+		return nil, fmt.Errorf("error initializing datbase connection: environment variables not set")
 	}
-	db, _ := sql.Open("mysql", config.FormatDSN())
 
+	config := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", dbUser, dbPass, dbHost, dbPort, dbName)
+	db, err := sql.Open("mysql", config)
+	if err != nil {
+		return nil, fmt.Errorf("error connecting to database: %v", err)
+	}
+
+	err = db.Ping()
+	if err != nil {
+		return nil, fmt.Errorf("error pinging database: %v", err)
+	}
+	
 	return db, nil
 }
