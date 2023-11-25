@@ -7,6 +7,7 @@ import (
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/controllers"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/handlers"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/managers"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/middlewares"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/repositories"
 	"github.com/gin-gonic/gin"
 )
@@ -21,6 +22,8 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 	// Attach Middleware
 
 	// Create api groups, with special middleware
+	publicRoutes := router.Group("/")
+	securedRoutes := router.Group("/", middlewares.JwtAuthMiddleware())
 
 	// Create managers and repositories
 	databaseManager := &managers.DatabaseManager{
@@ -39,11 +42,14 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 	}
 
 	// Set routes
-	router.Handle(http.MethodGet, "/lifecheck", handlers.LifeCheckHandler())
+	publicRoutes.Handle(http.MethodGet, "/lifecheck", handlers.LifeCheckHandler())
 
-	router.Handle(http.MethodPost, "/auth/register", handlers.RegisterUserHandler(controller.UserController))
-	router.Handle(http.MethodPost, "/auth/check-email", handlers.CheckEmailHandler(controller.UserController))
-	router.Handle(http.MethodPost, "/auth/check-username", handlers.CheckUsernameHandler(controller.UserController))
+	publicRoutes.Handle(http.MethodPost, "/auth/register", handlers.RegisterUserHandler(controller.UserController))
+	publicRoutes.Handle(http.MethodPost, "/auth/login", handlers.LoginUserHandler(controller.UserController))
+	publicRoutes.Handle(http.MethodPost, "/auth/check-email", handlers.CheckEmailHandler(controller.UserController))
+	publicRoutes.Handle(http.MethodPost, "/auth/check-username", handlers.CheckUsernameHandler(controller.UserController))
+
+	securedRoutes.Handle(http.MethodGet, "/test", handlers.TestJwtToken)
 
 	return router
 }

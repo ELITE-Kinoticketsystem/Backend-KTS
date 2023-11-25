@@ -3,12 +3,12 @@ package schemas
 import "github.com/google/uuid"
 
 type User struct {
-	Id         *uuid.UUID `json:"id"`
-	Username   string     `json:"username"`
-	Email      string     `json:"email"`
-	Password   string     `json:"password"`
-	FirstName  string     `json:"firstName"`
-	LastName   string     `json:"lastName"`
+	Id        *uuid.UUID `json:"id"`
+	Username  string     `json:"username"`
+	Email     string     `json:"email"`
+	Password  string     `json:"-"`
+	FirstName string     `json:"firstName"`
+	LastName  string     `json:"lastName"`
 }
 
 type UserMovies struct {
@@ -19,7 +19,7 @@ type UserMovies struct {
 
 type Admin struct {
 	Id       *uuid.UUID `json:"id"`
-	Email    string
-	Password string
+	Email    string     `json:"email"`
+	Password string     `json:"-"`
 	Theatre  *uuid.UUID `json:"theatreId"`
 }

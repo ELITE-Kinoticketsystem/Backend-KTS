@@ -10,7 +10,8 @@ import (
 )
 
 type UserControllerI interface {
-	RegisterUser(registrationData models.RegistrationRequest) *models.KTSError
+	RegisterUser(registrationData models.RegistrationRequest) (*models.LoginResponse, *models.KTSError)
+	LoginUser(loginData models.LoginRequest) (*models.LoginResponse, *models.KTSError)
 	CheckEmail(email string) *models.KTSError
 	CheckUsername(username string) *models.KTSError
 }
@@ -19,17 +20,17 @@ type UserController struct {
 	UserRepo repositories.UserRepositoryI
 }
 
-func (uc *UserController) RegisterUser(registrationData models.RegistrationRequest) *models.KTSError {
+func (uc *UserController) RegisterUser(registrationData models.RegistrationRequest) (*models.LoginResponse, *models.KTSError) {
 	userId := uuid.New()
 
 	hash, err := utils.HashPassword(registrationData.Password)
 	if err != nil {
-		return kts_errors.KTS_UPSTREAM_ERROR
+		return nil, kts_errors.KTS_UPSTREAM_ERROR
 	}
 
 	kts_err := uc.UserRepo.CheckIfEmailExists(registrationData.Email)
 	if kts_err != nil {
-		return kts_err
+		return nil, kts_err
 	}
 
 	user := schemas.User{
@@ -43,9 +44,45 @@ func (uc *UserController) RegisterUser(registrationData models.RegistrationReque
 
 	kts_err = uc.UserRepo.CreateUser(user)
 	if kts_err != nil {
-		return kts_err
+		return nil, kts_err
 	}
-	return nil
+
+	token, refreshToken, err := utils.GenerateJWT(user.Id)
+	if err != nil {
+		return nil, kts_errors.KTS_UPSTREAM_ERROR
+	}
+
+	return &models.LoginResponse{
+		User: user,
+		Token: token,
+		RefreshToken: refreshToken,
+	}, nil
+}
+
+func (uc *UserController) LoginUser(loginData models.LoginRequest) (*models.LoginResponse, *models.KTSError) {
+
+	// get user from database
+	user, kts_err := uc.UserRepo.GetUserByUsername(loginData.Username)
+	if kts_err != nil {
+		return nil, kts_err
+	}
+
+	// check if password is correct
+	if ok := utils.ComparePasswordHash(loginData.Password, user.Password); !ok {
+		return nil, kts_errors.KTS_CREDENTIALS_INVALID
+	}
+
+	// generate JWT token
+	token, refreshToken, err := utils.GenerateJWT(user.Id)
+	if err != nil {
+		return nil, kts_errors.KTS_UPSTREAM_ERROR
+	}
+
+	return &models.LoginResponse{
+		User:         *user,
+		Token:        token,
+		RefreshToken: refreshToken,
+	}, nil
 }
 
 func (uc *UserController) CheckEmail(email string) *models.KTSError {

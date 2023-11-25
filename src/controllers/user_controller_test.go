@@ -3,7 +3,7 @@ package controllers
 import (
 	"testing"
 
-	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
+	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/mocks"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models/schemas"
@@ -12,32 +12,35 @@ import (
 	"go.uber.org/mock/gomock"
 )
 
-func TestControllerRegister(t *testing.T) {
+func TestRegisterUser(t *testing.T) {
 	testCases := []struct {
 		name             string
 		registrationData models.RegistrationRequest
 		setExpectations  func(mockRepo mocks.MockUserRepositoryI, registrationData models.RegistrationRequest)
+		expectedResponse *models.LoginResponse
 		expectedError    *models.KTSError
 	}{
 		{
 			name:             "Email exists",
-			registrationData: getSampleRegistratonData(),
+			registrationData: utils.GetSampleRegistrationData(),
 			setExpectations: func(mockRepo mocks.MockUserRepositoryI, registrationData models.RegistrationRequest) {
 				mockRepo.EXPECT().CheckIfEmailExists(registrationData.Email).Return(kts_errors.KTS_EMAIL_EXISTS)
 			},
-			expectedError: kts_errors.KTS_EMAIL_EXISTS,
+			expectedResponse: nil,
+			expectedError:    kts_errors.KTS_EMAIL_EXISTS,
 		},
 		{
 			name:             "Email internal error",
-			registrationData: getSampleRegistratonData(),
+			registrationData: utils.GetSampleRegistrationData(),
 			setExpectations: func(mockRepo mocks.MockUserRepositoryI, registrationData models.RegistrationRequest) {
 				mockRepo.EXPECT().CheckIfEmailExists(registrationData.Email).Return(kts_errors.KTS_INTERNAL_ERROR)
 			},
-			expectedError: kts_errors.KTS_INTERNAL_ERROR,
+			expectedResponse: nil,
+			expectedError:    kts_errors.KTS_INTERNAL_ERROR,
 		},
 		{
-			name:             "create user internal error",
-			registrationData: getSampleRegistratonData(),
+			name:             "CreateUser internal error",
+			registrationData: utils.GetSampleRegistrationData(),
 			setExpectations: func(mockRepo mocks.MockUserRepositoryI, registrationData models.RegistrationRequest) {
 				user := schemas.User{
 					/* Id */
@@ -52,23 +55,29 @@ func TestControllerRegister(t *testing.T) {
 				mockRepo.EXPECT().CreateUser(utils.EqUserMatcher(user, registrationData.Password)).Return(kts_errors.KTS_INTERNAL_ERROR)
 
 			},
-			expectedError: kts_errors.KTS_INTERNAL_ERROR,
+			expectedResponse: nil,
+			expectedError:    kts_errors.KTS_INTERNAL_ERROR,
 		},
 		{
-			name:             "success",
-			registrationData: getSampleRegistratonData(),
+			name:             "Success",
+			registrationData: utils.GetSampleRegistrationData(),
 			setExpectations: func(mockRepo mocks.MockUserRepositoryI, registrationData models.RegistrationRequest) {
 				user := schemas.User{
 					/* Id */
 					Username:  registrationData.Username,
 					Email:     registrationData.Email,
-					Password:  registrationData.Password,
+					Password:  registrationData.Password, // unhashed password
 					FirstName: registrationData.FirstName,
 					LastName:  registrationData.LastName,
 				}
 
 				mockRepo.EXPECT().CheckIfEmailExists(registrationData.Email).Return(nil)
 				mockRepo.EXPECT().CreateUser(utils.EqUserMatcher(user, registrationData.Password)).Return(nil)
+			},
+			expectedResponse: &models.LoginResponse{
+				User: utils.GetSampleUser(),
+				/* Token */
+				/* RefreshToken */
 			},
 			expectedError: nil,
 		},
@@ -93,17 +102,106 @@ func TestControllerRegister(t *testing.T) {
 
 			// WHEN
 			// call RegisterUser with registrationData
-			err := userController.RegisterUser(registrationData)
+			loginResponse, err := userController.RegisterUser(registrationData)
 
 			// THEN
-			// check expected error
+			// check expected error and user
 			assert.Equal(t, err, tc.expectedError, "wrong error")
+			if tc.expectedResponse != nil {
+				assert.False(t, loginResponse == nil, "loginResponse should not be nil")
+				assert.True(t, utils.UserEqual(tc.expectedResponse.User, loginResponse.User))
+			}
 		})
 	}
 
 }
 
-func TestControllerCheckEmail(t *testing.T) {
+func TestLoginUser(t *testing.T) {
+	testCases := []struct {
+		name             string
+		loginData        models.LoginRequest
+		setExpectations  func(mockRepo mocks.MockUserRepositoryI, loginData models.LoginRequest)
+		expectedError    *models.KTSError
+		expectedResponse *models.LoginResponse
+	}{
+		{
+			name:      "User not found",
+			loginData: utils.GetSampleLoginData(),
+			setExpectations: func(mockRepo mocks.MockUserRepositoryI, loginData models.LoginRequest) {
+				mockRepo.EXPECT().GetUserByUsername(loginData.Username).Return(nil, kts_errors.KTS_USER_NOT_FOUND)
+			},
+			expectedError:    kts_errors.KTS_USER_NOT_FOUND,
+			expectedResponse: nil,
+		},
+		{
+			name:      "Internal error",
+			loginData: utils.GetSampleLoginData(),
+			setExpectations: func(mockRepo mocks.MockUserRepositoryI, loginData models.LoginRequest) {
+				mockRepo.EXPECT().GetUserByUsername(loginData.Username).Return(nil, kts_errors.KTS_INTERNAL_ERROR)
+			},
+			expectedError:    kts_errors.KTS_INTERNAL_ERROR,
+			expectedResponse: nil,
+		},
+		{
+			name:      "Incorrect password",
+			loginData: models.LoginRequest{Username: "Collinho el niño", Password: "incorrect"},
+			setExpectations: func(mockRepo mocks.MockUserRepositoryI, loginData models.LoginRequest) {
+				user := utils.GetSampleUser()
+				mockRepo.EXPECT().GetUserByUsername(loginData.Username).Return(&user, nil)
+			},
+			expectedError:    kts_errors.KTS_CREDENTIALS_INVALID,
+			expectedResponse: nil,
+		},
+		{
+			name:      "success",
+			loginData: utils.GetSampleLoginData(),
+			setExpectations: func(mockRepo mocks.MockUserRepositoryI, loginData models.LoginRequest) {
+				user := utils.GetSampleUser()
+				mockRepo.EXPECT().GetUserByUsername(loginData.Username).Return(&user, nil)
+			},
+			expectedError: nil,
+			expectedResponse: &models.LoginResponse{
+				User: utils.GetSampleUser(),
+				/* Token */
+				/* RefreshToken */
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			// GIVEN
+			// create mock user repo
+			mockCtrl := gomock.NewController(t)
+			defer mockCtrl.Finish()
+			userRepoMock := mocks.NewMockUserRepositoryI(mockCtrl)
+			userController := UserController{
+				UserRepo: userRepoMock,
+			}
+
+			// create mock data
+			loginData := tc.loginData
+
+			// define expectations
+			tc.setExpectations(*userRepoMock, loginData)
+
+			// WHEN
+			// call RegisterUser with registrationData
+			loginResponse, err := userController.LoginUser(loginData)
+
+			// THEN
+			// check expected error
+			assert.Equal(t, tc.expectedError, err, "wrong error")
+			if tc.expectedResponse != nil {
+				assert.False(t, loginResponse == nil, "loginResponse should not be nil")
+				assert.Equal(t, tc.expectedResponse.User, loginResponse.User, "wrong response")
+			}
+		})
+	}
+
+}
+
+func TestCheckEmail(t *testing.T) {
 	testCases := []struct {
 		name            string
 		email           string
@@ -154,7 +252,7 @@ func TestControllerCheckEmail(t *testing.T) {
 
 }
 
-func TestControllerCheckUsername(t *testing.T) {
+func TestCheckUsername(t *testing.T) {
 	testCases := []struct {
 		name            string
 		username        string
@@ -203,13 +301,4 @@ func TestControllerCheckUsername(t *testing.T) {
 		})
 	}
 
-}
-func getSampleRegistratonData() models.RegistrationRequest {
-	return models.RegistrationRequest{
-		Username:  "Collinho el niño",
-		Email:     "collin.forslund@gmail.com",
-		Password:  "Passwort",
-		FirstName: "Collin",
-		LastName:  "Forslund",
-	}
 }

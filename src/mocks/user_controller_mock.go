@@ -66,12 +66,28 @@ func (mr *MockUserControllerIMockRecorder) CheckUsername(username any) *gomock.C
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CheckUsername", reflect.TypeOf((*MockUserControllerI)(nil).CheckUsername), username)
 }
 
+// LoginUser mocks base method.
+func (m *MockUserControllerI) LoginUser(loginData models.LoginRequest) (*models.LoginResponse, *models.KTSError) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "LoginUser", loginData)
+	ret0, _ := ret[0].(*models.LoginResponse)
+	ret1, _ := ret[1].(*models.KTSError)
+	return ret0, ret1
+}
+
+// LoginUser indicates an expected call of LoginUser.
+func (mr *MockUserControllerIMockRecorder) LoginUser(loginData any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "LoginUser", reflect.TypeOf((*MockUserControllerI)(nil).LoginUser), loginData)
+}
+
 // RegisterUser mocks base method.
-func (m *MockUserControllerI) RegisterUser(registrationData models.RegistrationRequest) *models.KTSError {
+func (m *MockUserControllerI) RegisterUser(registrationData models.RegistrationRequest) (*models.LoginResponse, *models.KTSError) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "RegisterUser", registrationData)
-	ret0, _ := ret[0].(*models.KTSError)
-	return ret0
+	ret0, _ := ret[0].(*models.LoginResponse)
+	ret1, _ := ret[1].(*models.KTSError)
+	return ret0, ret1
 }
 
 // RegisterUser indicates an expected call of RegisterUser.

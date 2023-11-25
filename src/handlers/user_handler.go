@@ -22,13 +22,35 @@ func RegisterUserHandler(userCtrl controllers.UserControllerI) gin.HandlerFunc {
 			utils.HandleErrorAndAbort(c, *kts_errors.KTS_BAD_REQUEST)
 			return
 		}
-		kts_err := userCtrl.RegisterUser(registrationData)
+		// user is logged in after registration
+		loginResponse, kts_err := userCtrl.RegisterUser(registrationData)
 		if kts_err != nil {
 			utils.HandleErrorAndAbort(c, *kts_err)
 			return
 		}
 
-		c.JSON(http.StatusCreated, "")
+		c.JSON(http.StatusCreated, loginResponse)
+	}
+}
+
+func LoginUserHandler(userCtrl controllers.UserControllerI) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var loginData models.LoginRequest
+		err := c.ShouldBind(&loginData)
+		if err != nil ||
+			utils.ContainsEmptyString(
+				loginData.Username, loginData.Password,
+			) {
+			utils.HandleErrorAndAbort(c, *kts_errors.KTS_BAD_REQUEST)
+			return
+		}
+		loginResponse, kts_err := userCtrl.LoginUser(loginData)
+		if kts_err != nil {
+			utils.HandleErrorAndAbort(c, *kts_err)
+			return
+		}
+
+		c.JSON(http.StatusOK, loginResponse)
 	}
 }
 
@@ -50,7 +72,7 @@ func CheckEmailHandler(userCtrl controllers.UserControllerI) gin.HandlerFunc {
 			return
 		}
 
-		c.JSON(http.StatusOK, "")
+		c.Status(http.StatusOK)
 	}
 }
 
@@ -72,6 +94,10 @@ func CheckUsernameHandler(userCtrl controllers.UserControllerI) gin.HandlerFunc 
 			return
 		}
 
-		c.JSON(http.StatusOK, "")
+		c.Status(http.StatusOK)
 	}
+}
+
+func TestJwtToken(c *gin.Context) {
+	c.Status(http.StatusOK)
 }
