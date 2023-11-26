@@ -18,9 +18,12 @@ type EventRepo interface {
 	CreatePriceCategory(priceCategory *schemas.PriceCategory) (*schemas.PriceCategory, error)
 
 	AddEventMovie(eventId *uuid.UUID, movieId *uuid.UUID) error
+	DeleteEventMovies(eventId *uuid.UUID) error
 
 	CreateEventSeatCategory(eventSeatCategory *schemas.EventSeatCategory) (*schemas.EventSeatCategory, error)
+	DeleteEventSeatCategoryByEventId(eventId *uuid.UUID) error
 	CreateEventSeat(eventSeat *schemas.EventSeat) (*schemas.EventSeat, error)
+	DeleteEventSeatsByEventId(eventId *uuid.UUID) error
 }
 
 type EventRepository struct {
@@ -216,6 +219,11 @@ func (er *EventRepository) AddEventMovie(eventId *uuid.UUID, movieId *uuid.UUID)
 	return errors.New("not implemented")
 }
 
+func (er *EventRepository) DeleteEventMovies(eventId *uuid.UUID) error {
+	// TODO: implement
+	return errors.New("not implemented")
+}
+
 func (er *EventRepository) CreateEventSeatCategory(eventSeatCategory *schemas.EventSeatCategory) (*schemas.EventSeatCategory, error) {
 	// TODO: implement
 	return nil, errors.New("not implemented")
@@ -224,4 +232,13 @@ func (er *EventRepository) CreateEventSeatCategory(eventSeatCategory *schemas.Ev
 func (er *EventRepository) CreateEventSeat(eventSeat *schemas.EventSeat) (*schemas.EventSeat, error) {
 	// TODO: implement
 	return nil, errors.New("not implemented")
+}
+
+func (er *EventRepository) DeleteEventMovie(eventId *uuid.UUID) error {
+	// TODO: implement
+	return errors.New("not implemented")
+}
+
+func (er *EventRepository) DeleteEventSeatCategoryByEventId(eventId *uuid.UUID) error {
+	return errors.New("not implemented")
 }

@@ -5,6 +5,7 @@ import (
 	"testing"
 	"time"
 
+	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/mocks"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models/schemas"
@@ -242,6 +243,94 @@ func TestEventController_CreateEvent(t *testing.T) {
 	}
 }
 
+func TestEventController_DeleteEvent(t *testing.T) {
+	eventId := uuid.New()
+
+	tests := []struct {
+		name          string
+		expectFuncs   func(mockEventRepo *mocks.MockEventRepo, t *testing.T)
+		expectedError bool
+	}{
+		{
+			name: "ExpectDeleteEventWorks",
+			expectFuncs: func(mockEventRepo *mocks.MockEventRepo, t *testing.T) {
+				ExpectDeleteEventWorks(mockEventRepo, t)
+				ExpectDeleteEventMoviesWorks(mockEventRepo, t)
+				ExpectDeleteEventSeatCategoryByEventIdWorks(mockEventRepo, t)
+				ExpectDeleteEventSeatsByEventIdWorks(mockEventRepo, t)
+			},
+			expectedError: false,
+		},
+		{
+			name: "ExpectDeleteEventReturnsError",
+			expectFuncs: func(mockEventRepo *mocks.MockEventRepo, t *testing.T) {
+				ExpectDeleteEventReturnsError(mockEventRepo, t)
+			},
+			expectedError: true,
+		},
+		{
+			name: "ExpectDeleteEventMoviesReturnsError",
+			expectFuncs: func(mockEventRepo *mocks.MockEventRepo, t *testing.T) {
+				ExpectDeleteEventWorks(mockEventRepo, t)
+				ExpectDeleteEventMoviesReturnsError(mockEventRepo, t)
+			},
+			expectedError: true,
+		},
+		{
+			name: "ExpectDeleteEventSeatCategoryByEventIdReturnsError",
+			expectFuncs: func(mockEventRepo *mocks.MockEventRepo, t *testing.T) {
+				ExpectDeleteEventWorks(mockEventRepo, t)
+				ExpectDeleteEventMoviesWorks(mockEventRepo, t)
+				ExpectDeleteEventSeatCategoryByEventIdReturnsError(mockEventRepo, t)
+			},
+			expectedError: true,
+		},
+		{
+			name: "ExpectDeleteEventSeatsByEventIdReturnsError",
+			expectFuncs: func(mockEventRepo *mocks.MockEventRepo, t *testing.T) {
+				ExpectDeleteEventWorks(mockEventRepo, t)
+				ExpectDeleteEventMoviesWorks(mockEventRepo, t)
+				ExpectDeleteEventSeatCategoryByEventIdWorks(mockEventRepo, t)
+				ExpectDeleteEventSeatsByEventIdReturnsError(mockEventRepo, t)
+			},
+			expectedError: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// given
+			mockCtrl := gomock.NewController(t)
+			defer mockCtrl.Finish()
+
+			mockEventRepo := mocks.NewMockEventRepo(mockCtrl)
+
+			tt.expectFuncs(mockEventRepo, t)
+
+			eventController := &EventController{
+				EventRepo: mockEventRepo,
+			}
+
+			// when
+			err := eventController.DeleteEvent(&eventId)
+
+			// then
+			if tt.expectedError {
+				if err == nil {
+					t.Errorf("Expected error, but got nil")
+				}
+				if err != kts_errors.KTS_INTERNAL_ERROR {
+					t.Errorf("Expected error: %v, but got: %v", kts_errors.KTS_INTERNAL_ERROR, err)
+				}
+			} else {
+				if err != nil {
+					t.Errorf("Unexpected error: %v", err)
+				}
+			}
+		})
+	}
+}
+
 func ExpectCreateEventWorks(mockEventRepo *mocks.MockEventRepo, eventRequest *models.EventDTO, t *testing.T) {
 	mockEventRepo.EXPECT().CreateEvent(gomock.Any()).DoAndReturn(func(event *schemas.Event) (*schemas.Event, error) {
 		// check if all values are set
@@ -414,4 +503,56 @@ func ExpectCreateEventSeatCategoryWorks(mockEventRepo *mocks.MockEventRepo, t *t
 		}
 		return eventSeatCategory, nil
 	}).AnyTimes()
+}
+
+func ExpectDeleteEventWorks(mockEventRepo *mocks.MockEventRepo, t *testing.T) {
+	mockEventRepo.EXPECT().DeleteEvent(gomock.Any()).DoAndReturn(func(eventId *uuid.UUID) error {
+		if eventId == nil {
+			t.Errorf("Event Id is nil")
+		}
+		return nil
+	}).AnyTimes()
+}
+
+func ExpectDeleteEventReturnsError(mockEventRepo *mocks.MockEventRepo, t *testing.T) {
+	mockEventRepo.EXPECT().DeleteEvent(gomock.Any()).Return(errors.New("Error")).AnyTimes()
+}
+
+func ExpectDeleteEventMoviesWorks(mockEventRepo *mocks.MockEventRepo, t *testing.T) {
+	mockEventRepo.EXPECT().DeleteEventMovies(gomock.Any()).DoAndReturn(func(eventId *uuid.UUID) error {
+		if eventId == nil {
+			t.Errorf("Event Id is nil")
+		}
+		return nil
+	}).AnyTimes()
+}
+
+func ExpectDeleteEventSeatCategoryByEventIdReturnsError(mockEventRepo *mocks.MockEventRepo, t *testing.T) {
+	mockEventRepo.EXPECT().DeleteEventSeatCategoryByEventId(gomock.Any()).Return(errors.New("Error")).AnyTimes()
+}
+
+func ExpectDeleteEventSeatCategoryByEventIdWorks(mockEventRepo *mocks.MockEventRepo, t *testing.T) {
+	mockEventRepo.EXPECT().DeleteEventSeatCategoryByEventId(gomock.Any()).DoAndReturn(func(eventId *uuid.UUID) error {
+		if eventId == nil {
+			t.Errorf("Event Id is nil")
+		}
+		return nil
+	}).AnyTimes()
+}
+
+func ExpectDeleteEventSeatsByEventIdReturnsError(mockEventRepo *mocks.MockEventRepo, t *testing.T) {
+	mockEventRepo.EXPECT().DeleteEventSeatsByEventId(gomock.Any()).Return(errors.New("Error")).AnyTimes()
+}
+
+func ExpectDeleteEventSeatsByEventIdWorks(mockEventRepo *mocks.MockEventRepo, t *testing.T) {
+	mockEventRepo.EXPECT().DeleteEventSeatsByEventId(gomock.Any()).DoAndReturn(func(eventId *uuid.UUID) error {
+		if eventId == nil {
+			t.Errorf("Event Id is nil")
+		}
+		return nil
+	}).AnyTimes()
+}
+
+func ExpectDeleteEventMoviesReturnsError(mockEventRepo *mocks.MockEventRepo, t *testing.T) {
+	mockEventRepo.EXPECT().DeleteEventMovies(gomock.Any()).Return(errors.New("Error")).AnyTimes()
 }

@@ -70,6 +70,7 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 	securedRoutes.Handle(http.MethodGet, "/test", handlers.TestJwtToken)
 
 	router.Handle(http.MethodPost, "/events", handlers.CreateEventHandler(controller.EventController))
+	router.Handle(http.MethodDelete, "/events/:id", handlers.DeleteEventHandler(controller.EventController))
 
 	return router
 }

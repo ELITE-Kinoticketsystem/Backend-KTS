@@ -13,6 +13,7 @@ import (
 
 type EventControllerI interface {
 	CreateEvent(event *models.EventDTO) (*schemas.Event, *models.KTSError)
+	DeleteEvent(eventId *uuid.UUID) *models.KTSError
 }
 
 type EventController struct {
@@ -58,6 +59,29 @@ func (ec *EventController) CreateEvent(eventRequest *models.EventDTO) (*schemas.
 	}
 
 	return event, nil
+}
+
+func (ec *EventController) DeleteEvent(eventId *uuid.UUID) *models.KTSError {
+
+	err := ec.EventRepo.DeleteEvent(eventId)
+	if err != nil {
+		return kts_errors.KTS_INTERNAL_ERROR
+	}
+	err = ec.EventRepo.DeleteEventMovies(eventId)
+	if err != nil {
+		return kts_errors.KTS_INTERNAL_ERROR
+	}
+	err = ec.EventRepo.DeleteEventSeatCategoryByEventId(eventId)
+	if err != nil {
+		return kts_errors.KTS_INTERNAL_ERROR
+	}
+
+	err = ec.EventRepo.DeleteEventSeatsByEventId(eventId)
+	if err != nil {
+		return kts_errors.KTS_INTERNAL_ERROR
+	}
+
+	return nil
 }
 
 func (ec *EventController) createMovies(movies []models.MovieDTO, eventId *uuid.UUID) error {

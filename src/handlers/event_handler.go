@@ -8,6 +8,7 @@ import (
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 func CreateEventHandler(eventController controllers.EventControllerI) gin.HandlerFunc {
@@ -25,5 +26,18 @@ func CreateEventHandler(eventController controllers.EventControllerI) gin.Handle
 		}
 
 		c.JSON(http.StatusCreated, event)
+	}
+}
+
+func DeleteEventHandler(eventController controllers.EventControllerI) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		eventId := uuid.MustParse(c.Param("eventId"))
+		err := eventController.DeleteEvent(&eventId)
+		if err != nil {
+			utils.HandleErrorAndAbort(c, err)
+			return
+		}
+
+		c.Status(http.StatusNoContent)
 	}
 }

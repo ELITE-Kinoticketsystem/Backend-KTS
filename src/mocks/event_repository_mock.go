@@ -126,6 +126,48 @@ func (mr *MockEventRepoMockRecorder) DeleteEvent(arg0 any) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteEvent", reflect.TypeOf((*MockEventRepo)(nil).DeleteEvent), arg0)
 }
 
+// DeleteEventMovies mocks base method.
+func (m *MockEventRepo) DeleteEventMovies(eventId *uuid.UUID) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteEventMovies", eventId)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteEventMovies indicates an expected call of DeleteEventMovies.
+func (mr *MockEventRepoMockRecorder) DeleteEventMovies(eventId any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteEventMovies", reflect.TypeOf((*MockEventRepo)(nil).DeleteEventMovies), eventId)
+}
+
+// DeleteEventSeatCategoryByEventId mocks base method.
+func (m *MockEventRepo) DeleteEventSeatCategoryByEventId(eventId *uuid.UUID) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteEventSeatCategoryByEventId", eventId)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteEventSeatCategoryByEventId indicates an expected call of DeleteEventSeatCategoryByEventId.
+func (mr *MockEventRepoMockRecorder) DeleteEventSeatCategoryByEventId(eventId any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteEventSeatCategoryByEventId", reflect.TypeOf((*MockEventRepo)(nil).DeleteEventSeatCategoryByEventId), eventId)
+}
+
+// DeleteEventSeatsByEventId mocks base method.
+func (m *MockEventRepo) DeleteEventSeatsByEventId(eventId *uuid.UUID) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteEventSeatsByEventId", eventId)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteEventSeatsByEventId indicates an expected call of DeleteEventSeatsByEventId.
+func (mr *MockEventRepoMockRecorder) DeleteEventSeatsByEventId(eventId any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteEventSeatsByEventId", reflect.TypeOf((*MockEventRepo)(nil).DeleteEventSeatsByEventId), eventId)
+}
+
 // UpdateEvent mocks base method.
 func (m *MockEventRepo) UpdateEvent(event *schemas.Event) error {
 	m.ctrl.T.Helper()
