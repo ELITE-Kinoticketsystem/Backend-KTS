@@ -54,12 +54,11 @@ func (mr *MockEventRepoMockRecorder) AddEventMovie(eventId, movieId any) *gomock
 }
 
 // CreateEvent mocks base method.
-func (m *MockEventRepo) CreateEvent(event *schemas.Event) (*schemas.Event, error) {
+func (m *MockEventRepo) CreateEvent(event *schemas.Event) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateEvent", event)
-	ret0, _ := ret[0].(*schemas.Event)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
+	ret0, _ := ret[0].(error)
+	return ret0
 }
 
 // CreateEvent indicates an expected call of CreateEvent.
@@ -114,17 +113,17 @@ func (mr *MockEventRepoMockRecorder) CreatePriceCategory(priceCategory any) *gom
 }
 
 // DeleteEvent mocks base method.
-func (m *MockEventRepo) DeleteEvent(event *schemas.Event) error {
+func (m *MockEventRepo) DeleteEvent(arg0 *uuid.UUID) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "DeleteEvent", event)
+	ret := m.ctrl.Call(m, "DeleteEvent", arg0)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // DeleteEvent indicates an expected call of DeleteEvent.
-func (mr *MockEventRepoMockRecorder) DeleteEvent(event any) *gomock.Call {
+func (mr *MockEventRepoMockRecorder) DeleteEvent(arg0 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteEvent", reflect.TypeOf((*MockEventRepo)(nil).DeleteEvent), event)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteEvent", reflect.TypeOf((*MockEventRepo)(nil).DeleteEvent), arg0)
 }
 
 // UpdateEvent mocks base method.

@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/controllers"
-	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
+	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
 	"github.com/gin-gonic/gin"

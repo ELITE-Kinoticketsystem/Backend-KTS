@@ -1,6 +1,7 @@
 package repositories
 
 import (
+	"errors"
 	"log"
 	"time"
 
@@ -10,9 +11,9 @@ import (
 )
 
 type EventRepo interface {
-	CreateEvent(event *schemas.Event) (*schemas.Event, error)
+	CreateEvent(event *schemas.Event) error
 	UpdateEvent(event *schemas.Event) error
-	DeleteEvent(event *schemas.Event) error
+	DeleteEvent(*uuid.UUID) error
 
 	CreatePriceCategory(priceCategory *schemas.PriceCategory) (*schemas.PriceCategory, error)
 
@@ -23,7 +24,7 @@ type EventRepo interface {
 }
 
 type EventRepository struct {
-	DatabaseMgr managers.DatabaseManagerI
+	DatabaseManager managers.DatabaseManagerI
 }
 
 const (
@@ -87,7 +88,7 @@ const (
 // }
 
 func (er *EventRepository) CreateEvent(event *schemas.Event) error {
-	_, err := er.DatabaseMgr.ExecuteStatement("INSERT INTO events (id, title, start, end, event_type_id, cinema_hall_id) VALUES (?, ?, ?, ?, ?, ?)", event.Id, event.Title, event.Start, event.End, event.EventTypeId, event.CinemaHallId)
+	_, err := er.DatabaseManager.ExecuteStatement("INSERT INTO events (id, title, start, end, event_type_id, cinema_hall_id) VALUES (?, ?, ?, ?, ?, ?)", event.Id, event.Title, event.Start, event.End, event.EventTypeId, event.CinemaHallId)
 	if err != nil {
 		log.Printf("Error while inserting event: %v", err)
 		return err
@@ -97,7 +98,7 @@ func (er *EventRepository) CreateEvent(event *schemas.Event) error {
 }
 
 func (er *EventRepository) UpdateEvent(event *schemas.Event) error {
-	result, err := er.DatabaseMgr.ExecuteStatement("UPDATE events SET title=?, start=?, end=?, event_type_id=?, cinema_hall_id=? WHERE id=?", event.Title, event.Start, event.End, event.EventTypeId, event.CinemaHallId, event.Id)
+	result, err := er.DatabaseManager.ExecuteStatement("UPDATE events SET title=?, start=?, end=?, event_type_id=?, cinema_hall_id=? WHERE id=?", event.Title, event.Start, event.End, event.EventTypeId, event.CinemaHallId, event.Id)
 	if err != nil {
 		log.Printf("Error while updating event: %v", err)
 		return err
@@ -113,7 +114,7 @@ func (er *EventRepository) UpdateEvent(event *schemas.Event) error {
 
 func (er *EventRepository) DeleteEvent(id *uuid.UUID) error {
 	query := "DELETE FROM events WHERE id=?"
-	result, err := er.DatabaseMgr.ExecuteStatement(query, id)
+	result, err := er.DatabaseManager.ExecuteStatement(query, id)
 	if err != nil {
 		log.Printf("Error while deleting event: %v", err)
 		return err
@@ -127,7 +128,7 @@ func (er *EventRepository) DeleteEvent(id *uuid.UUID) error {
 
 func (er *EventRepository) GetEvent(id *uuid.UUID) (*schemas.Event, error) {
 	query := "SELECT * FROM events where id=? "
-	row := er.DatabaseMgr.ExecuteQueryRow(query, id)
+	row := er.DatabaseManager.ExecuteQueryRow(query, id)
 
 	event := schemas.Event{}
 	err := row.Scan(&event.Id, &event.Title, &event.Start, &event.End, &event.EventTypeId, &event.CinemaHallId)
@@ -141,7 +142,7 @@ func (er *EventRepository) GetEvent(id *uuid.UUID) (*schemas.Event, error) {
 
 func (er *EventRepository) GetEventsForMovieId(movieId *uuid.UUID) ([]*schemas.Event, error) {
 	query := "SELECT * FROM events WHERE id IN (SELECT event_id FROM event_movie WHERE movie_id=?)"
-	rows, err := er.DatabaseMgr.ExecuteQuery(query, movieId)
+	rows, err := er.DatabaseManager.ExecuteQuery(query, movieId)
 	if err != nil {
 		log.Printf("Error while getting events for movie id: %v", err)
 		return nil, err
@@ -163,7 +164,7 @@ func (er *EventRepository) GetEventsForMovieId(movieId *uuid.UUID) ([]*schemas.E
 
 func (er *EventRepository) GetEventsDateTimeIsBetween(start time.Time, end time.Time) ([]*schemas.Event, error) {
 	query := "SELECT * FROM events WHERE start BETWEEN ? AND ? OR end BETWEEN ? AND ?"
-	rows, err := er.DatabaseMgr.ExecuteQuery(query, start, end, start, end)
+	rows, err := er.DatabaseManager.ExecuteQuery(query, start, end, start, end)
 	if err != nil {
 		log.Printf("Error while getting events for movie id: %v", err)
 		return nil, err
@@ -185,7 +186,7 @@ func (er *EventRepository) GetEventsDateTimeIsBetween(start time.Time, end time.
 
 func (er *EventRepository) GetEventsForCinemaHallId(cinemaHallId *uuid.UUID) ([]*schemas.Event, error) {
 	query := "SELECT * FROM events WHERE cinema_hall_id=?"
-	rows, err := er.DatabaseMgr.ExecuteQuery(query, cinemaHallId)
+	rows, err := er.DatabaseManager.ExecuteQuery(query, cinemaHallId)
 	if err != nil {
 		log.Printf("Error while getting events for cinema hall id: %v", err)
 		return nil, err
@@ -203,4 +204,24 @@ func (er *EventRepository) GetEventsForCinemaHallId(cinemaHallId *uuid.UUID) ([]
 	}
 
 	return events, nil
+}
+
+func (er *EventRepository) CreatePriceCategory(priceCategory *schemas.PriceCategory) (*schemas.PriceCategory, error) {
+	// TODO: implement
+	return nil, errors.New("not implemented")
+}
+
+func (er *EventRepository) AddEventMovie(eventId *uuid.UUID, movieId *uuid.UUID) error {
+	// TODO: implement
+	return errors.New("not implemented")
+}
+
+func (er *EventRepository) CreateEventSeatCategory(eventSeatCategory *schemas.EventSeatCategory) (*schemas.EventSeatCategory, error) {
+	// TODO: implement
+	return nil, errors.New("not implemented")
+}
+
+func (er *EventRepository) CreateEventSeat(eventSeat *schemas.EventSeat) (*schemas.EventSeat, error) {
+	// TODO: implement
+	return nil, errors.New("not implemented")
 }

@@ -1,9 +1,10 @@
 package controllers
 
 import (
+	"log"
 	"time"
 
-	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/managers"
+	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models/schemas"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/repositories"
@@ -11,17 +12,16 @@ import (
 )
 
 type EventControllerI interface {
-	CreateEvent(event *schemas.Event) error
+	CreateEvent(event *models.EventDTO) (*schemas.Event, *models.KTSError)
 }
 
 type EventController struct {
-	DatabaseManager managers.DatabaseManagerI
-	EventRepo       repositories.EventRepo
-	MovieRepo       repositories.MovieRepoI
-	TheaterRepo     repositories.TheaterRepoI
+	EventRepo   repositories.EventRepo
+	MovieRepo   repositories.MovieRepoI
+	TheatreRepo repositories.TheaterRepoI
 }
 
-func (ec *EventController) CreateEvent(eventRequest *models.EventDTO) error {
+func (ec *EventController) CreateEvent(eventRequest *models.EventDTO) (*schemas.Event, *models.KTSError) {
 	eventId := uuid.New()
 	event := &schemas.Event{
 		Id:           &eventId,
@@ -31,67 +31,88 @@ func (ec *EventController) CreateEvent(eventRequest *models.EventDTO) error {
 		EventTypeId:  eventRequest.EventTypeId,
 		CinemaHallId: eventRequest.CinemaHallId,
 	}
-	createdEvent, err := ec.EventRepo.CreateEvent(event)
+	err := ec.EventRepo.CreateEvent(event)
 	if err != nil {
-		return err
+		log.Printf("Error creating event: %v", err)
+		return nil, kts_errors.KTS_INTERNAL_ERROR
 	}
-	return nil
 
-	createdEventId := createdEvent.Id
+	createdEventId := event.Id
 
 	err = ec.createMovies(eventRequest.Movies, createdEventId)
 	if err != nil {
-		return err
+		log.Printf("Error creating movies: %v", err)
+		return nil, kts_errors.KTS_INTERNAL_ERROR
 	}
 
 	err = ec.createEventSeatCategories(eventRequest.EventSeatCategories, createdEventId)
 	if err != nil {
-		return err
+		log.Printf("Error creating event seat categories: %v", err)
+		return nil, kts_errors.KTS_INTERNAL_ERROR
 	}
 
 	err = ec.createEventSeats(eventRequest.CinemaHallId, createdEventId)
 	if err != nil {
-		return err
+		log.Printf("Error creating event seats: %v", err)
+		return nil, kts_errors.KTS_INTERNAL_ERROR
+	}
+
+	return event, nil
+}
+
+func (ec *EventController) createMovies(movies []models.MovieDTO, eventId *uuid.UUID) error {
+	// TODO: still not completely though trough
+	// Currently when the id field is not set, we create a new movie
+	// How do we know we dont already have this movie in the database?
+
+	for _, movie := range movies {
+		var movieId uuid.UUID
+		if movie.Id == nil {
+			createdMovie, err := ec.createNewMovie(&movie)
+			if err != nil {
+				return err
+			}
+			movieId = *createdMovie.Id
+		} else {
+			movieId = *movie.Id
+		}
+		err := ec.EventRepo.AddEventMovie(eventId, &movieId)
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
 }
 
-func (ec *EventController) createMovies(movies []models.MovieDTO, eventId *uuid.UUID) error {
-	for _, movie := range movies {
-		if movie.Id == nil {
-			movieId := uuid.New()
-			genreNames := movie.GenreNames
+func (ec *EventController) createNewMovie(movieRequest *models.MovieDTO) (*schemas.Movie, error) {
+	movieId := uuid.New()
+	genreNames := movieRequest.GenreNames
 
-			movie := &schemas.Movie{
-				Id:          &movieId,
-				Title:       movie.Title,
-				Description: movie.Description,
-				ReleaseDate: movie.ReleaseDate,
-				TimeInMin:   movie.TimeInMin,
-				Fsk:         movie.Fsk,
-			}
-
-			createdMovie, err := ec.MovieRepo.CreateMovie(movie)
-			if err != nil {
-				return err
-			}
-
-			createdMovieId := createdMovie.Id
-
-			err = ec.EventRepo.AddEventMovie(eventId, createdMovieId)
-			if err != nil {
-				return err
-			}
-
-			err = ec.createGenres(genreNames, createdMovieId)
-			if err != nil {
-				return err
-			}
-		}
+	movie := &schemas.Movie{
+		Id:          &movieId,
+		Title:       movieRequest.Title,
+		Description: movieRequest.Description,
+		ReleaseDate: movieRequest.ReleaseDate,
+		TimeInMin:   movieRequest.TimeInMin,
+		Fsk:         movieRequest.Fsk,
 	}
 
-	return nil
+	err := ec.MovieRepo.CreateMovie(movie)
+	if err != nil {
+		return nil, err
+	}
+
+	createdMovieId := movie.Id
+	if createdMovieId == nil {
+		return nil, err
+	}
+
+	err = ec.createGenres(genreNames, createdMovieId)
+	if err != nil {
+		return nil, err
+	}
+	return movie, nil
 }
 
 func (ec *EventController) createGenres(genreNames []string, movieId *uuid.UUID) error {
@@ -107,7 +128,10 @@ func (ec *EventController) createGenres(genreNames []string, movieId *uuid.UUID)
 				Id:        &genreId,
 				GenreName: genreName,
 			}
-			ec.MovieRepo.CreateGenre(genre)
+			err := ec.MovieRepo.CreateGenre(genre)
+			if err != nil {
+				return err
+			}
 		}
 
 		err = ec.MovieRepo.AddMovieGenre(movieId, &genreId)
@@ -137,7 +161,7 @@ func (ec *EventController) createEventSeatCategories(eventSeatCategories []model
 }
 
 func (ec *EventController) createEventSeats(cinemaHallId *uuid.UUID, eventId *uuid.UUID) error {
-	seats, err := ec.TheaterRepo.GetSeatsForCinemaHall(cinemaHallId)
+	seats, err := ec.TheatreRepo.GetSeatsForCinemaHall(cinemaHallId)
 	if err != nil {
 		return err
 	}

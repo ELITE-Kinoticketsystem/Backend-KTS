@@ -43,7 +43,7 @@ func TestCreateEvent(t *testing.T) {
 
 	dbManager.EXPECT().ExecuteStatement("INSERT INTO events (id, title, start, end, event_type_id, cinema_hall_id) VALUES (?, ?, ?, ?, ?, ?)", id, title, time, time, id, id).Return(nil, nil)
 
-	EventRepository := EventRepository{DatabaseMgr: dbManager}
+	EventRepository := EventRepository{DatabaseManager: dbManager}
 
 	// Create mock event
 	event := &schemas.Event{
@@ -79,7 +79,7 @@ func TestCreateEventWithErrorInInsert(t *testing.T) {
 
 	dbManager.EXPECT().ExecuteStatement("INSERT INTO events (id, title, start, end, event_type_id, cinema_hall_id) VALUES (?, ?, ?, ?, ?, ?)", id, title, time, time, id, id).Return(nil, errors.New("Error"))
 
-	EventRepository := EventRepository{DatabaseMgr: dbManager}
+	EventRepository := EventRepository{DatabaseManager: dbManager}
 
 	// Create mock event
 	event := &schemas.Event{
@@ -118,7 +118,7 @@ func TestUpdateEvent(t *testing.T) {
 
 	dbManager.EXPECT().ExecuteStatement("UPDATE events SET title=?, start=?, end=?, event_type_id=?, cinema_hall_id=? WHERE id=?", title, time, time, id, id, id).Return(result, nil)
 
-	EventRepository := EventRepository{DatabaseMgr: dbManager}
+	EventRepository := EventRepository{DatabaseManager: dbManager}
 
 	// Create mock event
 	event := &schemas.Event{
@@ -156,7 +156,7 @@ func TestUpdateEventWithErrorInUpdate(t *testing.T) {
 
 	dbManager.EXPECT().ExecuteStatement("UPDATE events SET title=?, start=?, end=?, event_type_id=?, cinema_hall_id=? WHERE id=?", title, time, time, id, id, id).Return(result, errors.New("Error"))
 
-	EventRepository := EventRepository{DatabaseMgr: dbManager}
+	EventRepository := EventRepository{DatabaseManager: dbManager}
 
 	// Create mock event
 	event := &schemas.Event{
@@ -195,7 +195,7 @@ func TestUpdateEventWithNoRowsAffected(t *testing.T) {
 
 	dbManager.EXPECT().ExecuteStatement("UPDATE events SET title=?, start=?, end=?, event_type_id=?, cinema_hall_id=? WHERE id=?", title, time, time, id, id, id).Return(result, nil)
 
-	EventRepository := EventRepository{DatabaseMgr: dbManager}
+	EventRepository := EventRepository{DatabaseManager: dbManager}
 
 	// Create mock event
 	event := &schemas.Event{
@@ -229,7 +229,7 @@ func TestDeleteEvent(t *testing.T) {
 
 	dbManager.EXPECT().ExecuteStatement("DELETE FROM events WHERE id=?", id).Return(result, nil)
 
-	EventRepository := EventRepository{DatabaseMgr: dbManager}
+	EventRepository := EventRepository{DatabaseManager: dbManager}
 
 	//WHEN
 	err := EventRepository.DeleteEvent(id)
@@ -252,7 +252,7 @@ func TestDeleteEventWithErrorInDelete(t *testing.T) {
 
 	dbManager.EXPECT().ExecuteStatement("DELETE FROM events WHERE id=?", id).Return(result, errors.New("Error"))
 
-	EventRepository := EventRepository{DatabaseMgr: dbManager}
+	EventRepository := EventRepository{DatabaseManager: dbManager}
 
 	//WHEN
 	err := EventRepository.DeleteEvent(id)
@@ -276,7 +276,7 @@ func TestDeleteEventWithNoRowsAffected(t *testing.T) {
 
 	dbManager.EXPECT().ExecuteStatement("DELETE FROM events WHERE id=?", id).Return(result, nil)
 
-	EventRepository := EventRepository{DatabaseMgr: dbManager}
+	EventRepository := EventRepository{DatabaseManager: dbManager}
 
 	//WHEN
 	err := EventRepository.DeleteEvent(id)
@@ -302,7 +302,7 @@ func TestGetEvent(t *testing.T) {
 
 	dbManager := &managers.DatabaseManager{Connection: db}
 
-	EventRepository := EventRepository{DatabaseMgr: dbManager}
+	EventRepository := EventRepository{DatabaseManager: dbManager}
 
 	//WHEN
 	event, err := EventRepository.GetEvent(id)
@@ -331,7 +331,7 @@ func TestGetEventWithWrongId(t *testing.T) {
 
 	dbManager := &managers.DatabaseManager{Connection: db}
 
-	EventRepository := EventRepository{DatabaseMgr: dbManager}
+	EventRepository := EventRepository{DatabaseManager: dbManager}
 
 	//WHEN
 	event, err := EventRepository.GetEvent(id)
@@ -360,7 +360,7 @@ func TestGetEventsForMovieId(t *testing.T) {
 
 	mock.ExpectQuery("SELECT(.*)").WithArgs(id).WillReturnRows(rows)
 	dbManager := &managers.DatabaseManager{Connection: db}
-	eventRepository := EventRepository{DatabaseMgr: dbManager}
+	eventRepository := EventRepository{DatabaseManager: dbManager}
 
 	//WHEN
 	events, err := eventRepository.GetEventsForMovieId(id)
@@ -385,7 +385,7 @@ func TestGetEventsForMovieIdWithWrongId(t *testing.T) {
 
 	mock.ExpectQuery("SELECT(.*)").WithArgs(id).WillReturnError(errors.New("Error"))
 	dbManager := &managers.DatabaseManager{Connection: db}
-	eventRepository := EventRepository{DatabaseMgr: dbManager}
+	eventRepository := EventRepository{DatabaseManager: dbManager}
 
 	//WHEN
 	events, err := eventRepository.GetEventsForMovieId(id)
@@ -416,7 +416,7 @@ func TestGetEventsDateTimeIsBetween(t *testing.T) {
 
 	mock.ExpectQuery("SELECT(.*)").WithArgs(start, end, start, end).WillReturnRows(rows)
 	dbManager := &managers.DatabaseManager{Connection: db}
-	eventRepository := EventRepository{DatabaseMgr: dbManager}
+	eventRepository := EventRepository{DatabaseManager: dbManager}
 
 	//WHEN
 	events, err := eventRepository.GetEventsDateTimeIsBetween(start, end)
@@ -433,7 +433,6 @@ func TestGetEventsDateTimeIsBetween(t *testing.T) {
 	}
 }
 
-
 func TestGetEventsDateTimeIsBetweenWithWrongDates(t *testing.T) {
 	//GIVEN
 	db, mock, _ := sqlmock.New()
@@ -443,7 +442,7 @@ func TestGetEventsDateTimeIsBetweenWithWrongDates(t *testing.T) {
 
 	mock.ExpectQuery("SELECT(.*)").WithArgs(start, end, start, end).WillReturnError(errors.New("Error"))
 	dbManager := &managers.DatabaseManager{Connection: db}
-	eventRepository := EventRepository{DatabaseMgr: dbManager}
+	eventRepository := EventRepository{DatabaseManager: dbManager}
 
 	//WHEN
 	events, err := eventRepository.GetEventsDateTimeIsBetween(start, end)
@@ -471,7 +470,7 @@ func TestGetEventsForCinemaHallId(t *testing.T) {
 
 	mock.ExpectQuery("SELECT(.*)").WithArgs(id).WillReturnRows(rows)
 	dbManager := &managers.DatabaseManager{Connection: db}
-	eventRepository := EventRepository{DatabaseMgr: dbManager}
+	eventRepository := EventRepository{DatabaseManager: dbManager}
 
 	//WHEN
 	events, err := eventRepository.GetEventsForCinemaHallId(id)
@@ -496,7 +495,7 @@ func TestGetEventsForCinemaHallIdWithWrongId(t *testing.T) {
 
 	mock.ExpectQuery("SELECT(.*)").WithArgs(id).WillReturnError(errors.New("Error"))
 	dbManager := &managers.DatabaseManager{Connection: db}
-	eventRepository := EventRepository{DatabaseMgr: dbManager}
+	eventRepository := EventRepository{DatabaseManager: dbManager}
 
 	//WHEN
 	events, err := eventRepository.GetEventsForCinemaHallId(id)
@@ -509,4 +508,3 @@ func TestGetEventsForCinemaHallIdWithWrongId(t *testing.T) {
 		t.Fail()
 	}
 }
-
