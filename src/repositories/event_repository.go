@@ -12,8 +12,8 @@ import (
 
 type EventRepo interface {
 	CreateEvent(event *schemas.Event) error
-	UpdateEvent(event *schemas.Event) error
 	DeleteEvent(*uuid.UUID) error
+	GetEventsForMovieId(movieId *uuid.UUID) ([]*schemas.Event, error)
 
 	CreatePriceCategory(priceCategory *schemas.PriceCategory) (*schemas.PriceCategory, error)
 
@@ -100,21 +100,6 @@ func (er *EventRepository) CreateEvent(event *schemas.Event) error {
 	return nil
 }
 
-func (er *EventRepository) UpdateEvent(event *schemas.Event) error {
-	result, err := er.DatabaseManager.ExecuteStatement("UPDATE events SET title=?, start=?, end=?, event_type_id=?, cinema_hall_id=? WHERE id=?", event.Title, event.Start, event.End, event.EventTypeId, event.CinemaHallId, event.Id)
-	if err != nil {
-		log.Printf("Error while updating event: %v", err)
-		return err
-	}
-
-	if rowsAffected, err := result.RowsAffected(); rowsAffected == 0 {
-		log.Printf("No event with id %v found", event.Id)
-		return err
-	}
-
-	return nil
-}
-
 func (er *EventRepository) DeleteEvent(id *uuid.UUID) error {
 	query := "DELETE FROM events WHERE id=?"
 	result, err := er.DatabaseManager.ExecuteStatement(query, id)
@@ -144,7 +129,9 @@ func (er *EventRepository) GetEvent(id *uuid.UUID) (*schemas.Event, error) {
 }
 
 func (er *EventRepository) GetEventsForMovieId(movieId *uuid.UUID) ([]*schemas.Event, error) {
-	query := "SELECT * FROM events WHERE id IN (SELECT event_id FROM event_movie WHERE movie_id=?)"
+	// Add to query that only events that are in the future are returned
+	query := "SELECT * FROM events WHERE id IN (SELECT event_id FROM event_movie WHERE movie_id=?) AND start > NOW() ORDER BY start"
+
 	rows, err := er.DatabaseManager.ExecuteQuery(query, movieId)
 	if err != nil {
 		log.Printf("Error while getting events for movie id: %v", err)
@@ -240,5 +227,9 @@ func (er *EventRepository) DeleteEventMovie(eventId *uuid.UUID) error {
 }
 
 func (er *EventRepository) DeleteEventSeatCategoryByEventId(eventId *uuid.UUID) error {
+	return errors.New("not implemented")
+}
+
+func (er *EventRepository) DeleteEventSeatsByEventId(eventId *uuid.UUID) error {
 	return errors.New("not implemented")
 }

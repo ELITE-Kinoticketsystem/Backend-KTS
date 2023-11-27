@@ -41,3 +41,16 @@ func DeleteEventHandler(eventController controllers.EventControllerI) gin.Handle
 		c.Status(http.StatusNoContent)
 	}
 }
+
+func GetEventsForMovieHandler(eventController controllers.EventControllerI) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		movieId := uuid.MustParse(c.Param("movieId"))
+		events, err := eventController.GetEventsForMovie(&movieId)
+		if err != nil {
+			utils.HandleErrorAndAbort(c, err)
+			return
+		}
+
+		c.JSON(http.StatusOK, events)
+	}
+}

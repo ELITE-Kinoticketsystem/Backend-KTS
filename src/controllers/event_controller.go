@@ -14,6 +14,7 @@ import (
 type EventControllerI interface {
 	CreateEvent(event *models.EventDTO) (*schemas.Event, *models.KTSError)
 	DeleteEvent(eventId *uuid.UUID) *models.KTSError
+	GetEventsForMovie(movieId *uuid.UUID) ([]*schemas.Event, *models.KTSError)
 }
 
 type EventController struct {
@@ -82,6 +83,16 @@ func (ec *EventController) DeleteEvent(eventId *uuid.UUID) *models.KTSError {
 	}
 
 	return nil
+}
+
+func (ec *EventController) GetEventsForMovie(movieId *uuid.UUID) ([]*schemas.Event, *models.KTSError) {
+	events, err := ec.EventRepo.GetEventsForMovieId(movieId)
+	if err != nil {
+		log.Printf("Error getting events for movie: %v", err)
+		return nil, kts_errors.KTS_INTERNAL_ERROR
+	}
+
+	return events, nil
 }
 
 func (ec *EventController) createMovies(movies []models.MovieDTO, eventId *uuid.UUID) error {

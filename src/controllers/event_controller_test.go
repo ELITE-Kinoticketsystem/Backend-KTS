@@ -556,3 +556,94 @@ func ExpectDeleteEventSeatsByEventIdWorks(mockEventRepo *mocks.MockEventRepo, t 
 func ExpectDeleteEventMoviesReturnsError(mockEventRepo *mocks.MockEventRepo, t *testing.T) {
 	mockEventRepo.EXPECT().DeleteEventMovies(gomock.Any()).Return(errors.New("Error")).AnyTimes()
 }
+func TestEventController_GetEventsForMovie(t *testing.T) {
+	movieId := uuid.New()
+
+	tests := []struct {
+		name          string
+		expectFuncs   func(mockEventRepo *mocks.MockEventRepo, t *testing.T)
+		expectedError *models.KTSError
+	}{
+		{
+			name: "ExpectGetEventsForMovieIdReturnsEvents",
+			expectFuncs: func(mockEventRepo *mocks.MockEventRepo, t *testing.T) {
+				ExpectGetEventsForMovieIdReturnsEvents(mockEventRepo, t)
+			},
+			expectedError: nil,
+		},
+		{
+			name: "ExpectGetEventsForMovieIdReturnsError",
+			expectFuncs: func(mockEventRepo *mocks.MockEventRepo, t *testing.T) {
+				ExpectGetEventsForMovieIdReturnsError(mockEventRepo, t)
+			},
+			expectedError: kts_errors.KTS_INTERNAL_ERROR,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// given
+			mockCtrl := gomock.NewController(t)
+			defer mockCtrl.Finish()
+
+			mockEventRepo := mocks.NewMockEventRepo(mockCtrl)
+
+			tt.expectFuncs(mockEventRepo, t)
+
+			eventController := &EventController{
+				EventRepo: mockEventRepo,
+			}
+
+			// when
+			events, err := eventController.GetEventsForMovie(&movieId)
+
+			// then
+			if err != tt.expectedError {
+				t.Errorf("Expected error: %v, but got: %v", tt.expectedError, err)
+			}
+			if tt.expectedError == nil {
+				if events == nil {
+					t.Errorf("Expected events to be not nil, but got nil")
+				}
+				if len(events) != 2 {
+					t.Errorf("Expected events to have length 2, but got: %v", len(events))
+				}
+			} else {
+				if events != nil {
+					t.Errorf("Expected events to be nil, but got: %v", events)
+				}
+			}
+		})
+	}
+}
+
+func ExpectGetEventsForMovieIdReturnsEvents(mockEventRepo *mocks.MockEventRepo, t *testing.T) {
+	mockEventRepo.EXPECT().GetEventsForMovieId(gomock.Any()).DoAndReturn(func(movieId *uuid.UUID) ([]*schemas.Event, error) {
+		if movieId == nil {
+			t.Errorf("Movie Id is nil")
+		}
+		id := uuid.New()
+		return []*schemas.Event{
+			{
+				Id:           &id,
+				Title:        "Test Event 1",
+				Start:        time.Now(),
+				End:          time.Now(),
+				EventTypeId:  &id,
+				CinemaHallId: &id,
+			},
+			{
+				Id:           &id,
+				Title:        "Test Event 2",
+				Start:        time.Now(),
+				End:          time.Now(),
+				EventTypeId:  &id,
+				CinemaHallId: &id,
+			},
+		}, nil
+	}).AnyTimes()
+}
+
+func ExpectGetEventsForMovieIdReturnsError(mockEventRepo *mocks.MockEventRepo, t *testing.T) {
+	mockEventRepo.EXPECT().GetEventsForMovieId(gomock.Any()).Return(nil, errors.New("Error"))
+}

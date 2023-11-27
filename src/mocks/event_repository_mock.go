@@ -168,16 +168,17 @@ func (mr *MockEventRepoMockRecorder) DeleteEventSeatsByEventId(eventId any) *gom
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteEventSeatsByEventId", reflect.TypeOf((*MockEventRepo)(nil).DeleteEventSeatsByEventId), eventId)
 }
 
-// UpdateEvent mocks base method.
-func (m *MockEventRepo) UpdateEvent(event *schemas.Event) error {
+// GetEventsForMovieId mocks base method.
+func (m *MockEventRepo) GetEventsForMovieId(movieId *uuid.UUID) ([]*schemas.Event, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "UpdateEvent", event)
-	ret0, _ := ret[0].(error)
-	return ret0
+	ret := m.ctrl.Call(m, "GetEventsForMovieId", movieId)
+	ret0, _ := ret[0].([]*schemas.Event)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
-// UpdateEvent indicates an expected call of UpdateEvent.
-func (mr *MockEventRepoMockRecorder) UpdateEvent(event any) *gomock.Call {
+// GetEventsForMovieId indicates an expected call of GetEventsForMovieId.
+func (mr *MockEventRepoMockRecorder) GetEventsForMovieId(movieId any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateEvent", reflect.TypeOf((*MockEventRepo)(nil).UpdateEvent), event)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetEventsForMovieId", reflect.TypeOf((*MockEventRepo)(nil).GetEventsForMovieId), movieId)
 }

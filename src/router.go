@@ -71,6 +71,10 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 
 	router.Handle(http.MethodPost, "/events", handlers.CreateEventHandler(controller.EventController))
 	router.Handle(http.MethodDelete, "/events/:id", handlers.DeleteEventHandler(controller.EventController))
+	// Get events for movieId 
+	router.Handle(http.MethodGet, "/events/movies/:id", handlers.GetEventsForMovieHandler(controller.EventController))
+	// TODO: Do we need to add update event handler because how would we proceed then?
+
 
 	return router
 }
