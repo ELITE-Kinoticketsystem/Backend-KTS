@@ -20,7 +20,7 @@ func main() {
 	} else {
 		log.Println("Environment variables loaded successfully")
 	}
-	
+
 	log.Println("Initializing database connection...")
 	dbConnection, err := managers.InitializeDB()
 	if err != nil {
@@ -45,14 +45,14 @@ func main() {
 	go func() {
 		log.Printf("Server listening on port %s", port)
 		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			// TODO: Log proper information
+			log.Fatalf("error starting server: %v\n", err)
 		}
 	}()
 
 	<-quit
 
 	if err := server.Shutdown(context.TODO()); err != nil {
-		// TODO: Log proper information
+		log.Fatalf("error shutting down server: %v\n", err)
 	}
 
 	os.Exit(0)
