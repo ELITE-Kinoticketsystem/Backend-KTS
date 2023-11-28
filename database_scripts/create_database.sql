@@ -1,13 +1,12 @@
-DROP DATABASE IF EXISTS KinoTicketSystem;
-CREATE DATABASE IF NOT EXISTS KinoTicketSystem;
-USE KinoTicketSystem;
+DROP DATABASE IF EXISTS KinoTicketSystem_v2;
+CREATE DATABASE IF NOT EXISTS KinoTicketSystem_v2;
+USE KinoTicketSystem_v2;
 
 
 DROP TABLE IF EXISTS tickets;
 DROP TABLE IF EXISTS event_seats;
 DROP TABLE IF EXISTS event_seat_categories;
 DROP TABLE IF EXISTS event_movies;
-DROP TABLE IF EXISTS event_types;
 DROP TABLE IF EXISTS events;
 DROP TABLE IF EXISTS orders;
 DROP TABLE IF EXISTS payment_methods;
@@ -16,7 +15,10 @@ DROP TABLE IF EXISTS seat_categories;
 DROP TABLE IF EXISTS cinema_halls;
 DROP TABLE IF EXISTS theatres;
 DROP TABLE IF EXISTS user_movies;
+DROP TABLE IF EXISTS reviews;
 DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS actor_pictures;
+DROP TABLE IF EXISTS producer_pictures;
 DROP TABLE IF EXISTS movie_actors;
 DROP TABLE IF EXISTS movie_producers;
 DROP TABLE IF EXISTS producers;
@@ -31,29 +33,33 @@ DROP TABLE IF EXISTS addresses;
 CREATE TABLE addresses
   (
      id       BINARY(16) DEFAULT (Uuid_to_bin(Uuid(), 1)),
-     street   VARCHAR(255) NOT NULL,
+     street   VARCHAR(100) NOT NULL,
      street_nr VARCHAR(10) NOT NULL,
-     zipcode  VARCHAR(10) NOT NULL,
-     city     VARCHAR(255) NOT NULL,
-     country  VARCHAR(255) NOT NULL,
+     zipcode  VARCHAR(20) NOT NULL,
+     city     VARCHAR(50) NOT NULL,
+     country  VARCHAR(50) NOT NULL,
      PRIMARY KEY (id)
   );
 
 CREATE TABLE genres
   (
      id         BINARY(16) DEFAULT (Uuid_to_bin(Uuid(), 1)),
-     genre_name VARCHAR(255) NOT NULL,
+     genre_name VARCHAR(40) NOT NULL,
      PRIMARY KEY (id)
   );
 
 CREATE TABLE movies
   (
-     id           BINARY(16) DEFAULT (Uuid_to_bin(Uuid(), 1)),
-     title        VARCHAR(255) NOT NULL,
-     description  VARCHAR(255) NOT NULL,
-     release_date Date NOT NULL,
-     time_in_min  INT NOT NULL,
-     fsk          INT NOT NULL,
+     id             BINARY(16) DEFAULT (Uuid_to_bin(Uuid(), 1)),
+     title          VARCHAR(40) NOT NULL,
+     description    VARCHAR(255) NOT NULL,
+     banner_pic_url VARCHAR(255),
+     cover_pic_url  VARCHAR(255),
+     trailer_url    VARCHAR(255),
+     rating         FLOAT,
+     release_date   Date NOT NULL,
+     time_in_min    INT NOT NULL,
+     fsk            INT NOT NULL,
      PRIMARY KEY (id)
   );
 
@@ -68,18 +74,38 @@ CREATE TABLE movie_genres
 
 CREATE TABLE producers
   (
-     id   BINARY(16) DEFAULT (Uuid_to_bin(Uuid(), 1)),
-     name VARCHAR(255) NOT NULL,
-     age  INT NOT NULL,
+     id          BINARY(16) DEFAULT (Uuid_to_bin(Uuid(), 1)),
+     name        VARCHAR(50) NOT NULL,
+     age         INT NOT NULL,
+     description VARCHAR(255) NOT NULL,
      PRIMARY KEY (id)
   );
 
 CREATE TABLE actors
   (
-     id   BINARY(16) DEFAULT (Uuid_to_bin(Uuid(), 1)),
-     name VARCHAR(255) NOT NULL,
-     age  INT NOT NULL,
+     id          BINARY(16) DEFAULT (Uuid_to_bin(Uuid(), 1)),
+     name        VARCHAR(50) NOT NULL,
+     age         INT NOT NULL,
+     description VARCHAR(255) NOT NULL,
      PRIMARY KEY (id)
+  );
+
+CREATE TABLE actor_pictures
+  (
+     id         BINARY(16) DEFAULT (Uuid_to_bin(Uuid(), 1)),
+     actor_id   BINARY(16) NOT NULL,
+     pic_url    VARCHAR(255),
+     PRIMARY KEY (id),
+     FOREIGN KEY (actor_id) REFERENCES actors(id)
+  );
+
+CREATE TABLE producer_pictures
+  (
+     id            BINARY(16) DEFAULT (Uuid_to_bin(Uuid(), 1)),
+     producer_id   BINARY(16) NOT NULL,
+     pic_url       VARCHAR(255),
+     PRIMARY KEY (id),
+     FOREIGN KEY (producer_id) REFERENCES producers(id)
   );
 
 CREATE TABLE movie_producers
@@ -103,11 +129,11 @@ CREATE TABLE movie_actors
 CREATE TABLE users
   (
      id         BINARY(16) DEFAULT (Uuid_to_bin(Uuid(), 1)),
-     username   VARCHAR(255) NOT NULL,
-     email      VARCHAR(255) NOT NULL,
-     password   VARCHAR(255) NOT NULL,
-     firstname  VARCHAR(255) NOT NULL,
-     lastname   VARCHAR(255) NOT NULL,
+     username   VARCHAR(50),
+     email      VARCHAR(80) NOT NULL,
+     password   VARCHAR(50) NOT NULL,
+     firstname  VARCHAR(50),
+     lastname   VARCHAR(50),
      PRIMARY KEY (id)
   );
 
@@ -115,16 +141,29 @@ CREATE TABLE user_movies
   (
      user_id   BINARY(16) NOT NULL,
      movie_id  BINARY(16) NOT NULL,
-     list_type VARCHAR(255) NOT NULL,
+     list_type VARCHAR(40) NOT NULL,
      PRIMARY KEY (user_id, movie_id, list_type),
      FOREIGN KEY (user_id) REFERENCES users (id),
      FOREIGN KEY (movie_id) REFERENCES movies (id)
   );
 
+CREATE TABLE reviews
+  (
+     id         BINARY(16) DEFAULT (Uuid_to_bin(Uuid(), 1)),
+     rating     INT NOT NULL,
+     comment    VARCHAR(255) NOT NULL,
+     datetime   TIMESTAMP NOT NULL,
+     user_id    BINARY(16) NOT NULL,
+     movie_id   BINARY(16) NOT NULL,
+     PRIMARY KEY (id),
+     FOREIGN KEY (user_id) REFERENCES users(id),
+     FOREIGN KEY (movie_id) REFERENCES movies(id)
+  );
+
 CREATE TABLE theatres
   (
      id         BINARY(16) DEFAULT (Uuid_to_bin(Uuid(), 1)),
-     name       VARCHAR(255) NOT NULL,
+     name       VARCHAR(50) NOT NULL,
      address_id BINARY(16) NOT NULL,
      PRIMARY KEY(id),
      FOREIGN KEY (address_id) REFERENCES addresses(id)
@@ -133,7 +172,7 @@ CREATE TABLE theatres
 CREATE TABLE cinema_halls
   (
      id         BINARY(16) DEFAULT (Uuid_to_bin(Uuid(), 1)),
-     name       VARCHAR(255) NOT NULL,
+     name       VARCHAR(50) NOT NULL,
      capacity   INT NOT NULL,
      theatre_id BINARY(16) NOT NULL,
      PRIMARY KEY (id),
@@ -143,7 +182,7 @@ CREATE TABLE cinema_halls
 CREATE TABLE seat_categories
   (
      id            BINARY(16) DEFAULT (Uuid_to_bin(Uuid(), 1)),
-     category_name VARCHAR(255) NOT NULL,
+     category_name VARCHAR(30) NOT NULL,
      PRIMARY KEY (id)
   );
 
@@ -162,7 +201,7 @@ CREATE TABLE seats
 CREATE TABLE payment_methods
   (
      id         BINARY(16) DEFAULT (Uuid_to_bin(Uuid(), 1)),
-     methodname VARCHAR(255) NOT NULL,
+     methodname VARCHAR(30) NOT NULL,
      PRIMARY KEY (id)
   );
 
@@ -178,23 +217,16 @@ CREATE TABLE orders
      FOREIGN KEY (user_id) REFERENCES users(id)
   );
 
-CREATE TABLE event_types
-  (
-     id       BINARY(16) DEFAULT (Uuid_to_bin(Uuid(), 1)),
-     typename VARCHAR(255) NOT NULL,
-     PRIMARY KEY (id)
-  );
 
 CREATE TABLE events
   (
      id             BINARY(16) DEFAULT (Uuid_to_bin(Uuid(), 1)),
-     title          VARCHAR(255) NOT NULL,
+     title          VARCHAR(50) NOT NULL,
      start          DateTime NOT NULL,
      end            DateTime NOT NULL,
-     event_type_id  BINARY(16) NOT NULL,
+     event_type     VARCHAR(40) NOT NULL,
      cinema_hall_id BINARY(16) NOT NULL,
      PRIMARY KEY (id),
-     FOREIGN KEY (event_type_id) REFERENCES event_types(id),
      FOREIGN KEY (cinema_hall_id) REFERENCES cinema_halls(id)
   );
 
@@ -210,7 +242,7 @@ CREATE TABLE event_movies
 CREATE TABLE price_categories
   (
      id            BINARY(16) DEFAULT (Uuid_to_bin(Uuid(), 1)),
-     category_name VARCHAR(255) NOT NULL,
+     category_name VARCHAR(40) NOT NULL,
      price         INT NOT NULL,
      PRIMARY KEY (id)
   );
