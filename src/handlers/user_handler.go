@@ -19,13 +19,13 @@ func RegisterUserHandler(userCtrl controllers.UserControllerI) gin.HandlerFunc {
 				registrationData.Username, registrationData.Email, registrationData.Password,
 				registrationData.FirstName, registrationData.LastName,
 			) {
-			utils.HandleErrorAndAbort(c, *kts_errors.KTS_BAD_REQUEST)
+			utils.HandleErrorAndAbort(c, kts_errors.KTS_BAD_REQUEST)
 			return
 		}
 		// user is logged in after registration
 		loginResponse, kts_err := userCtrl.RegisterUser(registrationData)
 		if kts_err != nil {
-			utils.HandleErrorAndAbort(c, *kts_err)
+			utils.HandleErrorAndAbort(c, kts_err)
 			return
 		}
 
@@ -41,12 +41,12 @@ func LoginUserHandler(userCtrl controllers.UserControllerI) gin.HandlerFunc {
 			utils.ContainsEmptyString(
 				loginData.Username, loginData.Password,
 			) {
-			utils.HandleErrorAndAbort(c, *kts_errors.KTS_BAD_REQUEST)
+			utils.HandleErrorAndAbort(c, kts_errors.KTS_BAD_REQUEST)
 			return
 		}
 		loginResponse, kts_err := userCtrl.LoginUser(loginData)
 		if kts_err != nil {
-			utils.HandleErrorAndAbort(c, *kts_err)
+			utils.HandleErrorAndAbort(c, kts_err)
 			return
 		}
 
@@ -58,17 +58,17 @@ func CheckEmailHandler(userCtrl controllers.UserControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var requestData models.CheckEmailRequest
 		if err := c.ShouldBindJSON(&requestData); err != nil {
-			utils.HandleErrorAndAbort(c, *kts_errors.KTS_BAD_REQUEST)
+			utils.HandleErrorAndAbort(c, kts_errors.KTS_BAD_REQUEST)
 			return
 		}
 		if utils.ContainsEmptyString(requestData.Email) {
-			utils.HandleErrorAndAbort(c, *kts_errors.KTS_BAD_REQUEST)
+			utils.HandleErrorAndAbort(c, kts_errors.KTS_BAD_REQUEST)
 			return
 		}
 
 		err := userCtrl.CheckEmail(requestData.Email)
 		if err != nil {
-			utils.HandleErrorAndAbort(c, *err)
+			utils.HandleErrorAndAbort(c, err)
 			return
 		}
 
@@ -80,17 +80,17 @@ func CheckUsernameHandler(userCtrl controllers.UserControllerI) gin.HandlerFunc 
 	return func(c *gin.Context) {
 		var requestData models.CheckUsernameRequest
 		if err := c.ShouldBindJSON(&requestData); err != nil {
-			utils.HandleErrorAndAbort(c, *kts_errors.KTS_BAD_REQUEST)
+			utils.HandleErrorAndAbort(c, kts_errors.KTS_BAD_REQUEST)
 			return
 		}
 		if utils.ContainsEmptyString(requestData.Username) {
-			utils.HandleErrorAndAbort(c, *kts_errors.KTS_BAD_REQUEST)
+			utils.HandleErrorAndAbort(c, kts_errors.KTS_BAD_REQUEST)
 			return
 		}
 
 		err := userCtrl.CheckUsername(requestData.Username)
 		if err != nil {
-			utils.HandleErrorAndAbort(c, *err)
+			utils.HandleErrorAndAbort(c, err)
 			return
 		}
 
