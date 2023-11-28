@@ -54,10 +54,10 @@ CREATE TABLE movies
      id             BINARY(16) DEFAULT (Uuid_to_bin(Uuid(), 1)),
      title          VARCHAR(40) NOT NULL,
      description    VARCHAR(255) NOT NULL,
-     banner_pic_url VARCHAR(255) NOT NULL,
-     cover_pic_url  VARCHAR(255) NOT NULL,
-     trailer_url    VARCHAR(255) NOT NULL,
-     rating         FLOAT NOT NULL,
+     banner_pic_url VARCHAR(255),
+     cover_pic_url  VARCHAR(255),
+     trailer_url    VARCHAR(255),
+     rating         FLOAT,
      release_date   Date NOT NULL,
      time_in_min    INT NOT NULL,
      fsk            INT NOT NULL,
@@ -95,7 +95,7 @@ CREATE TABLE actor_pictures
   (
      id         BINARY(16) DEFAULT (Uuid_to_bin(Uuid(), 1)),
      actor_id   BINARY(16) NOT NULL,
-     pic_url    VARCHAR(255) NOT NULL,
+     pic_url    VARCHAR(255),
      PRIMARY KEY (id),
      FOREIGN KEY (actor_id) REFERENCES actors(id)
   );
@@ -104,7 +104,7 @@ CREATE TABLE producer_pictures
   (
      id            BINARY(16) DEFAULT (Uuid_to_bin(Uuid(), 1)),
      producer_id   BINARY(16) NOT NULL,
-     pic_url       VARCHAR(255) NOT NULL,
+     pic_url       VARCHAR(255),
      PRIMARY KEY (id),
      FOREIGN KEY (producer_id) REFERENCES producers(id)
   );
