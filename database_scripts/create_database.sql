@@ -7,7 +7,6 @@ DROP TABLE IF EXISTS tickets;
 DROP TABLE IF EXISTS event_seats;
 DROP TABLE IF EXISTS event_seat_categories;
 DROP TABLE IF EXISTS event_movies;
-DROP TABLE IF EXISTS event_types;
 DROP TABLE IF EXISTS events;
 DROP TABLE IF EXISTS orders;
 DROP TABLE IF EXISTS payment_methods;
@@ -218,12 +217,6 @@ CREATE TABLE orders
      FOREIGN KEY (user_id) REFERENCES users(id)
   );
 
-CREATE TABLE event_types
-  (
-     id       BINARY(16) DEFAULT (Uuid_to_bin(Uuid(), 1)),
-     typename VARCHAR(40) NOT NULL,
-     PRIMARY KEY (id)
-  );
 
 CREATE TABLE events
   (
@@ -231,10 +224,9 @@ CREATE TABLE events
      title          VARCHAR(50) NOT NULL,
      start          DateTime NOT NULL,
      end            DateTime NOT NULL,
-     event_type_id  BINARY(16) NOT NULL,
+     event_type     VARCHAR(40) NOT NULL,
      cinema_hall_id BINARY(16) NOT NULL,
      PRIMARY KEY (id),
-     FOREIGN KEY (event_type_id) REFERENCES event_types(id),
      FOREIGN KEY (cinema_hall_id) REFERENCES cinema_halls(id)
   );
 
