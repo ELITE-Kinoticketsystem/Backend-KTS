@@ -54,3 +54,16 @@ func GetEventsForMovieHandler(eventController controllers.EventControllerI) gin.
 		c.JSON(http.StatusOK, events)
 	}
 }
+
+
+func GetSpecialEventsHandler(eventController controllers.EventControllerI) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		events, err := eventController.GetSpecialEvents()
+		if err != nil {
+			utils.HandleErrorAndAbort(c, err)
+			return
+		}
+
+		c.JSON(http.StatusOK, events)
+	}
+}

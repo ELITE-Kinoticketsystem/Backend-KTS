@@ -331,6 +331,90 @@ func TestEventController_DeleteEvent(t *testing.T) {
 	}
 }
 
+func TestEventController_GetSpecialEvents(t *testing.T) {
+	tests := []struct {
+		name          string
+		expectFuncs   func(mockEventRepo *mocks.MockEventRepo, t *testing.T)
+		expectedError *models.KTSError
+	}{
+		{
+			name: "ExpectGetSpecialEventsWorks",
+			expectFuncs: func(mockEventRepo *mocks.MockEventRepo, t *testing.T) {
+				ExpectGetSpecialEventsWorks(mockEventRepo, t)
+			},
+			expectedError: nil,
+		},
+		{
+			name: "ExpectGetSpecialEventsReturnsError",
+			expectFuncs: func(mockEventRepo *mocks.MockEventRepo, t *testing.T) {
+				ExpectGetSpecialEventsReturnsError(mockEventRepo, t)
+			},
+			expectedError: kts_errors.KTS_INTERNAL_ERROR,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// given
+			mockCtrl := gomock.NewController(t)
+			defer mockCtrl.Finish()
+
+			mockEventRepo := mocks.NewMockEventRepo(mockCtrl)
+
+			tt.expectFuncs(mockEventRepo, t)
+
+			eventController := &EventController{
+				EventRepo: mockEventRepo,
+			}
+
+			// when
+			events, err := eventController.GetSpecialEvents()
+
+			// then
+			if tt.expectedError != nil {
+				if err == nil {
+					t.Errorf("Expected error: %v, but got nil", tt.expectedError)
+				}
+				if err != tt.expectedError {
+					t.Errorf("Expected error: %v, but got: %v", tt.expectedError, err)
+				}
+				if events != nil {
+					t.Errorf("Expected events to be nil, but got: %v", events)
+				}
+			} else {
+				if err != nil {
+					t.Errorf("Unexpected error: %v", err)
+				}
+				if events == nil {
+					t.Errorf("Expected events to be not nil, but got nil")
+				}
+			}
+		})
+	}
+}
+
+func ExpectGetSpecialEventsWorks(mockEventRepo *mocks.MockEventRepo, t *testing.T) {
+	mockEventRepo.EXPECT().GetSpecialEvents().DoAndReturn(func() ([]*models.EventDTO, error) {
+		id := uuid.New()
+		return []*models.EventDTO{
+			{
+				Id:                  &id,
+				Title:               "Test Event",
+				Start:               time.Now(),
+				End:                 time.Now(),
+				EventTypeId:         &id,
+				CinemaHallId:        &id,
+				Movies:              nil,
+				EventSeatCategories: nil,
+			},
+		}, nil
+	}).AnyTimes()
+}
+
+func ExpectGetSpecialEventsReturnsError(mockEventRepo *mocks.MockEventRepo, t *testing.T) {
+	mockEventRepo.EXPECT().GetSpecialEvents().Return(nil, errors.New("Error"))
+}
+
 func ExpectCreateEventWorks(mockEventRepo *mocks.MockEventRepo, eventRequest *models.EventDTO, t *testing.T) {
 	mockEventRepo.EXPECT().CreateEvent(gomock.Any()).DoAndReturn(func(event *schemas.Event) (*schemas.Event, error) {
 		// check if all values are set

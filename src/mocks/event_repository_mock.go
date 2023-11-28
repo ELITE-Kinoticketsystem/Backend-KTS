@@ -11,6 +11,7 @@ package mocks
 import (
 	reflect "reflect"
 
+	models "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
 	schemas "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models/schemas"
 	uuid "github.com/google/uuid"
 	gomock "go.uber.org/mock/gomock"
@@ -181,4 +182,19 @@ func (m *MockEventRepo) GetEventsForMovieId(movieId *uuid.UUID) ([]*schemas.Even
 func (mr *MockEventRepoMockRecorder) GetEventsForMovieId(movieId any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetEventsForMovieId", reflect.TypeOf((*MockEventRepo)(nil).GetEventsForMovieId), movieId)
+}
+
+// GetSpecialEvents mocks base method.
+func (m *MockEventRepo) GetSpecialEvents() ([]*models.EventDTO, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetSpecialEvents")
+	ret0, _ := ret[0].([]*models.EventDTO)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetSpecialEvents indicates an expected call of GetSpecialEvents.
+func (mr *MockEventRepoMockRecorder) GetSpecialEvents() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSpecialEvents", reflect.TypeOf((*MockEventRepo)(nil).GetSpecialEvents))
 }
