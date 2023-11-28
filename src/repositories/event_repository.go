@@ -2,7 +2,6 @@ package repositories
 
 import (
 	"errors"
-	"log"
 
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/managers"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
@@ -37,73 +36,23 @@ const (
 )
 
 func (er *EventRepository) CreateEvent(event *schemas.Event) error {
-	_, err := er.DatabaseManager.ExecuteStatement("INSERT INTO events (id, title, start, end, event_type_id, cinema_hall_id) VALUES (?, ?, ?, ?, ?, ?)", event.Id, event.Title, event.Start, event.End, event.EventTypeId, event.CinemaHallId)
-	if err != nil {
-		log.Printf("Error while inserting event: %v", err)
-		return err
-	}
-
-	return nil
+	// TODO: implement
+	return errors.New("not implemented")
 }
 
 func (er *EventRepository) DeleteEvent(id *uuid.UUID) error {
-	query := "DELETE FROM events WHERE id=?"
-	result, err := er.DatabaseManager.ExecuteStatement(query, id)
-	if err != nil {
-		log.Printf("Error while deleting event: %v", err)
-		return err
-	}
-	if rowsAffected, err := result.RowsAffected(); rowsAffected == 0 {
-		log.Printf("No event with id %v found", id)
-		return err
-	}
-	return nil
+	// TODO: implement
+	return errors.New("not implemented")
 }
 
 func (er *EventRepository) GetEventsForMovieId(movieId *uuid.UUID) ([]*schemas.Event, error) {
-	// Add to query that only events that are in the future are returned
-	query := "SELECT * FROM events WHERE id IN (SELECT event_id FROM event_movie WHERE movie_id=?) AND start > NOW() ORDER BY start"
-
-	rows, err := er.DatabaseManager.ExecuteQuery(query, movieId)
-	if err != nil {
-		log.Printf("Error while getting events for movie id: %v", err)
-		return nil, err
-	}
-
-	events := make([]*schemas.Event, 0)
-	for rows.Next() {
-		event := schemas.Event{}
-		err := rows.Scan(&event.Id, &event.Title, &event.Start, &event.End, &event.EventTypeId, &event.CinemaHallId)
-		if err != nil {
-			log.Printf("Error while scanning events for movie id: %v", err)
-			return nil, err
-		}
-		events = append(events, &event)
-	}
-
-	return events, nil
+	// TODO: implement
+	return nil, errors.New("not implemented")
 }
 
 func (er *EventRepository) GetEventsForCinemaHallId(cinemaHallId *uuid.UUID) ([]*schemas.Event, error) {
-	query := "SELECT * FROM events WHERE cinema_hall_id=?"
-	rows, err := er.DatabaseManager.ExecuteQuery(query, cinemaHallId)
-	if err != nil {
-		log.Printf("Error while getting events for cinema hall id: %v", err)
-		return nil, err
-	}
-
-	events := make([]*schemas.Event, 0)
-	for rows.Next() {
-		event := schemas.Event{}
-		err := rows.Scan(&event.Id, &event.Title, &event.Start, &event.End, &event.EventTypeId, &event.CinemaHallId)
-		if err != nil {
-			log.Printf("Error while scanning events for cinema hall id: %v", err)
-			return nil, err
-		}
-		events = append(events, &event)
-	}
-
-	return events, nil
+	// TODO: implement
+	return nil, errors.New("not implemented")
 }
 
 // type EventDTO struct {
