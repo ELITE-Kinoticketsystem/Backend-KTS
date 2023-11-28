@@ -1,11 +1,10 @@
-USE KinoTicketSystem;
+USE KinoTicketSystem_v2;
 
 
 Delete from tickets;
 Delete from event_seats;
 Delete from event_seat_categories;
 Delete from event_movies;
-Delete from event_types;
 Delete from events;
 Delete from orders;
 Delete from payment_methods;
@@ -14,7 +13,10 @@ Delete from seat_categories;
 Delete from cinema_halls;
 Delete from theatres;
 Delete from user_movies;
+Delete from reviews;
 Delete from users;
+Delete from actor_pictures;
+Delete from producer_pictures;
 Delete from movie_actors;
 Delete from movie_producers;
 Delete from producers;
@@ -39,11 +41,6 @@ VALUES
     (UUID_TO_BIN('6ba7b818-9dad-11d1-80b4-00c04fd430c8'), '987 Cherry St', '9', '90123', 'Denver', 'USA'), 
     (UUID_TO_BIN('6ba7b819-9dad-11d1-80b4-00c04fd430c8'), '654 Grape St', '10', '01234', 'Phoenix', 'USA'); 
 
--- Insert statement for EventType table
-INSERT INTO event_types (id, typename)
-VALUES
-    (UUID_TO_BIN('6ba7b81a-9dad-11d1-80b4-00c04fd430c8'), 'Showing'),
-    (UUID_TO_BIN('6ba7b81b-9dad-11d1-80b4-00c04fd430c9'), 'Special Event'); 
 
 -- Insert statement for PriceCategory table
 INSERT INTO price_categories (id, category_name, price)
@@ -112,33 +109,33 @@ VALUES
     (UUID_TO_BIN('6ba7b82f-9dad-11d1-80b4-00c04fd430c9'), UUID_TO_BIN('6ba7b825-9dad-11d1-80b4-00c04fd430c9'))
 ;
 -- Insert statement for Producer table
-INSERT INTO producers (id, name, age)
+INSERT INTO producers (id, name, age, description)
 VALUES
-    (UUID_TO_BIN('6ba7b830-9dad-11d1-80b4-00c04fd430c0'), 'John Doe', 25),
-    (UUID_TO_BIN('6ba7b831-9dad-11d1-80b4-00c04fd430c1'), 'Jane Smith', 30),
-    (UUID_TO_BIN('6ba7b832-9dad-11d1-80b4-00c04fd430c2'), 'Michael Johnson', 35),
-    (UUID_TO_BIN('6ba7b833-9dad-11d1-80b4-00c04fd430c3'), 'Emily Davis', 28),
-    (UUID_TO_BIN('6ba7b834-9dad-11d1-80b4-00c04fd430c4'), 'David Wilson', 32),
-    (UUID_TO_BIN('6ba7b835-9dad-11d1-80b4-00c04fd430c5'), 'Sarah Anderson', 29),
-    (UUID_TO_BIN('6ba7b836-9dad-11d1-80b4-00c04fd430c6'), 'Christopher Taylor', 31),
-    (UUID_TO_BIN('6ba7b837-9dad-11d1-80b4-00c04fd430c7'), 'Jessica Martinez', 27),
-    (UUID_TO_BIN('6ba7b838-9dad-11d1-80b4-00c04fd430c8'), 'Matthew Brown', 33),
-    (UUID_TO_BIN('6ba7b839-9dad-11d1-80b4-00c04fd430c9'), 'Olivia Garcia', 26);
+    (UUID_TO_BIN('6ba7b830-9dad-11d1-80b4-00c04fd430c0'), 'John Doe', 25, "John Doe is a producer."),
+    (UUID_TO_BIN('6ba7b831-9dad-11d1-80b4-00c04fd430c1'), 'Jane Smith', 30, "Jane Smith is a producer."),
+    (UUID_TO_BIN('6ba7b832-9dad-11d1-80b4-00c04fd430c2'), 'Michael Johnson', 35, "Michael Johnson is a producer."),
+    (UUID_TO_BIN('6ba7b833-9dad-11d1-80b4-00c04fd430c3'), 'Emily Davis', 28, "Emily Davis is a producer."),
+    (UUID_TO_BIN('6ba7b834-9dad-11d1-80b4-00c04fd430c4'), 'David Wilson', 32, "David Wilson is a producer."),
+    (UUID_TO_BIN('6ba7b835-9dad-11d1-80b4-00c04fd430c5'), 'Sarah Anderson', 29, "Sarah Anderson is a producer."),
+    (UUID_TO_BIN('6ba7b836-9dad-11d1-80b4-00c04fd430c6'), 'Christopher Taylor', 31, "Christopher Taylor is a producer."),
+    (UUID_TO_BIN('6ba7b837-9dad-11d1-80b4-00c04fd430c7'), 'Jessica Martinez', 27, "Jessica Martinez is a producer."),
+    (UUID_TO_BIN('6ba7b838-9dad-11d1-80b4-00c04fd430c8'), 'Matthew Brown', 33, "Matthew Brown is a producer."),
+    (UUID_TO_BIN('6ba7b839-9dad-11d1-80b4-00c04fd430c9'), 'Olivia Garcia', 26, "Olivia Garcia is a producer.");
 
 
 -- Insert statement for Actors table
-INSERT INTO actors (id, name, age)
+INSERT INTO actors (id, name, age, description)
 VALUES
-    (UUID_TO_BIN('6ba7b840-9dad-11d1-80b4-00c04fd430c0'), 'Tom Hanks', 65),
-    (UUID_TO_BIN('6ba7b841-9dad-11d1-80b4-00c04fd430c1'), 'Leonardo DiCaprio', 46),
-    (UUID_TO_BIN('6ba7b842-9dad-11d1-80b4-00c04fd430c2'), 'Brad Pitt', 57),
-    (UUID_TO_BIN('6ba7b843-9dad-11d1-80b4-00c04fd430c3'), 'Meryl Streep', 72),
-    (UUID_TO_BIN('6ba7b844-9dad-11d1-80b4-00c04fd430c4'), 'Robert Downey Jr.', 56),
-    (UUID_TO_BIN('6ba7b845-9dad-11d1-80b4-00c04fd430c5'), 'Scarlett Johansson', 36),
-    (UUID_TO_BIN('6ba7b846-9dad-11d1-80b4-00c04fd430c6'), 'Denzel Washington', 66),
-    (UUID_TO_BIN('6ba7b847-9dad-11d1-80b4-00c04fd430c7'), 'Jennifer Lawrence', 31),
-    (UUID_TO_BIN('6ba7b848-9dad-11d1-80b4-00c04fd430c8'), 'Johnny Depp', 58),
-    (UUID_TO_BIN('6ba7b849-9dad-11d1-80b4-00c04fd430c9'), 'Emma Stone', 33);
+    (UUID_TO_BIN('6ba7b840-9dad-11d1-80b4-00c04fd430c0'), 'Tom Hanks', 65, "Tom Hanks is an actor."),
+    (UUID_TO_BIN('6ba7b841-9dad-11d1-80b4-00c04fd430c1'), 'Leonardo DiCaprio', 46, "Leonardo DiCaprio is an actor."),
+    (UUID_TO_BIN('6ba7b842-9dad-11d1-80b4-00c04fd430c2'), 'Brad Pitt', 57, "Brad Pitt is an actor."),
+    (UUID_TO_BIN('6ba7b843-9dad-11d1-80b4-00c04fd430c3'), 'Meryl Streep', 72, "Meryl Streep is an actor."),
+    (UUID_TO_BIN('6ba7b844-9dad-11d1-80b4-00c04fd430c4'), 'Robert Downey Jr.', 56, "Robert Downey Jr. is an actor."),
+    (UUID_TO_BIN('6ba7b845-9dad-11d1-80b4-00c04fd430c5'), 'Scarlett Johansson', 36, "Scarlett Johansson is an actor."),
+    (UUID_TO_BIN('6ba7b846-9dad-11d1-80b4-00c04fd430c6'), 'Denzel Washington', 66, "Denzel Washington is an actor."),
+    (UUID_TO_BIN('6ba7b847-9dad-11d1-80b4-00c04fd430c7'), 'Jennifer Lawrence', 31, "Jennifer Lawrence is an actor."),
+    (UUID_TO_BIN('6ba7b848-9dad-11d1-80b4-00c04fd430c8'), 'Johnny Depp', 58, "Johnny Depp is an actor."),
+    (UUID_TO_BIN('6ba7b849-9dad-11d1-80b4-00c04fd430c9'), 'Emma Stone', 33, "Emma Stone is an actor.");
 
 
 -- Insert statement for MovieProducers table

@@ -49,7 +49,7 @@ CREATE TABLE genres
 CREATE TABLE movies
   (
      id           BINARY(16) DEFAULT (Uuid_to_bin(Uuid(), 1)),
-     title        VARCHAR(255) NOT NULL,
+     title        VARCHAR(80) NOT NULL,
      description  VARCHAR(255) NOT NULL,
      release_date Date NOT NULL,
      time_in_min  INT NOT NULL,
