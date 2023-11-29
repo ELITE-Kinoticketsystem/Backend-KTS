@@ -153,6 +153,7 @@ CREATE TABLE reviews
      rating     INT NOT NULL,
      comment    VARCHAR(255) NOT NULL,
      datetime   TIMESTAMP NOT NULL,
+     is_spoiler BOOLEAN,
      user_id    BINARY(16) NOT NULL,
      movie_id   BINARY(16) NOT NULL,
      PRIMARY KEY (id),
