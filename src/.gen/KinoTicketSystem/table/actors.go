@@ -17,9 +17,10 @@ type actorsTable struct {
 	mysql.Table
 
 	// Columns
-	ID   mysql.ColumnString
-	Name mysql.ColumnString
-	Age  mysql.ColumnInteger
+	ID          mysql.ColumnString
+	Name        mysql.ColumnString
+	Age         mysql.ColumnInteger
+	Description mysql.ColumnString
 
 	AllColumns     mysql.ColumnList
 	MutableColumns mysql.ColumnList
@@ -60,20 +61,22 @@ func newActorsTable(schemaName, tableName, alias string) *ActorsTable {
 
 func newActorsTableImpl(schemaName, tableName, alias string) actorsTable {
 	var (
-		IDColumn       = mysql.StringColumn("id")
-		NameColumn     = mysql.StringColumn("name")
-		AgeColumn      = mysql.IntegerColumn("age")
-		allColumns     = mysql.ColumnList{IDColumn, NameColumn, AgeColumn}
-		mutableColumns = mysql.ColumnList{NameColumn, AgeColumn}
+		IDColumn          = mysql.StringColumn("id")
+		NameColumn        = mysql.StringColumn("name")
+		AgeColumn         = mysql.IntegerColumn("age")
+		DescriptionColumn = mysql.StringColumn("description")
+		allColumns        = mysql.ColumnList{IDColumn, NameColumn, AgeColumn, DescriptionColumn}
+		mutableColumns    = mysql.ColumnList{NameColumn, AgeColumn, DescriptionColumn}
 	)
 
 	return actorsTable{
 		Table: mysql.NewTable(schemaName, tableName, alias, allColumns...),
 
 		//Columns
-		ID:   IDColumn,
-		Name: NameColumn,
-		Age:  AgeColumn,
+		ID:          IDColumn,
+		Name:        NameColumn,
+		Age:         AgeColumn,
+		Description: DescriptionColumn,
 
 		AllColumns:     allColumns,
 		MutableColumns: mutableColumns,

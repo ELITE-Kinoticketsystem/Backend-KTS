@@ -10,13 +10,13 @@ package table
 // UseSchema sets a new schema name for all generated table SQL builder types. It is recommended to invoke
 // this method only once at the beginning of the program.
 func UseSchema(schema string) {
+	ActorPictures = ActorPictures.FromSchema(schema)
 	Actors = Actors.FromSchema(schema)
-	Addressees = Addressees.FromSchema(schema)
+	Addresses = Addresses.FromSchema(schema)
 	CinemaHalls = CinemaHalls.FromSchema(schema)
 	EventMovies = EventMovies.FromSchema(schema)
 	EventSeatCategories = EventSeatCategories.FromSchema(schema)
 	EventSeats = EventSeats.FromSchema(schema)
-	EventTypes = EventTypes.FromSchema(schema)
 	Events = Events.FromSchema(schema)
 	Genres = Genres.FromSchema(schema)
 	MovieActors = MovieActors.FromSchema(schema)
@@ -26,7 +26,9 @@ func UseSchema(schema string) {
 	Orders = Orders.FromSchema(schema)
 	PaymentMethods = PaymentMethods.FromSchema(schema)
 	PriceCategories = PriceCategories.FromSchema(schema)
+	ProducerPictures = ProducerPictures.FromSchema(schema)
 	Producers = Producers.FromSchema(schema)
+	Reviews = Reviews.FromSchema(schema)
 	SeatCategories = SeatCategories.FromSchema(schema)
 	Seats = Seats.FromSchema(schema)
 	Theatres = Theatres.FromSchema(schema)

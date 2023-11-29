@@ -7,9 +7,15 @@
 
 package model
 
-type Actors struct {
-	ID          []byte `sql:"primary_key"`
-	Name        string
-	Age         int32
-	Description string
+import (
+	"time"
+)
+
+type Reviews struct {
+	ID       []byte `sql:"primary_key"`
+	Rating   int32
+	Comment  string
+	Datetime time.Time
+	UserID   []byte
+	MovieID  []byte
 }

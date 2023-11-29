@@ -23,7 +23,6 @@ type usersTable struct {
 	Password  mysql.ColumnString
 	Firstname mysql.ColumnString
 	Lastname  mysql.ColumnString
-	AddressID mysql.ColumnString
 
 	AllColumns     mysql.ColumnList
 	MutableColumns mysql.ColumnList
@@ -70,9 +69,8 @@ func newUsersTableImpl(schemaName, tableName, alias string) usersTable {
 		PasswordColumn  = mysql.StringColumn("password")
 		FirstnameColumn = mysql.StringColumn("firstname")
 		LastnameColumn  = mysql.StringColumn("lastname")
-		AddressIDColumn = mysql.StringColumn("address_id")
-		allColumns      = mysql.ColumnList{IDColumn, UsernameColumn, EmailColumn, PasswordColumn, FirstnameColumn, LastnameColumn, AddressIDColumn}
-		mutableColumns  = mysql.ColumnList{UsernameColumn, EmailColumn, PasswordColumn, FirstnameColumn, LastnameColumn, AddressIDColumn}
+		allColumns      = mysql.ColumnList{IDColumn, UsernameColumn, EmailColumn, PasswordColumn, FirstnameColumn, LastnameColumn}
+		mutableColumns  = mysql.ColumnList{UsernameColumn, EmailColumn, PasswordColumn, FirstnameColumn, LastnameColumn}
 	)
 
 	return usersTable{
@@ -85,7 +83,6 @@ func newUsersTableImpl(schemaName, tableName, alias string) usersTable {
 		Password:  PasswordColumn,
 		Firstname: FirstnameColumn,
 		Lastname:  LastnameColumn,
-		AddressID: AddressIDColumn,
 
 		AllColumns:     allColumns,
 		MutableColumns: mutableColumns,

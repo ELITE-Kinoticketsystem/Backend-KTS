@@ -11,9 +11,9 @@ import (
 	"github.com/go-jet/jet/v2/mysql"
 )
 
-var Addressees = newAddresseesTable("KinoTicketSystem", "addressees", "")
+var Addresses = newAddressesTable("KinoTicketSystem", "addresses", "")
 
-type addresseesTable struct {
+type addressesTable struct {
 	mysql.Table
 
 	// Columns
@@ -28,40 +28,40 @@ type addresseesTable struct {
 	MutableColumns mysql.ColumnList
 }
 
-type AddresseesTable struct {
-	addresseesTable
+type AddressesTable struct {
+	addressesTable
 
-	NEW addresseesTable
+	NEW addressesTable
 }
 
-// AS creates new AddresseesTable with assigned alias
-func (a AddresseesTable) AS(alias string) *AddresseesTable {
-	return newAddresseesTable(a.SchemaName(), a.TableName(), alias)
+// AS creates new AddressesTable with assigned alias
+func (a AddressesTable) AS(alias string) *AddressesTable {
+	return newAddressesTable(a.SchemaName(), a.TableName(), alias)
 }
 
-// Schema creates new AddresseesTable with assigned schema name
-func (a AddresseesTable) FromSchema(schemaName string) *AddresseesTable {
-	return newAddresseesTable(schemaName, a.TableName(), a.Alias())
+// Schema creates new AddressesTable with assigned schema name
+func (a AddressesTable) FromSchema(schemaName string) *AddressesTable {
+	return newAddressesTable(schemaName, a.TableName(), a.Alias())
 }
 
-// WithPrefix creates new AddresseesTable with assigned table prefix
-func (a AddresseesTable) WithPrefix(prefix string) *AddresseesTable {
-	return newAddresseesTable(a.SchemaName(), prefix+a.TableName(), a.TableName())
+// WithPrefix creates new AddressesTable with assigned table prefix
+func (a AddressesTable) WithPrefix(prefix string) *AddressesTable {
+	return newAddressesTable(a.SchemaName(), prefix+a.TableName(), a.TableName())
 }
 
-// WithSuffix creates new AddresseesTable with assigned table suffix
-func (a AddresseesTable) WithSuffix(suffix string) *AddresseesTable {
-	return newAddresseesTable(a.SchemaName(), a.TableName()+suffix, a.TableName())
+// WithSuffix creates new AddressesTable with assigned table suffix
+func (a AddressesTable) WithSuffix(suffix string) *AddressesTable {
+	return newAddressesTable(a.SchemaName(), a.TableName()+suffix, a.TableName())
 }
 
-func newAddresseesTable(schemaName, tableName, alias string) *AddresseesTable {
-	return &AddresseesTable{
-		addresseesTable: newAddresseesTableImpl(schemaName, tableName, alias),
-		NEW:             newAddresseesTableImpl("", "new", ""),
+func newAddressesTable(schemaName, tableName, alias string) *AddressesTable {
+	return &AddressesTable{
+		addressesTable: newAddressesTableImpl(schemaName, tableName, alias),
+		NEW:            newAddressesTableImpl("", "new", ""),
 	}
 }
 
-func newAddresseesTableImpl(schemaName, tableName, alias string) addresseesTable {
+func newAddressesTableImpl(schemaName, tableName, alias string) addressesTable {
 	var (
 		IDColumn       = mysql.StringColumn("id")
 		StreetColumn   = mysql.StringColumn("street")
@@ -73,7 +73,7 @@ func newAddresseesTableImpl(schemaName, tableName, alias string) addresseesTable
 		mutableColumns = mysql.ColumnList{StreetColumn, StreetNrColumn, ZipcodeColumn, CityColumn, CountryColumn}
 	)
 
-	return addresseesTable{
+	return addressesTable{
 		Table: mysql.NewTable(schemaName, tableName, alias, allColumns...),
 
 		//Columns

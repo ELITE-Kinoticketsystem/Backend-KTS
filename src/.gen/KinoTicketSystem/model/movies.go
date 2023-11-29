@@ -12,10 +12,14 @@ import (
 )
 
 type Movies struct {
-	ID          []byte `sql:"primary_key"`
-	Title       string
-	Description string
-	ReleaseDate time.Time
-	TimeInMin   int32
-	Fsk         int32
+	ID           []byte `sql:"primary_key"`
+	Title        string
+	Description  string
+	BannerPicURL *string
+	CoverPicURL  *string
+	TrailerURL   *string
+	Rating       *float64
+	ReleaseDate  time.Time
+	TimeInMin    int32
+	Fsk          int32
 }

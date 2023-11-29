@@ -7,7 +7,8 @@
 
 package model
 
-type EventTypes struct {
-	ID       []byte `sql:"primary_key"`
-	Typename string
+type ProducerPictures struct {
+	ID         []byte `sql:"primary_key"`
+	ProducerID []byte
+	PicURL     *string
 }

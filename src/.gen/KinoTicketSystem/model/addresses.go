@@ -7,9 +7,11 @@
 
 package model
 
-type Actors struct {
-	ID          []byte `sql:"primary_key"`
-	Name        string
-	Age         int32
-	Description string
+type Addresses struct {
+	ID       []byte `sql:"primary_key"`
+	Street   string
+	StreetNr string
+	Zipcode  string
+	City     string
+	Country  string
 }

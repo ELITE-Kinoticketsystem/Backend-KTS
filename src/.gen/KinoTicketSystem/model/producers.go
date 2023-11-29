@@ -8,7 +8,8 @@
 package model
 
 type Producers struct {
-	ID   []byte `sql:"primary_key"`
-	Name string
-	Age  int32
+	ID          []byte `sql:"primary_key"`
+	Name        string
+	Age         int32
+	Description string
 }

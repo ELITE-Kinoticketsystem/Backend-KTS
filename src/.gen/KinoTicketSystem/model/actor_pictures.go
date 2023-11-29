@@ -7,11 +7,8 @@
 
 package model
 
-type Addressees struct {
-	ID       []byte `sql:"primary_key"`
-	Street   string
-	StreetNr string
-	Zipcode  string
-	City     string
-	Country  string
+type ActorPictures struct {
+	ID      []byte `sql:"primary_key"`
+	ActorID []byte
+	PicURL  *string
 }

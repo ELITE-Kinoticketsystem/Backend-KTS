@@ -9,10 +9,9 @@ package model
 
 type Users struct {
 	ID        []byte `sql:"primary_key"`
-	Username  string
+	Username  *string
 	Email     string
 	Password  string
-	Firstname string
-	Lastname  string
-	AddressID *[]byte
+	Firstname *string
+	Lastname  *string
 }

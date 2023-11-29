@@ -17,12 +17,16 @@ type moviesTable struct {
 	mysql.Table
 
 	// Columns
-	ID          mysql.ColumnString
-	Title       mysql.ColumnString
-	Description mysql.ColumnString
-	ReleaseDate mysql.ColumnDate
-	TimeInMin   mysql.ColumnInteger
-	Fsk         mysql.ColumnInteger
+	ID           mysql.ColumnString
+	Title        mysql.ColumnString
+	Description  mysql.ColumnString
+	BannerPicURL mysql.ColumnString
+	CoverPicURL  mysql.ColumnString
+	TrailerURL   mysql.ColumnString
+	Rating       mysql.ColumnFloat
+	ReleaseDate  mysql.ColumnDate
+	TimeInMin    mysql.ColumnInteger
+	Fsk          mysql.ColumnInteger
 
 	AllColumns     mysql.ColumnList
 	MutableColumns mysql.ColumnList
@@ -63,26 +67,34 @@ func newMoviesTable(schemaName, tableName, alias string) *MoviesTable {
 
 func newMoviesTableImpl(schemaName, tableName, alias string) moviesTable {
 	var (
-		IDColumn          = mysql.StringColumn("id")
-		TitleColumn       = mysql.StringColumn("title")
-		DescriptionColumn = mysql.StringColumn("description")
-		ReleaseDateColumn = mysql.DateColumn("release_date")
-		TimeInMinColumn   = mysql.IntegerColumn("time_in_min")
-		FskColumn         = mysql.IntegerColumn("fsk")
-		allColumns        = mysql.ColumnList{IDColumn, TitleColumn, DescriptionColumn, ReleaseDateColumn, TimeInMinColumn, FskColumn}
-		mutableColumns    = mysql.ColumnList{TitleColumn, DescriptionColumn, ReleaseDateColumn, TimeInMinColumn, FskColumn}
+		IDColumn           = mysql.StringColumn("id")
+		TitleColumn        = mysql.StringColumn("title")
+		DescriptionColumn  = mysql.StringColumn("description")
+		BannerPicURLColumn = mysql.StringColumn("banner_pic_url")
+		CoverPicURLColumn  = mysql.StringColumn("cover_pic_url")
+		TrailerURLColumn   = mysql.StringColumn("trailer_url")
+		RatingColumn       = mysql.FloatColumn("rating")
+		ReleaseDateColumn  = mysql.DateColumn("release_date")
+		TimeInMinColumn    = mysql.IntegerColumn("time_in_min")
+		FskColumn          = mysql.IntegerColumn("fsk")
+		allColumns         = mysql.ColumnList{IDColumn, TitleColumn, DescriptionColumn, BannerPicURLColumn, CoverPicURLColumn, TrailerURLColumn, RatingColumn, ReleaseDateColumn, TimeInMinColumn, FskColumn}
+		mutableColumns     = mysql.ColumnList{TitleColumn, DescriptionColumn, BannerPicURLColumn, CoverPicURLColumn, TrailerURLColumn, RatingColumn, ReleaseDateColumn, TimeInMinColumn, FskColumn}
 	)
 
 	return moviesTable{
 		Table: mysql.NewTable(schemaName, tableName, alias, allColumns...),
 
 		//Columns
-		ID:          IDColumn,
-		Title:       TitleColumn,
-		Description: DescriptionColumn,
-		ReleaseDate: ReleaseDateColumn,
-		TimeInMin:   TimeInMinColumn,
-		Fsk:         FskColumn,
+		ID:           IDColumn,
+		Title:        TitleColumn,
+		Description:  DescriptionColumn,
+		BannerPicURL: BannerPicURLColumn,
+		CoverPicURL:  CoverPicURLColumn,
+		TrailerURL:   TrailerURLColumn,
+		Rating:       RatingColumn,
+		ReleaseDate:  ReleaseDateColumn,
+		TimeInMin:    TimeInMinColumn,
+		Fsk:          FskColumn,
 
 		AllColumns:     allColumns,
 		MutableColumns: mutableColumns,
