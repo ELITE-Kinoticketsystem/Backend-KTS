@@ -442,7 +442,7 @@ func ExpectCreateMovieWorks(mockMovieRepo *mocks.MockMovieRepoI, t *testing.T) {
 		if movie == nil {
 			t.Errorf("Movie is nil")
 		}
-		if movie.Id == nil {
+		if movie != nil && movie.Id == nil {
 			t.Errorf("Movie Id is nil")
 		}
 		return nil
@@ -489,7 +489,7 @@ func ExpectCreateGenreWorks(mockMovieRepo *mocks.MockMovieRepoI, t *testing.T) {
 		if genre == nil {
 			t.Errorf("Genre is nil")
 		}
-		if genre.Id == nil {
+		if genre != nil && genre.Id == nil {
 			t.Errorf("Genre Id is nil")
 		}
 		return nil

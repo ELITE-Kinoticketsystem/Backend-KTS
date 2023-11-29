@@ -30,11 +30,6 @@ type EventRepository struct {
 	DatabaseManager managers.DatabaseManagerI
 }
 
-const (
-	event        = "event"
-	specialEvent = "special_event"
-)
-
 func (er *EventRepository) CreateEvent(event *schemas.Event) error {
 	// TODO: implement
 	return errors.New("not implemented")
