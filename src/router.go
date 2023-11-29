@@ -13,7 +13,8 @@ import (
 )
 
 type Controllers struct {
-	UserController controllers.UserControllerI
+	UserController  controllers.UserControllerI
+	EventController controllers.EventControllerI
 }
 
 func createRouter(dbConnection *sql.DB) *gin.Engine {
@@ -34,10 +35,27 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 		DatabaseManager: databaseManager,
 	}
 
+	eventRepo := &repositories.EventRepository{
+		DatabaseManager: databaseManager,
+	}
+
+	movieRepo := &repositories.MovieRepository{
+		DatabaseManager: databaseManager,
+	}
+
+	theatreRepo := &repositories.TheatreRepository{
+		DatabaseManager: databaseManager,
+	}
+
 	// Create controllers
 	controller := Controllers{
 		UserController: &controllers.UserController{
 			UserRepo: userRepo,
+		},
+		EventController: &controllers.EventController{
+			EventRepo:   eventRepo,
+			MovieRepo:   movieRepo,
+			TheatreRepo: theatreRepo,
 		},
 	}
 
@@ -50,6 +68,13 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 	publicRoutes.Handle(http.MethodPost, "/auth/check-username", handlers.CheckUsernameHandler(controller.UserController))
 
 	securedRoutes.Handle(http.MethodGet, "/test", handlers.TestJwtToken)
+
+	router.Handle(http.MethodPost, "/events", handlers.CreateEventHandler(controller.EventController))
+	router.Handle(http.MethodDelete, "/events/:id", handlers.DeleteEventHandler(controller.EventController))
+	// Get events for movieId
+	router.Handle(http.MethodGet, "/events/movies/:id", handlers.GetEventsForMovieHandler(controller.EventController))
+	router.Handle(http.MethodGet, "/events/special-events", handlers.GetSpecialEventsHandler(controller.EventController))
+	// TODO: Do we need to add update event handler because how would we proceed then?
 
 	return router
 }

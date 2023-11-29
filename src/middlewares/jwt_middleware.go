@@ -12,20 +12,20 @@ func JwtAuthMiddleware() gin.HandlerFunc {
 		// Check if Authorization header is set
 		authHeader := c.GetHeader("Authorization")
 		if authHeader == "" {
-			utils.HandleErrorAndAbort(c, *kts_errors.KTS_UNAUTHORIZED)
+			utils.HandleErrorAndAbort(c, kts_errors.KTS_UNAUTHORIZED)
 			return
 		}
 
 		// Check if Authorization header is valid
 		tokenString, err := utils.ExtractToken(authHeader)
 		if err != nil {
-			utils.HandleErrorAndAbort(c, *kts_errors.KTS_UNAUTHORIZED)
+			utils.HandleErrorAndAbort(c, kts_errors.KTS_UNAUTHORIZED)
 			return
 		}
 
 		err = utils.ValidateToken(tokenString)
 		if err != nil {
-			utils.HandleErrorAndAbort(c, *kts_errors.KTS_UNAUTHORIZED)
+			utils.HandleErrorAndAbort(c, kts_errors.KTS_UNAUTHORIZED)
 			return
 		}
 
