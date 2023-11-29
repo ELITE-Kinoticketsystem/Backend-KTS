@@ -197,7 +197,7 @@ func (ec *EventController) createEventSeatCategories(eventSeatCategories []model
 			EventId:        eventId,
 			SeatCategoryId: &seatCategoryId,
 		}
-		_, err := ec.EventRepo.CreateEventSeatCategory(eventSeatCategory)
+		err := ec.EventRepo.CreateEventSeatCategory(eventSeatCategory)
 		if err != nil {
 			return err
 		}
@@ -222,7 +222,7 @@ func (ec *EventController) createEventSeats(cinemaHallId *uuid.UUID, eventId *uu
 			SeatId:       seat.Id,
 			EventId:      eventId,
 		}
-		_, err := ec.EventRepo.CreateEventSeat(eventSeat)
+		err := ec.EventRepo.CreateEventSeat(eventSeat)
 		if err != nil {
 			return err
 		}

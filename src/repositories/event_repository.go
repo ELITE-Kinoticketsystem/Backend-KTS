@@ -15,14 +15,14 @@ type EventRepo interface {
 	GetEventsForMovieId(movieId *uuid.UUID) ([]*schemas.Event, error)
 	GetSpecialEvents() ([]*models.EventDTO, error)
 
-	CreatePriceCategory(priceCategory *schemas.PriceCategory) (*schemas.PriceCategory, error)
+	CreatePriceCategory(priceCategory *schemas.PriceCategory) error
 
 	AddEventMovie(eventId *uuid.UUID, movieId *uuid.UUID) error
 	DeleteEventMovies(eventId *uuid.UUID) error
 
-	CreateEventSeatCategory(eventSeatCategory *schemas.EventSeatCategory) (*schemas.EventSeatCategory, error)
+	CreateEventSeatCategory(eventSeatCategory *schemas.EventSeatCategory) error
 	DeleteEventSeatCategoryByEventId(eventId *uuid.UUID) error
-	CreateEventSeat(eventSeat *schemas.EventSeat) (*schemas.EventSeat, error)
+	CreateEventSeat(eventSeat *schemas.EventSeat) error
 	DeleteEventSeatsByEventId(eventId *uuid.UUID) error
 }
 
@@ -55,40 +55,14 @@ func (er *EventRepository) GetEventsForCinemaHallId(cinemaHallId *uuid.UUID) ([]
 	return nil, errors.New("not implemented")
 }
 
-// type EventDTO struct {
-// 	Id                  *uuid.UUID             `json:"id"`
-// 	Title               string                 `json:"title"`
-// 	Start               time.Time              `json:"start"`
-// 	End                 time.Time              `json:"end"`
-// 	EventTypeId         *uuid.UUID             `json:"eventTypeID"`
-// 	CinemaHallId        *uuid.UUID             `json:"cinemaHallID"`
-// 	Movies              []MovieDTO             `json:"movie"`
-// 	EventSeatCategories []EventSeatCategoryDTO `json:"eventSeatCategories"`
-// }
-
-// type EventSeatCategoryDTO struct {
-// 	Name  string `json:"name"`
-// 	Price int    `json:"price"`
-// }
-
-// type MovieDTO struct {
-// 	Id          *uuid.UUID `json:"id"`
-// 	Title       string     `json:"title"`
-// 	Description string     `json:"description"`
-// 	ReleaseDate time.Time  `json:"releaseDate"`
-// 	TimeInMin   int        `json:"timeInMin"`
-// 	Fsk         int        `json:"fsk"`
-// 	GenreNames  []string   `json:"genreName"`
-// }
-
 func (er *EventRepository) GetSpecialEvents() ([]*models.EventDTO, error) {
 	// TODO: implement
 	return nil, errors.New("not implemented")
 }
 
-func (er *EventRepository) CreatePriceCategory(priceCategory *schemas.PriceCategory) (*schemas.PriceCategory, error) {
+func (er *EventRepository) CreatePriceCategory(priceCategory *schemas.PriceCategory) error {
 	// TODO: implement
-	return nil, errors.New("not implemented")
+	return errors.New("not implemented")
 }
 
 func (er *EventRepository) AddEventMovie(eventId *uuid.UUID, movieId *uuid.UUID) error {
@@ -101,14 +75,14 @@ func (er *EventRepository) DeleteEventMovies(eventId *uuid.UUID) error {
 	return errors.New("not implemented")
 }
 
-func (er *EventRepository) CreateEventSeatCategory(eventSeatCategory *schemas.EventSeatCategory) (*schemas.EventSeatCategory, error) {
+func (er *EventRepository) CreateEventSeatCategory(eventSeatCategory *schemas.EventSeatCategory) error {
 	// TODO: implement
-	return nil, errors.New("not implemented")
+	return errors.New("not implemented")
 }
 
-func (er *EventRepository) CreateEventSeat(eventSeat *schemas.EventSeat) (*schemas.EventSeat, error) {
+func (er *EventRepository) CreateEventSeat(eventSeat *schemas.EventSeat) error {
 	// TODO: implement
-	return nil, errors.New("not implemented")
+	return errors.New("not implemented")
 }
 
 func (er *EventRepository) DeleteEventMovie(eventId *uuid.UUID) error {

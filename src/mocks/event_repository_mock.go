@@ -69,12 +69,11 @@ func (mr *MockEventRepoMockRecorder) CreateEvent(event any) *gomock.Call {
 }
 
 // CreateEventSeat mocks base method.
-func (m *MockEventRepo) CreateEventSeat(eventSeat *schemas.EventSeat) (*schemas.EventSeat, error) {
+func (m *MockEventRepo) CreateEventSeat(eventSeat *schemas.EventSeat) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateEventSeat", eventSeat)
-	ret0, _ := ret[0].(*schemas.EventSeat)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
+	ret0, _ := ret[0].(error)
+	return ret0
 }
 
 // CreateEventSeat indicates an expected call of CreateEventSeat.
@@ -84,12 +83,11 @@ func (mr *MockEventRepoMockRecorder) CreateEventSeat(eventSeat any) *gomock.Call
 }
 
 // CreateEventSeatCategory mocks base method.
-func (m *MockEventRepo) CreateEventSeatCategory(eventSeatCategory *schemas.EventSeatCategory) (*schemas.EventSeatCategory, error) {
+func (m *MockEventRepo) CreateEventSeatCategory(eventSeatCategory *schemas.EventSeatCategory) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateEventSeatCategory", eventSeatCategory)
-	ret0, _ := ret[0].(*schemas.EventSeatCategory)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
+	ret0, _ := ret[0].(error)
+	return ret0
 }
 
 // CreateEventSeatCategory indicates an expected call of CreateEventSeatCategory.
@@ -99,12 +97,11 @@ func (mr *MockEventRepoMockRecorder) CreateEventSeatCategory(eventSeatCategory a
 }
 
 // CreatePriceCategory mocks base method.
-func (m *MockEventRepo) CreatePriceCategory(priceCategory *schemas.PriceCategory) (*schemas.PriceCategory, error) {
+func (m *MockEventRepo) CreatePriceCategory(priceCategory *schemas.PriceCategory) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreatePriceCategory", priceCategory)
-	ret0, _ := ret[0].(*schemas.PriceCategory)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
+	ret0, _ := ret[0].(error)
+	return ret0
 }
 
 // CreatePriceCategory indicates an expected call of CreatePriceCategory.

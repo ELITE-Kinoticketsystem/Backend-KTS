@@ -96,13 +96,6 @@ func TestEventController_CreateEvent(t *testing.T) {
 			expectedErrorMsg: "",
 		},
 		{
-			name: "CreateEventReturnsNil",
-			expectFuncs: func(mockEventRepo *mocks.MockEventRepo, mockMovieRepo *mocks.MockMovieRepoI, mockTheatreRepo *mocks.MockTheaterRepoI, t *testing.T) {
-				ExpectCreateEventReturnsNil(mockEventRepo, eventRequest, t)
-			},
-			expectedErrorMsg: "Event creation failed",
-		},
-		{
 			name: "CreateEventReturnsError",
 			expectFuncs: func(mockEventRepo *mocks.MockEventRepo, mockMovieRepo *mocks.MockMovieRepoI, mockTheatreRepo *mocks.MockTheaterRepoI, t *testing.T) {
 				ExpectCreateEventReturnsError(mockEventRepo, eventRequest, t)
@@ -416,7 +409,7 @@ func ExpectGetSpecialEventsReturnsError(mockEventRepo *mocks.MockEventRepo, t *t
 }
 
 func ExpectCreateEventWorks(mockEventRepo *mocks.MockEventRepo, eventRequest *models.EventDTO, t *testing.T) {
-	mockEventRepo.EXPECT().CreateEvent(gomock.Any()).DoAndReturn(func(event *schemas.Event) (*schemas.Event, error) {
+	mockEventRepo.EXPECT().CreateEvent(gomock.Any()).DoAndReturn(func(event *schemas.Event) error {
 		// check if all values are set
 		if event.Id == nil {
 			t.Errorf("Event Id is nil")
@@ -436,45 +429,41 @@ func ExpectCreateEventWorks(mockEventRepo *mocks.MockEventRepo, eventRequest *mo
 		if event.CinemaHallId != eventRequest.CinemaHallId {
 			t.Errorf("Event CinemaHallId is not equal")
 		}
-		return event, nil
+		return nil
 	})
 }
 
-func ExpectCreateEventReturnsNil(mockEventRepo *mocks.MockEventRepo, eventRequest *models.EventDTO, t *testing.T) {
-	mockEventRepo.EXPECT().CreateEvent(gomock.Any()).Return(nil, nil)
-}
-
 func ExpectCreateEventReturnsError(mockEventRepo *mocks.MockEventRepo, eventRequest *models.EventDTO, t *testing.T) {
-	mockEventRepo.EXPECT().CreateEvent(gomock.Any()).Return(nil, errors.New("Error"))
+	mockEventRepo.EXPECT().CreateEvent(gomock.Any()).Return(errors.New("Error"))
 }
 
 func ExpectCreateMovieWorks(mockMovieRepo *mocks.MockMovieRepoI, t *testing.T) {
-	mockMovieRepo.EXPECT().CreateMovie(gomock.Any()).DoAndReturn(func(movie *schemas.Movie) (*schemas.Movie, error) {
+	mockMovieRepo.EXPECT().CreateMovie(gomock.Any()).DoAndReturn(func(movie *schemas.Movie) error {
 		if movie == nil {
 			t.Errorf("Movie is nil")
 		}
 		if movie.Id == nil {
 			t.Errorf("Movie Id is nil")
 		}
-		return movie, nil
+		return nil
 	})
 }
 
 func ExpectCreateMovieReturnsError(mockMovieRepo *mocks.MockMovieRepoI, t *testing.T) {
-	mockMovieRepo.EXPECT().CreateMovie(gomock.Any()).Return(nil, errors.New("Error"))
+	mockMovieRepo.EXPECT().CreateMovie(gomock.Any()).Return(errors.New("Error"))
 }
 
 func ExpectCreateEventSeatCategory(mockEventRepo *mocks.MockEventRepo, t *testing.T) {
-	mockEventRepo.EXPECT().CreateEventSeatCategory(gomock.Any()).DoAndReturn(func(eventSeatCategory *schemas.EventSeatCategory) (*schemas.EventSeatCategory, error) {
+	mockEventRepo.EXPECT().CreateEventSeatCategory(gomock.Any()).DoAndReturn(func(eventSeatCategory *schemas.EventSeatCategory) error {
 		if eventSeatCategory == nil {
 			t.Errorf("EventSeatCategory is nil")
 		}
-		return eventSeatCategory, nil
+		return nil
 	}).AnyTimes()
 }
 
 func ExpectCreateEventSeatCategoryReturnsError(mockEventRepo *mocks.MockEventRepo, t *testing.T) {
-	mockEventRepo.EXPECT().CreateEventSeatCategory(gomock.Any()).Return(nil, errors.New("Error"))
+	mockEventRepo.EXPECT().CreateEventSeatCategory(gomock.Any()).Return(errors.New("Error"))
 }
 
 func ExcpectGetGenreByNameWorks(mockMovieRepo *mocks.MockMovieRepoI, t *testing.T) {
@@ -496,19 +485,19 @@ func ExpectGetGenreByNameReturnsNil(mockMovieRepo *mocks.MockMovieRepoI, t *test
 }
 
 func ExpectCreateGenreWorks(mockMovieRepo *mocks.MockMovieRepoI, t *testing.T) {
-	mockMovieRepo.EXPECT().CreateGenre(gomock.Any()).DoAndReturn(func(genre *schemas.Genre) (*schemas.Genre, error) {
+	mockMovieRepo.EXPECT().CreateGenre(gomock.Any()).DoAndReturn(func(genre *schemas.Genre) error {
 		if genre == nil {
 			t.Errorf("Genre is nil")
 		}
 		if genre.Id == nil {
 			t.Errorf("Genre Id is nil")
 		}
-		return genre, nil
+		return nil
 	}).AnyTimes()
 }
 
 func ExpectCreateGenreReturnsError(mockMovieRepo *mocks.MockMovieRepoI, t *testing.T) {
-	mockMovieRepo.EXPECT().CreateGenre(gomock.Any()).Return(nil, errors.New("Error"))
+	mockMovieRepo.EXPECT().CreateGenre(gomock.Any()).Return(errors.New("Error"))
 }
 
 func ExpectAddMovieGenreWorks(mockMovieRepo *mocks.MockMovieRepoI, t *testing.T) {
@@ -568,24 +557,24 @@ func ExpectGetSeatsForCinemaHallReturnsError(mockTheatreRepo *mocks.MockTheaterR
 }
 
 func ExpectCreateEventSeatWorks(mockEventRepo *mocks.MockEventRepo, t *testing.T) {
-	mockEventRepo.EXPECT().CreateEventSeat(gomock.Any()).DoAndReturn(func(eventSeat *schemas.EventSeat) (*schemas.EventSeat, error) {
+	mockEventRepo.EXPECT().CreateEventSeat(gomock.Any()).DoAndReturn(func(eventSeat *schemas.EventSeat) error {
 		if eventSeat == nil {
 			t.Errorf("EventSeat is nil")
 		}
-		return eventSeat, nil
+		return nil
 	}).AnyTimes()
 }
 
 func ExpectCreateEventSeatReturnsError(mockEventRepo *mocks.MockEventRepo, t *testing.T) {
-	mockEventRepo.EXPECT().CreateEventSeat(gomock.Any()).Return(nil, errors.New("Error"))
+	mockEventRepo.EXPECT().CreateEventSeat(gomock.Any()).Return(errors.New("Error"))
 }
 
 func ExpectCreateEventSeatCategoryWorks(mockEventRepo *mocks.MockEventRepo, t *testing.T) {
-	mockEventRepo.EXPECT().CreateEventSeatCategory(gomock.Any()).DoAndReturn(func(eventSeatCategory *schemas.EventSeatCategory) (*schemas.EventSeatCategory, error) {
+	mockEventRepo.EXPECT().CreateEventSeatCategory(gomock.Any()).DoAndReturn(func(eventSeatCategory *schemas.EventSeatCategory) error {
 		if eventSeatCategory == nil {
 			t.Errorf("EventSeatCategory is nil")
 		}
-		return eventSeatCategory, nil
+		return nil
 	}).AnyTimes()
 }
 
