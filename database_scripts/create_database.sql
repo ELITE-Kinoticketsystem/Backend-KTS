@@ -1,6 +1,6 @@
-DROP DATABASE IF EXISTS KinoTicketSystem_v2;
-CREATE DATABASE IF NOT EXISTS KinoTicketSystem_v2;
-USE KinoTicketSystem_v2;
+DROP DATABASE IF EXISTS KinoTicketSystem;
+CREATE DATABASE IF NOT EXISTS KinoTicketSystem;
+USE KinoTicketSystem;
 
 
 DROP TABLE IF EXISTS tickets;
