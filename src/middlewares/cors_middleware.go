@@ -13,6 +13,7 @@ func CorsMiddleware() gin.HandlerFunc {
 		allowedOrigins := []string{
 			"http://localhost:4173",
 			"http://localhost:5173",
+			"http://localhost:3000",
 		}
 		origin := c.GetHeader("Origin")
 
