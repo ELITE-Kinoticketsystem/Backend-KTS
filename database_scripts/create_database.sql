@@ -1,6 +1,6 @@
-DROP DATABASE IF EXISTS KinoTicketSystem_v2;
-CREATE DATABASE IF NOT EXISTS KinoTicketSystem_v2;
-USE KinoTicketSystem_v2;
+DROP DATABASE IF EXISTS KinoTicketSystem;
+CREATE DATABASE IF NOT EXISTS KinoTicketSystem;
+USE KinoTicketSystem;
 
 
 DROP TABLE IF EXISTS tickets;
@@ -52,7 +52,7 @@ CREATE TABLE movies
   (
      id             BINARY(16) DEFAULT (Uuid_to_bin(Uuid(), 1)),
      title          VARCHAR(80) NOT NULL,
-     description    VARCHAR(255) NOT NULL,
+     description    TEXT NOT NULL,
      banner_pic_url VARCHAR(255),
      cover_pic_url  VARCHAR(255),
      trailer_url    VARCHAR(255),
@@ -77,7 +77,7 @@ CREATE TABLE producers
      id          BINARY(16) DEFAULT (Uuid_to_bin(Uuid(), 1)),
      name        VARCHAR(50) NOT NULL,
      age         INT NOT NULL,
-     description VARCHAR(255) NOT NULL,
+     description TEXT NOT NULL,
      PRIMARY KEY (id)
   );
 
@@ -86,7 +86,7 @@ CREATE TABLE actors
      id          BINARY(16) DEFAULT (Uuid_to_bin(Uuid(), 1)),
      name        VARCHAR(50) NOT NULL,
      age         INT NOT NULL,
-     description VARCHAR(255) NOT NULL,
+     description TEXT NOT NULL,
      PRIMARY KEY (id)
   );
 
@@ -151,7 +151,7 @@ CREATE TABLE reviews
   (
      id         BINARY(16) DEFAULT (Uuid_to_bin(Uuid(), 1)),
      rating     INT NOT NULL,
-     comment    VARCHAR(255) NOT NULL,
+     comment    TEXT NOT NULL,
      datetime   TIMESTAMP NOT NULL,
      user_id    BINARY(16) NOT NULL,
      movie_id   BINARY(16) NOT NULL,
@@ -224,6 +224,7 @@ CREATE TABLE events
      title          VARCHAR(50) NOT NULL,
      start          DateTime NOT NULL,
      end            DateTime NOT NULL,
+     description    TEXT, 
      event_type     VARCHAR(40) NOT NULL,
      cinema_hall_id BINARY(16) NOT NULL,
      PRIMARY KEY (id),
