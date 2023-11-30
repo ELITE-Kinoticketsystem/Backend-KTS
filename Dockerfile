@@ -5,8 +5,6 @@ FROM golang:1.21.4-alpine3.18 AS build
 
 WORKDIR /app
 
-# Copy the go.mod and go.sum files to the working directory
-COPY go.mod go.sum ./
 
 # Copy the source code files to the working directory
 COPY src/ ./src
