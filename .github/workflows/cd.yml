@@ -6,7 +6,7 @@ on:
       - "main"
 
 jobs:
-  docker:
+  docker-build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -26,4 +26,23 @@ jobs:
           context: .
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: user/app:latest
+          tags: |
+            ${{ secrets.DOCKER_HUB_USERNAME }}/kts-backend:${{ github.sha }}
+            ${{ secrets.DOCKER_HUB_USERNAME }}/kts-backend:latest
+          
+  start-service:
+    runs-on: ubuntu-latest
+    needs: docker-build
+    steps:
+      - name: Execute remote ssh commands
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USERNAME }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          script: |
+            cd /home/azurebackend/kts
+            docker-compose pull
+            docker-compose stop
+            docker-compose rm -f
+            docker-compose up -d
