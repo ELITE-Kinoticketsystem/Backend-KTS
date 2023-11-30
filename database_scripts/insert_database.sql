@@ -1,4 +1,4 @@
-USE KinoTicketSystem_v2;
+USE KinoTicketSystem;
 
 
 Delete from tickets;
