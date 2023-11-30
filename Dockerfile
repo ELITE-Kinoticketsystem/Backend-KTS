@@ -11,6 +11,9 @@ COPY go.mod go.sum ./
 # Copy the source code files to the working directory
 COPY src/ ./src
 
+RUN echo "module github.com/ELITE-Kinoticketsystem/Backend-KTS" > go.mod
+RUN go mod tidy
+
 # Download the Go module dependencies
 RUN go mod download
 
@@ -22,6 +25,7 @@ FROM alpine:3.18.2 AS serve
 
 ## Necessary to run a health check in our docker-compose file
 RUN apk --update --no-cache add curl
+
 
 # Copy the pre-built binary file "api" from the build stage to the serve stage
 COPY --from=build /app/api /app/api
