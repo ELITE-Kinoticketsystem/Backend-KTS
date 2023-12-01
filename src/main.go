@@ -1,5 +1,4 @@
 package main
-
 import (
 	"context"
 	"log"
@@ -9,18 +8,9 @@ import (
 	"time"
 
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/managers"
-	"github.com/joho/godotenv"
 )
 
 func main() {
-	log.Println("Loading environment variables...")
-	err := godotenv.Load()
-	if err != nil {
-		log.Printf("error loading .env file: %v\n", err)
-	} else {
-		log.Println("Environment variables loaded successfully")
-	}
-
 	log.Println("Initializing database connection...")
 	dbConnection, err := managers.InitializeDB()
 	if err != nil {

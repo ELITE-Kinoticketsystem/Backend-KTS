@@ -21,6 +21,7 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 	router := gin.Default()
 
 	// Attach Middleware
+	router.Use(middlewares.CorsMiddleware())
 
 	// Create api groups, with special middleware
 	publicRoutes := router.Group("/")
