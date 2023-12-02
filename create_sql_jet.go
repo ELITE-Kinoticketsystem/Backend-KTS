@@ -1,4 +1,4 @@
-package generatorjetmysql
+package main
 
 import (
 	"log"
@@ -14,7 +14,7 @@ import (
 	mysql3 "github.com/go-jet/jet/v2/mysql"
 )
 
-func RunGeneration() {
+func main() {
 	log.Println("Starting Jet Generator for MySQL")
 
 	// Load Environment variables
