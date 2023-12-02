@@ -21,6 +21,7 @@ type eventsTable struct {
 	Title        mysql.ColumnString
 	Start        mysql.ColumnTimestamp
 	End          mysql.ColumnTimestamp
+	Description  mysql.ColumnString
 	EventType    mysql.ColumnString
 	CinemaHallID mysql.ColumnString
 
@@ -67,10 +68,11 @@ func newEventsTableImpl(schemaName, tableName, alias string) eventsTable {
 		TitleColumn        = mysql.StringColumn("title")
 		StartColumn        = mysql.TimestampColumn("start")
 		EndColumn          = mysql.TimestampColumn("end")
+		DescriptionColumn  = mysql.StringColumn("description")
 		EventTypeColumn    = mysql.StringColumn("event_type")
 		CinemaHallIDColumn = mysql.StringColumn("cinema_hall_id")
-		allColumns         = mysql.ColumnList{IDColumn, TitleColumn, StartColumn, EndColumn, EventTypeColumn, CinemaHallIDColumn}
-		mutableColumns     = mysql.ColumnList{TitleColumn, StartColumn, EndColumn, EventTypeColumn, CinemaHallIDColumn}
+		allColumns         = mysql.ColumnList{IDColumn, TitleColumn, StartColumn, EndColumn, DescriptionColumn, EventTypeColumn, CinemaHallIDColumn}
+		mutableColumns     = mysql.ColumnList{TitleColumn, StartColumn, EndColumn, DescriptionColumn, EventTypeColumn, CinemaHallIDColumn}
 	)
 
 	return eventsTable{
@@ -81,6 +83,7 @@ func newEventsTableImpl(schemaName, tableName, alias string) eventsTable {
 		Title:        TitleColumn,
 		Start:        StartColumn,
 		End:          EndColumn,
+		Description:  DescriptionColumn,
 		EventType:    EventTypeColumn,
 		CinemaHallID: CinemaHallIDColumn,
 

@@ -7,8 +7,12 @@
 
 package model
 
+import (
+	"github.com/google/uuid"
+)
+
 type ActorPictures struct {
-	ID      []byte `sql:"primary_key"`
-	ActorID []byte
+	ID      uuid.UUID `sql:"primary_key"`
+	ActorID uuid.UUID
 	PicURL  *string
 }

@@ -7,8 +7,12 @@
 
 package model
 
+import (
+	"github.com/google/uuid"
+)
+
 type EventSeatCategories struct {
-	EventID        []byte `sql:"primary_key"`
-	SeatCategoryID []byte `sql:"primary_key"`
+	EventID        uuid.UUID `sql:"primary_key"`
+	SeatCategoryID uuid.UUID `sql:"primary_key"`
 	Price          int32
 }

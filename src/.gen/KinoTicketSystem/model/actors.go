@@ -7,8 +7,12 @@
 
 package model
 
+import (
+	"github.com/google/uuid"
+)
+
 type Actors struct {
-	ID          []byte `sql:"primary_key"`
+	ID          uuid.UUID `sql:"primary_key"`
 	Name        string
 	Age         int32
 	Description string

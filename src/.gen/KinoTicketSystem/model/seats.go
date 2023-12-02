@@ -7,10 +7,14 @@
 
 package model
 
+import (
+	"github.com/google/uuid"
+)
+
 type Seats struct {
-	ID             []byte `sql:"primary_key"`
+	ID             uuid.UUID `sql:"primary_key"`
 	RowNr          int32
 	ColumnNr       int32
-	SeatCategoryID []byte
-	CinemaHallID   []byte
+	SeatCategoryID uuid.UUID
+	CinemaHallID   uuid.UUID
 }

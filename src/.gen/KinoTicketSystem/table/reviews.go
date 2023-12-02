@@ -17,12 +17,13 @@ type reviewsTable struct {
 	mysql.Table
 
 	// Columns
-	ID       mysql.ColumnString
-	Rating   mysql.ColumnInteger
-	Comment  mysql.ColumnString
-	Datetime mysql.ColumnTimestamp
-	UserID   mysql.ColumnString
-	MovieID  mysql.ColumnString
+	ID        mysql.ColumnString
+	Rating    mysql.ColumnInteger
+	Comment   mysql.ColumnString
+	Datetime  mysql.ColumnTimestamp
+	IsSpoiler mysql.ColumnBool
+	UserID    mysql.ColumnString
+	MovieID   mysql.ColumnString
 
 	AllColumns     mysql.ColumnList
 	MutableColumns mysql.ColumnList
@@ -63,26 +64,28 @@ func newReviewsTable(schemaName, tableName, alias string) *ReviewsTable {
 
 func newReviewsTableImpl(schemaName, tableName, alias string) reviewsTable {
 	var (
-		IDColumn       = mysql.StringColumn("id")
-		RatingColumn   = mysql.IntegerColumn("rating")
-		CommentColumn  = mysql.StringColumn("comment")
-		DatetimeColumn = mysql.TimestampColumn("datetime")
-		UserIDColumn   = mysql.StringColumn("user_id")
-		MovieIDColumn  = mysql.StringColumn("movie_id")
-		allColumns     = mysql.ColumnList{IDColumn, RatingColumn, CommentColumn, DatetimeColumn, UserIDColumn, MovieIDColumn}
-		mutableColumns = mysql.ColumnList{RatingColumn, CommentColumn, DatetimeColumn, UserIDColumn, MovieIDColumn}
+		IDColumn        = mysql.StringColumn("id")
+		RatingColumn    = mysql.IntegerColumn("rating")
+		CommentColumn   = mysql.StringColumn("comment")
+		DatetimeColumn  = mysql.TimestampColumn("datetime")
+		IsSpoilerColumn = mysql.BoolColumn("is_spoiler")
+		UserIDColumn    = mysql.StringColumn("user_id")
+		MovieIDColumn   = mysql.StringColumn("movie_id")
+		allColumns      = mysql.ColumnList{IDColumn, RatingColumn, CommentColumn, DatetimeColumn, IsSpoilerColumn, UserIDColumn, MovieIDColumn}
+		mutableColumns  = mysql.ColumnList{RatingColumn, CommentColumn, DatetimeColumn, IsSpoilerColumn, UserIDColumn, MovieIDColumn}
 	)
 
 	return reviewsTable{
 		Table: mysql.NewTable(schemaName, tableName, alias, allColumns...),
 
 		//Columns
-		ID:       IDColumn,
-		Rating:   RatingColumn,
-		Comment:  CommentColumn,
-		Datetime: DatetimeColumn,
-		UserID:   UserIDColumn,
-		MovieID:  MovieIDColumn,
+		ID:        IDColumn,
+		Rating:    RatingColumn,
+		Comment:   CommentColumn,
+		Datetime:  DatetimeColumn,
+		IsSpoiler: IsSpoilerColumn,
+		UserID:    UserIDColumn,
+		MovieID:   MovieIDColumn,
 
 		AllColumns:     allColumns,
 		MutableColumns: mutableColumns,

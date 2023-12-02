@@ -7,10 +7,14 @@
 
 package model
 
+import (
+	"github.com/google/uuid"
+)
+
 type Orders struct {
-	ID              []byte `sql:"primary_key"`
+	ID              uuid.UUID `sql:"primary_key"`
 	Totalprice      int32
 	IsPaid          bool
-	PaymentMethodID []byte
-	UserID          []byte
+	PaymentMethodID uuid.UUID
+	UserID          uuid.UUID
 }

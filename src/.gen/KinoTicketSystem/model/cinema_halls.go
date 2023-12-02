@@ -7,9 +7,13 @@
 
 package model
 
+import (
+	"github.com/google/uuid"
+)
+
 type CinemaHalls struct {
-	ID        []byte `sql:"primary_key"`
+	ID        uuid.UUID `sql:"primary_key"`
 	Name      string
 	Capacity  int32
-	TheatreID []byte
+	TheatreID uuid.UUID
 }

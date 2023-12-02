@@ -8,14 +8,15 @@
 package model
 
 import (
+	"github.com/google/uuid"
 	"time"
 )
 
 type EventSeats struct {
-	ID           []byte `sql:"primary_key"`
+	ID           uuid.UUID `sql:"primary_key"`
 	Booked       bool
 	BlockedUntil *time.Time
-	UserID       []byte
-	SeatID       []byte
-	EventID      []byte
+	UserID       uuid.UUID
+	SeatID       uuid.UUID
+	EventID      uuid.UUID
 }

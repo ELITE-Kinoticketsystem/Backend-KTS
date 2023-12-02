@@ -7,7 +7,11 @@
 
 package model
 
+import (
+	"github.com/google/uuid"
+)
+
 type MovieGenres struct {
-	MovieID []byte `sql:"primary_key"`
-	GenreID []byte `sql:"primary_key"`
+	MovieID uuid.UUID `sql:"primary_key"`
+	GenreID uuid.UUID `sql:"primary_key"`
 }

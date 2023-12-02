@@ -7,7 +7,11 @@
 
 package model
 
+import (
+	"github.com/google/uuid"
+)
+
 type PaymentMethods struct {
-	ID         []byte `sql:"primary_key"`
+	ID         uuid.UUID `sql:"primary_key"`
 	Methodname string
 }
