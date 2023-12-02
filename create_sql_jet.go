@@ -8,7 +8,6 @@ import (
 	"github.com/go-jet/jet/v2/generator/metadata"
 	"github.com/go-jet/jet/v2/generator/template"
 	"github.com/google/uuid"
-	"github.com/joho/godotenv"
 
 	mysql2 "github.com/go-jet/jet/v2/generator/mysql"
 	mysql3 "github.com/go-jet/jet/v2/mysql"
@@ -16,13 +15,6 @@ import (
 
 func main() {
 	log.Println("Starting Jet Generator for MySQL")
-
-	// Load Environment variables
-	err := godotenv.Load()
-	if err != nil {
-		log.Printf("Error loading .env file:: %v", err)
-	}
-	log.Println("Environment variables loaded successfully")
 
 	var (
 		dbHost    = os.Getenv("DB_HOST")
