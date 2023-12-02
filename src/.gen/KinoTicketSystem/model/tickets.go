@@ -7,11 +7,15 @@
 
 package model
 
+import (
+	"github.com/google/uuid"
+)
+
 type Tickets struct {
-	ID              []byte `sql:"primary_key"`
+	ID              uuid.UUID `sql:"primary_key"`
 	Validated       bool
 	Price           int32
-	PriceCategoryID []byte
-	OrderID         []byte
-	EventSeatID     []byte
+	PriceCategoryID uuid.UUID
+	OrderID         uuid.UUID
+	EventSeatID     uuid.UUID
 }

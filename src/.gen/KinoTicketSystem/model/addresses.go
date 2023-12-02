@@ -7,8 +7,12 @@
 
 package model
 
+import (
+	"github.com/google/uuid"
+)
+
 type Addresses struct {
-	ID       []byte `sql:"primary_key"`
+	ID       uuid.UUID `sql:"primary_key"`
 	Street   string
 	StreetNr string
 	Zipcode  string

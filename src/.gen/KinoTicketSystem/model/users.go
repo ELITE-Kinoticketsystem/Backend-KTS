@@ -7,8 +7,12 @@
 
 package model
 
+import (
+	"github.com/google/uuid"
+)
+
 type Users struct {
-	ID        []byte `sql:"primary_key"`
+	ID        uuid.UUID `sql:"primary_key"`
 	Username  *string
 	Email     string
 	Password  string

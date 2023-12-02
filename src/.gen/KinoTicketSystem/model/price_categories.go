@@ -7,8 +7,12 @@
 
 package model
 
+import (
+	"github.com/google/uuid"
+)
+
 type PriceCategories struct {
-	ID           []byte `sql:"primary_key"`
+	ID           uuid.UUID `sql:"primary_key"`
 	CategoryName string
 	Price        int32
 }

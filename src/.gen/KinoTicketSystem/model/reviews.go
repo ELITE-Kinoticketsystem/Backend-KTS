@@ -8,14 +8,16 @@
 package model
 
 import (
+	"github.com/google/uuid"
 	"time"
 )
 
 type Reviews struct {
-	ID       []byte `sql:"primary_key"`
-	Rating   int32
-	Comment  string
-	Datetime time.Time
-	UserID   []byte
-	MovieID  []byte
+	ID        uuid.UUID `sql:"primary_key"`
+	Rating    int32
+	Comment   string
+	Datetime  time.Time
+	IsSpoiler *bool
+	UserID    uuid.UUID
+	MovieID   uuid.UUID
 }

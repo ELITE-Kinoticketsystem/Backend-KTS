@@ -8,14 +8,16 @@
 package model
 
 import (
+	"github.com/google/uuid"
 	"time"
 )
 
 type Events struct {
-	ID           []byte `sql:"primary_key"`
+	ID           uuid.UUID `sql:"primary_key"`
 	Title        string
 	Start        time.Time
 	End          time.Time
+	Description  *string
 	EventType    string
-	CinemaHallID []byte
+	CinemaHallID uuid.UUID
 }
