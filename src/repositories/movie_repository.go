@@ -7,58 +7,165 @@ import (
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/.gen/KinoTicketSystem/model"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/managers"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
-	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models/schemas"
 
 	. "github.com/go-jet/jet/v2/mysql"
 	"github.com/google/uuid"
 )
 
 type MovieRepoI interface {
-	CreateMovie(movie *schemas.Movie) *models.KTSError
-	GetMovies() ([]models.MoviesWithGenre, *models.KTSError)
-	GetMovieById(id uuid.UUID) (*schemas.Movie, *models.KTSError)
-	UpdateMovie(movie *schemas.Movie) *models.KTSError
-	DeleteMovie(id *uuid.UUID) *models.KTSError
+	// Movie
+	GetMovies() (*[]model.Movies, *models.KTSError)
+	GetMovieById(movieId uuid.UUID) (*model.Movies, *models.KTSError)
+	CreateMovie(movie model.Movies) *models.KTSError
+	UpdateMovie(movie model.Movies) *models.KTSError
+	DeleteMovie(movieId uuid.UUID) *models.KTSError
 
-	GetGenreByName(name string) (*model.Genres, *models.KTSError)
-	CreateGenre(genre *model.Genres) *models.KTSError
+	// Genre
 	GetGenres() (*[]model.Genres, *models.KTSError)
+	GetGenreByName(name string) (*model.Genres, *models.KTSError)
+	CreateGenre(name string) *models.KTSError
 
-	AddMovieGenre(movieId *uuid.UUID, genreId *uuid.UUID) *models.KTSError
+	// Combine Movie and Genre
+	AddMovieGenre(movieId uuid.UUID, genreId uuid.UUID) *models.KTSError
 
-	GetMoviesByGenre(genreId *uuid.UUID) (*[]model.Movies, *models.KTSError)
-	GetMoviesByGenres() (*[]model.Movies, *models.KTSError)
+	// One Movie with all Genres
+	GetMovieByIdWithGenre(movieId uuid.UUID) (*models.MovieWithGenres, *models.KTSError)
+	// One Genre with all Movies
+	GetGenreWithMovies(genreName string) (*models.GenreWithMovies, *models.KTSError)
+	// All Movies with all Genres - Grouped by Genre
+	GetGenresWithMovies() (*[]models.GenreWithMovies, *models.KTSError)
+	// All Movies with all Genres - Grouped by Movie
+	GetMoviesWithGenres() ([]models.MovieWithGenres, *models.KTSError)
 }
 
 type MovieRepository struct {
 	DatabaseManager managers.DatabaseManagerI
 }
 
-func (mr *MovieRepository) AddMovieGenre(movieId *uuid.UUID, genreId *uuid.UUID) *models.KTSError {
-	// TODO: implement
-	return nil
-}
-func (mr *MovieRepository) GetGenreByName(name string) (*model.Genres, *models.KTSError) {
-	var genre model.Genres
+// Movie
+func (mr *MovieRepository) GetMovies() (*[]model.Movies, *models.KTSError) {
+	var movies []model.Movies
 
 	// Create the query
 	stmt := SELECT(
-		Genres.AllColumns,
+		Movies.AllColumns,
 	).FROM(
-		Genres,
-	).WHERE(
-		Genres.GenreName.EQ(String(name)),
+		Movies,
 	)
 
 	// Execute the query
-	err := stmt.Query(mr.DatabaseManager.GetDatabaseConnection(), &genre)
+	err := stmt.Query(mr.DatabaseManager.GetDatabaseConnection(), &movies)
 	if err != nil {
 		return nil, kts_errors.KTS_INTERNAL_ERROR
 	}
 
-	return &genre, nil
+	if len(movies) == 0 {
+		return nil, kts_errors.KTS_NOT_FOUND
+	}
+
+	return &movies, nil
 }
 
+func (mr *MovieRepository) GetMovieById(movieId uuid.UUID) (*model.Movies, *models.KTSError) {
+	// Prepare vairables
+	var movie model.Movies
+	binary_id, _ := movieId.MarshalBinary()
+
+	// Create the query
+	stmt := SELECT(
+		Movies.AllColumns,
+	).FROM(
+		Movies,
+	).WHERE(
+		Movies.ID.EQ(String(string(binary_id))),
+	)
+
+	// Execute the query
+	err := stmt.Query(mr.DatabaseManager.GetDatabaseConnection(), &movie)
+	if err != nil {
+		return nil, kts_errors.KTS_INTERNAL_ERROR
+	}
+
+	return &movie, nil
+}
+
+func (mr *MovieRepository) CreateMovie(movie model.Movies) *models.KTSError {
+	// Create the insert statement
+	insertQuery := Movies.INSERT(Movies.Title, Movies.Description, Movies.BannerPicURL, Movies.CoverPicURL, Movies.TrailerURL, Movies.Rating, Movies.ReleaseDate, Movies.TimeInMin, Movies.Fsk).
+		VALUES(movie.Title, movie.Description, movie.BannerPicURL, movie.CoverPicURL, movie.TrailerURL, movie.Rating, movie.ReleaseDate, movie.TimeInMin, movie.Fsk)
+
+	// Execute the query
+	_, err := insertQuery.Exec(mr.DatabaseManager.GetDatabaseConnection())
+	if err != nil {
+		return kts_errors.KTS_INTERNAL_ERROR
+	}
+
+	return nil
+}
+
+func (mr *MovieRepository) UpdateMovie(movie model.Movies) *models.KTSError {
+	// Prepare variables
+	binaryID, _ := movie.ID.MarshalBinary()
+
+	// Create the update statement
+	updateQuery := Movies.UPDATE().
+		SET(
+			Movies.Title.SET(String(movie.Title)),
+			Movies.Description.SET(String(movie.Description)),
+			Movies.BannerPicURL.SET(String(*movie.BannerPicURL)),
+			Movies.CoverPicURL.SET(String(*movie.CoverPicURL)),
+			Movies.TrailerURL.SET(String(*movie.TrailerURL)),
+			Movies.Rating.SET(Float(*movie.Rating)),
+			Movies.ReleaseDate.SET(Date(movie.ReleaseDate.Year(), movie.ReleaseDate.Month(), movie.ReleaseDate.Day())),
+			Movies.TimeInMin.SET(Int32(movie.TimeInMin)),
+			Movies.Fsk.SET(Int32(movie.Fsk)),
+		).WHERE(
+		Movies.ID.EQ(String(string(binaryID))),
+	)
+
+	// Execute the query
+	rows, err := updateQuery.Exec(mr.DatabaseManager.GetDatabaseConnection())
+	if err != nil {
+		return kts_errors.KTS_INTERNAL_ERROR
+	}
+
+	rowsAff, err := rows.RowsAffected()
+	if err != nil {
+		return kts_errors.KTS_INTERNAL_ERROR
+	}
+
+	if rowsAff == 0 {
+		return kts_errors.KTS_NOT_FOUND
+	}
+
+	return nil
+}
+
+func (mr *MovieRepository) DeleteMovie(movieId uuid.UUID) *models.KTSError {
+	binaryID, _ := movieId.MarshalBinary()
+
+	// Create the delete statement
+	deleteQuery := Movies.DELETE().WHERE(Movies.ID.EQ(String(string(binaryID))))
+
+	// Execute the query
+	rows, err := deleteQuery.Exec(mr.DatabaseManager.GetDatabaseConnection())
+	if err != nil {
+		return kts_errors.KTS_INTERNAL_ERROR
+	}
+
+	rowsAff, err := rows.RowsAffected()
+	if err != nil {
+		return kts_errors.KTS_INTERNAL_ERROR
+	}
+
+	if rowsAff == 0 {
+		return kts_errors.KTS_NOT_FOUND
+	}
+
+	return nil
+}
+
+// Genre
 func (mr *MovieRepository) GetGenres() (*[]model.Genres, *models.KTSError) {
 	var genres []model.Genres
 
@@ -82,46 +189,65 @@ func (mr *MovieRepository) GetGenres() (*[]model.Genres, *models.KTSError) {
 	return &genres, nil
 }
 
-func (mr *MovieRepository) CreateGenre(genre *model.Genres) *models.KTSError {
-	// TODO: implement
-	return nil
-}
-
-func (mr *MovieRepository) CreateMovie(movie *schemas.Movie) *models.KTSError {
-	// TODO: implement
-	return nil
-}
-
-func (mr *MovieRepository) GetMovies() (*[]models.MoviesWithGenre, *models.KTSError) {
-	var movies_with_genre []models.MoviesWithGenre
+func (mr *MovieRepository) GetGenreByName(name string) (*model.Genres, *models.KTSError) {
+	var genre model.Genres
 
 	// Create the query
 	stmt := SELECT(
-		Movies.AllColumns,
 		Genres.AllColumns,
 	).FROM(
-		MovieGenres.
-			INNER_JOIN(Movies, Movies.ID.EQ(MovieGenres.MovieID)).
-			INNER_JOIN(Genres, Genres.ID.EQ(MovieGenres.GenreID)),
+		Genres,
+	).WHERE(
+		Genres.GenreName.EQ(String(name)),
 	)
 
 	// Execute the query
-	err := stmt.Query(mr.DatabaseManager.GetDatabaseConnection(), &movies_with_genre)
+	err := stmt.Query(mr.DatabaseManager.GetDatabaseConnection(), &genre)
 	if err != nil {
 		return nil, kts_errors.KTS_INTERNAL_ERROR
 	}
 
-	if len(movies_with_genre) == 0 {
-		return nil, kts_errors.KTS_NOT_FOUND
-	}
-
-	return &movies_with_genre, nil
+	return &genre, nil
 }
 
-func (mr *MovieRepository) GetMovieById(id uuid.UUID) (*models.MoviesWithGenre, *models.KTSError) {
-	// Prepare vairables
-	var movie_with_genre models.MoviesWithGenre
-	binary_id, _ := id.MarshalBinary()
+func (mr *MovieRepository) CreateGenre(name string) *models.KTSError {
+	// Create the insert statement
+	insertQuery := Genres.INSERT(Genres.GenreName).
+		VALUES(name)
+
+	// Execute the query
+	_, err := insertQuery.Exec(mr.DatabaseManager.GetDatabaseConnection())
+	if err != nil {
+		return kts_errors.KTS_INTERNAL_ERROR
+	}
+
+	return nil
+}
+
+// Combine Movie and Genre
+func (mr *MovieRepository) AddMovieGenre(movieId uuid.UUID, genreId uuid.UUID) *models.KTSError {
+
+	binary_movie_id, _ := movieId.MarshalBinary()
+	binary_genre_id, _ := genreId.MarshalBinary()
+
+	// Create the insert statement
+	insertQuery := MovieGenres.INSERT(MovieGenres.MovieID, MovieGenres.GenreID).
+		VALUES(String(string(binary_movie_id)), String(string(binary_genre_id)))
+
+	// Execute the query
+	_, err := insertQuery.Exec(mr.DatabaseManager.GetDatabaseConnection())
+	if err != nil {
+		return kts_errors.KTS_INTERNAL_ERROR
+	}
+
+	return nil
+}
+
+// One Movie with all Genres
+func (mr *MovieRepository) GetMovieByIdWithGenre(movieId uuid.UUID) (*models.MovieWithGenres, *models.KTSError) {
+	var movie models.MovieWithGenres
+
+	binary_id, _ := movieId.MarshalBinary()
 
 	// Create the query
 	stmt := SELECT(
@@ -136,26 +262,17 @@ func (mr *MovieRepository) GetMovieById(id uuid.UUID) (*models.MoviesWithGenre, 
 	)
 
 	// Execute the query
-	err := stmt.Query(mr.DatabaseManager.GetDatabaseConnection(), &movie_with_genre)
+	err := stmt.Query(mr.DatabaseManager.GetDatabaseConnection(), &movie)
 	if err != nil {
 		return nil, kts_errors.KTS_INTERNAL_ERROR
 	}
 
-	return &movie_with_genre, nil
+	return &movie, nil
 }
 
-func (mr *MovieRepository) UpdateMovie(movie *schemas.Movie) *models.KTSError {
-	// TODO: implement
-	return nil
-}
-
-func (mr *MovieRepository) DeleteMovie(id *uuid.UUID) *models.KTSError {
-	// TODO: implement
-	return nil
-}
-
-func (mr *MovieRepository) GetMoviesByGenre(genreName string) (*models.GenresWithMovie, *models.KTSError) {
-	var movies models.GenresWithMovie
+// One Genre with all Movies
+func (mr *MovieRepository) GetGenreWithMovies(genreName string) (*models.GenreWithMovies, *models.KTSError) {
+	var movies models.GenreWithMovies
 
 	// Create the query
 	stmt := SELECT(
@@ -178,8 +295,9 @@ func (mr *MovieRepository) GetMoviesByGenre(genreName string) (*models.GenresWit
 	return &movies, nil
 }
 
-func (mr *MovieRepository) GetMoviesByGenres() (*[]models.GenresWithMovie, *models.KTSError) {
-	var genresWithMovies []models.GenresWithMovie
+// All Movies with all Genres - Grouped by Genre
+func (mr *MovieRepository) GetGenresWithMovies() (*[]models.GenreWithMovies, *models.KTSError) {
+	var genresWithMovies []models.GenreWithMovies
 
 	// Create the query
 	stmt := SELECT(
@@ -202,4 +320,31 @@ func (mr *MovieRepository) GetMoviesByGenres() (*[]models.GenresWithMovie, *mode
 	}
 
 	return &genresWithMovies, nil
+}
+
+// All Movies with all Genres - Grouped by Movie
+func (mr *MovieRepository) GetMoviesWithGenres() ([]models.MovieWithGenres, *models.KTSError) {
+	var moviesWithGenres []models.MovieWithGenres
+
+	// Create the query
+	stmt := SELECT(
+		Movies.AllColumns,
+		Genres.AllColumns,
+	).FROM(
+		MovieGenres.
+			INNER_JOIN(Movies, Movies.ID.EQ(MovieGenres.MovieID)).
+			INNER_JOIN(Genres, Genres.ID.EQ(MovieGenres.GenreID)),
+	)
+
+	// Execute the query
+	err := stmt.Query(mr.DatabaseManager.GetDatabaseConnection(), &moviesWithGenres)
+	if err != nil {
+		return nil, kts_errors.KTS_INTERNAL_ERROR
+	}
+
+	if len(moviesWithGenres) == 0 {
+		return nil, kts_errors.KTS_NOT_FOUND
+	}
+
+	return moviesWithGenres, nil
 }

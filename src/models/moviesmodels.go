@@ -17,10 +17,18 @@ type MovieDTO struct {
 	GenreNames  []string   `json:"genreName"`
 }
 
-type MoviesWithGenre struct {
+type MovieWithGenres struct {
 	model.Movies
 
 	Genres []struct {
 		model.Genres
+	}
+}
+
+type GenreWithMovies struct {
+	model.Genres
+
+	Movies []struct {
+		model.Movies
 	}
 }
