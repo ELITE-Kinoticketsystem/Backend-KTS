@@ -15,6 +15,7 @@ import (
 type Controllers struct {
 	UserController  controllers.UserControllerI
 	EventController controllers.EventControllerI
+	MovieController controllers.MovieControllerI
 }
 
 func createRouter(dbConnection *sql.DB) *gin.Engine {
@@ -55,8 +56,10 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 		},
 		EventController: &controllers.EventController{
 			EventRepo:   eventRepo,
-			MovieRepo:   movieRepo,
 			TheatreRepo: theatreRepo,
+		},
+		MovieController: &controllers.MovieController{
+			MovieRepo: movieRepo,
 		},
 	}
 
@@ -76,6 +79,21 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 	router.Handle(http.MethodGet, "/events/movies/:id", handlers.GetEventsForMovieHandler(controller.EventController))
 	router.Handle(http.MethodGet, "/events/special-events", handlers.GetSpecialEventsHandler(controller.EventController))
 	// TODO: Do we need to add update event handler because how would we proceed then?
+
+	router.Handle(http.MethodGet, "/movies", handlers.GetMovies(controller.MovieController))
+	router.Handle(http.MethodGet, "/movies/:id", handlers.GetMovieById(controller.MovieController))
+	router.Handle(http.MethodPost, "/movies", handlers.CreateMovie(controller.MovieController))
+	router.Handle(http.MethodPut, "/movies", handlers.UpdateMovie(controller.MovieController))
+	router.Handle(http.MethodDelete, "/movies/:id", handlers.DeleteMovie(controller.MovieController))
+
+	router.Handle(http.MethodGet, "/genres", handlers.GetGenres(controller.MovieController))
+	router.Handle(http.MethodGet, "/genres/:name", handlers.GetGenreByName(controller.MovieController))
+	router.Handle(http.MethodPost, "/genres", handlers.CreateGenre(controller.MovieController))
+
+	router.Handle(http.MethodGet, "/movies/:id/genres", handlers.GetMovieByIdWithGenre(controller.MovieController))
+	router.Handle(http.MethodGet, "/genres/:name/movies", handlers.GetGenreWithMovies(controller.MovieController))
+	router.Handle(http.MethodGet, "/genres/movies", handlers.GetGenresWithMovies(controller.MovieController))
+	router.Handle(http.MethodGet, "/movies/genres", handlers.GetMoviesWithGenres(controller.MovieController))
 
 	return router
 }
