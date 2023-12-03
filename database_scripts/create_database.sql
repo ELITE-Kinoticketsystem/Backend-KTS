@@ -165,6 +165,7 @@ CREATE TABLE theatres
   (
      id         BINARY(16) DEFAULT (Uuid_to_bin(Uuid(), 1)),
      name       VARCHAR(50) NOT NULL,
+     logo_url   VARCHAR(255),
      address_id BINARY(16) NOT NULL,
      PRIMARY KEY(id),
      FOREIGN KEY (address_id) REFERENCES addresses(id)
