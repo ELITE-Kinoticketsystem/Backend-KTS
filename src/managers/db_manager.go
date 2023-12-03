@@ -10,9 +10,9 @@ import (
 )
 
 type DatabaseManagerI interface {
-	ExecuteStatement(query string, args... any) (sql.Result, error)
-	ExecuteQuery(query string, args... any) (*sql.Rows, error)
-	ExecuteQueryRow(query string, args... any) *sql.Row
+	ExecuteStatement(query string, args ...any) (sql.Result, error)
+	ExecuteQuery(query string, args ...any) (*sql.Rows, error)
+	ExecuteQueryRow(query string, args ...any) *sql.Row
 	CheckIfExists(query string, args ...any) (bool, error)
 	GetDatabaseConnection() *sql.DB
 }
@@ -21,17 +21,17 @@ type DatabaseManager struct {
 	Connection *sql.DB
 }
 
-func (dm *DatabaseManager) ExecuteStatement(query string, args... any) (sql.Result, error) {
+func (dm *DatabaseManager) ExecuteStatement(query string, args ...any) (sql.Result, error) {
 	result, err := dm.Connection.Exec(query, args...)
 	return result, err
 }
 
-func (dm *DatabaseManager) ExecuteQuery(query string, args... any) (*sql.Rows, error) {
+func (dm *DatabaseManager) ExecuteQuery(query string, args ...any) (*sql.Rows, error) {
 	result, err := dm.Connection.Query(query, args...)
 	return result, err
 }
 
-func (dm *DatabaseManager) ExecuteQueryRow(query string, args... any) *sql.Row {
+func (dm *DatabaseManager) ExecuteQueryRow(query string, args ...any) *sql.Row {
 	result := dm.Connection.QueryRow(query, args...)
 	return result
 }
@@ -72,6 +72,6 @@ func InitializeDB() (*sql.DB, error) {
 	if err != nil {
 		return nil, fmt.Errorf("error pinging database: %v", err)
 	}
-	
+
 	return db, nil
 }

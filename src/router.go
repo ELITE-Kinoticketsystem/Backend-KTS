@@ -15,6 +15,7 @@ import (
 type Controllers struct {
 	UserController  controllers.UserControllerI
 	EventController controllers.EventControllerI
+	ActorController controllers.ActorControllerI
 }
 
 func createRouter(dbConnection *sql.DB) *gin.Engine {
@@ -48,6 +49,10 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 		DatabaseManager: databaseManager,
 	}
 
+	actorRepo := &repositories.ActorRepository{
+		DatabaseManager: databaseManager,
+	}
+
 	// Create controllers
 	controller := Controllers{
 		UserController: &controllers.UserController{
@@ -57,6 +62,9 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 			EventRepo:   eventRepo,
 			MovieRepo:   movieRepo,
 			TheatreRepo: theatreRepo,
+		},
+		ActorController: &controllers.ActorController{
+			ActorRepo: actorRepo,
 		},
 	}
 
