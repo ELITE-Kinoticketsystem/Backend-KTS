@@ -12,7 +12,7 @@ import (
 	"github.com/google/uuid"
 )
 
-type MovieRepoI interface {
+type MovieRepositoryI interface {
 	// Movie
 	GetMovies() (*[]model.Movies, *models.KTSError)
 	GetMovieById(movieId uuid.UUID) (*model.Movies, *models.KTSError)
