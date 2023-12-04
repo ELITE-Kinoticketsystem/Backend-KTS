@@ -70,12 +70,15 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 
 	securedRoutes.Handle(http.MethodGet, "/test", handlers.TestJwtToken)
 
-	router.Handle(http.MethodPost, "/events", handlers.CreateEventHandler(controller.EventController))
-	router.Handle(http.MethodDelete, "/events/:id", handlers.DeleteEventHandler(controller.EventController))
+	securedRoutes.Handle(http.MethodPost, "/events", handlers.CreateEventHandler(controller.EventController))
+
 	// Get events for movieId
-	router.Handle(http.MethodGet, "/events/movies/:id", handlers.GetEventsForMovieHandler(controller.EventController))
-	router.Handle(http.MethodGet, "/events/special-events", handlers.GetSpecialEventsHandler(controller.EventController))
+	publicRoutes.Handle(http.MethodGet, "/events/movies/:id", handlers.GetEventsForMovieHandler(controller.EventController))
+	publicRoutes.Handle(http.MethodGet, "/events/special-events", handlers.GetSpecialEventsHandler(controller.EventController))
 	// TODO: Do we need to add update event handler because how would we proceed then?
+
+	// Should be only accessible for admins
+	securedRoutes.Handle(http.MethodDelete, "/events/:id", handlers.DeleteEventHandler(controller.EventController))
 
 	return router
 }
