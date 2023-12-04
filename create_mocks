@@ -5,3 +5,5 @@
 ~/go/bin/mockgen -source=./src/repositories/genre_repository.go -destination=./src/mocks/genre_repository_mock.go -package=mocks
 ~/go/bin/mockgen -source=./src/repositories/actor_repository.go -destination=./src/mocks/actor_repository_mock.go -package=mocks
 ~/go/bin/mockgen -source=./src/repositories/movie_genres_repository.go -destination=./src/mocks/movie_genres_repository_mock.go -package=mocks
+~/go/bin/mockgen -source=./src/repositories/theatre_repository.go -destination=./src/mocks/theatre_repository_mock.go -package=mocks
+~/go/bin/mockgen -source=./src/controllers/theatre_controller.go -destination=./src/mocks/theatre_controller_mock.go -package=mocks
