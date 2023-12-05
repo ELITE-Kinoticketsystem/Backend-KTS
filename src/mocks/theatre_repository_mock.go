@@ -11,7 +11,7 @@ package mocks
 import (
 	reflect "reflect"
 
-	schemas "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models/schemas"
+	model "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/.gen/KinoTicketSystem/model"
 	uuid "github.com/google/uuid"
 	gomock "go.uber.org/mock/gomock"
 )
@@ -40,10 +40,10 @@ func (m *MockTheaterRepoI) EXPECT() *MockTheaterRepoIMockRecorder {
 }
 
 // GetSeatsForCinemaHall mocks base method.
-func (m *MockTheaterRepoI) GetSeatsForCinemaHall(cinemaHallId *uuid.UUID) ([]schemas.Seat, error) {
+func (m *MockTheaterRepoI) GetSeatsForCinemaHall(cinemaHallId *uuid.UUID) ([]model.Seats, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetSeatsForCinemaHall", cinemaHallId)
-	ret0, _ := ret[0].([]schemas.Seat)
+	ret0, _ := ret[0].([]model.Seats)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

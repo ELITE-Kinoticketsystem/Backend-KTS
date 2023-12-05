@@ -3,16 +3,16 @@ package repositories
 import (
 	"errors"
 
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/.gen/KinoTicketSystem/model"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/managers"
-	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models/schemas"
 	"github.com/google/uuid"
 )
 
 type MovieRepoI interface {
-	CreateMovie(movie *schemas.Movie) error
+	CreateMovie(movie *model.Movies) error
 
-	GetGenreByName(name string) (*schemas.Genre, error)
-	CreateGenre(genre *schemas.Genre) error
+	GetGenreByName(name string) (*model.Genres, error)
+	CreateGenre(genre *model.Genres) error
 
 	AddMovieGenre(movieId *uuid.UUID, genreId *uuid.UUID) error
 }
@@ -26,17 +26,17 @@ func (mr *MovieRepository) AddMovieGenre(movieId *uuid.UUID, genreId *uuid.UUID)
 	return errors.New("not implemented")
 }
 
-func (mr *MovieRepository) CreateGenre(genre *schemas.Genre) error {
+func (mr *MovieRepository) CreateGenre(genre *model.Genres) error {
 	// TODO: implement
 	return errors.New("not implemented")
 }
 
-func (mr *MovieRepository) GetGenreByName(name string) (*schemas.Genre, error) {
+func (mr *MovieRepository) GetGenreByName(name string) (*model.Genres, error) {
 	// TODO implement
 	return nil, errors.New("not implemented")
 }
 
-func (mr *MovieRepository) CreateMovie(movie *schemas.Movie) error {
+func (mr *MovieRepository) CreateMovie(movie *model.Movies) error {
 	// TODO: implement
 	return errors.New("not implemented")
 }

@@ -11,7 +11,7 @@ type MovieDTO struct {
 	Title       string     `json:"title"`
 	Description string     `json:"description"`
 	ReleaseDate time.Time  `json:"releaseDate"`
-	TimeInMin   int        `json:"timeInMin"`
-	Fsk         int        `json:"fsk"`
+	TimeInMin   int32      `json:"timeInMin"`
+	Fsk         int32      `json:"fsk"`
 	GenreNames  []string   `json:"genreName"`
 }
