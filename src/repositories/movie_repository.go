@@ -1,14 +1,16 @@
 package repositories
 
 import (
-	. "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/.gen/KinoTicketSystem/table"
+	"log"
+
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/.gen/KinoTicketSystem/table"
 	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
 
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/.gen/KinoTicketSystem/model"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/managers"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
 
-	. "github.com/go-jet/jet/v2/mysql"
+	jet_mysql "github.com/go-jet/jet/v2/mysql"
 	"github.com/google/uuid"
 )
 
@@ -47,21 +49,23 @@ func (mr *MovieRepository) GetMovies() (*[]model.Movies, *models.KTSError) {
 	var movies []model.Movies
 
 	// Create the query
-	stmt := SELECT(
-		Movies.AllColumns,
+	stmt := jet_mysql.SELECT(
+		table.Movies.AllColumns,
 	).FROM(
-		Movies,
+		table.Movies,
 	)
 
+	log.Printf("Query: %v\n", stmt.DebugSql())
 	// Execute the query
+
 	err := stmt.Query(mr.DatabaseManager.GetDatabaseConnection(), &movies)
 	if err != nil {
 		return nil, kts_errors.KTS_INTERNAL_ERROR
 	}
 
-	if len(movies) == 0 {
-		return nil, kts_errors.KTS_NOT_FOUND
-	}
+	// if len(movies) == 0 {
+	// 	return nil, kts_errors.KTS_NOT_FOUND
+	// }
 
 	return &movies, nil
 }
@@ -72,12 +76,12 @@ func (mr *MovieRepository) GetMovieById(movieId uuid.UUID) (*model.Movies, *mode
 	binary_id, _ := movieId.MarshalBinary()
 
 	// Create the query
-	stmt := SELECT(
-		Movies.AllColumns,
+	stmt := jet_mysql.SELECT(
+		table.Movies.AllColumns,
 	).FROM(
-		Movies,
+		table.Movies,
 	).WHERE(
-		Movies.ID.EQ(String(string(binary_id))),
+		table.Movies.ID.EQ(jet_mysql.String(string(binary_id))),
 	)
 
 	// Execute the query
@@ -91,7 +95,7 @@ func (mr *MovieRepository) GetMovieById(movieId uuid.UUID) (*model.Movies, *mode
 
 func (mr *MovieRepository) CreateMovie(movie model.Movies) *models.KTSError {
 	// Create the insert statement
-	insertQuery := Movies.INSERT(Movies.Title, Movies.Description, Movies.BannerPicURL, Movies.CoverPicURL, Movies.TrailerURL, Movies.Rating, Movies.ReleaseDate, Movies.TimeInMin, Movies.Fsk).
+	insertQuery := table.Movies.INSERT(table.Movies.Title, table.Movies.Description, table.Movies.BannerPicURL, table.Movies.CoverPicURL, table.Movies.TrailerURL, table.Movies.Rating, table.Movies.ReleaseDate, table.Movies.TimeInMin, table.Movies.Fsk).
 		VALUES(movie.Title, movie.Description, movie.BannerPicURL, movie.CoverPicURL, movie.TrailerURL, movie.Rating, movie.ReleaseDate, movie.TimeInMin, movie.Fsk)
 
 	// Execute the query
@@ -108,19 +112,19 @@ func (mr *MovieRepository) UpdateMovie(movie model.Movies) *models.KTSError {
 	binaryID, _ := movie.ID.MarshalBinary()
 
 	// Create the update statement
-	updateQuery := Movies.UPDATE().
+	updateQuery := table.Movies.UPDATE().
 		SET(
-			Movies.Title.SET(String(movie.Title)),
-			Movies.Description.SET(String(movie.Description)),
-			Movies.BannerPicURL.SET(String(*movie.BannerPicURL)),
-			Movies.CoverPicURL.SET(String(*movie.CoverPicURL)),
-			Movies.TrailerURL.SET(String(*movie.TrailerURL)),
-			Movies.Rating.SET(Float(*movie.Rating)),
-			Movies.ReleaseDate.SET(Date(movie.ReleaseDate.Year(), movie.ReleaseDate.Month(), movie.ReleaseDate.Day())),
-			Movies.TimeInMin.SET(Int32(movie.TimeInMin)),
-			Movies.Fsk.SET(Int32(movie.Fsk)),
+			table.Movies.Title.SET(jet_mysql.String(movie.Title)),
+			table.Movies.Description.SET(jet_mysql.String(movie.Description)),
+			table.Movies.BannerPicURL.SET(jet_mysql.String(*movie.BannerPicURL)),
+			table.Movies.CoverPicURL.SET(jet_mysql.String(*movie.CoverPicURL)),
+			table.Movies.TrailerURL.SET(jet_mysql.String(*movie.TrailerURL)),
+			table.Movies.Rating.SET(jet_mysql.Float(*movie.Rating)),
+			table.Movies.ReleaseDate.SET(jet_mysql.Date(movie.ReleaseDate.Year(), movie.ReleaseDate.Month(), movie.ReleaseDate.Day())),
+			table.Movies.TimeInMin.SET(jet_mysql.Int32(movie.TimeInMin)),
+			table.Movies.Fsk.SET(jet_mysql.Int32(movie.Fsk)),
 		).WHERE(
-		Movies.ID.EQ(String(string(binaryID))),
+		table.Movies.ID.EQ(jet_mysql.String(string(binaryID))),
 	)
 
 	// Execute the query
@@ -145,7 +149,7 @@ func (mr *MovieRepository) DeleteMovie(movieId uuid.UUID) *models.KTSError {
 	binaryID, _ := movieId.MarshalBinary()
 
 	// Create the delete statement
-	deleteQuery := Movies.DELETE().WHERE(Movies.ID.EQ(String(string(binaryID))))
+	deleteQuery := table.Movies.DELETE().WHERE(table.Movies.ID.EQ(jet_mysql.String(string(binaryID))))
 
 	// Execute the query
 	rows, err := deleteQuery.Exec(mr.DatabaseManager.GetDatabaseConnection())
@@ -170,10 +174,10 @@ func (mr *MovieRepository) GetGenres() (*[]model.Genres, *models.KTSError) {
 	var genres []model.Genres
 
 	// Create the query
-	stmt := SELECT(
-		Genres.AllColumns,
+	stmt := jet_mysql.SELECT(
+		table.Genres.AllColumns,
 	).FROM(
-		Genres,
+		table.Genres,
 	)
 
 	// Execute the query
@@ -193,12 +197,12 @@ func (mr *MovieRepository) GetGenreByName(name string) (*model.Genres, *models.K
 	var genre model.Genres
 
 	// Create the query
-	stmt := SELECT(
-		Genres.AllColumns,
+	stmt := jet_mysql.SELECT(
+		table.Genres.AllColumns,
 	).FROM(
-		Genres,
+		table.Genres,
 	).WHERE(
-		Genres.GenreName.EQ(String(name)),
+		table.Genres.GenreName.EQ(jet_mysql.String(name)),
 	)
 
 	// Execute the query
@@ -212,7 +216,7 @@ func (mr *MovieRepository) GetGenreByName(name string) (*model.Genres, *models.K
 
 func (mr *MovieRepository) CreateGenre(name string) *models.KTSError {
 	// Create the insert statement
-	insertQuery := Genres.INSERT(Genres.GenreName).
+	insertQuery := table.Genres.INSERT(table.Genres.GenreName).
 		VALUES(name)
 
 	// Execute the query
@@ -231,8 +235,8 @@ func (mr *MovieRepository) AddMovieGenre(movieId uuid.UUID, genreId uuid.UUID) *
 	binary_genre_id, _ := genreId.MarshalBinary()
 
 	// Create the insert statement
-	insertQuery := MovieGenres.INSERT(MovieGenres.MovieID, MovieGenres.GenreID).
-		VALUES(String(string(binary_movie_id)), String(string(binary_genre_id)))
+	insertQuery := table.MovieGenres.INSERT(table.MovieGenres.MovieID, table.MovieGenres.GenreID).
+		VALUES(jet_mysql.String(string(binary_movie_id)), jet_mysql.String(string(binary_genre_id)))
 
 	// Execute the query
 	_, err := insertQuery.Exec(mr.DatabaseManager.GetDatabaseConnection())
@@ -250,15 +254,15 @@ func (mr *MovieRepository) GetMovieByIdWithGenre(movieId uuid.UUID) (*models.Mov
 	binary_id, _ := movieId.MarshalBinary()
 
 	// Create the query
-	stmt := SELECT(
-		Movies.AllColumns,
-		Genres.AllColumns,
+	stmt := jet_mysql.SELECT(
+		table.Movies.AllColumns,
+		table.Genres.AllColumns,
 	).FROM(
-		MovieGenres.
-			INNER_JOIN(Movies, Movies.ID.EQ(MovieGenres.MovieID)).
-			INNER_JOIN(Genres, Genres.ID.EQ(MovieGenres.GenreID)),
+		table.MovieGenres.
+			INNER_JOIN(table.Movies, table.Movies.ID.EQ(table.MovieGenres.MovieID)).
+			INNER_JOIN(table.Genres, table.Genres.ID.EQ(table.MovieGenres.GenreID)),
 	).WHERE(
-		Movies.ID.EQ(String(string(binary_id))),
+		table.Movies.ID.EQ(jet_mysql.String(string(binary_id))),
 	)
 
 	// Execute the query
@@ -270,20 +274,20 @@ func (mr *MovieRepository) GetMovieByIdWithGenre(movieId uuid.UUID) (*models.Mov
 	return &movie, nil
 }
 
-// One Genre with all Movies
+// One Genre with all table.Movies
 func (mr *MovieRepository) GetGenreWithMovies(genreName string) (*models.GenreWithMovies, *models.KTSError) {
 	var movies models.GenreWithMovies
 
 	// Create the query
-	stmt := SELECT(
-		Movies.AllColumns,
-		Genres.AllColumns,
+	stmt := jet_mysql.SELECT(
+		table.Movies.AllColumns,
+		table.Genres.AllColumns,
 	).FROM(
-		MovieGenres.
-			INNER_JOIN(Movies, Movies.ID.EQ(MovieGenres.MovieID)).
-			INNER_JOIN(Genres, Genres.ID.EQ(MovieGenres.GenreID)),
+		table.MovieGenres.
+			INNER_JOIN(table.Movies, table.Movies.ID.EQ(table.MovieGenres.MovieID)).
+			INNER_JOIN(table.Genres, table.Genres.ID.EQ(table.MovieGenres.GenreID)),
 	).WHERE(
-		Genres.GenreName.EQ(String(genreName)),
+		table.Genres.GenreName.EQ(jet_mysql.String(genreName)),
 	)
 
 	// Execute the query
@@ -300,13 +304,13 @@ func (mr *MovieRepository) GetGenresWithMovies() (*[]models.GenreWithMovies, *mo
 	var genresWithMovies []models.GenreWithMovies
 
 	// Create the query
-	stmt := SELECT(
-		Movies.AllColumns,
-		Genres.AllColumns,
+	stmt := jet_mysql.SELECT(
+		table.Movies.AllColumns,
+		table.Genres.AllColumns,
 	).FROM(
-		MovieGenres.
-			INNER_JOIN(Movies, Movies.ID.EQ(MovieGenres.MovieID)).
-			INNER_JOIN(Genres, Genres.ID.EQ(MovieGenres.GenreID)),
+		table.MovieGenres.
+			INNER_JOIN(table.Movies, table.Movies.ID.EQ(table.MovieGenres.MovieID)).
+			INNER_JOIN(table.Genres, table.Genres.ID.EQ(table.MovieGenres.GenreID)),
 	)
 
 	// Execute the query
@@ -327,13 +331,13 @@ func (mr *MovieRepository) GetMoviesWithGenres() ([]models.MovieWithGenres, *mod
 	var moviesWithGenres []models.MovieWithGenres
 
 	// Create the query
-	stmt := SELECT(
-		Movies.AllColumns,
-		Genres.AllColumns,
+	stmt := jet_mysql.SELECT(
+		table.Movies.AllColumns,
+		table.Genres.AllColumns,
 	).FROM(
-		MovieGenres.
-			INNER_JOIN(Movies, Movies.ID.EQ(MovieGenres.MovieID)).
-			INNER_JOIN(Genres, Genres.ID.EQ(MovieGenres.GenreID)),
+		table.MovieGenres.
+			INNER_JOIN(table.Movies, table.Movies.ID.EQ(table.MovieGenres.MovieID)).
+			INNER_JOIN(table.Genres, table.Genres.ID.EQ(table.MovieGenres.GenreID)),
 	)
 
 	// Execute the query
