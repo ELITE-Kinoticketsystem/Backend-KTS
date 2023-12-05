@@ -26,6 +26,7 @@ func (ar *ActorRepository) GetActorById(actorId *uuid.UUID) (*models.ActorDTO, *
 	binary_id, _ := actorId.MarshalBinary()
 
 	// for the Movies you have to go through the movie_actors table
+	// Please use a union
 
 	stmt := SELECT(
 		Actors.AllColumns,
@@ -34,9 +35,9 @@ func (ar *ActorRepository) GetActorById(actorId *uuid.UUID) (*models.ActorDTO, *
 	).
 		FROM(
 			Actors.
-				INNER_JOIN(ActorPictures, ActorPictures.ActorID.EQ(Actors.ID)).
-				INNER_JOIN(MovieActors, MovieActors.ActorID.EQ(Actors.ID)).
-				INNER_JOIN(Movies, Movies.ID.EQ(MovieActors.MovieID)),
+				LEFT_JOIN(ActorPictures, ActorPictures.ActorID.EQ(Actors.ID)).
+				LEFT_JOIN(MovieActors, MovieActors.ActorID.EQ(Actors.ID)).
+				LEFT_JOIN(Movies, Movies.ID.EQ(MovieActors.MovieID)),
 		).
 		WHERE(
 			Actors.ID.EQ(String(string(binary_id))),
