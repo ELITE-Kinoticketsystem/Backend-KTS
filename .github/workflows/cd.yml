@@ -42,7 +42,7 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
             cd /home/azurebackend/kts
-            docker-compose pull
-            docker-compose stop
-            docker-compose rm -f
-            docker-compose up -d
+            docker compose pull
+            docker compose stop
+            docker compose rm -f
+            docker compose up -d
