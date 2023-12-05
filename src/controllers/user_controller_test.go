@@ -3,10 +3,10 @@ package controllers
 import (
 	"testing"
 
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/.gen/KinoTicketSystem/model"
 	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/mocks"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
-	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models/schemas"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
@@ -42,13 +42,13 @@ func TestRegisterUser(t *testing.T) {
 			name:             "CreateUser internal error",
 			registrationData: utils.GetSampleRegistrationData(),
 			setExpectations: func(mockRepo mocks.MockUserRepositoryI, registrationData models.RegistrationRequest) {
-				user := schemas.User{
+				user := model.Users{
 					/* Id */
-					Username:  registrationData.Username,
+					Username:  &registrationData.Username,
 					Email:     registrationData.Email,
 					Password:  registrationData.Password,
-					FirstName: registrationData.FirstName,
-					LastName:  registrationData.LastName,
+					Firstname: &registrationData.FirstName,
+					Lastname:  &registrationData.LastName,
 				}
 
 				mockRepo.EXPECT().CheckIfEmailExists(registrationData.Email).Return(nil)
@@ -62,13 +62,13 @@ func TestRegisterUser(t *testing.T) {
 			name:             "Success",
 			registrationData: utils.GetSampleRegistrationData(),
 			setExpectations: func(mockRepo mocks.MockUserRepositoryI, registrationData models.RegistrationRequest) {
-				user := schemas.User{
+				user := model.Users{
 					/* Id */
-					Username:  registrationData.Username,
+					Username:  &registrationData.Username,
 					Email:     registrationData.Email,
 					Password:  registrationData.Password, // unhashed password
-					FirstName: registrationData.FirstName,
-					LastName:  registrationData.LastName,
+					Firstname: &registrationData.FirstName,
+					Lastname:  &registrationData.LastName,
 				}
 
 				mockRepo.EXPECT().CheckIfEmailExists(registrationData.Email).Return(nil)

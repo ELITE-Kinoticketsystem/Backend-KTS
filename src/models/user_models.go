@@ -1,7 +1,7 @@
 package models
 
 import (
-	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models/schemas"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/.gen/KinoTicketSystem/model"
 )
 
 type RegistrationRequest struct {
@@ -18,7 +18,7 @@ type LoginRequest struct {
 }
 
 type LoginResponse struct {
-	User         schemas.User
+	User         model.Users
 	Token        string
 	RefreshToken string
 }

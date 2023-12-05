@@ -5,10 +5,10 @@ import (
 	"reflect"
 
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
-	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models/schemas"
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/google/uuid"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/.gen/KinoTicketSystem/model"
 )
 
 func GetSampleRegistrationData() models.RegistrationRequest {
@@ -28,30 +28,33 @@ func GetSampleLoginData() models.LoginRequest {
 	}
 }
 
-func GetSampleUser() schemas.User {
+func GetSampleUser() model.Users {
 	id, _ := uuid.Parse("47CF752501DF45B7A3A9D3CB25AE939F")
-	return schemas.User{
-		Id:        &id,
-		Username:  "Collinho el niño",
+	username := "Collinho el niño" 
+	firstname := "Collin"
+	lastname := "Forslund"
+	return model.Users{
+		ID:        &id,
+		Username: &username,
 		Email:     "collin.forslund@gmail.com",
 		Password:  "$2a$10$vxXPPpLp5baQ7mzS1pNSEuk6ZW3mbx1Ej7u0tJnF5wferEFqT.qlK",
-		FirstName: "Collin",
-		LastName:  "Forslund",
+		Firstname: &firstname,
+		Lastname:  &lastname,
 	}
 }
 
 // Compare two users while ignoring their ids and hashed passwords.
-func UserEqual(user1 schemas.User, user2 schemas.User) bool {
-	return cmp.Equal(user1, user2, cmpopts.IgnoreFields(schemas.User{}, "Id", "Password"))
+func UserEqual(user1 model.Users, user2 model.Users) bool {
+	return cmp.Equal(user1, user2, cmpopts.IgnoreFields(model.Users{}, "ID", "Password"))
 }
 
 type UserMatcher struct {
-	user     schemas.User
+	user     model.Users
 	password string
 }
 
 func (m UserMatcher) Matches(x interface{}) bool {
-	user, ok := x.(schemas.User)
+	user, ok := x.(model.Users)
 	if !ok {
 		return false
 	}
@@ -61,7 +64,7 @@ func (m UserMatcher) Matches(x interface{}) bool {
 	m.user.Password = user.Password
 
 	// ignore user_id
-	m.user.Id = user.Id
+	m.user.ID = user.ID
 
 	return reflect.DeepEqual(m.user, user)
 }
@@ -70,6 +73,6 @@ func (m UserMatcher) String() string {
 	return fmt.Sprintf("matches user %v and password %s", m.user, m.password)
 }
 
-func EqUserMatcher(u schemas.User, password string) UserMatcher {
+func EqUserMatcher(u model.Users, password string) UserMatcher {
 	return UserMatcher{user: u, password: password}
 }

@@ -3,16 +3,17 @@ package repositories
 import (
 	"database/sql"
 
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/.gen/KinoTicketSystem/model"
+	. "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/.gen/KinoTicketSystem/table"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/managers"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
-	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models/schemas"
+	. "github.com/go-jet/jet/v2/mysql"
 )
 
 type UserRepositoryI interface {
-	GetUserByUsername(username string) (*schemas.User, *models.KTSError)
-
-	CreateUser(user schemas.User) *models.KTSError
+	GetUserByUsername(username string) (*model.Users, *models.KTSError)
+	CreateUser(user model.Users) *models.KTSError
 	CheckIfUsernameExists(username string) *models.KTSError
 	CheckIfEmailExists(email string) *models.KTSError
 }
@@ -21,14 +22,31 @@ type UserRepository struct {
 	DatabaseManager managers.DatabaseManagerI
 }
 
-func (ur *UserRepository) GetUserByUsername(username string) (*schemas.User, *models.KTSError) {
-	var user schemas.User
-	err := ur.DatabaseManager.ExecuteQueryRow(
-		"SELECT id, username, email, password, firstname, lastname FROM users WHERE username = ?",
-		username,
-	).Scan(
-		&user.Id, &user.Username, &user.Email, &user.Password, &user.FirstName, &user.LastName,
+func (ur *UserRepository) GetUserByUsername(username string) (*model.Users, *models.KTSError) {
+	var user model.Users
+	stmt := SELECT(
+		Users.ID,
+		Users.Username,
+		Users.Email,
+		Users.Password,
+		Users.Firstname,
+		Users.Lastname,
+	).FROM(
+		Users,
+	).WHERE(
+		Users.Username.EQ(String(username)),
 	)
+
+	query, args := stmt.Sql()
+	err := ur.DatabaseManager.ExecuteQueryRow(query, args...).Scan(
+		&user.ID,
+		&user.Username,
+		&user.Email,
+		&user.Password,
+		&user.Firstname,
+		&user.Lastname,
+	)
+
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, kts_errors.KTS_USER_NOT_FOUND
@@ -36,14 +54,22 @@ func (ur *UserRepository) GetUserByUsername(username string) (*schemas.User, *mo
 		return nil, kts_errors.KTS_INTERNAL_ERROR
 	}
 	return &user, nil
-
 }
 
-func (ur *UserRepository) CreateUser(user schemas.User) *models.KTSError {
-	_, err := ur.DatabaseManager.ExecuteStatement(
-		"INSERT INTO users (id, username, email, password, firstname, lastname) VALUES (UUID_TO_BIN(?), ?, ?, ?, ?, ?);",
-		user.Id, user.Username, user.Email, user.Password, user.FirstName, user.LastName,
+func (ur *UserRepository) CreateUser(user model.Users) *models.KTSError {
+	stmt := Users.INSERT(
+		Users.ID,
+		Users.Username,
+		Users.Email,
+		Users.Password,
+		Users.Firstname,
+		Users.Lastname,
+	).MODEL(
+		user,
 	)
+
+	_, err := stmt.Exec(ur.DatabaseManager.GetDatabaseConnection())
+
 	if err != nil {
 		return kts_errors.KTS_INTERNAL_ERROR
 	}
@@ -51,9 +77,17 @@ func (ur *UserRepository) CreateUser(user schemas.User) *models.KTSError {
 }
 
 func (ur *UserRepository) CheckIfUsernameExists(username string) *models.KTSError {
-	exists, err := ur.DatabaseManager.CheckIfExists(
-		"SELECT COUNT(*) FROM users WHERE username = ?", username,
+	stmt := SELECT(
+		COUNT(Users.ID),
+	).FROM(
+		Users,
+	).WHERE(
+		Users.Username.EQ(String(username)),
 	)
+
+	query, args := stmt.Sql()
+	exists, err := ur.DatabaseManager.CheckIfExists(query, args...)
+
 	if err != nil {
 		return kts_errors.KTS_INTERNAL_ERROR
 	}
@@ -64,9 +98,17 @@ func (ur *UserRepository) CheckIfUsernameExists(username string) *models.KTSErro
 }
 
 func (ur *UserRepository) CheckIfEmailExists(email string) *models.KTSError {
-	exists, err := ur.DatabaseManager.CheckIfExists(
-		"SELECT COUNT(*) FROM users WHERE email = ?", email,
+	stmt := SELECT(
+		COUNT(Users.ID),
+	).FROM(
+		Users,
+	).WHERE(
+		Users.Email.EQ(String(email)),
 	)
+
+	query, args := stmt.Sql()
+	exists, err := ur.DatabaseManager.CheckIfExists(query, args...)
+
 	if err != nil {
 		return kts_errors.KTS_INTERNAL_ERROR
 	}
