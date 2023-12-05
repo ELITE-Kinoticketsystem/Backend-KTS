@@ -12,7 +12,8 @@ import (
 )
 
 type Theatres struct {
-	ID        uuid.UUID `sql:"primary_key"`
+	ID        *uuid.UUID `sql:"primary_key"`
 	Name      string
-	AddressID uuid.UUID
+	LogoURL   *string
+	AddressID *uuid.UUID
 }

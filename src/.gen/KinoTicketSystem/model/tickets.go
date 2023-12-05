@@ -12,10 +12,10 @@ import (
 )
 
 type Tickets struct {
-	ID              uuid.UUID `sql:"primary_key"`
+	ID              *uuid.UUID `sql:"primary_key"`
 	Validated       bool
 	Price           int32
-	PriceCategoryID uuid.UUID
-	OrderID         uuid.UUID
-	EventSeatID     uuid.UUID
+	PriceCategoryID *uuid.UUID
+	OrderID         *uuid.UUID
+	EventSeatID     *uuid.UUID
 }

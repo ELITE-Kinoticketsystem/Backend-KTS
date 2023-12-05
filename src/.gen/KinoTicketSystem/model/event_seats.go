@@ -13,10 +13,10 @@ import (
 )
 
 type EventSeats struct {
-	ID           uuid.UUID `sql:"primary_key"`
+	ID           *uuid.UUID `sql:"primary_key"`
 	Booked       bool
 	BlockedUntil *time.Time
-	UserID       uuid.UUID
-	SeatID       uuid.UUID
-	EventID      uuid.UUID
+	UserID       *uuid.UUID
+	SeatID       *uuid.UUID
+	EventID      *uuid.UUID
 }

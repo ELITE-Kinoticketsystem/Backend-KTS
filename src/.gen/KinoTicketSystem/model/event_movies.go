@@ -12,6 +12,6 @@ import (
 )
 
 type EventMovies struct {
-	EventID uuid.UUID `sql:"primary_key"`
-	MovieID uuid.UUID `sql:"primary_key"`
+	EventID *uuid.UUID `sql:"primary_key"`
+	MovieID *uuid.UUID `sql:"primary_key"`
 }

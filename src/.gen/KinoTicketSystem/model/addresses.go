@@ -12,7 +12,7 @@ import (
 )
 
 type Addresses struct {
-	ID       uuid.UUID `sql:"primary_key"`
+	ID       *uuid.UUID `sql:"primary_key"`
 	Street   string
 	StreetNr string
 	Zipcode  string

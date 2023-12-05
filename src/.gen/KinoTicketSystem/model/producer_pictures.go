@@ -12,7 +12,7 @@ import (
 )
 
 type ProducerPictures struct {
-	ID         uuid.UUID `sql:"primary_key"`
-	ProducerID uuid.UUID
+	ID         *uuid.UUID `sql:"primary_key"`
+	ProducerID *uuid.UUID
 	PicURL     *string
 }

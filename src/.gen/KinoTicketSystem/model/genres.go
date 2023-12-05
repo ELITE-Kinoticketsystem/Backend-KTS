@@ -12,6 +12,6 @@ import (
 )
 
 type Genres struct {
-	ID        uuid.UUID `sql:"primary_key"`
+	ID        *uuid.UUID `sql:"primary_key"`
 	GenreName string
 }

@@ -12,9 +12,9 @@ import (
 )
 
 type Orders struct {
-	ID              uuid.UUID `sql:"primary_key"`
+	ID              *uuid.UUID `sql:"primary_key"`
 	Totalprice      int32
 	IsPaid          bool
-	PaymentMethodID uuid.UUID
-	UserID          uuid.UUID
+	PaymentMethodID *uuid.UUID
+	UserID          *uuid.UUID
 }

@@ -12,7 +12,7 @@ import (
 )
 
 type Users struct {
-	ID        uuid.UUID `sql:"primary_key"`
+	ID        *uuid.UUID `sql:"primary_key"`
 	Username  *string
 	Email     string
 	Password  string

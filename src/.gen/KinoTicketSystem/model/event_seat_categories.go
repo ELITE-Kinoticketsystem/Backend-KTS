@@ -12,7 +12,7 @@ import (
 )
 
 type EventSeatCategories struct {
-	EventID        uuid.UUID `sql:"primary_key"`
-	SeatCategoryID uuid.UUID `sql:"primary_key"`
+	EventID        *uuid.UUID `sql:"primary_key"`
+	SeatCategoryID *uuid.UUID `sql:"primary_key"`
 	Price          int32
 }

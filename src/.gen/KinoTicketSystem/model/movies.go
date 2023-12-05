@@ -13,7 +13,7 @@ import (
 )
 
 type Movies struct {
-	ID           uuid.UUID `sql:"primary_key"`
+	ID           *uuid.UUID `sql:"primary_key"`
 	Title        string
 	Description  string
 	BannerPicURL *string
