@@ -55,17 +55,15 @@ func (mr *MovieRepository) GetMovies() (*[]model.Movies, *models.KTSError) {
 		table.Movies,
 	)
 
-	log.Printf("Query: %v\n", stmt.DebugSql())
 	// Execute the query
-
 	err := stmt.Query(mr.DatabaseManager.GetDatabaseConnection(), &movies)
 	if err != nil {
 		return nil, kts_errors.KTS_INTERNAL_ERROR
 	}
 
-	// if len(movies) == 0 {
-	// 	return nil, kts_errors.KTS_NOT_FOUND
-	// }
+	if len(movies) == 0 {
+		return nil, kts_errors.KTS_NOT_FOUND
+	}
 
 	return &movies, nil
 }
@@ -88,6 +86,10 @@ func (mr *MovieRepository) GetMovieById(movieId uuid.UUID) (*model.Movies, *mode
 	err := stmt.Query(mr.DatabaseManager.GetDatabaseConnection(), &movie)
 	if err != nil {
 		return nil, kts_errors.KTS_INTERNAL_ERROR
+	}
+
+	if &movie == nil {
+		return nil, kts_errors.KTS_NOT_FOUND
 	}
 
 	return &movie, nil

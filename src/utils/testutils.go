@@ -3,7 +3,9 @@ package utils
 import (
 	"fmt"
 	"reflect"
+	"time"
 
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/.gen/KinoTicketSystem/model"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models/schemas"
 	"github.com/google/go-cmp/cmp"
@@ -72,4 +74,68 @@ func (m UserMatcher) String() string {
 
 func EqUserMatcher(u schemas.User, password string) UserMatcher {
 	return UserMatcher{user: u, password: password}
+}
+
+func GetSampleMovies() *[]model.Movies {
+	modelMovies := []model.Movies{}
+	uuid1 := uuid.New()
+	uuid2 := uuid.New()
+	banner := ""
+	cover := ""
+	trailer := ""
+	rating := 5.0
+
+	modelMovies = append(modelMovies, model.Movies{
+		ID:           uuid1,
+		Title:        "Test Movie 1",
+		Description:  "Test Description 1",
+		BannerPicURL: &banner,
+		CoverPicURL:  &cover,
+		TrailerURL:   &trailer,
+		Rating:       &rating,
+		ReleaseDate:  time.Now(),
+		TimeInMin:    120,
+		Fsk:          18,
+	})
+
+	modelMovies = append(modelMovies, model.Movies{
+		ID:           uuid2,
+		Title:        "Test Movie 2",
+		Description:  "Test Description 2",
+		BannerPicURL: &banner,
+		CoverPicURL:  &cover,
+		TrailerURL:   &trailer,
+		Rating:       &rating,
+		ReleaseDate:  time.Now(),
+		TimeInMin:    120,
+		Fsk:          18,
+	})
+
+	return &modelMovies
+}
+
+//
+
+func GetSampleMovieById() *model.Movies {
+	modelMovies := model.Movies{}
+	uuid1 := uuid.MustParse("6ba7b826-9dad-11d1-80b4-00c04fd430c0")
+	banner := ""
+	cover := ""
+	trailer := ""
+	rating := 5.0
+
+	modelMovies = model.Movies{
+		ID:           uuid1,
+		Title:        "Test Movie 1",
+		Description:  "Test Description 1",
+		BannerPicURL: &banner,
+		CoverPicURL:  &cover,
+		TrailerURL:   &trailer,
+		Rating:       &rating,
+		ReleaseDate:  time.Now(),
+		TimeInMin:    120,
+		Fsk:          18,
+	}
+
+	return &modelMovies
 }
