@@ -78,6 +78,7 @@ CREATE TABLE producers
      name        VARCHAR(50) NOT NULL,
      age         DATE NOT NULL,
      description TEXT NOT NULL,
+     pic_url     TEXT,
      PRIMARY KEY (id)
   );
 
@@ -87,6 +88,7 @@ CREATE TABLE actors
      name        VARCHAR(50) NOT NULL,
      age         DATE NOT NULL,
      description TEXT NOT NULL,
+     pic_url     TEXT,
      PRIMARY KEY (id)
   );
 
