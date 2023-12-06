@@ -121,13 +121,13 @@ func TestGetMovieById(t *testing.T) {
 
 	testCases := []struct {
 		name            string
-		setExpectations func(mock sqlmock.Sqlmock, id uuid.UUID)
+		setExpectations func(mock sqlmock.Sqlmock, id *uuid.UUID)
 		expectedMovie   *model.Movies
 		expectedError   *models.KTSError
 	}{
 		// {
 		// 	name: "Empty result",
-		// 	setExpectations: func(mock sqlmock.Sqlmock, id uuid.UUID) {
+		// 	setExpectations: func(mock sqlmock.Sqlmock, id *uuid.UUID) {
 		// 		mock.ExpectQuery(query).WithArgs(id).WillReturnRows(
 		// 			sqlmock.NewRows([]string{"movies.id", "movies.title", "movies.description", "movies.banner_pic_url", "movies.cover_pic_url", "movies.trailer_url", "movies.rating", "movies.release_date", "movies.time_in_min", "movies.fsk"}),
 		// 		)
@@ -137,7 +137,7 @@ func TestGetMovieById(t *testing.T) {
 		// },
 		{
 			name: "Single movie",
-			setExpectations: func(mock sqlmock.Sqlmock, id uuid.UUID) {
+			setExpectations: func(mock sqlmock.Sqlmock, id *uuid.UUID) {
 				mock.ExpectQuery(query).WithArgs(id).WillReturnRows(
 					sqlmock.NewRows(
 						[]string{"movies.id", "movies.title", "movies.description", "movies.banner_pic_url", "movies.cover_pic_url", "movies.trailer_url", "movies.rating", "movies.release_date", "movies.time_in_min", "movies.fsk"},
@@ -151,7 +151,7 @@ func TestGetMovieById(t *testing.T) {
 		},
 		// {
 		// 	name: "Error while querying movies",
-		// 	setExpectations: func(mock sqlmock.Sqlmock, id uuid.UUID) {
+		// 	setExpectations: func(mock sqlmock.Sqlmock, id *uuid.UUID) {
 		// 		mock.ExpectQuery(query).WithArgs(id).WillReturnError(sqlmock.ErrCancelled)
 		// 	},
 		// 	expectedMovie: nil,
@@ -380,13 +380,13 @@ func TestGetMovieByIdWithGenre(t *testing.T) {
 
 	testCases := []struct {
 		name            string
-		setExpectations func(mock sqlmock.Sqlmock, id uuid.UUID)
+		setExpectations func(mock sqlmock.Sqlmock, id *uuid.UUID)
 		expectedMovie   *models.MovieWithGenres
 		expectedError   *models.KTSError
 	}{
 		// {
 		// 	name: "Empty result",
-		// 	setExpectations: func(mock sqlmock.Sqlmock, id uuid.UUID) {
+		// 	setExpectations: func(mock sqlmock.Sqlmock, id *uuid.UUID) {
 		// 		mock.ExpectQuery(query).WithArgs(id).WillReturnRows(
 		// 			sqlmock.NewRows([]string{"movies.id", "movies.title", "movies.description", "movies.banner_pic_url", "movies.cover_pic_url", "movies.trailer_url", "movies.rating", "movies.release_date", "movies.time_in_min", "movies.fsk", "genres.id", "genres.genre_name"}),
 		// 		)
@@ -396,7 +396,7 @@ func TestGetMovieByIdWithGenre(t *testing.T) {
 		// },
 		{
 			name: "Single movie",
-			setExpectations: func(mock sqlmock.Sqlmock, id uuid.UUID) {
+			setExpectations: func(mock sqlmock.Sqlmock, id *uuid.UUID) {
 				mock.ExpectQuery(query).WithArgs(id).WillReturnRows(
 					sqlmock.NewRows(
 						[]string{"movies.id", "movies.title", "movies.description", "movies.banner_pic_url", "movies.cover_pic_url", "movies.trailer_url", "movies.rating", "movies.release_date", "movies.time_in_min", "movies.fsk", "genres.id", "genres.genre_name", "genres.id", "genres.genre_name"},
@@ -410,7 +410,7 @@ func TestGetMovieByIdWithGenre(t *testing.T) {
 		},
 		// {
 		// 	name: "Error while querying movies",
-		// 	setExpectations: func(mock sqlmock.Sqlmock, id uuid.UUID) {
+		// 	setExpectations: func(mock sqlmock.Sqlmock, id *uuid.UUID) {
 		// 		mock.ExpectQuery(query).WithArgs(id).WillReturnError(sqlmock.ErrCancelled)
 		// 	},
 		// 	expectedMovie: nil,

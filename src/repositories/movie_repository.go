@@ -7,7 +7,6 @@ import (
 	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
 
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/.gen/KinoTicketSystem/model"
-	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/.gen/KinoTicketSystem/model"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/managers"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
 
@@ -18,10 +17,10 @@ import (
 type MovieRepositoryI interface {
 	// Movie
 	GetMovies() (*[]model.Movies, *models.KTSError)
-	GetMovieById(movieId uuid.UUID) (*model.Movies, *models.KTSError)
+	GetMovieById(movieId *uuid.UUID) (*model.Movies, *models.KTSError)
 	CreateMovie(movie model.Movies) *models.KTSError
 	UpdateMovie(movie model.Movies) *models.KTSError
-	DeleteMovie(movieId uuid.UUID) *models.KTSError
+	DeleteMovie(movieId *uuid.UUID) *models.KTSError
 
 	// Genre
 	GetGenres() (*[]model.Genres, *models.KTSError)
@@ -29,11 +28,11 @@ type MovieRepositoryI interface {
 	CreateGenre(name string) *models.KTSError
 
 	// Combine Movie and Genre
-	AddMovieGenre(movieId uuid.UUID, genreId uuid.UUID) *models.KTSError
-	RemoveMovieGenre(movieId uuid.UUID, genreId uuid.UUID) *models.KTSError
+	AddMovieGenre(movieId *uuid.UUID, genreId *uuid.UUID) *models.KTSError
+	RemoveMovieGenre(movieId *uuid.UUID, genreId *uuid.UUID) *models.KTSError
 
 	// One Movie with all Genres
-	GetMovieByIdWithGenre(movieId uuid.UUID) (*models.MovieWithGenres, *models.KTSError)
+	GetMovieByIdWithGenre(movieId *uuid.UUID) (*models.MovieWithGenres, *models.KTSError)
 	// One Genre with all Movies
 	GetGenreByNameWithMovies(genreName string) (*models.GenreWithMovies, *models.KTSError)
 	// All Movies with all Genres - Grouped by Genre
@@ -70,7 +69,7 @@ func (mr *MovieRepository) GetMovies() (*[]model.Movies, *models.KTSError) {
 	return &movies, nil
 }
 
-func (mr *MovieRepository) GetMovieById(movieId uuid.UUID) (*model.Movies, *models.KTSError) {
+func (mr *MovieRepository) GetMovieById(movieId *uuid.UUID) (*model.Movies, *models.KTSError) {
 	// Prepare vairables
 	var movie model.Movies
 
@@ -148,7 +147,7 @@ func (mr *MovieRepository) UpdateMovie(movie model.Movies) *models.KTSError {
 	return nil
 }
 
-func (mr *MovieRepository) DeleteMovie(movieId uuid.UUID) *models.KTSError {
+func (mr *MovieRepository) DeleteMovie(movieId *uuid.UUID) *models.KTSError {
 	binaryID, _ := movieId.MarshalBinary()
 
 	// Create the delete statement
@@ -232,7 +231,7 @@ func (mr *MovieRepository) CreateGenre(name string) *models.KTSError {
 }
 
 // Combine Movie and Genre
-func (mr *MovieRepository) AddMovieGenre(movieId uuid.UUID, genreId uuid.UUID) *models.KTSError {
+func (mr *MovieRepository) AddMovieGenre(movieId *uuid.UUID, genreId *uuid.UUID) *models.KTSError {
 
 	binary_movie_id, _ := movieId.MarshalBinary()
 	binary_genre_id, _ := genreId.MarshalBinary()
@@ -250,7 +249,7 @@ func (mr *MovieRepository) AddMovieGenre(movieId uuid.UUID, genreId uuid.UUID) *
 	return nil
 }
 
-func (mr *MovieRepository) RemoveMovieGenre(movieId uuid.UUID, genreId uuid.UUID) *models.KTSError {
+func (mr *MovieRepository) RemoveMovieGenre(movieId *uuid.UUID, genreId *uuid.UUID) *models.KTSError {
 
 	// Create the delete statement
 	deleteQuery := table.MovieGenres.DELETE().WHERE(
@@ -282,7 +281,7 @@ func (mr *MovieRepository) RemoveMovieGenre(movieId uuid.UUID, genreId uuid.UUID
 }
 
 // One Movie with all Genres
-func (mr *MovieRepository) GetMovieByIdWithGenre(movieId uuid.UUID) (*models.MovieWithGenres, *models.KTSError) {
+func (mr *MovieRepository) GetMovieByIdWithGenre(movieId *uuid.UUID) (*models.MovieWithGenres, *models.KTSError) {
 	var movie models.MovieWithGenres
 
 	binary_id, _ := movieId.MarshalBinary()

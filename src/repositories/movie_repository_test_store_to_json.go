@@ -80,7 +80,9 @@ func TestGetMovieByIdExecutable(t *testing.T) {
 		movieRepo, dbConnection := GetDatabaseConnection()
 		defer dbConnection.Close()
 
-		movies, kts_err := movieRepo.GetMovieById(uuid.MustParse("6ba7b826-9dad-11d1-80b4-00c04fd430c0"))
+		id := uuid.MustParse("6ba7b826-9dad-11d1-80b4-00c04fd430c0")
+
+		movies, kts_err := movieRepo.GetMovieById(&id)
 
 		// For Testing
 		JsonSave("./MovieDetail.json", movies)
@@ -128,23 +130,19 @@ func TestCreateMovieExecutable(t *testing.T) {
 func TestUpdateMovieExecutable(t *testing.T) {
 	var movie model.Movies
 
-	var banner *string = new(string)
-	var cover *string = new(string)
-	var trailer *string = new(string)
-	var rating *float64 = new(float64)
+	id := uuid.MustParse("6ba7b826-9dad-11d1-80b4-00c04fd430c0")
+	banner := "UpdatedBannerPicURL"
+	cover := "UpdatedCoverPicURL"
+	trailer := "UpdatedTrailerURL"
+	rating := 4.5
 
-	*banner = "UpdatedBannerPicURL"
-	*cover = "UpdatedCoverPicURL"
-	*trailer = "UpdatedTrailerURL"
-	*rating = 4.5
-
-	movie.ID = uuid.MustParse("6ba7b826-9dad-11d1-80b4-00c04fd430c0")
+	movie.ID = &id
 	movie.Title = "UpdatedMovie"
 	movie.Description = "UpdatedDescription"
-	movie.BannerPicURL = banner
-	movie.CoverPicURL = cover
-	movie.TrailerURL = trailer
-	movie.Rating = rating
+	movie.BannerPicURL = &banner
+	movie.CoverPicURL = &cover
+	movie.TrailerURL = &trailer
+	movie.Rating = &rating
 	movie.ReleaseDate = time.Now()
 	movie.TimeInMin = 150
 	movie.Fsk = 16
@@ -166,8 +164,10 @@ func TestDeleteMovieExecutable(t *testing.T) {
 		movieRepo, dbConnection := GetDatabaseConnection()
 		defer dbConnection.Close()
 
+		id := uuid.MustParse("6ba7b826-9dad-11d1-80b4-00c04fd430c0")
+
 		// Call the method under test
-		kts_err := movieRepo.DeleteMovie(uuid.MustParse("6ba7b826-9dad-11d1-80b4-00c04fd430c0"))
+		kts_err := movieRepo.DeleteMovie(&id)
 
 		assert.Nil(t, kts_err)
 	})
@@ -232,7 +232,7 @@ func TestAddMovieGenreExecutable(t *testing.T) {
 		genreId := uuid.MustParse("11ee913a-2c00-05f1-bf69-0242ac120003")
 
 		// Call the method under test
-		kts_err := movieRepo.AddMovieGenre(movieId, genreId)
+		kts_err := movieRepo.AddMovieGenre(&movieId, &genreId)
 
 		assert.Nil(t, kts_err)
 	})
@@ -247,7 +247,7 @@ func TestGetMovieByIdWithGenreExecutable(t *testing.T) {
 		movieId := uuid.MustParse("6ba7b828-9dad-11d1-80b4-00c04fd430c2")
 
 		// Call the method under test
-		movieWithGenres, kts_err := movieRepo.GetMovieByIdWithGenre(movieId)
+		movieWithGenres, kts_err := movieRepo.GetMovieByIdWithGenre(&movieId)
 
 		// For Testing
 		JsonSave("./MovieByIdWithGenres.json", movieWithGenres)
