@@ -14,6 +14,7 @@ import (
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/.gen/KinoTicketSystem/model"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/managers"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
 )
 
 // actors.id,actors.name,actors.age,actors.description,movie_actors.movie_id,movies.id,movies.title,movies.description,movies.banner_pic_url,movies.cover_pic_url,movies.trailer_url,movies.rating,movies.release_date,movies.time_in_min,movies.fsk,actor_pictures.id,actor_pictures.actor_id,actor_pictures.pic_url
@@ -28,7 +29,7 @@ func GetActors() *[]models.ActorDTO {
 
 	actor1 := models.ActorDTO{
 		Actors: model.Actors{
-			ID:          uuid.MustParse("6BA7B8429DAD11D180B400C04FD430C2"),
+			ID:          utils.UuidMustParse("6BA7B8429DAD11D180B400C04FD430C2"),
 			Name:        "Brad Pitt",
 			Description: "Brad Pitt is an actor.",
 			Age:         57,
@@ -39,14 +40,14 @@ func GetActors() *[]models.ActorDTO {
 	url2 := "https://en.wikipedia.org/wiki/Brad_Pitt_filmography#/media/File:Brad_Pitt_Fury_2014.jpg"
 
 	picture1 := model.ActorPictures{
-		ID:      uuid.MustParse("6BA7B8429DAD11D180B400C04FD430C2"),
-		ActorID: uuid.MustParse("6BA7B8429DAD11D180B400C04FD430C2"),
+		ID:      utils.UuidMustParse("6BA7B8429DAD11D180B400C04FD430C2"),
+		ActorID: utils.UuidMustParse("6BA7B8429DAD11D180B400C04FD430C2"),
 		PicURL:  &url1,
 	}
 
 	picture2 := model.ActorPictures{
-		ID:      uuid.MustParse("6BA7B8429DAD11D180B400C04FD430C2"),
-		ActorID: uuid.MustParse("6BA7B8429DAD11D180B400C04FD430C2"),
+		ID:      utils.UuidMustParse("6BA7B8429DAD11D180B400C04FD430C2"),
+		ActorID: utils.UuidMustParse("6BA7B8429DAD11D180B400C04FD430C2"),
 		PicURL:  &url2,
 	}
 
@@ -68,7 +69,7 @@ func GetActors() *[]models.ActorDTO {
 	rating := 0.
 
 	movie1 := model.Movies{
-		ID:           uuid.MustParse("6BA7B8279DAD11D180B400C04FD430C1"),
+		ID:           utils.UuidMustParse("6BA7B8279DAD11D180B400C04FD430C1"),
 		Title:        "The Godfather",
 		Description:  "The aging patriarch of an organized crime dynasty transfers control of his clandestine empire to his reluctant son.",
 		BannerPicURL: nil,
@@ -81,7 +82,7 @@ func GetActors() *[]models.ActorDTO {
 	}
 
 	movie2 := model.Movies{
-		ID:           uuid.MustParse("6BA7B82A9DAD11D180B400C04FD430C4"),
+		ID:           utils.UuidMustParse("6BA7B82A9DAD11D180B400C04FD430C4"),
 		Title:        "Fight Club",
 		Description:  "An insomniac office worker and a devil-may-care soapmaker form an underground fight club that evolves into something much, much more.",
 		BannerPicURL: nil,

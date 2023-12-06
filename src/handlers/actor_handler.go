@@ -21,3 +21,15 @@ func GetActorByIdHandler(actorController controllers.ActorControllerI) gin.Handl
 		c.JSON(http.StatusOK, actor)
 	}
 }
+
+func GetActorsHandler(actorController controllers.ActorControllerI) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		actors, err := actorController.GetActors()
+		if err != nil {
+			utils.HandleErrorAndAbort(c, err)
+			return
+		}
+
+		c.JSON(http.StatusOK, actors)
+	}
+}

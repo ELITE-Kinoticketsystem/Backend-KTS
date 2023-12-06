@@ -88,5 +88,9 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 	// Should be only accessible for admins
 	securedRoutes.Handle(http.MethodDelete, "/events/:id", handlers.DeleteEventHandler(controller.EventController))
 
+	// Actors
+	router.Handle(http.MethodGet, "/actors/:id", handlers.GetActorByIdHandler(controller.ActorController))
+	router.Handle(http.MethodGet, "/actors/", handlers.GetActorsHandler(controller.ActorController))
+
 	return router
 }

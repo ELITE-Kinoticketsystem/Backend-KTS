@@ -8,6 +8,7 @@ import (
 
 type ActorControllerI interface {
 	GetActorById(actorId *uuid.UUID) (*models.ActorDTO, *models.KTSError)
+	GetActors() (*[]models.GetActorsDTO, *models.KTSError)
 }
 
 type ActorController struct {
@@ -16,4 +17,8 @@ type ActorController struct {
 
 func (ac *ActorController) GetActorById(actorId *uuid.UUID) (*models.ActorDTO, *models.KTSError) {
 	return ac.ActorRepo.GetActorById(actorId)
+}
+
+func (ac *ActorController) GetActors() (*[]models.GetActorsDTO, *models.KTSError) {
+	return ac.ActorRepo.GetActors()
 }

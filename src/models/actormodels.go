@@ -15,3 +15,11 @@ type ActorDTO struct {
 		model.Movies
 	}
 }
+
+type GetActorsDTO struct {
+	model.Actors
+
+	Pictures []struct {
+		model.ActorPictures
+	}
+}
