@@ -29,11 +29,12 @@ type MovieRepositoryI interface {
 
 	// Combine Movie and Genre
 	AddMovieGenre(movieId uuid.UUID, genreId uuid.UUID) *models.KTSError
+	RemoveMovieGenre(movieId uuid.UUID, genreId uuid.UUID) *models.KTSError
 
 	// One Movie with all Genres
 	GetMovieByIdWithGenre(movieId uuid.UUID) (*models.MovieWithGenres, *models.KTSError)
 	// One Genre with all Movies
-	GetGenreWithMovies(genreName string) (*models.GenreWithMovies, *models.KTSError)
+	GetGenreByNameWithMovies(genreName string) (*models.GenreWithMovies, *models.KTSError)
 	// All Movies with all Genres - Grouped by Genre
 	GetGenresWithMovies() (*[]models.GenreWithMovies, *models.KTSError)
 	// All Movies with all Genres - Grouped by Movie
@@ -71,7 +72,6 @@ func (mr *MovieRepository) GetMovies() (*[]model.Movies, *models.KTSError) {
 func (mr *MovieRepository) GetMovieById(movieId uuid.UUID) (*model.Movies, *models.KTSError) {
 	// Prepare vairables
 	var movie model.Movies
-	binary_id, _ := movieId.MarshalBinary()
 
 	// Create the query
 	stmt := jet_mysql.SELECT(
@@ -79,7 +79,7 @@ func (mr *MovieRepository) GetMovieById(movieId uuid.UUID) (*model.Movies, *mode
 	).FROM(
 		table.Movies,
 	).WHERE(
-		table.Movies.ID.EQ(jet_mysql.String(string(binary_id))),
+		table.Movies.ID.EQ(jet_mysql.String(movieId.String())),
 	)
 
 	// Execute the query
@@ -249,6 +249,37 @@ func (mr *MovieRepository) AddMovieGenre(movieId uuid.UUID, genreId uuid.UUID) *
 	return nil
 }
 
+func (mr *MovieRepository) RemoveMovieGenre(movieId uuid.UUID, genreId uuid.UUID) *models.KTSError {
+
+	// Create the delete statement
+	deleteQuery := table.MovieGenres.DELETE().WHERE(
+		table.MovieGenres.MovieID.EQ(
+			jet_mysql.CAST(jet_mysql.String(movieId.String())).AS_BINARY(),
+		).AND(
+			table.MovieGenres.GenreID.EQ(
+				jet_mysql.CAST(jet_mysql.String(genreId.String())).AS_BINARY(),
+			),
+		),
+	)
+
+	// Execute the query
+	rows, err := deleteQuery.Exec(mr.DatabaseManager.GetDatabaseConnection())
+	if err != nil {
+		return kts_errors.KTS_INTERNAL_ERROR
+	}
+
+	rowsAff, err := rows.RowsAffected()
+	if err != nil {
+		return kts_errors.KTS_INTERNAL_ERROR
+	}
+
+	if rowsAff == 0 {
+		return kts_errors.KTS_NOT_FOUND
+	}
+
+	return nil
+}
+
 // One Movie with all Genres
 func (mr *MovieRepository) GetMovieByIdWithGenre(movieId uuid.UUID) (*models.MovieWithGenres, *models.KTSError) {
 	var movie models.MovieWithGenres
@@ -277,7 +308,7 @@ func (mr *MovieRepository) GetMovieByIdWithGenre(movieId uuid.UUID) (*models.Mov
 }
 
 // One Genre with all table.Movies
-func (mr *MovieRepository) GetGenreWithMovies(genreName string) (*models.GenreWithMovies, *models.KTSError) {
+func (mr *MovieRepository) GetGenreByNameWithMovies(genreName string) (*models.GenreWithMovies, *models.KTSError) {
 	var movies models.GenreWithMovies
 
 	// Create the query
@@ -291,6 +322,8 @@ func (mr *MovieRepository) GetGenreWithMovies(genreName string) (*models.GenreWi
 	).WHERE(
 		table.Genres.GenreName.EQ(jet_mysql.String(genreName)),
 	)
+
+	log.Print(stmt.DebugSql())
 
 	// Execute the query
 	err := stmt.Query(mr.DatabaseManager.GetDatabaseConnection(), &movies)
@@ -315,6 +348,7 @@ func (mr *MovieRepository) GetGenresWithMovies() (*[]models.GenreWithMovies, *mo
 			INNER_JOIN(table.Genres, table.Genres.ID.EQ(table.MovieGenres.GenreID)),
 	)
 
+	log.Print(stmt.DebugSql())
 	// Execute the query
 	err := stmt.Query(mr.DatabaseManager.GetDatabaseConnection(), &genresWithMovies)
 	if err != nil {

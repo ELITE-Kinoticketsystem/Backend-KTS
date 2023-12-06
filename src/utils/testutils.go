@@ -139,3 +139,215 @@ func GetSampleMovieById() *model.Movies {
 
 	return &modelMovies
 }
+
+func GetSampleGenres() *[]model.Genres {
+	modelGenres := []model.Genres{}
+	uuid1 := uuid.New()
+	uuid2 := uuid.New()
+
+	modelGenres = append(modelGenres, model.Genres{
+		ID:        uuid1,
+		GenreName: "Action",
+	})
+
+	modelGenres = append(modelGenres, model.Genres{
+		ID:        uuid2,
+		GenreName: "Drama",
+	})
+
+	return &modelGenres
+}
+
+func GetSampleGenreByName() *model.Genres {
+	modelGenres := model.Genres{}
+	uuid1 := uuid.MustParse("6ba7b820-9dad-11d1-80b4-00c04fd430c4")
+
+	modelGenres = model.Genres{
+		ID:        uuid1,
+		GenreName: "Action",
+	}
+
+	return &modelGenres
+}
+
+func GetSampleMovieByIdWithGenre() *models.MovieWithGenres {
+	movieWithGenre := models.MovieWithGenres{}
+
+	banner := ""
+	cover := ""
+	trailer := ""
+	rating := 5.0
+
+	movieWithGenre = models.MovieWithGenres{
+		Movies: model.Movies{
+			ID:           uuid.MustParse("6ba7b827-9dad-11d1-80b4-00c04fd430c1"),
+			Title:        "Test Movie 1",
+			Description:  "Test Description 1",
+			BannerPicURL: &banner,
+			CoverPicURL:  &cover,
+			TrailerURL:   &trailer,
+			Rating:       &rating,
+			ReleaseDate:  time.Now(),
+			TimeInMin:    120,
+			Fsk:          18,
+		},
+		Genres: []struct {
+			model.Genres
+		}{
+			{
+				model.Genres{
+					ID:        uuid.MustParse("6ba7b820-9dad-11d1-80b4-00c04fd430c4"),
+					GenreName: "Action",
+				},
+			},
+			{
+				model.Genres{
+					ID:        uuid.MustParse("6ba7b821-9dad-11d1-80b4-00c04fd430c5"),
+					GenreName: "Drama",
+				},
+			},
+		},
+	}
+
+	return &movieWithGenre
+
+}
+
+func GetSampleGenreByNameWithMovies() *models.GenreWithMovies {
+	genreByNameWithMovies := models.GenreWithMovies{}
+
+	banner := ""
+	cover := ""
+	trailer := ""
+	rating := 5.0
+
+	genreByNameWithMovies = models.GenreWithMovies{
+		Genres: model.Genres{
+			ID:        uuid.MustParse("6ba7b820-9dad-11d1-80b4-00c04fd430c4"),
+			GenreName: "Action",
+		},
+		Movies: []struct {
+			model.Movies
+		}{
+			{
+				model.Movies{
+					ID:           uuid.MustParse("6ba7b827-9dad-11d1-80b4-00c04fd430c1"),
+					Title:        "Test Movie 1",
+					Description:  "Test Description 1",
+					BannerPicURL: &banner,
+					CoverPicURL:  &cover,
+					TrailerURL:   &trailer,
+					Rating:       &rating,
+					ReleaseDate:  time.Now(),
+					TimeInMin:    120,
+					Fsk:          18,
+				},
+			},
+			{
+				model.Movies{
+					ID:           uuid.MustParse("6ba7b828-9dad-11d1-80b4-00c04fd430c2"),
+					Title:        "Test Movie 2",
+					Description:  "Test Description 2",
+					BannerPicURL: &banner,
+					CoverPicURL:  &cover,
+					TrailerURL:   &trailer,
+					Rating:       &rating,
+					ReleaseDate:  time.Now(),
+					TimeInMin:    120,
+					Fsk:          18,
+				},
+			},
+		},
+	}
+
+	return &genreByNameWithMovies
+}
+
+func GetSampleGenresWithMovies() *[]models.GenreWithMovies {
+	genresWithMovies := []models.GenreWithMovies{}
+
+	banner := ""
+	cover := ""
+	trailer := ""
+	rating := 5.0
+
+	genresWithMovies = append(genresWithMovies, models.GenreWithMovies{
+		Genres: model.Genres{
+			ID:        uuid.MustParse("6ba7b820-9dad-11d1-80b4-00c04fd430c4"),
+			GenreName: "Action",
+		},
+		Movies: []struct {
+			model.Movies
+		}{
+			{
+				model.Movies{
+					ID:           uuid.MustParse("6ba7b827-9dad-11d1-80b4-00c04fd430c1"),
+					Title:        "Test Movie 1",
+					Description:  "Test Description 1",
+					BannerPicURL: &banner,
+					CoverPicURL:  &cover,
+					TrailerURL:   &trailer,
+					Rating:       &rating,
+					ReleaseDate:  time.Now(),
+					TimeInMin:    120,
+					Fsk:          18,
+				},
+			},
+			{
+				model.Movies{
+					ID:           uuid.MustParse("6ba7b828-9dad-11d1-80b4-00c04fd430c2"),
+					Title:        "Test Movie 2",
+					Description:  "Test Description 2",
+					BannerPicURL: &banner,
+					CoverPicURL:  &cover,
+					TrailerURL:   &trailer,
+					Rating:       &rating,
+					ReleaseDate:  time.Now(),
+					TimeInMin:    120,
+					Fsk:          18,
+				},
+			},
+		},
+	})
+
+	genresWithMovies = append(genresWithMovies, models.GenreWithMovies{
+		Genres: model.Genres{
+			ID:        uuid.MustParse("6ba7b821-9dad-11d1-80b4-00c04fd430c5"),
+			GenreName: "Drama",
+		},
+		Movies: []struct {
+			model.Movies
+		}{
+			{
+				model.Movies{
+					ID:           uuid.MustParse("6ba7b829-9dad-11d1-80b4-00c04fd430c3"),
+					Title:        "Test Movie 3",
+					Description:  "Test Description 3",
+					BannerPicURL: &banner,
+					CoverPicURL:  &cover,
+					TrailerURL:   &trailer,
+					Rating:       &rating,
+					ReleaseDate:  time.Now(),
+					TimeInMin:    120,
+					Fsk:          18,
+				},
+			},
+			{
+				model.Movies{
+					ID:           uuid.MustParse("6ba7b82a-9dad-11d1-80b4-00c04fd430c4"),
+					Title:        "Test Movie 4",
+					Description:  "Test Description 4",
+					BannerPicURL: &banner,
+					CoverPicURL:  &cover,
+					TrailerURL:   &trailer,
+					Rating:       &rating,
+					ReleaseDate:  time.Now(),
+					TimeInMin:    120,
+					Fsk:          18,
+				},
+			},
+		},
+	})
+
+	return &genresWithMovies
+}

@@ -26,7 +26,7 @@ type MovieControllerI interface {
 	// One Movie with all Genres
 	GetMovieByIdWithGenre(movieId uuid.UUID) (*models.MovieWithGenres, *models.KTSError)
 	// One Genre with all Movies
-	GetGenreWithMovies(genreName string) (*models.GenreWithMovies, *models.KTSError)
+	GetGenreByNameWithMovies(genreName string) (*models.GenreWithMovies, *models.KTSError)
 	// All Movies with all Genres - Grouped by Genre
 	GetGenresWithMovies() (*[]models.GenreWithMovies, *models.KTSError)
 	// All Movies with all Genres - Grouped by Movie
@@ -122,8 +122,8 @@ func (mc *MovieController) GetMovieByIdWithGenre(movieId uuid.UUID) (*models.Mov
 }
 
 // One Genre with all Movies
-func (mc *MovieController) GetGenreWithMovies(genreName string) (*models.GenreWithMovies, *models.KTSError) {
-	genre, kts_errors := mc.MovieRepo.GetGenreWithMovies(genreName)
+func (mc *MovieController) GetGenreByNameWithMovies(genreName string) (*models.GenreWithMovies, *models.KTSError) {
+	genre, kts_errors := mc.MovieRepo.GetGenreByNameWithMovies(genreName)
 	if kts_errors != nil {
 		return nil, kts_errors
 	}
