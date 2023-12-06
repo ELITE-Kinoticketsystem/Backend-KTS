@@ -12,8 +12,8 @@ import (
 )
 
 type CinemaHalls struct {
-	ID        uuid.UUID `sql:"primary_key"`
+	ID        *uuid.UUID `sql:"primary_key"`
 	Name      string
 	Capacity  int32
-	TheatreID uuid.UUID
+	TheatreID *uuid.UUID
 }

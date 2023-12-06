@@ -12,7 +12,7 @@ import (
 )
 
 type Actors struct {
-	ID          uuid.UUID `sql:"primary_key"`
+	ID          *uuid.UUID `sql:"primary_key"`
 	Name        string
 	Age         int32
 	Description string

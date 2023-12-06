@@ -12,6 +12,6 @@ import (
 )
 
 type MovieGenres struct {
-	MovieID uuid.UUID `sql:"primary_key"`
-	GenreID uuid.UUID `sql:"primary_key"`
+	MovieID *uuid.UUID `sql:"primary_key"`
+	GenreID *uuid.UUID `sql:"primary_key"`
 }

@@ -13,11 +13,11 @@ import (
 )
 
 type Reviews struct {
-	ID        uuid.UUID `sql:"primary_key"`
+	ID        *uuid.UUID `sql:"primary_key"`
 	Rating    int32
 	Comment   string
 	Datetime  time.Time
 	IsSpoiler *bool
-	UserID    uuid.UUID
-	MovieID   uuid.UUID
+	UserID    *uuid.UUID
+	MovieID   *uuid.UUID
 }

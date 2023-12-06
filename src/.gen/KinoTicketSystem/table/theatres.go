@@ -19,6 +19,7 @@ type theatresTable struct {
 	// Columns
 	ID        mysql.ColumnString
 	Name      mysql.ColumnString
+	LogoURL   mysql.ColumnString
 	AddressID mysql.ColumnString
 
 	AllColumns     mysql.ColumnList
@@ -62,9 +63,10 @@ func newTheatresTableImpl(schemaName, tableName, alias string) theatresTable {
 	var (
 		IDColumn        = mysql.StringColumn("id")
 		NameColumn      = mysql.StringColumn("name")
+		LogoURLColumn   = mysql.StringColumn("logo_url")
 		AddressIDColumn = mysql.StringColumn("address_id")
-		allColumns      = mysql.ColumnList{IDColumn, NameColumn, AddressIDColumn}
-		mutableColumns  = mysql.ColumnList{NameColumn, AddressIDColumn}
+		allColumns      = mysql.ColumnList{IDColumn, NameColumn, LogoURLColumn, AddressIDColumn}
+		mutableColumns  = mysql.ColumnList{NameColumn, LogoURLColumn, AddressIDColumn}
 	)
 
 	return theatresTable{
@@ -73,6 +75,7 @@ func newTheatresTableImpl(schemaName, tableName, alias string) theatresTable {
 		//Columns
 		ID:        IDColumn,
 		Name:      NameColumn,
+		LogoURL:   LogoURLColumn,
 		AddressID: AddressIDColumn,
 
 		AllColumns:     allColumns,

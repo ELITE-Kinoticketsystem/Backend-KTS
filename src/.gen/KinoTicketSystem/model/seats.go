@@ -12,9 +12,9 @@ import (
 )
 
 type Seats struct {
-	ID             uuid.UUID `sql:"primary_key"`
+	ID             *uuid.UUID `sql:"primary_key"`
 	RowNr          int32
 	ColumnNr       int32
-	SeatCategoryID uuid.UUID
-	CinemaHallID   uuid.UUID
+	SeatCategoryID *uuid.UUID
+	CinemaHallID   *uuid.UUID
 }

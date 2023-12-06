@@ -12,7 +12,7 @@ import (
 )
 
 type PriceCategories struct {
-	ID           uuid.UUID `sql:"primary_key"`
+	ID           *uuid.UUID `sql:"primary_key"`
 	CategoryName string
 	Price        int32
 }

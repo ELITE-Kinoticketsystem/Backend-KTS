@@ -11,8 +11,8 @@ package mocks
 import (
 	reflect "reflect"
 
+	model "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/.gen/KinoTicketSystem/model"
 	models "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
-	schemas "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models/schemas"
 	gomock "go.uber.org/mock/gomock"
 )
 
@@ -68,7 +68,7 @@ func (mr *MockUserRepositoryIMockRecorder) CheckIfUsernameExists(username any) *
 }
 
 // CreateUser mocks base method.
-func (m *MockUserRepositoryI) CreateUser(user schemas.User) *models.KTSError {
+func (m *MockUserRepositoryI) CreateUser(user model.Users) *models.KTSError {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateUser", user)
 	ret0, _ := ret[0].(*models.KTSError)
@@ -82,10 +82,10 @@ func (mr *MockUserRepositoryIMockRecorder) CreateUser(user any) *gomock.Call {
 }
 
 // GetUserByUsername mocks base method.
-func (m *MockUserRepositoryI) GetUserByUsername(username string) (*schemas.User, *models.KTSError) {
+func (m *MockUserRepositoryI) GetUserByUsername(username string) (*model.Users, *models.KTSError) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetUserByUsername", username)
-	ret0, _ := ret[0].(*schemas.User)
+	ret0, _ := ret[0].(*model.Users)
 	ret1, _ := ret[1].(*models.KTSError)
 	return ret0, ret1
 }

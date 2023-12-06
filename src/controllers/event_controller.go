@@ -2,19 +2,18 @@ package controllers
 
 import (
 	"log"
-	"time"
 
 	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
-	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models/schemas"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/repositories"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/.gen/KinoTicketSystem/model"
 	"github.com/google/uuid"
 )
 
 type EventControllerI interface {
-	CreateEvent(event *models.EventDTO) (*schemas.Event, *models.KTSError)
+	CreateEvent(event *models.EventDTO) (*model.Events, *models.KTSError)
 	DeleteEvent(eventId *uuid.UUID) *models.KTSError
-	GetEventsForMovie(movieId *uuid.UUID) ([]*schemas.Event, *models.KTSError)
+	GetEventsForMovie(movieId *uuid.UUID) ([]*model.Events, *models.KTSError)
 	GetSpecialEvents() ([]*models.EventDTO, *models.KTSError)
 }
 
@@ -24,15 +23,15 @@ type EventController struct {
 	TheatreRepo repositories.TheaterRepoI
 }
 
-func (ec *EventController) CreateEvent(eventRequest *models.EventDTO) (*schemas.Event, *models.KTSError) {
+func (ec *EventController) CreateEvent(eventRequest *models.EventDTO) (*model.Events, *models.KTSError) {
 	eventId := uuid.New()
-	event := &schemas.Event{
-		Id:           &eventId,
+	event := &model.Events{
+		ID:           &eventId,
 		Title:        eventRequest.Title,
 		Start:        eventRequest.Start,
 		End:          eventRequest.End,
-		EventTypeId:  eventRequest.EventTypeId,
-		CinemaHallId: eventRequest.CinemaHallId,
+		EventType:  eventRequest.EventType,
+		CinemaHallID: eventRequest.CinemaHallId,
 	}
 	err := ec.EventRepo.CreateEvent(event)
 	if err != nil {
@@ -40,7 +39,7 @@ func (ec *EventController) CreateEvent(eventRequest *models.EventDTO) (*schemas.
 		return nil, kts_errors.KTS_INTERNAL_ERROR
 	}
 
-	createdEventId := event.Id
+	createdEventId := event.ID
 
 	err = ec.createMovies(eventRequest.Movies, createdEventId)
 	if err != nil {
@@ -86,7 +85,7 @@ func (ec *EventController) DeleteEvent(eventId *uuid.UUID) *models.KTSError {
 	return nil
 }
 
-func (ec *EventController) GetEventsForMovie(movieId *uuid.UUID) ([]*schemas.Event, *models.KTSError) {
+func (ec *EventController) GetEventsForMovie(movieId *uuid.UUID) ([]*model.Events, *models.KTSError) {
 	events, err := ec.EventRepo.GetEventsForMovieId(movieId)
 	if err != nil {
 		log.Printf("Error getting events for movie: %v", err)
@@ -118,7 +117,7 @@ func (ec *EventController) createMovies(movies []models.MovieDTO, eventId *uuid.
 			if err != nil {
 				return err
 			}
-			movieId = *createdMovie.Id
+			movieId = *createdMovie.ID
 		} else {
 			movieId = *movie.Id
 		}
@@ -131,12 +130,12 @@ func (ec *EventController) createMovies(movies []models.MovieDTO, eventId *uuid.
 	return nil
 }
 
-func (ec *EventController) createNewMovie(movieRequest *models.MovieDTO) (*schemas.Movie, error) {
+func (ec *EventController) createNewMovie(movieRequest *models.MovieDTO) (*model.Movies, error) {
 	movieId := uuid.New()
 	genreNames := movieRequest.GenreNames
 
-	movie := &schemas.Movie{
-		Id:          &movieId,
+	movie := &model.Movies{
+		ID:          &movieId,
 		Title:       movieRequest.Title,
 		Description: movieRequest.Description,
 		ReleaseDate: movieRequest.ReleaseDate,
@@ -149,7 +148,7 @@ func (ec *EventController) createNewMovie(movieRequest *models.MovieDTO) (*schem
 		return nil, err
 	}
 
-	createdMovieId := movie.Id
+	createdMovieId := movie.ID
 	if createdMovieId == nil {
 		return nil, err
 	}
@@ -170,8 +169,8 @@ func (ec *EventController) createGenres(genreNames []string, movieId *uuid.UUID)
 		var genreId uuid.UUID
 		if genre == nil {
 			genreId = uuid.New()
-			genre := &schemas.Genre{
-				Id:        &genreId,
+			genre := &model.Genres{
+				ID:        &genreId,
 				GenreName: genreName,
 			}
 			err := ec.MovieRepo.CreateGenre(genre)
@@ -192,10 +191,10 @@ func (ec *EventController) createGenres(genreNames []string, movieId *uuid.UUID)
 func (ec *EventController) createEventSeatCategories(eventSeatCategories []models.EventSeatCategoryDTO, eventId *uuid.UUID) error {
 	for _, eventSeatCategory := range eventSeatCategories {
 		seatCategoryId := uuid.New()
-		eventSeatCategory := &schemas.EventSeatCategory{
+		eventSeatCategory := &model.EventSeatCategories{
 			Price:          eventSeatCategory.Price,
-			EventId:        eventId,
-			SeatCategoryId: &seatCategoryId,
+			EventID:        eventId,
+			SeatCategoryID: &seatCategoryId,
 		}
 		err := ec.EventRepo.CreateEventSeatCategory(eventSeatCategory)
 		if err != nil {
@@ -214,13 +213,13 @@ func (ec *EventController) createEventSeats(cinemaHallId *uuid.UUID, eventId *uu
 
 	for _, seat := range seats {
 		eventSeatId := uuid.New()
-		eventSeat := &schemas.EventSeat{
-			Id:           &eventSeatId,
+		eventSeat := &model.EventSeats{
+			ID:           &eventSeatId,
 			Booked:       false,
-			BlockedUntil: time.Time{},
-			UserId:       nil,
-			SeatId:       seat.Id,
-			EventId:      eventId,
+			BlockedUntil: nil,
+			UserID:       nil,
+			SeatID:       seat.ID,
+			EventID:      eventId,
 		}
 		err := ec.EventRepo.CreateEventSeat(eventSeat)
 		if err != nil {

@@ -52,7 +52,7 @@ func GenerateJetMySQL(dbMySQLConnection mysql2.DBConnection) {
 
 									switch defaultTableModelField.Type.Name {
 									case "[]byte":
-										defaultTableModelField.Type = template.NewType(uuid.UUID{})
+										defaultTableModelField.Type = template.NewType(&uuid.UUID{})
 									}
 									return defaultTableModelField
 								})

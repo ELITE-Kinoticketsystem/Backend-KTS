@@ -46,6 +46,10 @@ func (dm *DatabaseManager) CheckIfExists(query string, args ...any) (bool, error
 	return count > 0, nil
 }
 
+func (dm *DatabaseManager) GetDatabaseConnection() *sql.DB {
+	return dm.Connection
+}
+
 func InitializeDB() (*sql.DB, error) {
 	var (
 		dbHost = os.Getenv("DB_HOST")
