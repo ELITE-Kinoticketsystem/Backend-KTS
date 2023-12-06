@@ -109,7 +109,7 @@ VALUES
     (UUID_TO_BIN('6ba7b82f-9dad-11d1-80b4-00c04fd430c9'), UUID_TO_BIN('6ba7b825-9dad-11d1-80b4-00c04fd430c9'))
 ;
 -- Insert statement for Producer table
-INSERT INTO producers (id, name, age, description)
+INSERT INTO producers (id, name, birthdate, description)
 VALUES
     (UUID_TO_BIN('6ba7b830-9dad-11d1-80b4-00c04fd430c0'), 'John Doe', '1996-01-01', "John Doe is a producer."),
     (UUID_TO_BIN('6ba7b831-9dad-11d1-80b4-00c04fd430c1'), 'Jane Smith', '1991-05-15', "Jane Smith is a producer."),
@@ -124,7 +124,7 @@ VALUES
 
 
 -- Insert statement for Actors table
-INSERT INTO actors (id, name, age, description)
+INSERT INTO actors (id, name, birthdate, description)
 VALUES
     (UUID_TO_BIN('6ba7b840-9dad-11d1-80b4-00c04fd430c0'), 'Tom Hanks', '1956-07-09', "Tom Hanks is an actor."),
     (UUID_TO_BIN('6ba7b841-9dad-11d1-80b4-00c04fd430c1'), 'Leonardo DiCaprio', '1974-11-11', "Leonardo DiCaprio is an actor."),
