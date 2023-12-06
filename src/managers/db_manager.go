@@ -75,7 +75,3 @@ func InitializeDB() (*sql.DB, error) {
 
 	return db, nil
 }
-
-func (dm *DatabaseManager) GetDatabaseConnection() *sql.DB {
-	return dm.Connection
-}
