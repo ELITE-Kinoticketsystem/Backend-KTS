@@ -4,11 +4,11 @@ import (
 	"database/sql"
 
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/.gen/KinoTicketSystem/model"
-	. "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/.gen/KinoTicketSystem/table"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/.gen/KinoTicketSystem/table"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/managers"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
-	. "github.com/go-jet/jet/v2/mysql"
+	"github.com/go-jet/jet/v2/mysql"
 )
 
 type UserRepositoryI interface {
@@ -24,17 +24,17 @@ type UserRepository struct {
 
 func (ur *UserRepository) GetUserByUsername(username string) (*model.Users, *models.KTSError) {
 	var user model.Users
-	stmt := SELECT(
-		Users.ID,
-		Users.Username,
-		Users.Email,
-		Users.Password,
-		Users.Firstname,
-		Users.Lastname,
+	stmt := mysql.SELECT(
+		table.Users.ID,
+		table.Users.Username,
+		table.Users.Email,
+		table.Users.Password,
+		table.Users.Firstname,
+		table.Users.Lastname,
 	).FROM(
-		Users,
+		table.Users,
 	).WHERE(
-		Users.Username.EQ(String(username)),
+		table.Users.Username.EQ(mysql.String(username)),
 	)
 
 	query, args := stmt.Sql()
@@ -57,13 +57,13 @@ func (ur *UserRepository) GetUserByUsername(username string) (*model.Users, *mod
 }
 
 func (ur *UserRepository) CreateUser(user model.Users) *models.KTSError {
-	stmt := Users.INSERT(
-		Users.ID,
-		Users.Username,
-		Users.Email,
-		Users.Password,
-		Users.Firstname,
-		Users.Lastname,
+	stmt := table.Users.INSERT(
+		table.Users.ID,
+		table.Users.Username,
+		table.Users.Email,
+		table.Users.Password,
+		table.Users.Firstname,
+		table.Users.Lastname,
 	).MODEL(
 		user,
 	)
@@ -77,12 +77,12 @@ func (ur *UserRepository) CreateUser(user model.Users) *models.KTSError {
 }
 
 func (ur *UserRepository) CheckIfUsernameExists(username string) *models.KTSError {
-	stmt := SELECT(
-		COUNT(Users.ID),
+	stmt := mysql.SELECT(
+		mysql.COUNT(table.Users.ID),
 	).FROM(
-		Users,
+		table.Users,
 	).WHERE(
-		Users.Username.EQ(String(username)),
+		table.Users.Username.EQ(mysql.String(username)),
 	)
 
 	query, args := stmt.Sql()
@@ -98,12 +98,12 @@ func (ur *UserRepository) CheckIfUsernameExists(username string) *models.KTSErro
 }
 
 func (ur *UserRepository) CheckIfEmailExists(email string) *models.KTSError {
-	stmt := SELECT(
-		COUNT(Users.ID),
+	stmt := mysql.SELECT(
+		mysql.COUNT(table.Users.ID),
 	).FROM(
-		Users,
+		table.Users,
 	).WHERE(
-		Users.Email.EQ(String(email)),
+		table.Users.Email.EQ(mysql.String(email)),
 	)
 
 	query, args := stmt.Sql()
