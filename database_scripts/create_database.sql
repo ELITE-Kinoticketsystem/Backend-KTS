@@ -76,7 +76,7 @@ CREATE TABLE producers
   (
      id          BINARY(16) DEFAULT (Uuid_to_bin(Uuid(), 1)),
      name        VARCHAR(50) NOT NULL,
-     age         DATE NOT NULL,
+     birthdate   DATE NOT NULL,
      description TEXT NOT NULL,
      pic_url     TEXT,
      PRIMARY KEY (id)
@@ -86,7 +86,7 @@ CREATE TABLE actors
   (
      id          BINARY(16) DEFAULT (Uuid_to_bin(Uuid(), 1)),
      name        VARCHAR(50) NOT NULL,
-     age         DATE NOT NULL,
+     birthdate   DATE NOT NULL,
      description TEXT NOT NULL,
      pic_url     TEXT,
      PRIMARY KEY (id)
