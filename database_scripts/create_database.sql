@@ -44,7 +44,7 @@ CREATE TABLE addresses
 CREATE TABLE genres
   (
      id         BINARY(16) DEFAULT (Uuid_to_bin(Uuid(), 1)),
-     genre_name VARCHAR(40) NOT NULL,
+     genre_name VARCHAR(40) NOT NULL UNIQUE,
      PRIMARY KEY (id)
   );
 
