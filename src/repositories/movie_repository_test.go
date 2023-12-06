@@ -117,7 +117,8 @@ func TestGetMovieById(t *testing.T) {
 	// query := `\\nSELECT movies\.id AS \\"movies\.id\\",\\n movies\.title AS \\"movies\.title\\",\\n movies\.description AS \\"movies\.description\\",\\n movies\.banner_pic_url AS \\"movies\.banner_pic_url\\",\\n movies\.cover_pic_url AS \\"movies\.cover_pic_url\\",\\n movies\.trailer_url AS \\"movies\.trailer_url\\",\\n movies\.rating AS \\"movies\.rating\\",\\n movies\.release_date AS \\"movies\.release_date\\",\\n movies\.time_in_min AS \\"movies\.time_in_min\\",\\n movies\.fsk AS \\"movies\.fsk\\"\\nFROM movies\\nWHERE movies\.id \= \?;\\n`
 	// query := "\nSELECT movies.id AS \"movies.id\",\n     movies.title AS \"movies.title\",\n     movies.description AS \"movies.description\",\n     movies.banner_pic_url AS \"movies.banner_pic_url\",\n     movies.cover_pic_url AS \"movies.cover_pic_url\",\n     movies.trailer_url AS \"movies.trailer_url\",\n     movies.rating AS \"movies.rating\",\n     movies.release_date AS \"movies.release_date\",\n     movies.time_in_min AS \"movies.time_in_min\",\n     movies.fsk AS \"movies.fsk\"\nFROM `KinoTicketSystem`.movies\nWHERE movies.id \\= \\?;\n"
 	// query := "\nSELECT movies.id AS \"movies.id\",\n     movies.title AS \"movies.title\",\n     movies.description AS \"movies.description\",\n     movies.banner_pic_url AS \"movies.banner_pic_url\",\n     movies.cover_pic_url AS \"movies.cover_pic_url\",\n     movies.trailer_url AS \"movies.trailer_url\",\n     movies.rating AS \"movies.rating\",\n     movies.release_date AS \"movies.release_date\",\n     movies.time_in_min AS \"movies.time_in_min\",\n     movies.fsk AS \"movies.fsk\"\nFROM KinoTicketSystem.movies\nWHERE movies.id = ?;\n"
-	query := "SELECT movies.id AS \"movies.id\", movies.title AS \"movies.title\", movies.description AS no \"movies.description\", movies.banner_pic_url AS \"movies.banner_pic_url\", movies.cover_pic_url AS \"movies.cover_pic_url\", movies.trailer_url AS \"movies.trailer_url\", movies.rating AS \"movies.rating\", movies.release_date AS \"movies.release_date\", movies.time_in_min AS \"movies.time_in_min\", movies.fsk AS \"movies.fsk\" FROM `KinoTicketSystem`.movies WHERE movies.id = \\?;"
+	// query := "SELECT movies.id AS \"movies.id\", movies.title AS \"movies.title\", movies.description AS no \"movies.description\", movies.banner_pic_url AS \"movies.banner_pic_url\", movies.cover_pic_url AS \"movies.cover_pic_url\", movies.trailer_url AS \"movies.trailer_url\", movies.rating AS \"movies.rating\", movies.release_date AS \"movies.release_date\", movies.time_in_min AS \"movies.time_in_min\", movies.fsk AS \"movies.fsk\" FROM `KinoTicketSystem`.movies WHERE movies.id = ?;"
+	query := "SELECT movies.id AS \"movies.id\",\n     movies.title AS \"movies.title\",\n     movies.description AS \"movies.description\",\n     movies.banner_pic_url AS \"movies.banner_pic_url\",\n     movies.cover_pic_url AS \"movies.cover_pic_url\",\n     movies.trailer_url AS \"movies.trailer_url\",\n     movies.rating AS \"movies.rating\",\n     movies.release_date AS \"movies.release_date\",\n     movies.time_in_min AS \"movies.time_in_min\",\n     movies.fsk AS \"movies.fsk\"\nFROM `KinoTicketSystem`.movies\nWHERE movies.id = ?;"
 
 	testCases := []struct {
 		name            string
@@ -142,11 +143,11 @@ func TestGetMovieById(t *testing.T) {
 					sqlmock.NewRows(
 						[]string{"movies.id", "movies.title", "movies.description", "movies.banner_pic_url", "movies.cover_pic_url", "movies.trailer_url", "movies.rating", "movies.release_date", "movies.time_in_min", "movies.fsk"},
 					).AddRow(
-						(*sampleMovie).ID, (*sampleMovie).Title, (*sampleMovie).Description, (*sampleMovie).BannerPicURL, (*sampleMovie).CoverPicURL, (*sampleMovie).TrailerURL, (*sampleMovie).Rating, (*sampleMovie).ReleaseDate, (*sampleMovie).TimeInMin, (*sampleMovie).Fsk,
+						&sampleMovie.ID, &sampleMovie.Title, &sampleMovie.Description, &sampleMovie.BannerPicURL, &sampleMovie.CoverPicURL, &sampleMovie.TrailerURL, &sampleMovie.Rating, &sampleMovie.ReleaseDate, &sampleMovie.TimeInMin, &sampleMovie.Fsk,
 					),
 				)
 			},
-			expectedMovie: &(*sampleMovie),
+			expectedMovie: sampleMovie,
 			expectedError: nil,
 		},
 		// {
@@ -553,7 +554,7 @@ func TestGetGenreByNameWithMovies(t *testing.T) {
 }
 
 func TestGetGenresWithMovies(t *testing.T) {
-	// sampleGenresWithMovies := utils.GetSampleGenresWithMovies()
+	sampleGenresWithMovies := utils.GetSampleGenresWithMovies()
 
 	// query := "\nSELECT movies.id AS \"movies.id\",\n     movies.title AS \"movies.title\",\n     movies.description AS \"movies.description\",\n     movies.banner_pic_url AS \"movies.banner_pic_url\",\n     movies.cover_pic_url AS \"movies.cover_pic_url\",\n     movies.trailer_url AS \"movies.trailer_url\",\n     movies.rating AS \"movies.rating\",\n     movies.release_date AS \"movies.release_date\",\n     movies.time_in_min AS \"movies.time_in_min\",\n     movies.fsk AS \"movies.fsk\",\n     genres.id AS \"genres.id\",\n     genres.genre_name AS \"genres.genre_name\"\nFROM `KinoTicketSystem`.movie_genres\n     INNER JOIN `KinoTicketSystem`.movies ON (movies.id = movie_genres.movie_id)\n     INNER JOIN `KinoTicketSystem`.genres ON (genres.id = movie_genres.genre_id);\n"
 	// query := "\nSELECT movies.id AS \"movies.id\",\n     movies.title AS \"movies.title\",\n     movies.description AS \"movies.description\",\n     movies.banner_pic_url AS \"movies.banner_pic_url\",\n     movies.cover_pic_url AS \"movies.cover_pic_url\",\n     movies.trailer_url AS \"movies.trailer_url\",\n     movies.rating AS \"movies.rating\",\n     movies.release_date AS \"movies.release_date\",\n     movies.time_in_min AS \"movies.time_in_min\",\n     movies.fsk AS \"movies.fsk\",\n     genres.id AS \"genres.id\",\n     genres.genre_name AS \"genres.genre_name\"\nFROM `KinoTicketSystem`.movie_genres\n     INNER JOIN `KinoTicketSystem`.movies ON (movies.id = movie_genres.movie_id)\n     INNER JOIN `KinoTicketSystem`.genres ON (genres.id = movie_genres.genre_id);\n"
@@ -574,8 +575,8 @@ func TestGetGenresWithMovies(t *testing.T) {
 	// 	INNER JOIN KinoTicketSystem.movies ON (movies.id = movie_genres.movie_id)
 	// 	INNER JOIN KinoTicketSystem.genres ON (genres.id = movie_genres.genre_id);`
 
-	// query := "\"SELECT movies.id AS \"movies.id\", movies.title AS \"movies.title\", movies.description AS \"movies.description\", movies.banner_pic_url AS \"movies.banner_pic_url\", movies.cover_pic_url AS \"movies.cover_pic_url\", movies.trailer_url AS \"movies.trailer_url\", movies.rating AS \"movies.rating\", movies.release_date AS \"movies.release_date\", movies.time_in_min AS \"movies.time_in_min\", movies.fsk AS \"movies.fsk\", genres.id AS \"genres.id\", genres.genre_name AS \"genres.genre_name\" FROM `KinoTicketSystem`.movie_genres INNER JOIN `KinoTicketSystem`.movies ON (movies.id = movie_genres.movie_id) INNER JOIN `KinoTicketSystem`.genres ON (genres.id = movie_genres.genre_id);\" with expected regexp \"SELECT movies.id AS \"movies.id\", movies.title AS \"movies.title\", movies.description AS \"movies.description\", movies.banner_pic_url AS \"movies.banner_pic_url\", movies.cover_pic_url AS \"movies.cover_pic_url\", movies.trailer_url AS \"movies.trailer_url\", movies.rating AS \"movies.rating\", movies.release_date AS \"movies.release_date\", movies.time_in_min AS \"movies.time_in_min\", movies.fsk AS \"movies.fsk\", genres.id AS \"genres.id\", genres.genre_name AS \"genres.genre_name\" FROM KinoTicketSystem.movie_genres INNER JOIN KinoTicketSystem.movies ON (movies.id = movie_genres.movie_id) INNER JOIN KinoTicketSystem.genres ON (genres.id = movie_genres.genre_id);\""
-	query := `SELECT movies\.id AS \\"movies\.id\\", movies\.title AS \\"movies\.title\\", movies\.description AS \\"movies\.description\\", movies\.banner_pic_url AS \\"movies\.banner_pic_url\\", movies\.cover_pic_url AS \\"movies\.cover_pic_url\\", movies\.trailer_url AS \\"movies\.trailer_url\\", movies\.rating AS \\"movies\.rating\\", movies\.release_date AS \\"movies\.release_date\\", movies\.time_in_min AS \\"movies\.time_in_min\\", movies\.fsk AS \\"movies\.fsk\\", genres\.id AS \\"genres\.id\\", genres\.genre_name AS \\"genres\.genre_name\\" FROM 'KinoTicketSystem'\.movie_genres INNER JOIN 'KinoTicketSystem'\.movies ON \(movies\.id \= movie_genres\.movie_id\) INNER JOIN 'KinoTicketSystem'\.genres ON \(genres\.id \= movie_genres\.genre_id\);`
+	query := "\"SELECT movies.id AS \"movies.id\", movies.title AS \"movies.title\", movies.description AS \"movies.description\", movies.banner_pic_url AS \"movies.banner_pic_url\", movies.cover_pic_url AS \"movies.cover_pic_url\", movies.trailer_url AS \"movies.trailer_url\", movies.rating AS \"movies.rating\", movies.release_date AS \"movies.release_date\", movies.time_in_min AS \"movies.time_in_min\", movies.fsk AS \"movies.fsk\", genres.id AS \"genres.id\", genres.genre_name AS \"genres.genre_name\" FROM `KinoTicketSystem`.movie_genres INNER JOIN `KinoTicketSystem`.movies ON (movies.id = movie_genres.movie_id) INNER JOIN `KinoTicketSystem`.genres ON (genres.id = movie_genres.genre_id);\" with expected regexp \"SELECT movies.id AS \"movies.id\", movies.title AS \"movies.title\", movies.description AS \"movies.description\", movies.banner_pic_url AS \"movies.banner_pic_url\", movies.cover_pic_url AS \"movies.cover_pic_url\", movies.trailer_url AS \"movies.trailer_url\", movies.rating AS \"movies.rating\", movies.release_date AS \"movies.release_date\", movies.time_in_min AS \"movies.time_in_min\", movies.fsk AS \"movies.fsk\", genres.id AS \"genres.id\", genres.genre_name AS \"genres.genre_name\" FROM KinoTicketSystem.movie_genres INNER JOIN KinoTicketSystem.movies ON (movies.id = movie_genres.movie_id) INNER JOIN KinoTicketSystem.genres ON (genres.id = movie_genres.genre_id);\""
+	// query := `SELECT movies\.id AS \\"movies\.id\\", movies\.title AS \\"movies\.title\\", movies\.description AS \\"movies\.description\\", movies\.banner_pic_url AS \\"movies\.banner_pic_url\\", movies\.cover_pic_url AS \\"movies\.cover_pic_url\\", movies\.trailer_url AS \\"movies\.trailer_url\\", movies\.rating AS \\"movies\.rating\\", movies\.release_date AS \\"movies\.release_date\\", movies\.time_in_min AS \\"movies\.time_in_min\\", movies\.fsk AS \\"movies\.fsk\\", genres\.id AS \\"genres\.id\\", genres\.genre_name AS \\"genres\.genre_name\\" FROM 'KinoTicketSystem'\.movie_genres INNER JOIN 'KinoTicketSystem'\.movies ON \(movies\.id \= movie_genres\.movie_id\) INNER JOIN 'KinoTicketSystem'\.genres ON \(genres\.id \= movie_genres\.genre_id\);`
 
 	testCases := []struct {
 		name            string
@@ -583,32 +584,32 @@ func TestGetGenresWithMovies(t *testing.T) {
 		expectedGenres  *[]models.GenreWithMovies
 		expectedError   *models.KTSError
 	}{
-		{
-			name: "Empty result",
-			setExpectations: func(mock sqlmock.Sqlmock) {
-				mock.ExpectQuery(query).WillReturnRows(
-					sqlmock.NewRows([]string{"movies.id", "movies.title", "movies.description", "movies.banner_pic_url", "movies.cover_pic_url", "movies.trailer_url", "movies.rating", "movies.release_date", "movies.time_in_min", "movies.fsk", "genres.id", "genres.genre_name"}),
-				)
-			},
-			expectedGenres: nil,
-			expectedError:  kts_errors.KTS_NOT_FOUND,
-		},
 		// {
-		// 	name: "Multiple genres",
+		// 	name: "Empty result",
 		// 	setExpectations: func(mock sqlmock.Sqlmock) {
 		// 		mock.ExpectQuery(query).WillReturnRows(
-		// 			sqlmock.NewRows(
-		// 				[]string{"genres.id", "genres.genre_name", "movies.id", "movies.title", "movies.description", "movies.banner_pic_url", "movies.cover_pic_url", "movies.trailer_url", "movies.rating", "movies.release_date", "movies.time_in_min", "movies.fsk", "movies.id", "movies.title", "movies.description", "movies.banner_pic", "movies.cover_pic", "movies.trailer", "movies.rating", "movies.release_date", "movies.time_in_min", "movies.fsk"},
-		// 			).AddRow(
-		// 				(*sampleGenresWithMovies)[0].ID, (*sampleGenresWithMovies)[0].GenreName, (*sampleGenresWithMovies)[0].Movies[0].ID, (*sampleGenresWithMovies)[0].Movies[0].Title, (*sampleGenresWithMovies)[0].Movies[0].Description, (*sampleGenresWithMovies)[0].Movies[0].BannerPicURL, (*sampleGenresWithMovies)[0].Movies[0].CoverPicURL, (*sampleGenresWithMovies)[0].Movies[0].TrailerURL, (*sampleGenresWithMovies)[0].Movies[0].Rating, (*sampleGenresWithMovies)[0].Movies[0].ReleaseDate, (*sampleGenresWithMovies)[0].Movies[0].TimeInMin, (*sampleGenresWithMovies)[0].Movies[0].Fsk, (*sampleGenresWithMovies)[0].Movies[1].ID, (*sampleGenresWithMovies)[0].Movies[1].Title, (*sampleGenresWithMovies)[0].Movies[1].Description, (*sampleGenresWithMovies)[0].Movies[1].BannerPicURL, (*sampleGenresWithMovies)[0].Movies[1].CoverPicURL, (*sampleGenresWithMovies)[0].Movies[1].TrailerURL, (*sampleGenresWithMovies)[0].Movies[1].Rating, (*sampleGenresWithMovies)[0].Movies[1].ReleaseDate, (*sampleGenresWithMovies)[0].Movies[1].TimeInMin, (*sampleGenresWithMovies)[0].Movies[1].Fsk,
-		// 			).AddRow(
-		// 				(*sampleGenresWithMovies)[1].ID, (*sampleGenresWithMovies)[1].GenreName, (*sampleGenresWithMovies)[1].Movies[0].ID, (*sampleGenresWithMovies)[1].Movies[0].Title, (*sampleGenresWithMovies)[1].Movies[0].Description, (*sampleGenresWithMovies)[1].Movies[0].BannerPicURL, (*sampleGenresWithMovies)[1].Movies[0].CoverPicURL, (*sampleGenresWithMovies)[1].Movies[0].TrailerURL, (*sampleGenresWithMovies)[1].Movies[0].Rating, (*sampleGenresWithMovies)[1].Movies[0].ReleaseDate, (*sampleGenresWithMovies)[1].Movies[0].TimeInMin, (*sampleGenresWithMovies)[1].Movies[0].Fsk, (*sampleGenresWithMovies)[1].Movies[1].ID, (*sampleGenresWithMovies)[1].Movies[1].Title, (*sampleGenresWithMovies)[1].Movies[1].Description, (*sampleGenresWithMovies)[1].Movies[1].BannerPicURL, (*sampleGenresWithMovies)[1].Movies[1].CoverPicURL, (*sampleGenresWithMovies)[1].Movies[1].TrailerURL, (*sampleGenresWithMovies)[1].Movies[1].Rating, (*sampleGenresWithMovies)[1].Movies[1].ReleaseDate, (*sampleGenresWithMovies)[1].Movies[1].TimeInMin, (*sampleGenresWithMovies)[1].Movies[1].Fsk,
-		// 			),
+		// 			sqlmock.NewRows([]string{"movies.id", "movies.title", "movies.description", "movies.banner_pic_url", "movies.cover_pic_url", "movies.trailer_url", "movies.rating", "movies.release_date", "movies.time_in_min", "movies.fsk", "genres.id", "genres.genre_name"}),
 		// 		)
 		// 	},
-		// 	expectedGenres: sampleGenresWithMovies,
-		// 	expectedError:  nil,
+		// 	expectedGenres: nil,
+		// 	expectedError:  kts_errors.KTS_NOT_FOUND,
 		// },
+		{
+			name: "Multiple genres",
+			setExpectations: func(mock sqlmock.Sqlmock) {
+				mock.ExpectQuery(query).WillReturnRows(
+					sqlmock.NewRows(
+						[]string{"genres.id", "genres.genre_name", "movies.id", "movies.title", "movies.description", "movies.banner_pic_url", "movies.cover_pic_url", "movies.trailer_url", "movies.rating", "movies.release_date", "movies.time_in_min", "movies.fsk", "movies.id", "movies.title", "movies.description", "movies.banner_pic", "movies.cover_pic", "movies.trailer", "movies.rating", "movies.release_date", "movies.time_in_min", "movies.fsk"},
+					).AddRow(
+						(*sampleGenresWithMovies)[0].ID, (*sampleGenresWithMovies)[0].GenreName, (*sampleGenresWithMovies)[0].Movies[0].ID, (*sampleGenresWithMovies)[0].Movies[0].Title, (*sampleGenresWithMovies)[0].Movies[0].Description, (*sampleGenresWithMovies)[0].Movies[0].BannerPicURL, (*sampleGenresWithMovies)[0].Movies[0].CoverPicURL, (*sampleGenresWithMovies)[0].Movies[0].TrailerURL, (*sampleGenresWithMovies)[0].Movies[0].Rating, (*sampleGenresWithMovies)[0].Movies[0].ReleaseDate, (*sampleGenresWithMovies)[0].Movies[0].TimeInMin, (*sampleGenresWithMovies)[0].Movies[0].Fsk, (*sampleGenresWithMovies)[0].Movies[1].ID, (*sampleGenresWithMovies)[0].Movies[1].Title, (*sampleGenresWithMovies)[0].Movies[1].Description, (*sampleGenresWithMovies)[0].Movies[1].BannerPicURL, (*sampleGenresWithMovies)[0].Movies[1].CoverPicURL, (*sampleGenresWithMovies)[0].Movies[1].TrailerURL, (*sampleGenresWithMovies)[0].Movies[1].Rating, (*sampleGenresWithMovies)[0].Movies[1].ReleaseDate, (*sampleGenresWithMovies)[0].Movies[1].TimeInMin, (*sampleGenresWithMovies)[0].Movies[1].Fsk,
+					).AddRow(
+						(*sampleGenresWithMovies)[1].ID, (*sampleGenresWithMovies)[1].GenreName, (*sampleGenresWithMovies)[1].Movies[0].ID, (*sampleGenresWithMovies)[1].Movies[0].Title, (*sampleGenresWithMovies)[1].Movies[0].Description, (*sampleGenresWithMovies)[1].Movies[0].BannerPicURL, (*sampleGenresWithMovies)[1].Movies[0].CoverPicURL, (*sampleGenresWithMovies)[1].Movies[0].TrailerURL, (*sampleGenresWithMovies)[1].Movies[0].Rating, (*sampleGenresWithMovies)[1].Movies[0].ReleaseDate, (*sampleGenresWithMovies)[1].Movies[0].TimeInMin, (*sampleGenresWithMovies)[1].Movies[0].Fsk, (*sampleGenresWithMovies)[1].Movies[1].ID, (*sampleGenresWithMovies)[1].Movies[1].Title, (*sampleGenresWithMovies)[1].Movies[1].Description, (*sampleGenresWithMovies)[1].Movies[1].BannerPicURL, (*sampleGenresWithMovies)[1].Movies[1].CoverPicURL, (*sampleGenresWithMovies)[1].Movies[1].TrailerURL, (*sampleGenresWithMovies)[1].Movies[1].Rating, (*sampleGenresWithMovies)[1].Movies[1].ReleaseDate, (*sampleGenresWithMovies)[1].Movies[1].TimeInMin, (*sampleGenresWithMovies)[1].Movies[1].Fsk,
+					),
+				)
+			},
+			expectedGenres: sampleGenresWithMovies,
+			expectedError:  nil,
+		},
 		// {
 		// 	name: "Error while querying movies",
 		// 	setExpectations: func(mock sqlmock.Sqlmock) {
