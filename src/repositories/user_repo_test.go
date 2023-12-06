@@ -5,10 +5,10 @@ import (
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/.gen/KinoTicketSystem/model"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/managers"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
-	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models/schemas"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
 	"github.com/stretchr/testify/assert"
 )
@@ -19,7 +19,7 @@ func TestGetUserByUsername(t *testing.T) {
 		name            string
 		username        string
 		setExpectations func(mock sqlmock.Sqlmock, username string)
-		expectedUser    *schemas.User
+		expectedUser    *model.Users
 		expectedError   *models.KTSError
 	}{
 		{
@@ -27,8 +27,17 @@ func TestGetUserByUsername(t *testing.T) {
 			username: "Collinho el niño",
 			setExpectations: func(mock sqlmock.Sqlmock, username string) {
 				mock.ExpectQuery(
-					"SELECT id, username, email, password, firstname, lastname FROM users WHERE username = ?",
-				).WithArgs(username).WillReturnError(sql.ErrNoRows)
+					"SELECT users.id AS \"users.id\",\n" +
+						"users.username AS \"users.username\",\n" +
+						"users.email AS \"users.email\",\n" +
+						"users.password AS \"users.password\",\n" +
+						"users.firstname AS \"users.firstname\",\n" +
+						"users.lastname AS \"users.lastname\"\n" +
+						"FROM `KinoTicketSystem`.users\n" +
+						"WHERE users.username = ?;",
+				).WithArgs(
+					username,
+				).WillReturnError(sql.ErrNoRows)
 			},
 			expectedUser:  nil,
 			expectedError: kts_errors.KTS_USER_NOT_FOUND,
@@ -38,8 +47,17 @@ func TestGetUserByUsername(t *testing.T) {
 			username: "Collinho el niño",
 			setExpectations: func(mock sqlmock.Sqlmock, username string) {
 				mock.ExpectQuery(
-					"SELECT id, username, email, password, firstname, lastname FROM users WHERE username = ?",
-				).WithArgs(username).WillReturnError(sqlmock.ErrCancelled)
+					"SELECT users.id AS \"users.id\",\n" +
+						"users.username AS \"users.username\",\n" +
+						"users.email AS \"users.email\",\n" +
+						"users.password AS \"users.password\",\n" +
+						"users.firstname AS \"users.firstname\",\n" +
+						"users.lastname AS \"users.lastname\"\n" +
+						"FROM `KinoTicketSystem`.users\n" +
+						"WHERE users.username = ?;",
+				).WithArgs(
+					username,
+				).WillReturnError(sql.ErrConnDone)
 			},
 			expectedUser:  nil,
 			expectedError: kts_errors.KTS_INTERNAL_ERROR,
@@ -49,11 +67,22 @@ func TestGetUserByUsername(t *testing.T) {
 			username: "Collinho el niño",
 			setExpectations: func(mock sqlmock.Sqlmock, username string) {
 				mock.ExpectQuery(
-					"SELECT id, username, email, password, firstname, lastname FROM users WHERE username = ?",
-				).WithArgs(username).WillReturnRows(
+					"SELECT users.id AS \"users.id\",\n" +
+						"users.username AS \"users.username\",\n" +
+						"users.email AS \"users.email\",\n" +
+						"users.password AS \"users.password\",\n" +
+						"users.firstname AS \"users.firstname\",\n" +
+						"users.lastname AS \"users.lastname\"\n" +
+						"FROM `KinoTicketSystem`.users\n" +
+						"WHERE users.username = ?;",
+				).WithArgs(
+					username,
+				).WillReturnRows(
 					sqlmock.NewRows([]string{
-						"id", "username", "email", "password", "firstname", "lastname",
-					}).AddRow(sampleUser.Id, sampleUser.Username, sampleUser.Email, sampleUser.Password, sampleUser.FirstName, sampleUser.LastName),
+						"users.id", "users.username", "users.email", "users.password", "users.firstname", "users.lastname",
+					}).AddRow(
+						sampleUser.ID, sampleUser.Username, sampleUser.Email, sampleUser.Password, sampleUser.Firstname, sampleUser.Lastname,
+					),
 				)
 			},
 			expectedUser:  &sampleUser,
@@ -65,7 +94,7 @@ func TestGetUserByUsername(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			// GIVEN
 			// create mock db manager
-			db, mock, err := sqlmock.New()
+			db, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
 			if err != nil {
 				t.Fatalf("error while setting up mock database: %s", err)
 			}
@@ -96,16 +125,19 @@ func TestGetUserByUsername(t *testing.T) {
 func TestCreateUser(t *testing.T) {
 	testCases := []struct {
 		name            string
-		data            schemas.User
-		setExpectations func(mock sqlmock.Sqlmock, user *schemas.User)
+		data            model.Users
+		setExpectations func(mock sqlmock.Sqlmock, user *model.Users)
 		expectedError   *models.KTSError
 	}{
 		{
 			name: "Success",
 			data: utils.GetSampleUser(),
-			setExpectations: func(mock sqlmock.Sqlmock, user *schemas.User) {
-				mock.ExpectExec("INSERT INTO users").WithArgs(
-					user.Id, user.Username, user.Email, user.Password, user.FirstName, user.LastName,
+			setExpectations: func(mock sqlmock.Sqlmock, user *model.Users) {
+				mock.ExpectExec(
+					"INSERT INTO `KinoTicketSystem`.users (id, username, email, password, firstname, lastname)\n"+
+						"VALUES (?, ?, ?, ?, ?, ?);",
+				).WithArgs(
+					user.ID, user.Username, user.Email, user.Password, user.Firstname, user.Lastname,
 				).WillReturnResult(sqlmock.NewResult(1, 1))
 			},
 			expectedError: nil,
@@ -113,9 +145,12 @@ func TestCreateUser(t *testing.T) {
 		{
 			name: "Internal error",
 			data: utils.GetSampleUser(),
-			setExpectations: func(mock sqlmock.Sqlmock, user *schemas.User) {
-				mock.ExpectExec("INSERT INTO users").WithArgs(
-					user.Id, user.Username, user.Email, user.Password, user.FirstName, user.LastName,
+			setExpectations: func(mock sqlmock.Sqlmock, user *model.Users) {
+				mock.ExpectExec(
+					"INSERT INTO `KinoTicketSystem`.users (id, username, email, password, firstname, lastname)\n"+
+						"VALUES (?, ?, ?, ?, ?, ?);",
+				).WithArgs(
+					user.ID, user.Username, user.Email, user.Password, user.Firstname, user.Lastname,
 				).WillReturnError(sqlmock.ErrCancelled)
 			},
 			expectedError: kts_errors.KTS_INTERNAL_ERROR,
@@ -126,7 +161,7 @@ func TestCreateUser(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			// GIVEN
 			// create mock db manager
-			db, mock, err := sqlmock.New()
+			db, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
 			if err != nil {
 				t.Fatalf("error while setting up mock database: %s", err)
 			}
@@ -165,10 +200,18 @@ func TestCheckIfUsernameExists(t *testing.T) {
 			name:     "Username exists",
 			username: "Collinho el niño",
 			setExpectations: func(mock sqlmock.Sqlmock, username string) {
-				mock.ExpectQuery("SELECT COUNT\\(\\*\\) FROM users WHERE username = \\?").WithArgs(
+				mock.ExpectQuery(
+					"SELECT COUNT(users.id)\n" +
+						"FROM `KinoTicketSystem`.users\n" +
+						"WHERE users.username = ?;",
+				).WithArgs(
 					username,
 				).WillReturnRows(
-					sqlmock.NewRows([]string{"COUNT(*)"}).AddRow(1),
+					sqlmock.NewRows([]string{
+						"COUNT(users.id)",
+					}).AddRow(
+						1,
+					),
 				)
 			},
 			expectedError: kts_errors.KTS_USERNAME_EXISTS,
@@ -177,10 +220,18 @@ func TestCheckIfUsernameExists(t *testing.T) {
 			name:     "Username doesn't exist",
 			username: "Collinho el niño",
 			setExpectations: func(mock sqlmock.Sqlmock, username string) {
-				mock.ExpectQuery("SELECT COUNT\\(\\*\\) FROM users WHERE username = \\?").WithArgs(
+				mock.ExpectQuery(
+					"SELECT COUNT(users.id)\n" +
+						"FROM `KinoTicketSystem`.users\n" +
+						"WHERE users.username = ?;",
+				).WithArgs(
 					username,
 				).WillReturnRows(
-					sqlmock.NewRows([]string{"COUNT(*)"}).AddRow(0),
+					sqlmock.NewRows([]string{
+						"COUNT(users.id)",
+					}).AddRow(
+						0,
+					),
 				)
 			},
 			expectedError: nil,
@@ -189,7 +240,11 @@ func TestCheckIfUsernameExists(t *testing.T) {
 			name:     "Internal error",
 			username: "Collinho el niño",
 			setExpectations: func(mock sqlmock.Sqlmock, username string) {
-				mock.ExpectQuery("SELECT COUNT\\(\\*\\) FROM users WHERE username = \\?").WithArgs(
+				mock.ExpectQuery(
+					"SELECT COUNT(users.id)\n" +
+						"FROM `KinoTicketSystem`.users\n" +
+						"WHERE users.username = ?;",
+				).WithArgs(
 					username,
 				).WillReturnError(
 					sqlmock.ErrCancelled,
@@ -203,7 +258,7 @@ func TestCheckIfUsernameExists(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			// GIVEN
 			// create mock db manager
-			db, mock, err := sqlmock.New()
+			db, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
 			if err != nil {
 				t.Fatalf("error while setting up mock database: %s", err)
 			}
@@ -242,10 +297,18 @@ func TestCheckIfEmailExists(t *testing.T) {
 			name:  "Email exists",
 			email: "collin.forslund@gmail.com",
 			setExpectations: func(mock sqlmock.Sqlmock, email string) {
-				mock.ExpectQuery("SELECT COUNT\\(\\*\\) FROM users WHERE email = \\?").WithArgs(
+				mock.ExpectQuery(
+					"SELECT COUNT(users.id)\n" +
+						"FROM `KinoTicketSystem`.users\n" +
+						"WHERE users.email = ?;",
+				).WithArgs(
 					email,
 				).WillReturnRows(
-					sqlmock.NewRows([]string{"COUNT(*)"}).AddRow(1),
+					sqlmock.NewRows([]string{
+						"COUNT(users.email)",
+					}).AddRow(
+						1,
+					),
 				)
 			},
 			expectedError: kts_errors.KTS_EMAIL_EXISTS,
@@ -254,10 +317,18 @@ func TestCheckIfEmailExists(t *testing.T) {
 			name:  "Email doesn't exist",
 			email: "collin.forslund@gmail.com",
 			setExpectations: func(mock sqlmock.Sqlmock, email string) {
-				mock.ExpectQuery("SELECT COUNT\\(\\*\\) FROM users WHERE email = \\?").WithArgs(
+				mock.ExpectQuery(
+					"SELECT COUNT(users.id)\n" +
+						"FROM `KinoTicketSystem`.users\n" +
+						"WHERE users.email = ?;",
+				).WithArgs(
 					email,
 				).WillReturnRows(
-					sqlmock.NewRows([]string{"COUNT(*)"}).AddRow(0),
+					sqlmock.NewRows([]string{
+						"COUNT(users.email)",
+					}).AddRow(
+						0,
+					),
 				)
 			},
 			expectedError: nil,
@@ -266,7 +337,11 @@ func TestCheckIfEmailExists(t *testing.T) {
 			name:  "Internal error",
 			email: "collin.forslund@gmail.com",
 			setExpectations: func(mock sqlmock.Sqlmock, email string) {
-				mock.ExpectQuery("SELECT COUNT\\(\\*\\) FROM users WHERE email = \\?").WithArgs(
+				mock.ExpectQuery(
+					"SELECT COUNT(users.id)\n" +
+						"FROM `KinoTicketSystem`.users\n" +
+						"WHERE users.email = ?;",
+				).WithArgs(
 					email,
 				).WillReturnError(
 					sqlmock.ErrCancelled,
@@ -280,7 +355,7 @@ func TestCheckIfEmailExists(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			// GIVEN
 			// create mock db manager
-			db, mock, err := sqlmock.New()
+			db, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
 			if err != nil {
 				t.Fatalf("error while setting up mock database: %s", err)
 			}

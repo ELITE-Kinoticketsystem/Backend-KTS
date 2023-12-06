@@ -3,26 +3,26 @@ package repositories
 import (
 	"errors"
 
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/.gen/KinoTicketSystem/model"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/managers"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
-	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models/schemas"
 	"github.com/google/uuid"
 )
 
 type EventRepo interface {
-	CreateEvent(event *schemas.Event) error
+	CreateEvent(event *model.Events) error
 	DeleteEvent(*uuid.UUID) error
-	GetEventsForMovieId(movieId *uuid.UUID) ([]*schemas.Event, error)
+	GetEventsForMovieId(movieId *uuid.UUID) ([]*model.Events, error)
 	GetSpecialEvents() ([]*models.EventDTO, error)
 
-	CreatePriceCategory(priceCategory *schemas.PriceCategory) error
+	CreatePriceCategory(priceCategory *model.PriceCategories) error
 
 	AddEventMovie(eventId *uuid.UUID, movieId *uuid.UUID) error
 	DeleteEventMovies(eventId *uuid.UUID) error
 
-	CreateEventSeatCategory(eventSeatCategory *schemas.EventSeatCategory) error
+	CreateEventSeatCategory(eventSeatCategory *model.EventSeatCategories) error
 	DeleteEventSeatCategoryByEventId(eventId *uuid.UUID) error
-	CreateEventSeat(eventSeat *schemas.EventSeat) error
+	CreateEventSeat(eventSeat *model.EventSeats) error
 	DeleteEventSeatsByEventId(eventId *uuid.UUID) error
 }
 
@@ -30,7 +30,7 @@ type EventRepository struct {
 	DatabaseManager managers.DatabaseManagerI
 }
 
-func (er *EventRepository) CreateEvent(event *schemas.Event) error {
+func (er *EventRepository) CreateEvent(event *model.Events) error {
 	// TODO: implement
 	return errors.New("not implemented")
 }
@@ -40,12 +40,12 @@ func (er *EventRepository) DeleteEvent(id *uuid.UUID) error {
 	return errors.New("not implemented")
 }
 
-func (er *EventRepository) GetEventsForMovieId(movieId *uuid.UUID) ([]*schemas.Event, error) {
+func (er *EventRepository) GetEventsForMovieId(movieId *uuid.UUID) ([]*model.Events, error) {
 	// TODO: implement
 	return nil, errors.New("not implemented")
 }
 
-func (er *EventRepository) GetEventsForCinemaHallId(cinemaHallId *uuid.UUID) ([]*schemas.Event, error) {
+func (er *EventRepository) GetEventsForCinemaHallId(cinemaHallId *uuid.UUID) ([]*model.Events, error) {
 	// TODO: implement
 	return nil, errors.New("not implemented")
 }
@@ -55,7 +55,7 @@ func (er *EventRepository) GetSpecialEvents() ([]*models.EventDTO, error) {
 	return nil, errors.New("not implemented")
 }
 
-func (er *EventRepository) CreatePriceCategory(priceCategory *schemas.PriceCategory) error {
+func (er *EventRepository) CreatePriceCategory(priceCategory *model.PriceCategories) error {
 	// TODO: implement
 	return errors.New("not implemented")
 }
@@ -70,12 +70,12 @@ func (er *EventRepository) DeleteEventMovies(eventId *uuid.UUID) error {
 	return errors.New("not implemented")
 }
 
-func (er *EventRepository) CreateEventSeatCategory(eventSeatCategory *schemas.EventSeatCategory) error {
+func (er *EventRepository) CreateEventSeatCategory(eventSeatCategory *model.EventSeatCategories) error {
 	// TODO: implement
 	return errors.New("not implemented")
 }
 
-func (er *EventRepository) CreateEventSeat(eventSeat *schemas.EventSeat) error {
+func (er *EventRepository) CreateEventSeat(eventSeat *model.EventSeats) error {
 	// TODO: implement
 	return errors.New("not implemented")
 }

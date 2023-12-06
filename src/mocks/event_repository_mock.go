@@ -11,8 +11,8 @@ package mocks
 import (
 	reflect "reflect"
 
+	model "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/.gen/KinoTicketSystem/model"
 	models "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
-	schemas "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models/schemas"
 	uuid "github.com/google/uuid"
 	gomock "go.uber.org/mock/gomock"
 )
@@ -55,7 +55,7 @@ func (mr *MockEventRepoMockRecorder) AddEventMovie(eventId, movieId any) *gomock
 }
 
 // CreateEvent mocks base method.
-func (m *MockEventRepo) CreateEvent(event *schemas.Event) error {
+func (m *MockEventRepo) CreateEvent(event *model.Events) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateEvent", event)
 	ret0, _ := ret[0].(error)
@@ -69,7 +69,7 @@ func (mr *MockEventRepoMockRecorder) CreateEvent(event any) *gomock.Call {
 }
 
 // CreateEventSeat mocks base method.
-func (m *MockEventRepo) CreateEventSeat(eventSeat *schemas.EventSeat) error {
+func (m *MockEventRepo) CreateEventSeat(eventSeat *model.EventSeats) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateEventSeat", eventSeat)
 	ret0, _ := ret[0].(error)
@@ -83,7 +83,7 @@ func (mr *MockEventRepoMockRecorder) CreateEventSeat(eventSeat any) *gomock.Call
 }
 
 // CreateEventSeatCategory mocks base method.
-func (m *MockEventRepo) CreateEventSeatCategory(eventSeatCategory *schemas.EventSeatCategory) error {
+func (m *MockEventRepo) CreateEventSeatCategory(eventSeatCategory *model.EventSeatCategories) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateEventSeatCategory", eventSeatCategory)
 	ret0, _ := ret[0].(error)
@@ -97,7 +97,7 @@ func (mr *MockEventRepoMockRecorder) CreateEventSeatCategory(eventSeatCategory a
 }
 
 // CreatePriceCategory mocks base method.
-func (m *MockEventRepo) CreatePriceCategory(priceCategory *schemas.PriceCategory) error {
+func (m *MockEventRepo) CreatePriceCategory(priceCategory *model.PriceCategories) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreatePriceCategory", priceCategory)
 	ret0, _ := ret[0].(error)
@@ -167,10 +167,10 @@ func (mr *MockEventRepoMockRecorder) DeleteEventSeatsByEventId(eventId any) *gom
 }
 
 // GetEventsForMovieId mocks base method.
-func (m *MockEventRepo) GetEventsForMovieId(movieId *uuid.UUID) ([]*schemas.Event, error) {
+func (m *MockEventRepo) GetEventsForMovieId(movieId *uuid.UUID) ([]*model.Events, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetEventsForMovieId", movieId)
-	ret0, _ := ret[0].([]*schemas.Event)
+	ret0, _ := ret[0].([]*model.Events)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

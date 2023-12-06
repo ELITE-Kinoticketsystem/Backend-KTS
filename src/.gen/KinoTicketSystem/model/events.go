@@ -13,11 +13,11 @@ import (
 )
 
 type Events struct {
-	ID           uuid.UUID `sql:"primary_key"`
+	ID           *uuid.UUID `sql:"primary_key"`
 	Title        string
 	Start        time.Time
 	End          time.Time
 	Description  *string
 	EventType    string
-	CinemaHallID uuid.UUID
+	CinemaHallID *uuid.UUID
 }

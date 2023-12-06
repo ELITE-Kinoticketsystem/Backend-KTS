@@ -12,6 +12,6 @@ import (
 )
 
 type SeatCategories struct {
-	ID           uuid.UUID `sql:"primary_key"`
+	ID           *uuid.UUID `sql:"primary_key"`
 	CategoryName string
 }

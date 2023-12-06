@@ -11,7 +11,7 @@ type EventDTO struct {
 	Title               string                 `json:"title"`
 	Start               time.Time              `json:"start"`
 	End                 time.Time              `json:"end"`
-	EventTypeId         *uuid.UUID             `json:"eventTypeID"`
+	EventType           string                 `json:"eventType"`
 	CinemaHallId        *uuid.UUID             `json:"cinemaHallID"`
 	Movies              []MovieDTO             `json:"movie"`
 	EventSeatCategories []EventSeatCategoryDTO `json:"eventSeatCategories"`
@@ -19,5 +19,5 @@ type EventDTO struct {
 
 type EventSeatCategoryDTO struct {
 	Name  string `json:"name"`
-	Price int    `json:"price"`
+	Price int32  `json:"price"`
 }

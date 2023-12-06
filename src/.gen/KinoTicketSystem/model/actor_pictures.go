@@ -12,7 +12,7 @@ import (
 )
 
 type ActorPictures struct {
-	ID      uuid.UUID `sql:"primary_key"`
-	ActorID uuid.UUID
+	ID      *uuid.UUID `sql:"primary_key"`
+	ActorID *uuid.UUID
 	PicURL  *string
 }

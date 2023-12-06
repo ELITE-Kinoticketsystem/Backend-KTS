@@ -11,7 +11,7 @@ package mocks
 import (
 	reflect "reflect"
 
-	schemas "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models/schemas"
+	model "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/.gen/KinoTicketSystem/model"
 	uuid "github.com/google/uuid"
 	gomock "go.uber.org/mock/gomock"
 )
@@ -54,7 +54,7 @@ func (mr *MockMovieRepoIMockRecorder) AddMovieGenre(movieId, genreId any) *gomoc
 }
 
 // CreateGenre mocks base method.
-func (m *MockMovieRepoI) CreateGenre(genre *schemas.Genre) error {
+func (m *MockMovieRepoI) CreateGenre(genre *model.Genres) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateGenre", genre)
 	ret0, _ := ret[0].(error)
@@ -68,7 +68,7 @@ func (mr *MockMovieRepoIMockRecorder) CreateGenre(genre any) *gomock.Call {
 }
 
 // CreateMovie mocks base method.
-func (m *MockMovieRepoI) CreateMovie(movie *schemas.Movie) error {
+func (m *MockMovieRepoI) CreateMovie(movie *model.Movies) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateMovie", movie)
 	ret0, _ := ret[0].(error)
@@ -82,10 +82,10 @@ func (mr *MockMovieRepoIMockRecorder) CreateMovie(movie any) *gomock.Call {
 }
 
 // GetGenreByName mocks base method.
-func (m *MockMovieRepoI) GetGenreByName(name string) (*schemas.Genre, error) {
+func (m *MockMovieRepoI) GetGenreByName(name string) (*model.Genres, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetGenreByName", name)
-	ret0, _ := ret[0].(*schemas.Genre)
+	ret0, _ := ret[0].(*model.Genres)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

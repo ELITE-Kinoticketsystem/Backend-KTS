@@ -12,6 +12,6 @@ import (
 )
 
 type PaymentMethods struct {
-	ID         uuid.UUID `sql:"primary_key"`
+	ID         *uuid.UUID `sql:"primary_key"`
 	Methodname string
 }
