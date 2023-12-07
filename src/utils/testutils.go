@@ -368,6 +368,77 @@ func GetSampleGenresWithMovies() *[]models.GenreWithMovies {
 	return &genresWithMovies
 }
 
+func GetSampleMoviesWithGenres() *[]models.MovieWithGenres {
+	movieWithGenres := []models.MovieWithGenres{}
+
+	uuid1 := uuid.MustParse("6ba7b820-9dad-11d1-80b4-00c04fd430c4")
+	uuid2 := uuid.MustParse("6ba7b827-9dad-11d1-80b4-00c04fd430c1")
+	uuid3 := uuid.MustParse("6ba7b828-9dad-11d1-80b4-00c04fd430c2")
+	uuid4 := uuid.MustParse("6ba7b821-9dad-11d1-80b4-00c04fd430c5")
+	banner := ""
+	cover := ""
+	trailer := ""
+	rating := 5.0
+
+	movieWithGenres = append(movieWithGenres, models.MovieWithGenres{
+		Movies: model.Movies{
+			ID:           &uuid1,
+			Title:        "Test Movie 1",
+			Description:  "Test Description 1",
+			BannerPicURL: &banner,
+			CoverPicURL:  &cover,
+			TrailerURL:   &trailer,
+			Rating:       &rating,
+			ReleaseDate:  time.Now(),
+			TimeInMin:    120,
+			Fsk:          18,
+		},
+		Genres: []struct {
+			model.Genres
+		}{
+			{
+				model.Genres{
+					ID:        &uuid2,
+					GenreName: "Action",
+				},
+			},
+			{
+				model.Genres{
+					ID:        &uuid3,
+					GenreName: "Drama",
+				},
+			},
+		},
+	})
+
+	movieWithGenres = append(movieWithGenres, models.MovieWithGenres{
+		Movies: model.Movies{
+			ID:           &uuid4,
+			Title:        "Test Movie 2",
+			Description:  "Test Description 2",
+			BannerPicURL: &banner,
+			CoverPicURL:  &cover,
+			TrailerURL:   &trailer,
+			Rating:       &rating,
+			ReleaseDate:  time.Now(),
+			TimeInMin:    120,
+			Fsk:          18,
+		},
+		Genres: []struct {
+			model.Genres
+		}{
+			{
+				model.Genres{
+					ID:        &uuid3,
+					GenreName: "Drama",
+				},
+			},
+		},
+	})
+
+	return &movieWithGenres
+}
+
 // for matching a struct except for uuid fields
 type IdMatcher struct {
 	value interface{}

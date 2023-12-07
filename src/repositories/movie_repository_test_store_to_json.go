@@ -152,7 +152,7 @@ func TestUpdateMovieExecutable(t *testing.T) {
 		defer dbConnection.Close()
 
 		// Call the method under test
-		kts_err := movieRepo.UpdateMovie(movie)
+		kts_err := movieRepo.UpdateMovie(&movie)
 
 		assert.Nil(t, kts_err)
 
