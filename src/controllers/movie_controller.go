@@ -11,8 +11,8 @@ type MovieControllerI interface {
 	// Movie
 	GetMovies() (*[]model.Movies, *models.KTSError)
 	GetMovieById(movieId *uuid.UUID) (*model.Movies, *models.KTSError)
-	CreateMovie(movie model.Movies) *models.KTSError
-	UpdateMovie(movie model.Movies) *models.KTSError
+	CreateMovie(movie *model.Movies) *models.KTSError
+	UpdateMovie(movie *model.Movies) *models.KTSError
 	DeleteMovie(movieId *uuid.UUID) *models.KTSError
 
 	// Genre
@@ -30,7 +30,7 @@ type MovieControllerI interface {
 	// All Movies with all Genres - Grouped by Genre
 	GetGenresWithMovies() (*[]models.GenreWithMovies, *models.KTSError)
 	// All Movies with all Genres - Grouped by Movie
-	GetMoviesWithGenres() ([]models.MovieWithGenres, *models.KTSError)
+	GetMoviesWithGenres() (*[]models.MovieWithGenres, *models.KTSError)
 }
 
 type MovieController struct {
@@ -56,7 +56,7 @@ func (mc *MovieController) GetMovieById(movieId *uuid.UUID) (*model.Movies, *mod
 	return movie, nil
 }
 
-func (mc *MovieController) CreateMovie(movie model.Movies) *models.KTSError {
+func (mc *MovieController) CreateMovie(movie *model.Movies) *models.KTSError {
 	kts_errors := mc.MovieRepo.CreateMovie(movie)
 	if kts_errors != nil {
 		return kts_errors
@@ -64,7 +64,7 @@ func (mc *MovieController) CreateMovie(movie model.Movies) *models.KTSError {
 	return nil
 }
 
-func (mc *MovieController) UpdateMovie(movie model.Movies) *models.KTSError {
+func (mc *MovieController) UpdateMovie(movie *model.Movies) *models.KTSError {
 	kts_errors := mc.MovieRepo.UpdateMovie(movie)
 	if kts_errors != nil {
 		return kts_errors
@@ -142,7 +142,7 @@ func (mc *MovieController) GetGenresWithMovies() (*[]models.GenreWithMovies, *mo
 }
 
 // All Movies with all Genres - Grouped by Movie
-func (mc *MovieController) GetMoviesWithGenres() ([]models.MovieWithGenres, *models.KTSError) {
+func (mc *MovieController) GetMoviesWithGenres() (*[]models.MovieWithGenres, *models.KTSError) {
 	movies, kts_errors := mc.MovieRepo.GetMoviesWithGenres()
 	if kts_errors != nil {
 		return nil, kts_errors
