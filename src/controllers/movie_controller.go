@@ -34,7 +34,9 @@ type MovieControllerI interface {
 }
 
 type MovieController struct {
-	MovieRepo repositories.MovieRepositoryI
+	MovieRepo      repositories.MovieRepositoryI
+	GenreRepo      repositories.GenreRepositoryI
+	MovieGenreRepo repositories.MovieGenreRepositoryI
 }
 
 // Movie
@@ -80,7 +82,7 @@ func (mc *MovieController) DeleteMovie(movieId *uuid.UUID) *models.KTSError {
 
 // Genre
 func (mc *MovieController) GetGenres() (*[]model.Genres, *models.KTSError) {
-	genres, ktskts_errors := mc.MovieRepo.GetGenres()
+	genres, ktskts_errors := mc.GenreRepo.GetGenres()
 	if ktskts_errors != nil {
 		return nil, ktskts_errors
 	}
@@ -88,7 +90,7 @@ func (mc *MovieController) GetGenres() (*[]model.Genres, *models.KTSError) {
 }
 
 func (mc *MovieController) GetGenreByName(name string) (*model.Genres, *models.KTSError) {
-	genre, kts_errors := mc.MovieRepo.GetGenreByName(name)
+	genre, kts_errors := mc.GenreRepo.GetGenreByName(name)
 	if kts_errors != nil {
 		return nil, kts_errors
 	}
@@ -96,7 +98,7 @@ func (mc *MovieController) GetGenreByName(name string) (*model.Genres, *models.K
 }
 
 func (mc *MovieController) CreateGenre(name string) *models.KTSError {
-	kts_errors := mc.MovieRepo.CreateGenre(name)
+	kts_errors := mc.GenreRepo.CreateGenre(name)
 	if kts_errors != nil {
 		return kts_errors
 	}
@@ -105,7 +107,7 @@ func (mc *MovieController) CreateGenre(name string) *models.KTSError {
 
 // Combine Movie and Genre
 func (mc *MovieController) AddMovieGenre(movieId *uuid.UUID, genreId *uuid.UUID) *models.KTSError {
-	kts_errors := mc.MovieRepo.AddMovieGenre(movieId, genreId)
+	kts_errors := mc.MovieGenreRepo.AddMovieGenre(movieId, genreId)
 	if kts_errors != nil {
 		return kts_errors
 	}
@@ -123,7 +125,7 @@ func (mc *MovieController) GetMovieByIdWithGenre(movieId *uuid.UUID) (*models.Mo
 
 // One Genre with all Movies
 func (mc *MovieController) GetGenreByNameWithMovies(genreName string) (*models.GenreWithMovies, *models.KTSError) {
-	genre, kts_errors := mc.MovieRepo.GetGenreByNameWithMovies(genreName)
+	genre, kts_errors := mc.GenreRepo.GetGenreByNameWithMovies(genreName)
 	if kts_errors != nil {
 		return nil, kts_errors
 	}
@@ -132,7 +134,7 @@ func (mc *MovieController) GetGenreByNameWithMovies(genreName string) (*models.G
 
 // All Movies with all Genres - Grouped by Genre
 func (mc *MovieController) GetGenresWithMovies() (*[]models.GenreWithMovies, *models.KTSError) {
-	genres, kts_errors := mc.MovieRepo.GetGenresWithMovies()
+	genres, kts_errors := mc.GenreRepo.GetGenresWithMovies()
 	if kts_errors != nil {
 		return nil, kts_errors
 	}
