@@ -128,7 +128,7 @@ func GetActors() *[]models.ActorDTO {
 
 func TestGetActorById(t *testing.T) {
 
-	query := "\nSELECT actors.id AS \"actors.id\",\n     actors.name AS \"actors.name\",\n     actors.age AS \"actors.age\",\n     actors.description AS \"actors.description\",\n     actor_pictures.id AS \"actor_pictures.id\",\n     actor_pictures.actor_id AS \"actor_pictures.actor_id\",\n     actor_pictures.pic_url AS \"actor_pictures.pic_url\",\n     movies.id AS \"movies.id\",\n     movies.title AS \"movies.title\",\n     movies.description AS \"movies.description\",\n     movies.banner_pic_url AS \"movies.banner_pic_url\",\n     movies.cover_pic_url AS \"movies.cover_pic_url\",\n     movies.trailer_url AS \"movies.trailer_url\",\n     movies.rating AS \"movies.rating\",\n     movies.release_date AS \"movies.release_date\",\n     movies.time_in_min AS \"movies.time_in_min\",\n     movies.fsk AS \"movies.fsk\"\nFROM `KinoTicketSystem`.actors\n     LEFT JOIN `KinoTicketSystem`.actor_pictures ON (actor_pictures.actor_id = actors.id)\n     LEFT JOIN `KinoTicketSystem`.movie_actors ON (movie_actors.actor_id = actors.id)\n     LEFT JOIN `KinoTicketSystem`.movies ON (movies.id = movie_actors.movie_id)\nWHERE actors.id = ?;\n"
+	query := "SELECT actors.id AS \"actors.id\",\n     actors.name AS \"actors.name\",\n     actors.age AS \"actors.age\",\n     actors.description AS \"actors.description\",\n     actor_pictures.id AS \"actor_pictures.id\",\n     actor_pictures.actor_id AS \"actor_pictures.actor_id\",\n     actor_pictures.pic_url AS \"actor_pictures.pic_url\",\n     movies.id AS \"movies.id\",\n     movies.title AS \"movies.title\",\n     movies.description AS \"movies.description\",\n     movies.banner_pic_url AS \"movies.banner_pic_url\",\n     movies.cover_pic_url AS \"movies.cover_pic_url\",\n     movies.trailer_url AS \"movies.trailer_url\",\n     movies.rating AS \"movies.rating\",\n     movies.release_date AS \"movies.release_date\",\n     movies.time_in_min AS \"movies.time_in_min\",\n     movies.fsk AS \"movies.fsk\"\nFROM `KinoTicketSystem`.actors\n     LEFT JOIN `KinoTicketSystem`.actor_pictures ON (actor_pictures.actor_id = actors.id)\n     LEFT JOIN `KinoTicketSystem`.movie_actors ON (movie_actors.actor_id = actors.id)\n     LEFT JOIN `KinoTicketSystem`.movies ON (movies.id = movie_actors.movie_id)\nWHERE actors.id = ?;\n"
 
 	actor := (*GetActors())[0]
 
@@ -143,10 +143,10 @@ func TestGetActorById(t *testing.T) {
 		{
 			name: "Select actor by id",
 			setExpectations: func(mock sqlmock.Sqlmock) {
-				mock.ExpectQuery(query).
-					WillReturnRows(sqlmock.NewRows([]string{"id", "name", "age", "description", "movie_id", "id", "title", "description", "banner_pic_url", "cover_pic_url", "trailer_url", "rating", "release_date", "time_in_min", "fsk", "id", "actor_id", "pic_url"}).
-						AddRow(actor.ID, actor.Name, actor.Age, actor.Description, actor.Movies[0].ID, actor.Movies[0].ID, actor.Movies[0].Title, actor.Movies[0].Description, actor.Movies[0].BannerPicURL, actor.Movies[0].CoverPicURL, actor.Movies[0].TrailerURL, actor.Movies[0].Rating, actor.Movies[0].ReleaseDate, actor.Movies[0].TimeInMin, actor.Movies[0].Fsk, actor.Pictures[0].ID, actor.Pictures[0].ActorID, actor.Pictures[0].PicURL).
-						AddRow(actor.ID, actor.Name, actor.Age, actor.Description, actor.Movies[1].ID, actor.Movies[1].ID, actor.Movies[1].Title, actor.Movies[1].Description, actor.Movies[1].BannerPicURL, actor.Movies[1].CoverPicURL, actor.Movies[1].TrailerURL, actor.Movies[1].Rating, actor.Movies[1].ReleaseDate, actor.Movies[1].TimeInMin, actor.Movies[1].Fsk, actor.Pictures[1].ID, actor.Pictures[1].ActorID, actor.Pictures[1].PicURL))
+				mock.ExpectQuery(query).WithArgs(utils.EqUUID(&id)).
+					WillReturnRows(sqlmock.NewRows([]string{"actors.id", "actors.name", "actors.age", "actors.description", "actor_pictures.id", "actor_pictures.actor_id", "actor_pictures.pic_url", "movies.id", "movies.title", "movies.description", "movies.banner_pic_url", "movies.cover_pic_url", "movies.trailer_url", "movies.rating", "movies.release_date", "movies.time_in_min", "movies.fsk"}).
+						AddRow(actor.ID, actor.Name, actor.Age, actor.Description, actor.Pictures[0].ID, actor.Pictures[0].ActorID, actor.Pictures[0].PicURL, actor.Movies[0].ID, actor.Movies[0].Title, actor.Movies[0].Description, actor.Movies[0].BannerPicURL, actor.Movies[0].CoverPicURL, actor.Movies[0].TrailerURL, actor.Movies[0].Rating, actor.Movies[0].ReleaseDate, actor.Movies[0].TimeInMin, actor.Movies[0].Fsk).
+						AddRow(actor.ID, actor.Name, actor.Age, actor.Description, actor.Pictures[1].ID, actor.Pictures[1].ActorID, actor.Pictures[1].PicURL, actor.Movies[1].ID, actor.Movies[1].Title, actor.Movies[1].Description, actor.Movies[1].BannerPicURL, actor.Movies[1].CoverPicURL, actor.Movies[1].TrailerURL, actor.Movies[1].Rating, actor.Movies[1].ReleaseDate, actor.Movies[1].TimeInMin, actor.Movies[1].Fsk))
 
 			},
 			expectedActor: &actor,
@@ -157,7 +157,7 @@ func TestGetActorById(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 
-			db, mock, err := sqlmock.New()
+			db, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
 			if err != nil {
 				t.Fatalf("Failed to create mock database connection: %v", err)
 			}
