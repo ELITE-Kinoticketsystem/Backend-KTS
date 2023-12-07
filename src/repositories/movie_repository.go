@@ -16,7 +16,7 @@ type MovieRepositoryI interface {
 	// Movie
 	GetMovies() (*[]model.Movies, *models.KTSError)
 	GetMovieById(movieId *uuid.UUID) (*model.Movies, *models.KTSError)
-	CreateMovie(movie model.Movies) *models.KTSError
+	CreateMovie(movie *model.Movies) *models.KTSError
 	UpdateMovie(movie *model.Movies) *models.KTSError
 	DeleteMovie(movieId *uuid.UUID) *models.KTSError
 
@@ -81,7 +81,7 @@ func (mr *MovieRepository) GetMovieById(movieId *uuid.UUID) (*model.Movies, *mod
 	return &movie, nil
 }
 
-func (mr *MovieRepository) CreateMovie(movie model.Movies) *models.KTSError {
+func (mr *MovieRepository) CreateMovie(movie *model.Movies) *models.KTSError {
 	// Create the insert statement
 	insertQuery := table.Movies.INSERT(table.Movies.Title, table.Movies.Description, table.Movies.BannerPicURL, table.Movies.CoverPicURL, table.Movies.TrailerURL, table.Movies.Rating, table.Movies.ReleaseDate, table.Movies.TimeInMin, table.Movies.Fsk).
 		VALUES(movie.Title, movie.Description, movie.BannerPicURL, movie.CoverPicURL, movie.TrailerURL, movie.Rating, movie.ReleaseDate, movie.TimeInMin, movie.Fsk)
