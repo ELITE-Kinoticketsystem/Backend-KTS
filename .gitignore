@@ -35,4 +35,4 @@ go.sum
 
 src/repositories/movie_repository_test_store_to_json.go
 
-movie_repository_test_store_to_json.go
+
