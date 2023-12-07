@@ -109,34 +109,33 @@ VALUES
     (UUID_TO_BIN('6ba7b82f-9dad-11d1-80b4-00c04fd430c9'), UUID_TO_BIN('6ba7b825-9dad-11d1-80b4-00c04fd430c9'))
 ;
 -- Insert statement for Producer table
-INSERT INTO producers (id, name, age, description)
+INSERT INTO producers (id, name, birthdate, description)
 VALUES
-    (UUID_TO_BIN('6ba7b830-9dad-11d1-80b4-00c04fd430c0'), 'John Doe', 25, "John Doe is a producer."),
-    (UUID_TO_BIN('6ba7b831-9dad-11d1-80b4-00c04fd430c1'), 'Jane Smith', 30, "Jane Smith is a producer."),
-    (UUID_TO_BIN('6ba7b832-9dad-11d1-80b4-00c04fd430c2'), 'Michael Johnson', 35, "Michael Johnson is a producer."),
-    (UUID_TO_BIN('6ba7b833-9dad-11d1-80b4-00c04fd430c3'), 'Emily Davis', 28, "Emily Davis is a producer."),
-    (UUID_TO_BIN('6ba7b834-9dad-11d1-80b4-00c04fd430c4'), 'David Wilson', 32, "David Wilson is a producer."),
-    (UUID_TO_BIN('6ba7b835-9dad-11d1-80b4-00c04fd430c5'), 'Sarah Anderson', 29, "Sarah Anderson is a producer."),
-    (UUID_TO_BIN('6ba7b836-9dad-11d1-80b4-00c04fd430c6'), 'Christopher Taylor', 31, "Christopher Taylor is a producer."),
-    (UUID_TO_BIN('6ba7b837-9dad-11d1-80b4-00c04fd430c7'), 'Jessica Martinez', 27, "Jessica Martinez is a producer."),
-    (UUID_TO_BIN('6ba7b838-9dad-11d1-80b4-00c04fd430c8'), 'Matthew Brown', 33, "Matthew Brown is a producer."),
-    (UUID_TO_BIN('6ba7b839-9dad-11d1-80b4-00c04fd430c9'), 'Olivia Garcia', 26, "Olivia Garcia is a producer.");
+    (UUID_TO_BIN('6ba7b830-9dad-11d1-80b4-00c04fd430c0'), 'John Doe', '1996-01-01', "John Doe is a producer."),
+    (UUID_TO_BIN('6ba7b831-9dad-11d1-80b4-00c04fd430c1'), 'Jane Smith', '1991-05-15', "Jane Smith is a producer."),
+    (UUID_TO_BIN('6ba7b832-9dad-11d1-80b4-00c04fd430c2'), 'Michael Johnson', '1986-09-30', "Michael Johnson is a producer."),
+    (UUID_TO_BIN('6ba7b833-9dad-11d1-80b4-00c04fd430c3'), 'Emily Davis', '1993-03-10', "Emily Davis is a producer."),
+    (UUID_TO_BIN('6ba7b834-9dad-11d1-80b4-00c04fd430c4'), 'David Wilson', '1989-07-25', "David Wilson is a producer."),
+    (UUID_TO_BIN('6ba7b835-9dad-11d1-80b4-00c04fd430c5'), 'Sarah Anderson', '1992-11-05', "Sarah Anderson is a producer."),
+    (UUID_TO_BIN('6ba7b836-9dad-11d1-80b4-00c04fd430c6'), 'Christopher Taylor', '1990-08-20', "Christopher Taylor is a producer."),
+    (UUID_TO_BIN('6ba7b837-9dad-11d1-80b4-00c04fd430c7'), 'Jessica Martinez', '1994-02-14', "Jessica Martinez is a producer."),
+    (UUID_TO_BIN('6ba7b838-9dad-11d1-80b4-00c04fd430c8'), 'Matthew Brown', '1988-12-03', "Matthew Brown is a producer."),
+    (UUID_TO_BIN('6ba7b839-9dad-11d1-80b4-00c04fd430c9'), 'Olivia Garcia', '1995-06-28', "Olivia Garcia is a producer.");
 
 
 -- Insert statement for Actors table
-INSERT INTO actors (id, name, age, description)
+INSERT INTO actors (id, name, birthdate, description)
 VALUES
-    (UUID_TO_BIN('6ba7b840-9dad-11d1-80b4-00c04fd430c0'), 'Tom Hanks', 65, "Tom Hanks is an actor."),
-    (UUID_TO_BIN('6ba7b841-9dad-11d1-80b4-00c04fd430c1'), 'Leonardo DiCaprio', 46, "Leonardo DiCaprio is an actor."),
-    (UUID_TO_BIN('6ba7b842-9dad-11d1-80b4-00c04fd430c2'), 'Brad Pitt', 57, "Brad Pitt is an actor."),
-    (UUID_TO_BIN('6ba7b843-9dad-11d1-80b4-00c04fd430c3'), 'Meryl Streep', 72, "Meryl Streep is an actor."),
-    (UUID_TO_BIN('6ba7b844-9dad-11d1-80b4-00c04fd430c4'), 'Robert Downey Jr.', 56, "Robert Downey Jr. is an actor."),
-    (UUID_TO_BIN('6ba7b845-9dad-11d1-80b4-00c04fd430c5'), 'Scarlett Johansson', 36, "Scarlett Johansson is an actor."),
-    (UUID_TO_BIN('6ba7b846-9dad-11d1-80b4-00c04fd430c6'), 'Denzel Washington', 66, "Denzel Washington is an actor."),
-    (UUID_TO_BIN('6ba7b847-9dad-11d1-80b4-00c04fd430c7'), 'Jennifer Lawrence', 31, "Jennifer Lawrence is an actor."),
-    (UUID_TO_BIN('6ba7b848-9dad-11d1-80b4-00c04fd430c8'), 'Johnny Depp', 58, "Johnny Depp is an actor."),
-    (UUID_TO_BIN('6ba7b849-9dad-11d1-80b4-00c04fd430c9'), 'Emma Stone', 33, "Emma Stone is an actor.");
-
+    (UUID_TO_BIN('6ba7b840-9dad-11d1-80b4-00c04fd430c0'), 'Tom Hanks', '1956-07-09', "Tom Hanks is an actor."),
+    (UUID_TO_BIN('6ba7b841-9dad-11d1-80b4-00c04fd430c1'), 'Leonardo DiCaprio', '1974-11-11', "Leonardo DiCaprio is an actor."),
+    (UUID_TO_BIN('6ba7b842-9dad-11d1-80b4-00c04fd430c2'), 'Brad Pitt', '1963-12-18', "Brad Pitt is an actor."),
+    (UUID_TO_BIN('6ba7b843-9dad-11d1-80b4-00c04fd430c3'), 'Meryl Streep', '1949-06-22', "Meryl Streep is an actor."),
+    (UUID_TO_BIN('6ba7b844-9dad-11d1-80b4-00c04fd430c4'), 'Robert Downey Jr.', '1965-04-04', "Robert Downey Jr. is an actor."),
+    (UUID_TO_BIN('6ba7b845-9dad-11d1-80b4-00c04fd430c5'), 'Scarlett Johansson', '1984-11-22', "Scarlett Johansson is an actor."),
+    (UUID_TO_BIN('6ba7b846-9dad-11d1-80b4-00c04fd430c6'), 'Denzel Washington', '1954-12-28', "Denzel Washington is an actor."),
+    (UUID_TO_BIN('6ba7b847-9dad-11d1-80b4-00c04fd430c7'), 'Jennifer Lawrence', '1990-08-15', "Jennifer Lawrence is an actor."),
+    (UUID_TO_BIN('6ba7b848-9dad-11d1-80b4-00c04fd430c8'), 'Johnny Depp', '1963-06-09', "Johnny Depp is an actor."),
+    (UUID_TO_BIN('6ba7b849-9dad-11d1-80b4-00c04fd430c9'), 'Emma Stone', '1988-11-06', "Emma Stone is an actor.");
 
 -- Insert statement for MovieProducers table
 INSERT INTO movie_producers (movie_id, producer_id)

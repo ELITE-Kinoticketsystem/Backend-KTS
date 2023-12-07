@@ -9,11 +9,13 @@ package model
 
 import (
 	"github.com/google/uuid"
+	"time"
 )
 
 type Producers struct {
 	ID          *uuid.UUID `sql:"primary_key"`
 	Name        string
-	Age         int32
+	Birthdate   time.Time
 	Description string
+	PicURL      *string
 }

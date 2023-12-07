@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"database/sql/driver"
 	"fmt"
 	"reflect"
 	"time"
@@ -365,4 +366,44 @@ func GetSampleGenresWithMovies() *[]models.GenreWithMovies {
 	})
 
 	return &genresWithMovies
+}
+
+// for matching a struct except for uuid fields
+type IdMatcher struct {
+	value interface{}
+}
+
+func (m IdMatcher) Matches(otherValue interface{}) bool {
+	return cmp.Equal(m.value, otherValue, cmpopts.IgnoreTypes(&uuid.UUID{}))
+}
+
+func (m IdMatcher) String() string {
+	return fmt.Sprintf("matches %v", m.value)
+}
+
+// Returns a matcher that matches the struct except for the uuid fields.
+func EqExceptId(value interface{}) IdMatcher {
+	return IdMatcher{value: value}
+}
+
+// for matching a uuid with its binary representation
+type UUIDMatcher struct {
+	id *uuid.UUID
+}
+
+func (m UUIDMatcher) Match(v driver.Value) bool {
+	bytes, ok := v.(string)
+	if !ok {
+		return false
+	}
+	id, err := m.id.MarshalBinary()
+	if err != nil {
+		return false
+	}
+	return string(id) == bytes
+}
+
+// Returns a matcher that matches the uuid with its binary representation.
+func EqUUID(id *uuid.UUID) UUIDMatcher {
+	return UUIDMatcher{id: id}
 }
