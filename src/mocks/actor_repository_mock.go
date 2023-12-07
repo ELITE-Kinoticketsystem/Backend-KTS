@@ -53,3 +53,18 @@ func (mr *MockActorRepoIMockRecorder) GetActorById(actorId any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetActorById", reflect.TypeOf((*MockActorRepoI)(nil).GetActorById), actorId)
 }
+
+// GetActors mocks base method.
+func (m *MockActorRepoI) GetActors() (*[]models.GetActorsDTO, *models.KTSError) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetActors")
+	ret0, _ := ret[0].(*[]models.GetActorsDTO)
+	ret1, _ := ret[1].(*models.KTSError)
+	return ret0, ret1
+}
+
+// GetActors indicates an expected call of GetActors.
+func (mr *MockActorRepoIMockRecorder) GetActors() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetActors", reflect.TypeOf((*MockActorRepoI)(nil).GetActors))
+}

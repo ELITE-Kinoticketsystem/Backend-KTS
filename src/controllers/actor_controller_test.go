@@ -23,7 +23,7 @@ func TestGetActorById(t *testing.T) {
 	actorId := uuid.New()
 	expectedActorDTO := &models.ActorDTO{
 		Actors: model.Actors{
-			ID:          actorId,
+			ID:          &actorId,
 			Name:        "Test Actor",
 			Description: "Test Description",
 		},
