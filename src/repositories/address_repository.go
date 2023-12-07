@@ -13,7 +13,7 @@ import (
 )
 
 type AddressRepositoryI interface {
-	GetAddresses() ([]*model.Addresses, *models.KTSError)
+	GetAddresses() (*[]model.Addresses, *models.KTSError)
 	GetAddressById(id *uuid.UUID) (*model.Addresses, *models.KTSError)
 	CreateAddress(address *model.Addresses) *models.KTSError
 	UpdateAddress(address *model.Addresses) *models.KTSError
@@ -70,24 +70,88 @@ func (mr *MovieRepository) GetAddressById(id *uuid.UUID) (*model.Addresses, *mod
 	return &address, nil
 }
 
-// func (mr *MovieRepository) CreateAddress(address *model.Addresses) *models.KTSError {
-// 	// Create the query
-// 	stmt := jet_mysql.INSERT(
-// 		table.Addresses,
-// 	).VALUES(
-// 		table.Addresses.ID.SET(address.ID),
-// 		table.Addresses.Street.SET(address.Street),
-// 		table.Addresses.HouseNumber.SET(address.HouseNumber),
-// 		table.Addresses.ZipCode.SET(address.ZipCode),
-// 		table.Addresses.City.SET(address.City),
-// 		table.Addresses.Country.SET(address.Country),
-// 	)
+func (mr *MovieRepository) CreateAddress(address *model.Addresses) *models.KTSError {
+	// Create the query
+	stmt := table.Addresses.INSERT(
+		table.Addresses.AllColumns,
+	).VALUES(
+		table.Addresses.ID.SET(jet_mysql.String(address.ID.String())),
+		table.Addresses.Street.SET(jet_mysql.String(address.Street)),
+		table.Addresses.StreetNr.SET(jet_mysql.String(address.StreetNr)),
+		table.Addresses.Zipcode.SET(jet_mysql.String(address.Zipcode)),
+		table.Addresses.City.SET(jet_mysql.String(address.City)),
+		table.Addresses.Country.SET(jet_mysql.String(address.Country)),
+	)
 
-// 	// Execute the query
-// 	_, err := stmt.Exec(mr.DatabaseManager.GetDatabaseConnection())
-// 	if err != nil {
-// 		return kts_errors.KTS_INTERNAL_ERROR
-// 	}
+	// Execute the query
+	rows, err := stmt.Exec(mr.DatabaseManager.GetDatabaseConnection())
+	if err != nil {
+		return kts_errors.KTS_INTERNAL_ERROR
+	}
 
-// 	return nil
-// }
+	rowsAffected, err := rows.RowsAffected()
+	if err != nil {
+		return kts_errors.KTS_INTERNAL_ERROR
+	}
+
+	if rowsAffected == 0 {
+		return kts_errors.KTS_NOT_FOUND
+	}
+
+	return nil
+}
+
+func (mr *MovieRepository) UpdateAddress(address *model.Addresses) *models.KTSError {
+	// Create the query
+	stmt := table.Addresses.UPDATE(
+		table.Addresses.AllColumns,
+	).SET(
+		table.Addresses.ID.SET(jet_mysql.String(address.ID.String())),
+		table.Addresses.Street.SET(jet_mysql.String(address.Street)),
+		table.Addresses.StreetNr.SET(jet_mysql.String(address.StreetNr)),
+		table.Addresses.Zipcode.SET(jet_mysql.String(address.Zipcode)),
+		table.Addresses.City.SET(jet_mysql.String(address.City)),
+		table.Addresses.Country.SET(jet_mysql.String(address.Country)),
+	).WHERE(
+		table.Addresses.ID.EQ(jet_mysql.String(address.ID.String())),
+	)
+
+	// Execute the query
+	rows, err := stmt.Exec(mr.DatabaseManager.GetDatabaseConnection())
+	if err != nil {
+		return kts_errors.KTS_INTERNAL_ERROR
+	}
+
+	rowsAffected, err := rows.RowsAffected()
+	if err != nil {
+		return kts_errors.KTS_INTERNAL_ERROR
+	}
+
+	if rowsAffected == 0 {
+		return kts_errors.KTS_NOT_FOUND
+	}
+
+	return nil
+}
+
+func (mr *MovieRepository) DeleteAddress(id *uuid.UUID) *models.KTSError {
+	// Create the query
+	stmt := table.Addresses.DELETE().WHERE(table.Addresses.ID.EQ(jet_mysql.String(id.String())))
+
+	// Execute the query
+	rows, err := stmt.Exec(mr.DatabaseManager.GetDatabaseConnection())
+	if err != nil {
+		return kts_errors.KTS_INTERNAL_ERROR
+	}
+
+	rowsAffected, err := rows.RowsAffected()
+	if err != nil {
+		return kts_errors.KTS_INTERNAL_ERROR
+	}
+
+	if rowsAffected == 0 {
+		return kts_errors.KTS_NOT_FOUND
+	}
+
+	return nil
+}
