@@ -41,7 +41,7 @@ func (ar *ActorRepository) GetActorById(actorId *uuid.UUID) (*models.ActorDTO, *
 	err := stmt.Query(ar.DatabaseManager.GetDatabaseConnection(), &actor)
 
 	if err != nil {
-		return nil, kts_errors.KTS_INTERNAL_ERROR
+		return nil, kts_errors.KTS_NOT_FOUND
 	}
 
 	return &actor, nil
@@ -62,7 +62,7 @@ func (ar *ActorRepository) GetActors() (*[]models.GetActorsDTO, *models.KTSError
 	err := stmt.Query(ar.DatabaseManager.GetDatabaseConnection(), &actors)
 
 	if err != nil {
-		return nil, kts_errors.KTS_INTERNAL_ERROR
+		return nil, kts_errors.KTS_NOT_FOUND
 	}
 
 	return &actors, nil
