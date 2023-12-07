@@ -241,7 +241,7 @@ func TestUpdateMovie(t *testing.T) {
 	sampleMovie := utils.GetSampleMovieById()
 
 	// query := "UPDATE `KinoTicketSystem`.movies SET title = ?, description = ?, banner_pic_url = ?, cover_pic_url = ?, trailer_url = ?, rating = ?, release_date = ?, time_in_min = ?, fsk = ? WHERE movies.id = ?;\n"
-	query := "UPDATE `KinoTicketSystem`.movies SET title = ?, description = ?, banner_pic_url = ?, cover_pic_url = ?, trailer_url = ?, rating = ?, release_date = CAST(? AS DATE), time_in_min = ?, fsk = ? WHERE movies.id = ?;"
+	query := "\nUPDATE `KinoTicketSystem`.movies\nSET title = ?,\n    description = ?,\n    banner_pic_url = ?,\n    cover_pic_url = ?,\n    trailer_url = ?,\n    rating = ?,\n    release_date = CAST(? AS DATE),\n    time_in_min = ?,\n    fsk = ?\nWHERE movies.id = ?;\n"
 
 	testCases := []struct {
 		name            string

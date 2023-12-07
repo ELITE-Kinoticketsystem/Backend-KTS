@@ -117,7 +117,7 @@ func (mr *MovieRepository) UpdateMovie(movie *model.Movies) *models.KTSError {
 			table.Movies.CoverPicURL.SET(jet_mysql.String(*movie.CoverPicURL)),
 			table.Movies.TrailerURL.SET(jet_mysql.String(*movie.TrailerURL)),
 			table.Movies.Rating.SET(jet_mysql.Float(*movie.Rating)),
-			table.Movies.ReleaseDate.SET(jet_mysql.Date(movie.ReleaseDate.Date())),
+			table.Movies.ReleaseDate.SET(jet_mysql.DateT(movie.ReleaseDate)),
 			table.Movies.TimeInMin.SET(jet_mysql.Int32(movie.TimeInMin)),
 			table.Movies.Fsk.SET(jet_mysql.Int32(movie.Fsk)),
 		).WHERE(
