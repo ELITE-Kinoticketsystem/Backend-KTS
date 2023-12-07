@@ -1,6 +1,7 @@
 package repositories
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
@@ -186,34 +187,36 @@ func TestCreateMovie(t *testing.T) {
 		setExpectations func(mock sqlmock.Sqlmock, movie *model.Movies)
 		expectedError   *models.KTSError
 	}{
-		// {
-		// 	name: "Create movie",
-		// 	setExpectations: func(mock sqlmock.Sqlmock, movie *model.Movies) {
-		// 		mock.ExpectExec(query).WithArgs(movie.Title, movie.Description, movie.BannerPicURL, movie.CoverPicURL, movie.TrailerURL, movie.Rating, movie.ReleaseDate, movie.TimeInMin, movie.Fsk).WillReturnResult(sqlmock.NewResult(1, 1))
-		// 	},
-		// 	expectedError: nil,
-		// },
-		// {
-		// 	name: "Error while creating movie",
-		// 	setExpectations: func(mock sqlmock.Sqlmock, movie *model.Movies) {
-		// 		mock.ExpectExec(query).WithArgs(movie.Title, movie.Description, movie.BannerPicURL, movie.CoverPicURL, movie.TrailerURL, movie.Rating, movie.ReleaseDate, movie.TimeInMin, movie.Fsk).WillReturnError(sqlmock.ErrCancelled)
-		// 	},
-		// 	expectedError: kts_errors.KTS_INTERNAL_ERROR,
-		// },
 		{
-			name: "Error while rows affected != 1",
+			name: "Create movie",
 			setExpectations: func(mock sqlmock.Sqlmock, movie *model.Movies) {
-				mock.ExpectExec(query).WithArgs(movie.Title, movie.Description, movie.BannerPicURL, movie.CoverPicURL, movie.TrailerURL, movie.Rating, movie.ReleaseDate, movie.TimeInMin, movie.Fsk).WillReturnResult(sqlmock.NewResult(0, -1))
+				mock.ExpectExec(query).WithArgs(movie.Title, movie.Description, movie.BannerPicURL, movie.CoverPicURL, movie.TrailerURL, movie.Rating, movie.ReleaseDate, movie.TimeInMin, movie.Fsk).WillReturnResult(sqlmock.NewResult(1, 1))
+			},
+			expectedError: nil,
+		},
+		{
+			name: "Error while creating movie",
+			setExpectations: func(mock sqlmock.Sqlmock, movie *model.Movies) {
+				mock.ExpectExec(query).WithArgs(movie.Title, movie.Description, movie.BannerPicURL, movie.CoverPicURL, movie.TrailerURL, movie.Rating, movie.ReleaseDate, movie.TimeInMin, movie.Fsk).WillReturnError(sqlmock.ErrCancelled)
 			},
 			expectedError: kts_errors.KTS_INTERNAL_ERROR,
 		},
-		// {
-		// 	name: "Error while trying to get rows affected",
-		// 	setExpectations: func(mock sqlmock.Sqlmock, movie *model.Movies) {
-		// 		mock.ExpectExec(query).WithArgs(movie.Title, movie.Description, movie.BannerPicURL, movie.CoverPicURL, movie.TrailerURL, movie.Rating, movie.ReleaseDate, movie.TimeInMin, movie.Fsk).WillReturnResult(sqlmock.NewResult(1, 0))
-		// 	},
-		// 	expectedError: kts_errors.KTS_NOT_FOUND,
-		// },
+		{
+			name: "Error while converting rows affected",
+			setExpectations: func(mock sqlmock.Sqlmock, movie *model.Movies) {
+				mock.ExpectExec(query).WithArgs(movie.Title, movie.Description, movie.BannerPicURL, movie.CoverPicURL, movie.TrailerURL, movie.Rating, movie.ReleaseDate, movie.TimeInMin, movie.Fsk).WillReturnResult(
+					sqlmock.NewErrorResult(errors.New("rows affected conversion did not work")),
+				)
+			},
+			expectedError: kts_errors.KTS_INTERNAL_ERROR,
+		},
+		{
+			name: "Movie not found",
+			setExpectations: func(mock sqlmock.Sqlmock, movie *model.Movies) {
+				mock.ExpectExec(query).WithArgs(movie.Title, movie.Description, movie.BannerPicURL, movie.CoverPicURL, movie.TrailerURL, movie.Rating, movie.ReleaseDate, movie.TimeInMin, movie.Fsk).WillReturnResult(sqlmock.NewResult(1, 0))
+			},
+			expectedError: kts_errors.KTS_NOT_FOUND,
+		},
 	}
 
 	for _, tc := range testCases {
@@ -269,13 +272,29 @@ func TestUpdateMovie(t *testing.T) {
 			},
 			expectedError: nil,
 		},
-		// {
-		// 	name: "Error while updating movie",
-		// 	setExpectations: func(mock sqlmock.Sqlmock, movie *model.Movies) {
-		// 		mock.ExpectExec(query).WithArgs(movie.Title, movie.Description, movie.BannerPicURL, movie.CoverPicURL, movie.TrailerURL, movie.Rating, movie.ReleaseDate, movie.TimeInMin, movie.Fsk, movie.ID).WillReturnError(sqlmock.ErrCancelled)
-		// 	},
-		// 	expectedError: kts_errors.KTS_INTERNAL_ERROR,
-		// },
+		{
+			name: "Error while updating movie",
+			setExpectations: func(mock sqlmock.Sqlmock, movie *model.Movies) {
+				mock.ExpectExec(query).WithArgs(movie.Title, movie.Description, movie.BannerPicURL, movie.CoverPicURL, movie.TrailerURL, movie.Rating, movie.ReleaseDate, movie.TimeInMin, movie.Fsk, utils.EqUUID(movie.ID)).WillReturnError(sqlmock.ErrCancelled)
+			},
+			expectedError: kts_errors.KTS_INTERNAL_ERROR,
+		},
+		{
+			name: "Error while converting rows affected",
+			setExpectations: func(mock sqlmock.Sqlmock, movie *model.Movies) {
+				mock.ExpectExec(query).WithArgs(movie.Title, movie.Description, movie.BannerPicURL, movie.CoverPicURL, movie.TrailerURL, movie.Rating, movie.ReleaseDate, movie.TimeInMin, movie.Fsk, utils.EqUUID(movie.ID)).WillReturnResult(
+					sqlmock.NewErrorResult(errors.New("rows affected conversion did not work")),
+				)
+			},
+			expectedError: kts_errors.KTS_INTERNAL_ERROR,
+		},
+		{
+			name: "Movie not found",
+			setExpectations: func(mock sqlmock.Sqlmock, movie *model.Movies) {
+				mock.ExpectExec(query).WithArgs(movie.Title, movie.Description, movie.BannerPicURL, movie.CoverPicURL, movie.TrailerURL, movie.Rating, movie.ReleaseDate, movie.TimeInMin, movie.Fsk, utils.EqUUID(movie.ID)).WillReturnResult(sqlmock.NewResult(1, 0))
+			},
+			expectedError: kts_errors.KTS_NOT_FOUND,
+		},
 	}
 
 	for _, tc := range testCases {
@@ -335,6 +354,22 @@ func TestDeleteMovie(t *testing.T) {
 				mock.ExpectExec(query).WithArgs(utils.EqUUID(movieId)).WillReturnError(sqlmock.ErrCancelled)
 			},
 			expectedError: kts_errors.KTS_INTERNAL_ERROR,
+		},
+		{
+			name: "Error while converting rows affected",
+			setExpectations: func(mock sqlmock.Sqlmock, movieId *uuid.UUID) {
+				mock.ExpectExec(query).WithArgs(utils.EqUUID(movieId)).WillReturnResult(
+					sqlmock.NewErrorResult(errors.New("rows affected conversion did not work")),
+				)
+			},
+			expectedError: kts_errors.KTS_INTERNAL_ERROR,
+		},
+		{
+			name: "Movie not found",
+			setExpectations: func(mock sqlmock.Sqlmock, movieId *uuid.UUID) {
+				mock.ExpectExec(query).WithArgs(utils.EqUUID(movieId)).WillReturnResult(sqlmock.NewResult(1, 0))
+			},
+			expectedError: kts_errors.KTS_NOT_FOUND,
 		},
 	}
 
