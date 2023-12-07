@@ -36,7 +36,7 @@ func GetMovieById(movieCtrl controllers.MovieControllerI) gin.HandlerFunc {
 
 func CreateMovie(movieCtrl controllers.MovieControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var movie model.Movies
+		var movie *model.Movies
 		err := c.ShouldBindJSON(&movie)
 		if err != nil ||
 			utils.ContainsEmptyString(
@@ -57,7 +57,7 @@ func CreateMovie(movieCtrl controllers.MovieControllerI) gin.HandlerFunc {
 
 func UpdateMovie(movieCtrl controllers.MovieControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var movie model.Movies
+		var movie *model.Movies
 		err := c.ShouldBindJSON(&movie)
 		if err != nil ||
 			utils.ContainsEmptyString(
