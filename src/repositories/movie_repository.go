@@ -16,6 +16,7 @@ type MovieRepositoryI interface {
 	// Movie
 	GetMovies() (*[]model.Movies, *models.KTSError)
 	GetMovieById(movieId *uuid.UUID) (*model.Movies, *models.KTSError)
+	GetMovieByName(movieName *string) (*model.Movies, *models.KTSError)
 	CreateMovie(movie *model.Movies) *models.KTSError
 	UpdateMovie(movie *model.Movies) *models.KTSError
 	DeleteMovie(movieId *uuid.UUID) *models.KTSError
@@ -67,6 +68,31 @@ func (mr *MovieRepository) GetMovieById(movieId *uuid.UUID) (*model.Movies, *mod
 		table.Movies,
 	).WHERE(
 		table.Movies.ID.EQ(jet_mysql.String(string(binary_id))),
+	)
+
+	// Execute the query
+	err := stmt.Query(mr.DatabaseManager.GetDatabaseConnection(), &movie)
+	if err != nil {
+		if err.Error() == "qrm: no rows in result set" {
+			return nil, kts_errors.KTS_NOT_FOUND
+		}
+		return nil, kts_errors.KTS_INTERNAL_ERROR
+	}
+
+	return &movie, nil
+}
+
+func (mr *MovieRepository) GetMovieByName(movieName *string) (*model.Movies, *models.KTSError) {
+	// Prepare vairables
+	var movie model.Movies
+
+	// Create the query
+	stmt := jet_mysql.SELECT(
+		table.Movies.AllColumns,
+	).FROM(
+		table.Movies,
+	).WHERE(
+		table.Movies.Title.EQ(jet_mysql.String((*movieName))),
 	)
 
 	// Execute the query

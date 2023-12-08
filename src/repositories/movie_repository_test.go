@@ -177,6 +177,88 @@ func TestGetMovieById(t *testing.T) {
 	}
 }
 
+func TestGetMovieByName(t *testing.T) {
+	sampleMovie := utils.GetSampleMovieById()
+
+	name := sampleMovie.Title
+
+	query := "SELECT movies.id AS \"movies.id\",\n     movies.title AS \"movies.title\",\n     movies.description AS \"movies.description\",\n     movies.banner_pic_url AS \"movies.banner_pic_url\",\n     movies.cover_pic_url AS \"movies.cover_pic_url\",\n     movies.trailer_url AS \"movies.trailer_url\",\n     movies.rating AS \"movies.rating\",\n     movies.release_date AS \"movies.release_date\",\n     movies.time_in_min AS \"movies.time_in_min\",\n     movies.fsk AS \"movies.fsk\"\nFROM `KinoTicketSystem`.movies\nWHERE movies.title = ?;\n"
+
+	testCases := []struct {
+		name            string
+		setExpectations func(mock sqlmock.Sqlmock, name *string)
+		expectedMovie   *model.Movies
+		expectedError   *models.KTSError
+	}{
+		{
+			name: "Empty result",
+			setExpectations: func(mock sqlmock.Sqlmock, name *string) {
+				mock.ExpectQuery(query).WithArgs(name).WillReturnRows(
+					sqlmock.NewRows([]string{"movies.id", "movies.title", "movies.description", "movies.banner_pic_url", "movies.cover_pic_url", "movies.trailer_url", "movies.rating", "movies.release_date", "movies.time_in_min", "movies.fsk"}),
+				)
+			},
+			expectedMovie: nil,
+			expectedError: kts_errors.KTS_NOT_FOUND,
+		},
+		{
+			name: "Single movie",
+			setExpectations: func(mock sqlmock.Sqlmock, name *string) {
+				mock.ExpectQuery(query).WithArgs(name).WillReturnRows(
+					sqlmock.NewRows(
+						[]string{"movies.id", "movies.title", "movies.description", "movies.banner_pic_url", "movies.cover_pic_url", "movies.trailer_url", "movies.rating", "movies.release_date", "movies.time_in_min", "movies.fsk"},
+					).AddRow(
+						&sampleMovie.ID, &sampleMovie.Title, &sampleMovie.Description, &sampleMovie.BannerPicURL, &sampleMovie.CoverPicURL, &sampleMovie.TrailerURL, &sampleMovie.Rating, &sampleMovie.ReleaseDate, &sampleMovie.TimeInMin, &sampleMovie.Fsk,
+					),
+				)
+			},
+			expectedMovie: sampleMovie,
+			expectedError: nil,
+		},
+		{
+			name: "Error while querying movies",
+			setExpectations: func(mock sqlmock.Sqlmock, name *string) {
+				mock.ExpectQuery(query).WithArgs(name).WillReturnError(sqlmock.ErrCancelled)
+			},
+			expectedMovie: nil,
+			expectedError: kts_errors.KTS_INTERNAL_ERROR,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			// Create a new mock database connection
+			db, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
+			// db, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
+			if err != nil {
+				t.Fatalf("Failed to create mock database connection: %v", err)
+			}
+			defer db.Close()
+
+			// Create a new instance of the MovieRepository with the mock database connection
+			movieRepo := MovieRepository{
+				DatabaseManager: &managers.DatabaseManager{
+					Connection: db,
+				},
+			}
+
+			tc.setExpectations(mock, &name)
+
+			// Call the method under test
+			movies, kts_err := movieRepo.GetMovieByName(&name)
+
+			// Verify the results
+			assert.Equal(t, tc.expectedMovie, movies)
+			assert.Equal(t, tc.expectedError, kts_err)
+
+			// Verify that all expectations were met
+			if err = mock.ExpectationsWereMet(); err != nil {
+				t.Errorf("There were unfulfilled expectations: %s", err)
+			}
+
+		})
+	}
+}
+
 func TestCreateMovie(t *testing.T) {
 	sampleMovie := utils.GetSampleMovieById()
 
