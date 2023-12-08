@@ -16,6 +16,7 @@ type Controllers struct {
 	UserController  controllers.UserControllerI
 	EventController controllers.EventControllerI
 	MovieController controllers.MovieControllerI
+	GenreController controllers.GenreControllerI
 }
 
 func createRouter(dbConnection *sql.DB) *gin.Engine {
@@ -44,10 +45,21 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 	movieRepo := &repositories.MovieRepository{
 		DatabaseManager: databaseManager,
 	}
-
 	theatreRepo := &repositories.TheatreRepository{
 		DatabaseManager: databaseManager,
 	}
+
+	genreRepo := &repositories.GenreRepository{
+		DatabaseManager: databaseManager,
+	}
+
+	movieGenreRepo := &repositories.MovieGenreRepository{
+		DatabaseManager: databaseManager,
+	}
+
+	// theatreRepo := &repositories.TheatreRepository{
+	// 	DatabaseManager: databaseManager,
+	// }
 
 	// Create controllers
 	controller := Controllers{
@@ -59,7 +71,12 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 			TheatreRepo: theatreRepo,
 		},
 		MovieController: &controllers.MovieController{
-			MovieRepo: movieRepo,
+			MovieRepo:      movieRepo,
+			MovieGenreRepo: movieGenreRepo,
+		},
+
+		GenreController: &controllers.GenreController{
+			GenreRepo: genreRepo,
 		},
 	}
 
@@ -86,14 +103,16 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 	router.Handle(http.MethodPut, "/movies", handlers.UpdateMovie(controller.MovieController))
 	router.Handle(http.MethodDelete, "/movies/:id", handlers.DeleteMovie(controller.MovieController))
 
-	router.Handle(http.MethodGet, "/genres", handlers.GetGenres(controller.MovieController))
-	router.Handle(http.MethodGet, "/genres/:name", handlers.GetGenreByName(controller.MovieController))
-	router.Handle(http.MethodPost, "/genres", handlers.CreateGenre(controller.MovieController))
+	router.Handle(http.MethodGet, "/genres", handlers.GetGenres(controller.GenreController))
+	router.Handle(http.MethodGet, "/genres/:name", handlers.GetGenreByName(controller.GenreController))
+	router.Handle(http.MethodPost, "/genres", handlers.CreateGenre(controller.GenreController))
 
 	router.Handle(http.MethodGet, "/movies/:id/genres", handlers.GetMovieByIdWithGenre(controller.MovieController))
-	router.Handle(http.MethodGet, "/genres/:name/movies", handlers.GetGenreByNameWithMovies(controller.MovieController))
-	router.Handle(http.MethodGet, "/genres/movies", handlers.GetGenresWithMovies(controller.MovieController))
+	router.Handle(http.MethodGet, "/genres/:name/movies", handlers.GetGenreByNameWithMovies(controller.GenreController))
+	router.Handle(http.MethodGet, "/genres/movies", handlers.GetGenresWithMovies(controller.GenreController))
 	router.Handle(http.MethodGet, "/movies/genres", handlers.GetMoviesWithGenres(controller.MovieController))
+
+	router.Handle(http.MethodGet, "/moviewitheverything/:id", handlers.GetMovieByIdWithEverything(controller.MovieController))
 
 	// Should be only accessible for admins
 	securedRoutes.Handle(http.MethodDelete, "/events/:id", handlers.DeleteEventHandler(controller.EventController))
