@@ -25,6 +25,8 @@ type MovieRepositoryI interface {
 	GetMovieByIdWithGenre(movieId *uuid.UUID) (*models.MovieWithGenres, *models.KTSError)
 	// All Movies with all Genres - Grouped by Movie
 	GetMoviesWithGenres() (*[]models.MovieWithGenres, *models.KTSError)
+
+	GetMovieByIdWithEverything(movieId *uuid.UUID) (*models.MovieWithEverything, *models.KTSError)
 }
 
 type MovieRepository struct {
@@ -247,4 +249,41 @@ func (mr *MovieRepository) GetMoviesWithGenres() (*[]models.MovieWithGenres, *mo
 	}
 
 	return &moviesWithGenres, nil
+}
+
+func (mr *MovieRepository) GetMovieByIdWithEverything(movieId *uuid.UUID) (*models.MovieWithEverything, *models.KTSError) {
+	var movie models.MovieWithEverything
+
+	binary_id, _ := movieId.MarshalBinary()
+
+	// Create the query
+	stmt := jet_mysql.SELECT(
+		table.Movies.AllColumns,
+		table.Genres.AllColumns,
+		table.Actors.AllColumns,
+		table.Producers.AllColumns,
+		table.Reviews.AllColumns,
+	).FROM(
+		table.Movies.
+			LEFT_JOIN(table.MovieGenres, table.MovieGenres.MovieID.EQ(table.Movies.ID)).
+			LEFT_JOIN(table.Genres, table.Genres.ID.EQ(table.MovieGenres.GenreID)).
+			LEFT_JOIN(table.MovieActors, table.MovieActors.MovieID.EQ(table.Movies.ID)).
+			LEFT_JOIN(table.Actors, table.Actors.ID.EQ(table.MovieActors.ActorID)).
+			LEFT_JOIN(table.MovieProducers, table.MovieProducers.MovieID.EQ(table.Movies.ID)).
+			LEFT_JOIN(table.Producers, table.Producers.ID.EQ(table.MovieProducers.ProducerID)).
+			LEFT_JOIN(table.Reviews, table.Reviews.MovieID.EQ(table.Movies.ID)),
+	).WHERE(
+		table.Movies.ID.EQ(jet_mysql.String(string(binary_id))),
+	)
+
+	// Execute the query
+	err := stmt.Query(mr.DatabaseManager.GetDatabaseConnection(), &movie)
+	if err != nil {
+		if err.Error() == "qrm: no rows in result set" {
+			return nil, kts_errors.KTS_NOT_FOUND
+		}
+		return nil, kts_errors.KTS_INTERNAL_ERROR
+	}
+
+	return &movie, nil
 }
