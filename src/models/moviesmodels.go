@@ -32,3 +32,23 @@ type GenreWithMovies struct {
 		model.Movies
 	}
 }
+
+type MovieWithEverything struct {
+	model.Movies
+
+	Genres []struct {
+		model.Genres
+	}
+
+	Actors []struct {
+		model.Actors
+	}
+
+	Producers []struct {
+		model.Producers
+	}
+
+	Reviews []struct {
+		model.Reviews
+	}
+}
