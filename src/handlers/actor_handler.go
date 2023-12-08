@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/controllers"
+	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -11,10 +12,14 @@ import (
 
 func GetActorByIdHandler(actorController controllers.ActorControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		actorId := uuid.MustParse(c.Param("id"))
-		actor, err := actorController.GetActorById(&actorId)
+		actorId, err := uuid.Parse(c.Param("id"))
 		if err != nil {
-			utils.HandleErrorAndAbort(c, err)
+			utils.HandleErrorAndAbort(c, kts_errors.KTS_INTERNAL_ERROR)
+			return
+		}
+		actor, kts_err := actorController.GetActorById(&actorId)
+		if err != nil {
+			utils.HandleErrorAndAbort(c, kts_err)
 			return
 		}
 

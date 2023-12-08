@@ -23,6 +23,12 @@ type ActorRepository struct {
 func (ar *ActorRepository) GetActorById(actorId *uuid.UUID) (*models.ActorDTO, *models.KTSError) {
 	var actor models.ActorDTO
 
+	mySqlId, err := utils.MysqlUuid(actorId)
+
+	if err != nil {
+		return nil, kts_errors.KTS_INTERNAL_ERROR
+	}
+
 	stmt := mysql.SELECT(
 		table.Actors.AllColumns,
 		table.ActorPictures.AllColumns,
@@ -35,10 +41,10 @@ func (ar *ActorRepository) GetActorById(actorId *uuid.UUID) (*models.ActorDTO, *
 				LEFT_JOIN(table.Movies, table.Movies.ID.EQ(table.MovieActors.MovieID)),
 		).
 		WHERE(
-			table.Actors.ID.EQ(utils.MysqlUuid(actorId)),
+			table.Actors.ID.EQ(mySqlId),
 		)
 
-	err := stmt.Query(ar.DatabaseManager.GetDatabaseConnection(), &actor)
+	err = stmt.Query(ar.DatabaseManager.GetDatabaseConnection(), &actor)
 
 	if err != nil {
 		return nil, kts_errors.KTS_NOT_FOUND
@@ -62,6 +68,10 @@ func (ar *ActorRepository) GetActors() (*[]models.GetActorsDTO, *models.KTSError
 	err := stmt.Query(ar.DatabaseManager.GetDatabaseConnection(), &actors)
 
 	if err != nil {
+		return nil, kts_errors.KTS_INTERNAL_ERROR
+	}
+
+	if len(actors) == 0 {
 		return nil, kts_errors.KTS_NOT_FOUND
 	}
 

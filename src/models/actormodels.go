@@ -7,19 +7,13 @@ import (
 type ActorDTO struct {
 	model.Actors
 
-	Pictures []struct {
-		model.ActorPictures
-	}
+	Pictures []model.ActorPictures
 
-	Movies []struct {
-		model.Movies
-	}
+	Movies []model.Movies
 }
 
 type GetActorsDTO struct {
 	model.Actors
 
-	Pictures []struct {
-		model.ActorPictures
-	}
+	Pictures []model.ActorPictures
 }

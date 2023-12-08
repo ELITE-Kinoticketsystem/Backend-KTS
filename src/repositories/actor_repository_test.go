@@ -49,7 +49,7 @@ func TestGetActorById(t *testing.T) {
 			name: "Select actor by id - no actor found",
 			setExpectations: func(mock sqlmock.Sqlmock) {
 				mock.ExpectQuery(query).WithArgs(utils.EqUUID(&id)).
-					WillReturnError(sql.ErrNoRows)
+					WillReturnRows(sqlmock.NewRows([]string{"actors.id", "actors.name", "actors.birthdate", "actors.description", "actor_pictures.id", "actor_pictures.actor_id", "actor_pictures.pic_url", "movies.id", "movies.title", "movies.description", "movies.banner_pic_url", "movies.cover_pic_url", "movies.trailer_url", "movies.rating", "movies.release_date", "movies.time_in_min", "movies.fsk"}))
 			},
 			expectedActor: nil,
 			expectedError: kts_errors.KTS_NOT_FOUND,
@@ -121,10 +121,19 @@ func TestGetActors(t *testing.T) {
 			name: "Select all actors - no actors found",
 			setExpectations: func(mock sqlmock.Sqlmock) {
 				mock.ExpectQuery(query).
-					WillReturnError(sql.ErrNoRows)
+					WillReturnRows(sqlmock.NewRows([]string{"actors.id", "actors.name", "actors.birthdate", "actors.description", "actor_pictures.id", "actor_pictures.actor_id", "actor_pictures.pic_url"}))
 			},
 			expectedActors: nil,
 			expectedError:  kts_errors.KTS_NOT_FOUND,
+		},
+		{
+			name: "Select all actors - internal error",
+			setExpectations: func(mock sqlmock.Sqlmock) {
+				mock.ExpectQuery(query).
+					WillReturnError(sql.ErrConnDone)
+			},
+			expectedActors: nil,
+			expectedError:  kts_errors.KTS_INTERNAL_ERROR,
 		},
 	}
 
@@ -167,14 +176,8 @@ func TestGetActors(t *testing.T) {
 }
 
 func GetActor() *models.ActorDTO {
-	actor := models.ActorDTO{
-		Actors: model.Actors{
-			ID:          utils.UuidMustParse("6BA7B8429DAD11D180B400C04FD430C2"),
-			Name:        "Brad Pitt",
-			Description: "Brad Pitt is an actor.",
-			Birthdate:   time.Date(1963, 12, 18, 0, 0, 0, 0, time.UTC),
-		},
-	}
+
+	actorId := uuid.New()
 
 	url1 := "https://de.wikipedia.org/wiki/Brad_Pitt#/media/Datei:SevenYearsInTibeta.jpg"
 	url2 := "https://en.wikipedia.org/wiki/Brad_Pitt_filmography#/media/File:Brad_Pitt_Fury_2014.jpg"
@@ -184,27 +187,15 @@ func GetActor() *models.ActorDTO {
 
 	picture1 := model.ActorPictures{
 		ID:      &picId1,
-		ActorID: utils.UuidMustParse("6BA7B8429DAD11D180B400C04FD430C2"),
+		ActorID: &actorId,
 		PicURL:  &url1,
 	}
 
 	picture2 := model.ActorPictures{
 		ID:      &picId2,
-		ActorID: utils.UuidMustParse("6BA7B8429DAD11D180B400C04FD430C2"),
+		ActorID: &actorId,
 		PicURL:  &url2,
 	}
-
-	actor.Pictures = append(actor.Pictures, struct {
-		model.ActorPictures
-	}{
-		picture1,
-	})
-
-	actor.Pictures = append(actor.Pictures, struct {
-		model.ActorPictures
-	}{
-		picture2,
-	})
 
 	releaseDate1 := time.Date(1972, 3, 24, 0, 0, 0, 0, time.UTC)
 	releaseDate2 := time.Date(1999, 10, 15, 0, 0, 0, 0, time.UTC)
@@ -240,17 +231,22 @@ func GetActor() *models.ActorDTO {
 		Fsk:          0,
 	}
 
-	actor.Movies = append(actor.Movies, struct {
-		model.Movies
-	}{
-		movie1,
-	})
-
-	actor.Movies = append(actor.Movies, struct {
-		model.Movies
-	}{
-		movie2,
-	})
+	actor := models.ActorDTO{
+		Actors: model.Actors{
+			ID:          &actorId,
+			Name:        "Brad Pitt",
+			Description: "Brad Pitt is an actor.",
+			Birthdate:   time.Date(1963, 12, 18, 0, 0, 0, 0, time.UTC),
+		},
+		Pictures: []model.ActorPictures{
+			picture1,
+			picture2,
+		},
+		Movies: []model.Movies{
+			movie1,
+			movie2,
+		},
+	}
 
 	return &actor
 }
@@ -258,15 +254,6 @@ func GetActor() *models.ActorDTO {
 func GetActors() *[]models.GetActorsDTO {
 
 	actor1Id := uuid.New()
-
-	actor1 := models.GetActorsDTO{
-		Actors: model.Actors{
-			ID:          &actor1Id,
-			Name:        "Brad Pitt",
-			Description: "Brad Pitt is an actor.",
-			Birthdate:   time.Date(1963, 12, 18, 0, 0, 0, 0, time.UTC),
-		},
-	}
 
 	url := "BradPitt.jpg"
 
@@ -278,22 +265,19 @@ func GetActors() *[]models.GetActorsDTO {
 		PicURL:  &url,
 	}
 
-	actor1.Pictures = append(actor1.Pictures, struct {
-		model.ActorPictures
-	}{
-		actor1Picture,
-	})
-
-	actor2Id := uuid.New()
-
-	actor2 := models.GetActorsDTO{
+	actor1 := models.GetActorsDTO{
 		Actors: model.Actors{
-			ID:          &actor2Id,
-			Name:        "Edward Norton",
-			Description: "Edward Norton is an actor.",
-			Birthdate:   time.Date(1969, 8, 18, 0, 0, 0, 0, time.UTC),
+			ID:          &actor1Id,
+			Name:        "Brad Pitt",
+			Description: "Brad Pitt is an actor.",
+			Birthdate:   time.Date(1963, 12, 18, 0, 0, 0, 0, time.UTC),
+		},
+		Pictures: []model.ActorPictures{
+			actor1Picture,
 		},
 	}
+
+	actor2Id := uuid.New()
 
 	url2 := "EdwardNorton.jpg"
 
@@ -305,11 +289,17 @@ func GetActors() *[]models.GetActorsDTO {
 		PicURL:  &url2,
 	}
 
-	actor2.Pictures = append(actor2.Pictures, struct {
-		model.ActorPictures
-	}{
-		actor2Picture,
-	})
+	actor2 := models.GetActorsDTO{
+		Actors: model.Actors{
+			ID:          &actor2Id,
+			Name:        "Edward Norton",
+			Description: "Edward Norton is an actor.",
+			Birthdate:   time.Date(1969, 8, 18, 0, 0, 0, 0, time.UTC),
+		},
+		Pictures: []model.ActorPictures{
+			actor2Picture,
+		},
+	}
 
 	return &[]models.GetActorsDTO{
 		actor1,

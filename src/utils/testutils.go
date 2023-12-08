@@ -12,11 +12,6 @@ import (
 	"github.com/google/uuid"
 )
 
-func UuidMustParse(s string) *uuid.UUID {
-	id := uuid.MustParse("6BA7B8429DAD11D180B400C04FD430C2")
-	return &id
-}
-
 func GetSampleRegistrationData() models.RegistrationRequest {
 	return models.RegistrationRequest{
 		Username:  "Collinho el niño",

@@ -5,7 +5,10 @@ import (
 	"github.com/google/uuid"
 )
 
-func MysqlUuid(uuid *uuid.UUID) mysql.StringExpression {
-	binary_id, _ := uuid.MarshalBinary()
-	return mysql.String(string(binary_id))
+func MysqlUuid(uuid *uuid.UUID) (mysql.StringExpression, error) {
+	binary_id, err := uuid.MarshalBinary()
+	if err != nil {
+		return nil, err
+	}
+	return mysql.String(string(binary_id)), nil
 }
