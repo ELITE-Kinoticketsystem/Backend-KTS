@@ -478,3 +478,88 @@ func (m UUIDMatcher) Match(v driver.Value) bool {
 func EqUUID(id *uuid.UUID) UUIDMatcher {
 	return UUIDMatcher{id: id}
 }
+
+func GetSampleMovieByIdWithEverything() *models.MovieWithEverything {
+	movieWithEverything := models.MovieWithEverything{}
+
+	uuid1 := uuid.MustParse("6ba7b820-9dad-11d1-80b4-00c04fd430c4")
+	uuid2 := uuid.MustParse("6ba7b827-9dad-11d1-80b4-00c04fd430c1")
+	uuid5 := uuid.MustParse("6ba7b829-9dad-11d1-80b4-00c04fd430c3")
+	uuid7 := uuid.MustParse("6ba7b82b-9dad-11d1-80b4-00c04fd430c5")
+	uuid9 := uuid.MustParse("6ba7b82d-9dad-11d1-80b4-00c04fd430c7")
+	uuid10 := uuid.MustParse("6ba7b82e-9dad-11d1-80b4-00c04fd430c8")
+
+	banner := ""
+	cover := ""
+	trailer := ""
+	rating := 5.0
+	isSpoiler := false
+
+	movieWithEverything = models.MovieWithEverything{
+		Movies: model.Movies{
+			ID:           &uuid1,
+			Title:        "Test Movie 1",
+			Description:  "Test Description 1",
+			BannerPicURL: &banner,
+			CoverPicURL:  &cover,
+			TrailerURL:   &trailer,
+			Rating:       &rating,
+			ReleaseDate:  time.Now(),
+			TimeInMin:    120,
+			Fsk:          18,
+		},
+		Genres: []struct {
+			model.Genres
+		}{
+			{
+				model.Genres{
+					ID:        &uuid2,
+					GenreName: "Action",
+				},
+			},
+		},
+		Actors: []struct {
+			model.Actors
+		}{
+			{
+				model.Actors{
+					ID:          &uuid5,
+					Name:        "MaxActor Mustermann",
+					Birthdate:   time.Now(),
+					Description: "This is a description",
+					PicURL:      &banner,
+				},
+			},
+		},
+		Producers: []struct {
+			model.Producers
+		}{
+			{
+				model.Producers{
+					ID:          &uuid7,
+					Name:        "MaxProducer Mustermann",
+					Birthdate:   time.Now(),
+					Description: "This is a description",
+					PicURL:      &banner,
+				},
+			},
+		},
+		Reviews: []struct {
+			model.Reviews
+		}{
+			{
+				model.Reviews{
+					ID:        &uuid9,
+					Rating:    4.0,
+					Comment:   "This is a comment",
+					Datetime:  time.Now(),
+					IsSpoiler: &isSpoiler,
+					UserID:    &uuid10,
+					MovieID:   &uuid1,
+				},
+			},
+		},
+	}
+
+	return &movieWithEverything
+}
