@@ -34,6 +34,18 @@ func GetMovieById(movieCtrl controllers.MovieControllerI) gin.HandlerFunc {
 	}
 }
 
+func GetMovieByName(movieCtrl controllers.MovieControllerI) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		name := c.Param("name")
+		movie, kts_err := movieCtrl.GetMovieByName(&name)
+		if kts_err != nil {
+			c.JSON(kts_err.Status, kts_err)
+			return
+		}
+		c.JSON(http.StatusOK, movie)
+	}
+}
+
 func CreateMovie(movieCtrl controllers.MovieControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var movie *model.Movies
@@ -88,62 +100,20 @@ func DeleteMovie(movieCtrl controllers.MovieControllerI) gin.HandlerFunc {
 	}
 }
 
-// Genre
-func GetGenres(movieCtrl controllers.MovieControllerI) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		genres, kts_err := movieCtrl.GetGenres()
-		if kts_err != nil {
-			c.JSON(kts_err.Status, kts_err)
-			return
-		}
-		c.JSON(http.StatusOK, genres)
-	}
-}
-
-func GetGenreByName(movieCtrl controllers.MovieControllerI) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		name := c.Param("name")
-		genre, kts_err := movieCtrl.GetGenreByName(name)
-		if kts_err != nil {
-			c.JSON(kts_err.Status, kts_err)
-			return
-		}
-		c.JSON(http.StatusOK, genre)
-	}
-}
-
-func CreateGenre(movieCtrl controllers.MovieControllerI) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		var genre model.Genres
-		err := c.ShouldBindJSON(&genre)
-		if err != nil || utils.ContainsEmptyString(genre.GenreName) {
-			utils.HandleErrorAndAbort(c, kts_errors.KTS_BAD_REQUEST)
-			return
-		}
-
-		kts_err := movieCtrl.CreateGenre(genre.GenreName)
-		if kts_err != nil {
-			utils.HandleErrorAndAbort(c, kts_err)
-			return
-		}
-		c.JSON(http.StatusCreated, genre)
-	}
-}
-
 // Combine Movie and Genre
-func AddMovieGenre(movieCtrl controllers.MovieControllerI) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		movieId := uuid.MustParse(c.Param("movieId"))
-		genreId := uuid.MustParse(c.Param("genreId"))
+// func AddMovieGenre(movieCtrl controllers.MovieControllerI) gin.HandlerFunc {
+// 	return func(c *gin.Context) {
+// 		movieId := uuid.MustParse(c.Param("movieId"))
+// 		genreId := uuid.MustParse(c.Param("genreId"))
 
-		kts_err := movieCtrl.AddMovieGenre(&movieId, &genreId)
-		if kts_err != nil {
-			utils.HandleErrorAndAbort(c, kts_err)
-			return
-		}
-		c.Status(http.StatusNoContent)
-	}
-}
+// 		kts_err := movieCtrl.AddMovieGenre(&movieId, &genreId)
+// 		if kts_err != nil {
+// 			utils.HandleErrorAndAbort(c, kts_err)
+// 			return
+// 		}
+// 		c.Status(http.StatusNoContent)
+// 	}
+// }
 
 // func RemoveMovieGenre(movieCtrl controllers.MovieControllerI) gin.HandlerFunc {
 // 	return func(c *gin.Context) {
@@ -172,30 +142,6 @@ func GetMovieByIdWithGenre(movieCtrl controllers.MovieControllerI) gin.HandlerFu
 	}
 }
 
-func GetGenreByNameWithMovies(movieCtrl controllers.MovieControllerI) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		genreName := c.Param("genreName")
-
-		genre, kts_err := movieCtrl.GetGenreByNameWithMovies(genreName)
-		if kts_err != nil {
-			utils.HandleErrorAndAbort(c, kts_err)
-			return
-		}
-		c.JSON(http.StatusOK, genre)
-	}
-}
-
-func GetGenresWithMovies(movieCtrl controllers.MovieControllerI) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		genres, kts_err := movieCtrl.GetGenresWithMovies()
-		if kts_err != nil {
-			utils.HandleErrorAndAbort(c, kts_err)
-			return
-		}
-		c.JSON(http.StatusOK, genres)
-	}
-}
-
 func GetMoviesWithGenres(movieCtrl controllers.MovieControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		movies, kts_err := movieCtrl.GetMoviesWithGenres()
@@ -204,5 +150,18 @@ func GetMoviesWithGenres(movieCtrl controllers.MovieControllerI) gin.HandlerFunc
 			return
 		}
 		c.JSON(http.StatusOK, movies)
+	}
+}
+
+func GetMovieByIdWithEverything(movieCtrl controllers.MovieControllerI) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		movieId := uuid.MustParse(c.Param("id"))
+
+		movie, kts_err := movieCtrl.GetMovieByIdWithEverything(&movieId)
+		if kts_err != nil {
+			utils.HandleErrorAndAbort(c, kts_err)
+			return
+		}
+		c.JSON(http.StatusOK, movie)
 	}
 }
