@@ -33,7 +33,7 @@ func TestGetGenres(t *testing.T) {
 				)
 			},
 			expectedGenres: nil,
-			expectedError:  kts_errors.KTS_NOT_FOUND,
+			expectedError:  kts_errors.KTS_MOVIE_NOT_FOUND,
 		},
 		{
 			name: "Multiple genres",
@@ -105,23 +105,23 @@ func TestGetGenreByName(t *testing.T) {
 
 	testCases := []struct {
 		name            string
-		setExpectations func(mock sqlmock.Sqlmock, genreName string)
+		setExpectations func(mock sqlmock.Sqlmock, genreName *string)
 		expectedGenre   *model.Genres
 		expectedError   *models.KTSError
 	}{
 		{
 			name: "Empty result",
-			setExpectations: func(mock sqlmock.Sqlmock, genreName string) {
+			setExpectations: func(mock sqlmock.Sqlmock, genreName *string) {
 				mock.ExpectQuery(query).WithArgs(genreName).WillReturnRows(
 					sqlmock.NewRows([]string{"genres.id", "genres.genre_name"}),
 				)
 			},
 			expectedGenre: nil,
-			expectedError: kts_errors.KTS_INTERNAL_ERROR,
+			expectedError: kts_errors.KTS_MOVIE_NOT_FOUND,
 		},
 		{
 			name: "Single genre",
-			setExpectations: func(mock sqlmock.Sqlmock, genreName string) {
+			setExpectations: func(mock sqlmock.Sqlmock, genreName *string) {
 				mock.ExpectQuery(query).WithArgs(genreName).WillReturnRows(
 					sqlmock.NewRows(
 						[]string{"genres.id", "genres.genre_name"},
@@ -135,7 +135,7 @@ func TestGetGenreByName(t *testing.T) {
 		},
 		{
 			name: "Error while querying movies",
-			setExpectations: func(mock sqlmock.Sqlmock, genreName string) {
+			setExpectations: func(mock sqlmock.Sqlmock, genreName *string) {
 				mock.ExpectQuery(query).WithArgs(genreName).WillReturnError(sqlmock.ErrCancelled)
 			},
 			expectedGenre: nil,
@@ -159,10 +159,10 @@ func TestGetGenreByName(t *testing.T) {
 				},
 			}
 
-			tc.setExpectations(mock, genreName)
+			tc.setExpectations(mock, &genreName)
 
 			// Call the method under test
-			genre, kts_err := genreRepo.GetGenreByName(genreName)
+			genre, kts_err := genreRepo.GetGenreByName(&genreName)
 
 			// Verify the results
 			assert.Equal(t, tc.expectedGenre, genre)
@@ -185,26 +185,26 @@ func TestCreateGenre(t *testing.T) {
 
 	testCases := []struct {
 		name            string
-		setExpectations func(mock sqlmock.Sqlmock, genreName string)
+		setExpectations func(mock sqlmock.Sqlmock, genreName *string)
 		expectedError   *models.KTSError
 	}{
 		{
 			name: "Successful creation",
-			setExpectations: func(mock sqlmock.Sqlmock, genreName string) {
+			setExpectations: func(mock sqlmock.Sqlmock, genreName *string) {
 				mock.ExpectExec(query).WithArgs(genreName).WillReturnResult(sqlmock.NewResult(1, 1))
 			},
 			expectedError: nil,
 		},
 		{
 			name: "Error while creating genre",
-			setExpectations: func(mock sqlmock.Sqlmock, genreName string) {
+			setExpectations: func(mock sqlmock.Sqlmock, genreName *string) {
 				mock.ExpectExec(query).WithArgs(genreName).WillReturnError(sqlmock.ErrCancelled)
 			},
 			expectedError: kts_errors.KTS_INTERNAL_ERROR,
 		},
 		{
 			name: "Error while converting rows affected",
-			setExpectations: func(mock sqlmock.Sqlmock, genreName string) {
+			setExpectations: func(mock sqlmock.Sqlmock, genreName *string) {
 				mock.ExpectExec(query).WithArgs(genreName).WillReturnResult(
 					sqlmock.NewErrorResult(errors.New("rows affected conversion did not work")),
 				)
@@ -213,10 +213,10 @@ func TestCreateGenre(t *testing.T) {
 		},
 		{
 			name: "Movie not found",
-			setExpectations: func(mock sqlmock.Sqlmock, genreName string) {
+			setExpectations: func(mock sqlmock.Sqlmock, genreName *string) {
 				mock.ExpectExec(query).WithArgs(genreName).WillReturnResult(sqlmock.NewResult(1, 0))
 			},
-			expectedError: kts_errors.KTS_NOT_FOUND,
+			expectedError: kts_errors.KTS_MOVIE_NOT_FOUND,
 		},
 	}
 
@@ -236,10 +236,10 @@ func TestCreateGenre(t *testing.T) {
 				},
 			}
 
-			tc.setExpectations(mock, genreName)
+			tc.setExpectations(mock, &genreName)
 
 			// Call the method under test
-			kts_err := genreRepo.CreateGenre(genreName)
+			kts_err := genreRepo.CreateGenre(&genreName)
 
 			// Verify the results
 			assert.Equal(t, tc.expectedError, kts_err)
@@ -291,7 +291,7 @@ func TestUpdateGenre(t *testing.T) {
 			setExpectations: func(mock sqlmock.Sqlmock, genre *model.Genres) {
 				mock.ExpectExec(query).WithArgs(sampleGenre.GenreName, utils.EqUUID(sampleGenre.ID)).WillReturnResult(sqlmock.NewResult(1, 0))
 			},
-			expectedError: kts_errors.KTS_NOT_FOUND,
+			expectedError: kts_errors.KTS_MOVIE_NOT_FOUND,
 		},
 	}
 
@@ -367,7 +367,7 @@ func TestDeleteGenre(t *testing.T) {
 			setExpectations: func(mock sqlmock.Sqlmock, genre *uuid.UUID) {
 				mock.ExpectExec(query).WithArgs(utils.EqUUID(&genreId)).WillReturnResult(sqlmock.NewResult(1, 0))
 			},
-			expectedError: kts_errors.KTS_NOT_FOUND,
+			expectedError: kts_errors.KTS_MOVIE_NOT_FOUND,
 		},
 	}
 
@@ -414,23 +414,23 @@ func TestGetGenreByNameWithMovies(t *testing.T) {
 
 	testCases := []struct {
 		name            string
-		setExpectations func(mock sqlmock.Sqlmock, genreName string)
+		setExpectations func(mock sqlmock.Sqlmock, genreName *string)
 		expectedGenre   *models.GenreWithMovies
 		expectedError   *models.KTSError
 	}{
 		{
 			name: "Empty result",
-			setExpectations: func(mock sqlmock.Sqlmock, genreName string) {
+			setExpectations: func(mock sqlmock.Sqlmock, genreName *string) {
 				mock.ExpectQuery(query).WithArgs(genreName).WillReturnRows(
 					sqlmock.NewRows([]string{"genres.id", "genres.genre_name", "movies.id", "movies.title", "movies.description", "movies.banner_pic_url", "movies.cover_pic_url", "movies.trailer_url", "movies.rating", "movies.release_date", "movies.time_in_min", "movies.fsk"}),
 				)
 			},
 			expectedGenre: nil,
-			expectedError: kts_errors.KTS_NOT_FOUND,
+			expectedError: kts_errors.KTS_MOVIE_NOT_FOUND,
 		},
 		{
 			name: "Single genre",
-			setExpectations: func(mock sqlmock.Sqlmock, genreName string) {
+			setExpectations: func(mock sqlmock.Sqlmock, genreName *string) {
 				mock.ExpectQuery(query).WithArgs(genreName).WillReturnRows(
 					sqlmock.NewRows(
 						[]string{"genres.id", "genres.genre_name", "movies.id", "movies.title", "movies.description", "movies.banner_pic_url", "movies.cover_pic_url", "movies.trailer_url", "movies.rating", "movies.release_date", "movies.time_in_min", "movies.fsk"},
@@ -446,7 +446,7 @@ func TestGetGenreByNameWithMovies(t *testing.T) {
 		},
 		{
 			name: "Error while querying movies",
-			setExpectations: func(mock sqlmock.Sqlmock, genreName string) {
+			setExpectations: func(mock sqlmock.Sqlmock, genreName *string) {
 				mock.ExpectQuery(query).WithArgs(genreName).WillReturnError(sqlmock.ErrCancelled)
 			},
 			expectedGenre: nil,
@@ -470,10 +470,10 @@ func TestGetGenreByNameWithMovies(t *testing.T) {
 				},
 			}
 
-			tc.setExpectations(mock, genreName)
+			tc.setExpectations(mock, &genreName)
 
 			// Call the method under test
-			genre, kts_err := genreRepo.GetGenreByNameWithMovies(genreName)
+			genre, kts_err := genreRepo.GetGenreByNameWithMovies(&genreName)
 
 			// Verify the results
 			assert.Equal(t, tc.expectedGenre, genre)
@@ -507,7 +507,7 @@ func TestGetGenresWithMovies(t *testing.T) {
 				)
 			},
 			expectedGenres: nil,
-			expectedError:  kts_errors.KTS_NOT_FOUND,
+			expectedError:  kts_errors.KTS_MOVIE_NOT_FOUND,
 		},
 		{
 			name: "Multiple genres",
