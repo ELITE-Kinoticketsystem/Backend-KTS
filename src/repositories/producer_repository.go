@@ -24,7 +24,7 @@ type ProducerRepository struct {
 	DatabaseManager managers.DatabaseManagerI
 }
 
-func (mr *MovieRepository) GetProducers() (*[]model.Producers, *models.KTSError) {
+func (pr *ProducerRepository) GetProducers() (*[]model.Producers, *models.KTSError) {
 	var producers []model.Producers
 
 	// Create the query
@@ -35,7 +35,7 @@ func (mr *MovieRepository) GetProducers() (*[]model.Producers, *models.KTSError)
 	)
 
 	// Execute the query
-	err := stmt.Query(mr.DatabaseManager.GetDatabaseConnection(), &producers)
+	err := stmt.Query(pr.DatabaseManager.GetDatabaseConnection(), &producers)
 	if err != nil {
 		return nil, kts_errors.KTS_INTERNAL_ERROR
 	}
@@ -47,7 +47,7 @@ func (mr *MovieRepository) GetProducers() (*[]model.Producers, *models.KTSError)
 	return &producers, nil
 }
 
-func (mr *MovieRepository) GetProducerById(id *uuid.UUID) (*model.Producers, *models.KTSError) {
+func (pr *ProducerRepository) GetProducerById(id *uuid.UUID) (*model.Producers, *models.KTSError) {
 	var producer model.Producers
 
 	binary_id, _ := id.MarshalBinary()
@@ -62,7 +62,7 @@ func (mr *MovieRepository) GetProducerById(id *uuid.UUID) (*model.Producers, *mo
 	)
 
 	// Execute the query
-	err := stmt.Query(mr.DatabaseManager.GetDatabaseConnection(), &producer)
+	err := stmt.Query(pr.DatabaseManager.GetDatabaseConnection(), &producer)
 	if err != nil {
 		return nil, kts_errors.KTS_INTERNAL_ERROR
 	}
@@ -70,7 +70,7 @@ func (mr *MovieRepository) GetProducerById(id *uuid.UUID) (*model.Producers, *mo
 	return &producer, nil
 }
 
-func (mr *MovieRepository) CreateProducer(producer *model.Producers) *models.KTSError {
+func (pr *ProducerRepository) CreateProducer(producer *model.Producers) *models.KTSError {
 	// Create the query
 	stmt := table.Producers.INSERT(
 		table.Producers.AllColumns,
@@ -83,7 +83,7 @@ func (mr *MovieRepository) CreateProducer(producer *model.Producers) *models.KTS
 	)
 
 	// Execute the query
-	rows, err := stmt.Exec(mr.DatabaseManager.GetDatabaseConnection())
+	rows, err := stmt.Exec(pr.DatabaseManager.GetDatabaseConnection())
 	if err != nil {
 		return kts_errors.KTS_INTERNAL_ERROR
 	}
@@ -100,7 +100,7 @@ func (mr *MovieRepository) CreateProducer(producer *model.Producers) *models.KTS
 	return nil
 }
 
-func (mr *MovieRepository) UpdateProducer(producer *model.Producers) *models.KTSError {
+func (pr *ProducerRepository) UpdateProducer(producer *model.Producers) *models.KTSError {
 	// Create the query
 	stmt := table.Producers.UPDATE(
 		table.Producers.AllColumns,
@@ -115,7 +115,7 @@ func (mr *MovieRepository) UpdateProducer(producer *model.Producers) *models.KTS
 	)
 
 	// Execute the query
-	rows, err := stmt.Exec(mr.DatabaseManager.GetDatabaseConnection())
+	rows, err := stmt.Exec(pr.DatabaseManager.GetDatabaseConnection())
 	if err != nil {
 		return kts_errors.KTS_INTERNAL_ERROR
 	}
@@ -132,12 +132,12 @@ func (mr *MovieRepository) UpdateProducer(producer *model.Producers) *models.KTS
 	return nil
 }
 
-func (mr *MovieRepository) DeleteProducer(id *uuid.UUID) *models.KTSError {
+func (pr *ProducerRepository) DeleteProducer(id *uuid.UUID) *models.KTSError {
 	// Create the query
 	stmt := table.Producers.DELETE().WHERE(table.Producers.ID.EQ(jet_mysql.String(id.String())))
 
 	// Execute the query
-	rows, err := stmt.Exec(mr.DatabaseManager.GetDatabaseConnection())
+	rows, err := stmt.Exec(pr.DatabaseManager.GetDatabaseConnection())
 	if err != nil {
 		return kts_errors.KTS_INTERNAL_ERROR
 	}

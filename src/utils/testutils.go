@@ -4,6 +4,7 @@ import (
 	"database/sql/driver"
 	"fmt"
 	"reflect"
+	"time"
 
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/.gen/KinoTicketSystem/model"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
@@ -31,12 +32,12 @@ func GetSampleLoginData() models.LoginRequest {
 
 func GetSampleUser() model.Users {
 	id, _ := uuid.Parse("47CF752501DF45B7A3A9D3CB25AE939F")
-	username := "Collinho el niño" 
+	username := "Collinho el niño"
 	firstname := "Collin"
 	lastname := "Forslund"
 	return model.Users{
 		ID:        &id,
-		Username: &username,
+		Username:  &username,
 		Email:     "collin.forslund@gmail.com",
 		Password:  "$2a$10$vxXPPpLp5baQ7mzS1pNSEuk6ZW3mbx1Ej7u0tJnF5wferEFqT.qlK",
 		Firstname: &firstname,
@@ -116,4 +117,45 @@ func (m UUIDMatcher) Match(v driver.Value) bool {
 // Returns a matcher that matches the uuid with its binary representation.
 func EqUUID(id *uuid.UUID) UUIDMatcher {
 	return UUIDMatcher{id: id}
+}
+
+func GetSampleProducers() *[]model.Producers {
+	var producers []model.Producers
+
+	uuid1 := uuid.New()
+	uuid2 := uuid.New()
+
+	picUrl := "https://www.picture.google.com"
+
+	producers = append(producers, model.Producers{
+		ID:          &uuid1,
+		Name:        "Producer 1",
+		Birthdate:   time.Now(),
+		Description: "Description 1",
+		PicURL:      &picUrl,
+	})
+
+	producers = append(producers, model.Producers{
+		ID:          &uuid2,
+		Name:        "Producer 2",
+		Birthdate:   time.Now(),
+		Description: "Description 2",
+		PicURL:      &picUrl,
+	})
+
+	return &producers
+}
+
+func GetSampleProducer() model.Producers {
+	uuid1 := uuid.New()
+
+	picUrl := "https://www.picture.google.com"
+
+	return model.Producers{
+		ID:          &uuid1,
+		Name:        "Producer 1",
+		Birthdate:   time.Now(),
+		Description: "Description 1",
+		PicURL:      &picUrl,
+	}
 }
