@@ -15,7 +15,7 @@ func GetGenres(genreCtrl controllers.GenreControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		genres, kts_err := genreCtrl.GetGenres()
 		if kts_err != nil {
-			c.JSON(kts_err.Status, kts_err)
+			utils.HandleErrorAndAbort(c, kts_err)
 			return
 		}
 		c.JSON(http.StatusOK, genres)
@@ -25,9 +25,9 @@ func GetGenres(genreCtrl controllers.GenreControllerI) gin.HandlerFunc {
 func GetGenreByName(genreCtrl controllers.GenreControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		name := c.Param("name")
-		genre, kts_err := genreCtrl.GetGenreByName(name)
+		genre, kts_err := genreCtrl.GetGenreByName(&name)
 		if kts_err != nil {
-			c.JSON(kts_err.Status, kts_err)
+			utils.HandleErrorAndAbort(c, kts_err)
 			return
 		}
 		c.JSON(http.StatusOK, genre)
@@ -43,7 +43,7 @@ func CreateGenre(genreCtrl controllers.GenreControllerI) gin.HandlerFunc {
 			return
 		}
 
-		kts_err := genreCtrl.CreateGenre(genre.GenreName)
+		kts_err := genreCtrl.CreateGenre(&genre.GenreName)
 		if kts_err != nil {
 			utils.HandleErrorAndAbort(c, kts_err)
 			return
@@ -56,7 +56,7 @@ func GetGenreByNameWithMovies(genreCtrl controllers.GenreControllerI) gin.Handle
 	return func(c *gin.Context) {
 		genreName := c.Param("genreName")
 
-		genre, kts_err := genreCtrl.GetGenreByNameWithMovies(genreName)
+		genre, kts_err := genreCtrl.GetGenreByNameWithMovies(&genreName)
 		if kts_err != nil {
 			utils.HandleErrorAndAbort(c, kts_err)
 			return
