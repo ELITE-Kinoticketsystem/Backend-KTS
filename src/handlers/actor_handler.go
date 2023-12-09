@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/controllers"
@@ -44,9 +45,12 @@ func CreateActorHandler(actorController controllers.ActorControllerI) gin.Handle
 	return func(c *gin.Context) {
 		var actorDto models.CreateActorDTO
 		if err := c.ShouldBindJSON(&actorDto); err != nil {
+			log.Println(err)
 			utils.HandleErrorAndAbort(c, kts_errors.KTS_BAD_REQUEST)
 			return
 		}
+
+		log.Println(actorDto)
 
 		actor, kts_err := actorController.CreateActor(&actorDto)
 		if kts_err != nil {

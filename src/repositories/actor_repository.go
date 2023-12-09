@@ -88,9 +88,15 @@ func (ar *ActorRepository) GetActors() (*[]models.GetActorsDTO, *models.KTSError
 func (ar *ActorRepository) CreateActor(actor *model.Actors) (*uuid.UUID, *models.KTSError) {
 	actor.ID = utils.NewUUID()
 
-	insertStmt := table.Actors.INSERT(table.Actors.AllColumns).MODEL(actor)
+	mySqlId, err := utils.MysqlUuid(actor.ID)
 
-	log.Println(insertStmt.DebugSql())
+	insertStmt := table.Actors.INSERT(table.Actors.AllColumns).VALUES(
+		mySqlId,
+		actor.Name,
+		actor.Birthdate,
+		actor.Description,
+		actor.PicURL,
+	)
 
 	rows, err := insertStmt.Exec(ar.DatabaseManager.GetDatabaseConnection())
 
@@ -114,9 +120,18 @@ func (ar *ActorRepository) CreateActor(actor *model.Actors) (*uuid.UUID, *models
 func (ar *ActorRepository) CreateActorPicture(actorPicture *model.ActorPictures) (*uuid.UUID, *models.KTSError) {
 	actorPicture.ID = utils.NewUUID()
 
-	insertStmt := table.ActorPictures.INSERT(table.ActorPictures.AllColumns).MODEL(actorPicture)
+	mySqlPicId, err := utils.MysqlUuid(actorPicture.ID)
+	mySqlActorId, err := utils.MysqlUuid(actorPicture.ActorID)
+
+	insertStmt := table.ActorPictures.INSERT(table.ActorPictures.AllColumns).VALUES(
+		mySqlPicId,
+		mySqlActorId,
+		actorPicture.PicURL,
+	)
 
 	rows, err := insertStmt.Exec(ar.DatabaseManager.GetDatabaseConnection())
+
+	log.Println(err)
 
 	if err != nil {
 		return nil, kts_errors.KTS_INTERNAL_ERROR
