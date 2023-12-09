@@ -17,3 +17,9 @@ type GetActorsDTO struct {
 
 	Pictures []model.ActorPictures
 }
+
+type CreateActorDTO struct {
+	model.Actors
+
+	PicturesUrls []string
+}

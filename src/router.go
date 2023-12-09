@@ -91,6 +91,7 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 	// Actors
 	router.Handle(http.MethodGet, "/actors/:id", handlers.GetActorByIdHandler(controller.ActorController))
 	router.Handle(http.MethodGet, "/actors/", handlers.GetActorsHandler(controller.ActorController))
+	router.Handle(http.MethodPost, "/actors/", handlers.CreateActorHandler(controller.ActorController))
 
 	return router
 }

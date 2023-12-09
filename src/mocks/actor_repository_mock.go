@@ -11,6 +11,7 @@ package mocks
 import (
 	reflect "reflect"
 
+	model "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/.gen/KinoTicketSystem/model"
 	models "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
 	uuid "github.com/google/uuid"
 	gomock "go.uber.org/mock/gomock"
@@ -37,6 +38,36 @@ func NewMockActorRepoI(ctrl *gomock.Controller) *MockActorRepoI {
 // EXPECT returns an object that allows the caller to indicate expected use.
 func (m *MockActorRepoI) EXPECT() *MockActorRepoIMockRecorder {
 	return m.recorder
+}
+
+// CreateActor mocks base method.
+func (m *MockActorRepoI) CreateActor(actor *model.Actors) (*uuid.UUID, *models.KTSError) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateActor", actor)
+	ret0, _ := ret[0].(*uuid.UUID)
+	ret1, _ := ret[1].(*models.KTSError)
+	return ret0, ret1
+}
+
+// CreateActor indicates an expected call of CreateActor.
+func (mr *MockActorRepoIMockRecorder) CreateActor(actor any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateActor", reflect.TypeOf((*MockActorRepoI)(nil).CreateActor), actor)
+}
+
+// CreateActorPicture mocks base method.
+func (m *MockActorRepoI) CreateActorPicture(actorPicture *model.ActorPictures) (*uuid.UUID, *models.KTSError) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateActorPicture", actorPicture)
+	ret0, _ := ret[0].(*uuid.UUID)
+	ret1, _ := ret[1].(*models.KTSError)
+	return ret0, ret1
+}
+
+// CreateActorPicture indicates an expected call of CreateActorPicture.
+func (mr *MockActorRepoIMockRecorder) CreateActorPicture(actorPicture any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateActorPicture", reflect.TypeOf((*MockActorRepoI)(nil).CreateActorPicture), actorPicture)
 }
 
 // GetActorById mocks base method.

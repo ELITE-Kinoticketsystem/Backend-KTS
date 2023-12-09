@@ -5,6 +5,7 @@ import (
 
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/controllers"
 	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -36,5 +37,23 @@ func GetActorsHandler(actorController controllers.ActorControllerI) gin.HandlerF
 		}
 
 		c.JSON(http.StatusOK, actors)
+	}
+}
+
+func CreateActorHandler(actorController controllers.ActorControllerI) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var actorDto models.CreateActorDTO
+		if err := c.ShouldBindJSON(&actorDto); err != nil {
+			utils.HandleErrorAndAbort(c, kts_errors.KTS_BAD_REQUEST)
+			return
+		}
+
+		actor, kts_err := actorController.CreateActor(&actorDto)
+		if kts_err != nil {
+			utils.HandleErrorAndAbort(c, kts_err)
+			return
+		}
+
+		c.JSON(http.StatusCreated, actor)
 	}
 }

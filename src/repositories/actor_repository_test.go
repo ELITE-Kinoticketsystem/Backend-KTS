@@ -306,3 +306,154 @@ func GetActors() *[]models.GetActorsDTO {
 		actor2,
 	}
 }
+
+func TestCreateActor(t *testing.T) {
+
+	actor := &model.Actors{
+		Name:        "John Doe",
+		Description: "Test actor",
+		Birthdate:   time.Now(),
+	}
+
+	teststCases := []struct {
+		name            string
+		setExpectations func(mock sqlmock.Sqlmock)
+		expectActorId   bool
+		expectedError   *models.KTSError
+	}{
+		{
+			name: "Create actor",
+			setExpectations: func(mock sqlmock.Sqlmock) {
+				mock.ExpectExec("INSERT INTO `KinoTicketSystem`.actors .*").WillReturnResult(sqlmock.NewResult(1, 1))
+			},
+			expectActorId: true,
+			expectedError: nil,
+		},
+		{
+			name: "Create actor sql error",
+			setExpectations: func(mock sqlmock.Sqlmock) {
+				mock.ExpectExec("INSERT INTO `KinoTicketSystem`.actors .*").WillReturnError(sql.ErrConnDone)
+			},
+			expectActorId: false,
+			expectedError: kts_errors.KTS_INTERNAL_ERROR,
+		},
+		{
+			name: "Create actor no rows affected",
+			setExpectations: func(mock sqlmock.Sqlmock) {
+				mock.ExpectExec("INSERT INTO `KinoTicketSystem`.actors .*").WillReturnResult(sqlmock.NewResult(1, 0))
+			},
+			expectActorId: false,
+			expectedError: kts_errors.KTS_INTERNAL_ERROR,
+		},
+	}
+
+	for _, tc := range teststCases {
+		t.Run(tc.name, func(t *testing.T) {
+
+			db, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherRegexp))
+			if err != nil {
+				t.Fatalf("Failed to create mock database connection: %v", err)
+			}
+			defer db.Close()
+
+			actorRepo := &ActorRepository{
+				DatabaseManager: &managers.DatabaseManager{
+					Connection: db,
+				},
+			}
+
+			tc.setExpectations(mock)
+
+			id, kts_err := actorRepo.CreateActor(actor)
+
+			if kts_err != tc.expectedError {
+				t.Errorf("Unexpected error: %v", kts_err)
+			}
+
+			if tc.expectActorId && id == nil {
+				t.Error("Expected actor ID, got nil")
+			}
+
+			if err := mock.ExpectationsWereMet(); err != nil {
+				t.Errorf("There were unfulfilled expectations: %s", err)
+			}
+
+		})
+	}
+}
+
+func TestCreateActorPicture(t *testing.T) {
+
+	picUrl := "pic.jpg"
+
+	ActorPicture := &model.ActorPictures{
+		ActorID: utils.NewUUID(),
+		PicURL:  &picUrl,
+	}
+
+	testCases := []struct {
+		name                 string
+		setExpectations      func(mock sqlmock.Sqlmock)
+		expectActorPictureId bool
+		expectedError        *models.KTSError
+	}{
+		{
+			name: "Create actor picture",
+			setExpectations: func(mock sqlmock.Sqlmock) {
+				mock.ExpectExec("INSERT INTO `KinoTicketSystem`.actor_pictures .*").WillReturnResult(sqlmock.NewResult(1, 1))
+			},
+			expectActorPictureId: true,
+			expectedError:        nil,
+		},
+		{
+			name: "Create actor picture sql error",
+			setExpectations: func(mock sqlmock.Sqlmock) {
+				mock.ExpectExec("INSERT INTO `KinoTicketSystem`.actor_pictures .*").WillReturnError(sql.ErrConnDone)
+			},
+			expectActorPictureId: false,
+			expectedError:        kts_errors.KTS_INTERNAL_ERROR,
+		},
+		{
+			name: "Create actor picture no rows affected",
+			setExpectations: func(mock sqlmock.Sqlmock) {
+				mock.ExpectExec("INSERT INTO `KinoTicketSystem`.actor_pictures .*").WillReturnResult(sqlmock.NewResult(1, 0))
+			},
+			expectActorPictureId: false,
+			expectedError:        kts_errors.KTS_INTERNAL_ERROR,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+
+			db, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherRegexp))
+			if err != nil {
+				t.Fatalf("Failed to create mock database connection: %v", err)
+			}
+			defer db.Close()
+
+			actorRepo := &ActorRepository{
+				DatabaseManager: &managers.DatabaseManager{
+					Connection: db,
+				},
+			}
+
+			tc.setExpectations(mock)
+
+			id, kts_err := actorRepo.CreateActorPicture(ActorPicture)
+
+			if kts_err != tc.expectedError {
+				t.Errorf("Unexpected error: %v", kts_err)
+			}
+
+			if tc.expectActorPictureId && id == nil {
+				t.Error("Expected actor picture ID, got nil")
+			}
+
+			if err := mock.ExpectationsWereMet(); err != nil {
+				t.Errorf("There were unfulfilled expectations: %s", err)
+			}
+
+		})
+	}
+}

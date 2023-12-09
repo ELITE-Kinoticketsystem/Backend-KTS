@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/google/uuid"
@@ -12,66 +11,175 @@ import (
 	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/mocks"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
 )
 
-func TestGetActorById(t *testing.T) {
+func TestGetActorByID(t *testing.T) {
 
-	mockCtrl := gomock.NewController(t)
-	defer mockCtrl.Finish()
+	id := utils.NewUUID()
 
-	// GIVEN
-	actorId := uuid.New()
-	expectedActorDTO := &models.ActorDTO{
-		Actors: model.Actors{
-			ID:          &actorId,
-			Name:        "Test Actor",
-			Description: "Test Description",
+	testCases := []struct {
+		name             string
+		actorId          *uuid.UUID
+		expectedActorDTO *models.ActorDTO
+		expectedError    *models.KTSError
+	}{
+		{
+			name:    "Get actor by id",
+			actorId: id,
+			expectedActorDTO: &models.ActorDTO{
+				Actors: model.Actors{
+					ID:          id,
+					Name:        "Test Actor",
+					Description: "Test Description",
+				},
+				Pictures: nil,
+				Movies:   nil,
+			},
+			expectedError: nil,
 		},
-		Pictures: nil,
-		Movies:   nil,
+		{
+			name:             "Get actor by id fails",
+			actorId:          id,
+			expectedActorDTO: nil,
+			expectedError:    kts_errors.KTS_INTERNAL_ERROR,
+		},
 	}
 
-	mockActorRepo := mocks.NewMockActorRepoI(mockCtrl)
+	for _, testCase := range testCases {
+		t.Run(testCase.name, func(t *testing.T) {
+			mockCtrl := gomock.NewController(t)
+			defer mockCtrl.Finish()
 
-	mockActorRepo.EXPECT().GetActorById(&actorId).Return(expectedActorDTO, nil)
+			mockActorRepo := mocks.NewMockActorRepoI(mockCtrl)
 
-	ac := &ActorController{
-		ActorRepo: mockActorRepo,
+			mockActorRepo.EXPECT().GetActorById(testCase.actorId).Return(testCase.expectedActorDTO, testCase.expectedError)
+
+			ac := &ActorController{
+				ActorRepo: mockActorRepo,
+			}
+
+			actorDTO, err := ac.GetActorById(testCase.actorId)
+
+			if err != testCase.expectedError {
+				t.Errorf("Expected error to be nil")
+			}
+			assert.Equal(t, testCase.expectedActorDTO, actorDTO, "Expected actor DTO to match")
+		})
 	}
-
-	// WHEN
-	actorDTO, err := ac.GetActorById(&actorId)
-	fmt.Println(err)
-
-	// THEN
-	if err != nil {
-		t.Errorf("Expected error to be nil")
-	}
-	assert.Equal(t, expectedActorDTO, actorDTO, "Expected actor DTO to match")
 }
 
-func TestGetActorByIdFails(t *testing.T) {
+func TestGetActors(t *testing.T) {
 
-	mockCtrl := gomock.NewController(t)
-	defer mockCtrl.Finish()
-
-	// GIVEN
-	actorId := uuid.New()
-
-	mockActorRepo := mocks.NewMockActorRepoI(mockCtrl)
-
-	mockActorRepo.EXPECT().GetActorById(&actorId).Return(nil, kts_errors.KTS_INTERNAL_ERROR)
-
-	ac := &ActorController{
-		ActorRepo: mockActorRepo,
+	testCases := []struct {
+		name              string
+		expectedActorsDTO *[]models.GetActorsDTO
+		expectedError     *models.KTSError
+	}{
+		{
+			name: "Get actors",
+			expectedActorsDTO: &[]models.GetActorsDTO{
+				{
+					Actors: model.Actors{
+						ID:          utils.NewUUID(),
+						Name:        "Test Actor",
+						Description: "Test Description",
+					},
+					Pictures: nil,
+				},
+			},
+			expectedError: nil,
+		},
+		{
+			name:              "Get actors fails",
+			expectedActorsDTO: nil,
+			expectedError:     kts_errors.KTS_INTERNAL_ERROR,
+		},
 	}
 
-	// WHEN
-	actorDTO, err := ac.GetActorById(&actorId)
+	for _, testCase := range testCases {
+		t.Run(testCase.name, func(t *testing.T) {
+			mockCtrl := gomock.NewController(t)
+			defer mockCtrl.Finish()
 
-	// THEN
-	if err == nil {
-		t.Errorf("Expected error to be not nil")
+			mockActorRepo := mocks.NewMockActorRepoI(mockCtrl)
+
+			mockActorRepo.EXPECT().GetActors().Return(testCase.expectedActorsDTO, testCase.expectedError)
+
+			ac := &ActorController{
+				ActorRepo: mockActorRepo,
+			}
+
+			actorsDTO, err := ac.GetActors()
+
+			if err != testCase.expectedError {
+				t.Errorf("Expected error to be nil")
+			}
+			assert.Equal(t, testCase.expectedActorsDTO, actorsDTO, "Expected actors DTO to match")
+		})
 	}
-	assert.Equal(t, (*models.ActorDTO)(nil), actorDTO, "Expected actor DTO to be nil")
 }
+
+func TestCreateActor(t *testing.T) {
+
+	id := utils.NewUUID()
+
+	testCases := []struct {
+		name          string
+		actorDto      *models.CreateActorDTO
+		expectedActor *uuid.UUID
+		expectedError *models.KTSError
+	}{
+		{
+			name: "Create actor",
+			actorDto: &models.CreateActorDTO{
+				Actors: model.Actors{
+					ID:          id,
+					Name:        "Test Actor",
+					Description: "Test Description",
+				},
+				PicturesUrls: []string{
+					"test1",
+					"test2",
+				},
+			},
+			expectedActor: id,
+			expectedError: nil,
+		},
+		{
+			name:          "Create actor fails",
+			actorDto:      nil,
+			expectedActor: nil,
+			expectedError: kts_errors.KTS_BAD_REQUEST,
+		},
+	}
+
+	for _, testCase := range testCases {
+		t.Run(testCase.name, func(t *testing.T) {
+			mockCtrl := gomock.NewController(t)
+			defer mockCtrl.Finish()
+
+			mockActorRepo := mocks.NewMockActorRepoI(mockCtrl)
+
+			if testCase.actorDto != nil {
+				mockActorRepo.EXPECT().CreateActor(gomock.Any()).Return(testCase.expectedActor, testCase.expectedError)
+
+				if testCase.actorDto.PicturesUrls != nil {
+					mockActorRepo.EXPECT().CreateActorPicture(gomock.Any()).Return(id, testCase.expectedError).AnyTimes()
+				}
+			}
+
+			ac := &ActorController{
+				ActorRepo: mockActorRepo,
+			}
+
+			actorId, kts_err := ac.CreateActor(testCase.actorDto)
+
+			if kts_err != testCase.expectedError {
+				t.Error("Expected error different than acutal")
+			}
+			assert.Equal(t, testCase.expectedActor, actorId, "Expected actor id to match")
+		})
+	}
+}
+
