@@ -10,7 +10,7 @@ import (
 )
 
 type EventRepo interface {
-	CreateEvent(event *model.Events) error
+	CreateEvent(event *model.Events) (*uuid.UUID, error)
 	DeleteEvent(*uuid.UUID) error
 	GetEventsForMovieId(movieId *uuid.UUID) ([]*model.Events, error)
 	GetSpecialEvents() ([]*models.EventDTO, error)
@@ -31,8 +31,7 @@ type EventRepository struct {
 }
 
 func (er *EventRepository) CreateEvent(event *model.Events) error {
-	// TODO: implement
-	return errors.New("not implemented")
+
 }
 
 func (er *EventRepository) DeleteEvent(id *uuid.UUID) error {

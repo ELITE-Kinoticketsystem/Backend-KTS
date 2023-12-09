@@ -11,10 +11,10 @@ import (
 )
 
 type EventControllerI interface {
-	CreateEvent(event *models.EventDTO) (*model.Events, *models.KTSError)
+	CreateEvent(event *models.CreateEvtDTO) (*model.Events, *models.KTSError)
 	DeleteEvent(eventId *uuid.UUID) *models.KTSError
 	GetEventsForMovie(movieId *uuid.UUID) ([]*model.Events, *models.KTSError)
-	GetSpecialEvents() ([]*models.EventDTO, *models.KTSError)
+	// GetSpecialEvents() ([]*models.EventDTO, *models.KTSError)
 }
 
 type EventController struct {
@@ -23,7 +23,15 @@ type EventController struct {
 	TheatreRepo repositories.TheaterRepoI
 }
 
-func (ec *EventController) CreateEvent(eventRequest *models.EventDTO) (*model.Events, *models.KTSError) {
+func (ec *EventController) CreateEvent(eventDto *models.CreateEvtDTO) (*model.Events, *models.KTSError) {
+	if eventDto == nil {
+		return nil, kts_errors.KTS_BAD_REQUEST
+	}
+
+	event  := eventDto.Events
+	
+	eventId, err := ec.EventRepo.CreateEvent(event)
+
 	eventId := uuid.New()
 	event := &model.Events{
 		ID:           &eventId,
@@ -62,170 +70,170 @@ func (ec *EventController) CreateEvent(eventRequest *models.EventDTO) (*model.Ev
 	return event, nil
 }
 
-func (ec *EventController) DeleteEvent(eventId *uuid.UUID) *models.KTSError {
+// func (ec *EventController) DeleteEvent(eventId *uuid.UUID) *models.KTSError {
 
-	err := ec.EventRepo.DeleteEvent(eventId)
-	if err != nil {
-		return kts_errors.KTS_INTERNAL_ERROR
-	}
-	err = ec.EventRepo.DeleteEventMovies(eventId)
-	if err != nil {
-		return kts_errors.KTS_INTERNAL_ERROR
-	}
-	err = ec.EventRepo.DeleteEventSeatCategoryByEventId(eventId)
-	if err != nil {
-		return kts_errors.KTS_INTERNAL_ERROR
-	}
+// 	err := ec.EventRepo.DeleteEvent(eventId)
+// 	if err != nil {
+// 		return kts_errors.KTS_INTERNAL_ERROR
+// 	}
+// 	err = ec.EventRepo.DeleteEventMovies(eventId)
+// 	if err != nil {
+// 		return kts_errors.KTS_INTERNAL_ERROR
+// 	}
+// 	err = ec.EventRepo.DeleteEventSeatCategoryByEventId(eventId)
+// 	if err != nil {
+// 		return kts_errors.KTS_INTERNAL_ERROR
+// 	}
 
-	err = ec.EventRepo.DeleteEventSeatsByEventId(eventId)
-	if err != nil {
-		return kts_errors.KTS_INTERNAL_ERROR
-	}
+// 	err = ec.EventRepo.DeleteEventSeatsByEventId(eventId)
+// 	if err != nil {
+// 		return kts_errors.KTS_INTERNAL_ERROR
+// 	}
 
-	return nil
-}
+// 	return nil
+// }
 
-func (ec *EventController) GetEventsForMovie(movieId *uuid.UUID) ([]*model.Events, *models.KTSError) {
-	events, err := ec.EventRepo.GetEventsForMovieId(movieId)
-	if err != nil {
-		log.Printf("Error getting events for movie: %v", err)
-		return nil, kts_errors.KTS_INTERNAL_ERROR
-	}
+// func (ec *EventController) GetEventsForMovie(movieId *uuid.UUID) ([]*model.Events, *models.KTSError) {
+// 	events, err := ec.EventRepo.GetEventsForMovieId(movieId)
+// 	if err != nil {
+// 		log.Printf("Error getting events for movie: %v", err)
+// 		return nil, kts_errors.KTS_INTERNAL_ERROR
+// 	}
 
-	return events, nil
-}
+// 	return events, nil
+// }
 
-func (ec *EventController) GetSpecialEvents() ([]*models.EventDTO, *models.KTSError) {
-	events, err := ec.EventRepo.GetSpecialEvents()
-	if err != nil {
-		log.Printf("Error getting special events: %v", err)
-		return nil, kts_errors.KTS_INTERNAL_ERROR
-	}
+// func (ec *EventController) GetSpecialEvents() ([]*models.EventDTO, *models.KTSError) {
+// 	events, err := ec.EventRepo.GetSpecialEvents()
+// 	if err != nil {
+// 		log.Printf("Error getting special events: %v", err)
+// 		return nil, kts_errors.KTS_INTERNAL_ERROR
+// 	}
 
-	return events, nil
-}
+// 	return events, nil
+// }
 
-func (ec *EventController) createMovies(movies []models.MovieDTO, eventId *uuid.UUID) error {
-	// TODO: still not completely though trough
-	// Currently when the id field is not set, we create a new movie
-	// How do we know we dont already have this movie in the database?
+// func (ec *EventController) createMovies(movies []models.MovieDTO, eventId *uuid.UUID) error {
+// 	// TODO: still not completely though trough
+// 	// Currently when the id field is not set, we create a new movie
+// 	// How do we know we dont already have this movie in the database?
 
-	for _, movie := range movies {
-		var movieId uuid.UUID
-		if movie.Id == nil {
-			createdMovie, err := ec.createNewMovie(&movie)
-			if err != nil {
-				return err
-			}
-			movieId = *createdMovie.ID
-		} else {
-			movieId = *movie.Id
-		}
-		err := ec.EventRepo.AddEventMovie(eventId, &movieId)
-		if err != nil {
-			return err
-		}
-	}
+// 	for _, movie := range movies {
+// 		var movieId uuid.UUID
+// 		if movie.Id == nil {
+// 			createdMovie, err := ec.createNewMovie(&movie)
+// 			if err != nil {
+// 				return err
+// 			}
+// 			movieId = *createdMovie.ID
+// 		} else {
+// 			movieId = *movie.Id
+// 		}
+// 		err := ec.EventRepo.AddEventMovie(eventId, &movieId)
+// 		if err != nil {
+// 			return err
+// 		}
+// 	}
 
-	return nil
-}
+// 	return nil
+// }
 
-func (ec *EventController) createNewMovie(movieRequest *models.MovieDTO) (*model.Movies, error) {
-	movieId := uuid.New()
-	genreNames := movieRequest.GenreNames
+// func (ec *EventController) createNewMovie(movieRequest *models.MovieDTO) (*model.Movies, error) {
+// 	movieId := uuid.New()
+// 	genreNames := movieRequest.GenreNames
 
-	movie := &model.Movies{
-		ID:          &movieId,
-		Title:       movieRequest.Title,
-		Description: movieRequest.Description,
-		ReleaseDate: movieRequest.ReleaseDate,
-		TimeInMin:   movieRequest.TimeInMin,
-		Fsk:         movieRequest.Fsk,
-	}
+// 	movie := &model.Movies{
+// 		ID:          &movieId,
+// 		Title:       movieRequest.Title,
+// 		Description: movieRequest.Description,
+// 		ReleaseDate: movieRequest.ReleaseDate,
+// 		TimeInMin:   movieRequest.TimeInMin,
+// 		Fsk:         movieRequest.Fsk,
+// 	}
 
-	err := ec.MovieRepo.CreateMovie(movie)
-	if err != nil {
-		return nil, err
-	}
+// 	err := ec.MovieRepo.CreateMovie(movie)
+// 	if err != nil {
+// 		return nil, err
+// 	}
 
-	createdMovieId := movie.ID
-	if createdMovieId == nil {
-		return nil, err
-	}
+// 	createdMovieId := movie.ID
+// 	if createdMovieId == nil {
+// 		return nil, err
+// 	}
 
-	err = ec.createGenres(genreNames, createdMovieId)
-	if err != nil {
-		return nil, err
-	}
-	return movie, nil
-}
+// 	err = ec.createGenres(genreNames, createdMovieId)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// 	return movie, nil
+// }
 
-func (ec *EventController) createGenres(genreNames []string, movieId *uuid.UUID) error {
-	for _, genreName := range genreNames {
-		genre, err := ec.MovieRepo.GetGenreByName(genreName)
-		if err != nil {
-			return err
-		}
-		var genreId uuid.UUID
-		if genre == nil {
-			genreId = uuid.New()
-			genre := &model.Genres{
-				ID:        &genreId,
-				GenreName: genreName,
-			}
-			err := ec.MovieRepo.CreateGenre(genre)
-			if err != nil {
-				return err
-			}
-		}
+// func (ec *EventController) createGenres(genreNames []string, movieId *uuid.UUID) error {
+// 	for _, genreName := range genreNames {
+// 		genre, err := ec.MovieRepo.GetGenreByName(genreName)
+// 		if err != nil {
+// 			return err
+// 		}
+// 		var genreId uuid.UUID
+// 		if genre == nil {
+// 			genreId = uuid.New()
+// 			genre := &model.Genres{
+// 				ID:        &genreId,
+// 				GenreName: genreName,
+// 			}
+// 			err := ec.MovieRepo.CreateGenre(genre)
+// 			if err != nil {
+// 				return err
+// 			}
+// 		}
 
-		err = ec.MovieRepo.AddMovieGenre(movieId, &genreId)
-		if err != nil {
-			return err
-		}
-	}
+// 		err = ec.MovieRepo.AddMovieGenre(movieId, &genreId)
+// 		if err != nil {
+// 			return err
+// 		}
+// 	}
 
-	return nil
-}
+// 	return nil
+// }
 
-func (ec *EventController) createEventSeatCategories(eventSeatCategories []models.EventSeatCategoryDTO, eventId *uuid.UUID) error {
-	for _, eventSeatCategory := range eventSeatCategories {
-		seatCategoryId := uuid.New()
-		eventSeatCategory := &model.EventSeatCategories{
-			Price:          eventSeatCategory.Price,
-			EventID:        eventId,
-			SeatCategoryID: &seatCategoryId,
-		}
-		err := ec.EventRepo.CreateEventSeatCategory(eventSeatCategory)
-		if err != nil {
-			return err
-		}
-	}
+// func (ec *EventController) createEventSeatCategories(eventSeatCategories []models.EventSeatCategoryDTO, eventId *uuid.UUID) error {
+// 	for _, eventSeatCategory := range eventSeatCategories {
+// 		seatCategoryId := uuid.New()
+// 		eventSeatCategory := &model.EventSeatCategories{
+// 			Price:          eventSeatCategory.Price,
+// 			EventID:        eventId,
+// 			SeatCategoryID: &seatCategoryId,
+// 		}
+// 		err := ec.EventRepo.CreateEventSeatCategory(eventSeatCategory)
+// 		if err != nil {
+// 			return err
+// 		}
+// 	}
 
-	return nil
-}
+// 	return nil
+// }
 
-func (ec *EventController) createEventSeats(cinemaHallId *uuid.UUID, eventId *uuid.UUID) error {
-	seats, err := ec.TheatreRepo.GetSeatsForCinemaHall(cinemaHallId)
-	if err != nil {
-		return err
-	}
+// func (ec *EventController) createEventSeats(cinemaHallId *uuid.UUID, eventId *uuid.UUID) error {
+// 	seats, err := ec.TheatreRepo.GetSeatsForCinemaHall(cinemaHallId)
+// 	if err != nil {
+// 		return err
+// 	}
 
-	for _, seat := range seats {
-		eventSeatId := uuid.New()
-		eventSeat := &model.EventSeats{
-			ID:           &eventSeatId,
-			Booked:       false,
-			BlockedUntil: nil,
-			UserID:       nil,
-			SeatID:       seat.ID,
-			EventID:      eventId,
-		}
-		err := ec.EventRepo.CreateEventSeat(eventSeat)
-		if err != nil {
-			return err
-		}
-	}
+// 	for _, seat := range seats {
+// 		eventSeatId := uuid.New()
+// 		eventSeat := &model.EventSeats{
+// 			ID:           &eventSeatId,
+// 			Booked:       false,
+// 			BlockedUntil: nil,
+// 			UserID:       nil,
+// 			SeatID:       seat.ID,
+// 			EventID:      eventId,
+// 		}
+// 		err := ec.EventRepo.CreateEventSeat(eventSeat)
+// 		if err != nil {
+// 			return err
+// 		}
+// 	}
 
-	return nil
-}
+// 	return nil
+// }

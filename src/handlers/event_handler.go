@@ -13,7 +13,7 @@ import (
 
 func CreateEventHandler(eventController controllers.EventControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var eventData models.EventDTO
+		var eventData models.CreateEvtDTO
 		if err := c.ShouldBindJSON(&eventData); err != nil {
 			utils.HandleErrorAndAbort(c, kts_errors.KTS_BAD_REQUEST)
 			return
