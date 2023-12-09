@@ -33,7 +33,7 @@ func TestGetMovies(t *testing.T) {
 				)
 			},
 			expectedMovies: nil,
-			expectedError:  kts_errors.KTS_NOT_FOUND,
+			expectedError:  kts_errors.KTS_MOVIE_NOT_FOUND,
 		},
 		{
 			name: "Multiple movies",
@@ -116,7 +116,7 @@ func TestGetMovieById(t *testing.T) {
 				)
 			},
 			expectedMovie: nil,
-			expectedError: kts_errors.KTS_NOT_FOUND,
+			expectedError: kts_errors.KTS_MOVIE_NOT_FOUND,
 		},
 		{
 			name: "Single movie",
@@ -198,7 +198,7 @@ func TestGetMovieByName(t *testing.T) {
 				)
 			},
 			expectedMovie: nil,
-			expectedError: kts_errors.KTS_NOT_FOUND,
+			expectedError: kts_errors.KTS_MOVIE_NOT_FOUND,
 		},
 		{
 			name: "Single movie",
@@ -297,7 +297,7 @@ func TestCreateMovie(t *testing.T) {
 			setExpectations: func(mock sqlmock.Sqlmock, movie *model.Movies) {
 				mock.ExpectExec(query).WithArgs(movie.Title, movie.Description, movie.BannerPicURL, movie.CoverPicURL, movie.TrailerURL, movie.Rating, movie.ReleaseDate, movie.TimeInMin, movie.Fsk).WillReturnResult(sqlmock.NewResult(1, 0))
 			},
-			expectedError: kts_errors.KTS_NOT_FOUND,
+			expectedError: kts_errors.KTS_MOVIE_NOT_FOUND,
 		},
 	}
 
@@ -375,7 +375,7 @@ func TestUpdateMovie(t *testing.T) {
 			setExpectations: func(mock sqlmock.Sqlmock, movie *model.Movies) {
 				mock.ExpectExec(query).WithArgs(movie.Title, movie.Description, movie.BannerPicURL, movie.CoverPicURL, movie.TrailerURL, movie.Rating, movie.ReleaseDate, movie.TimeInMin, movie.Fsk, utils.EqUUID(movie.ID)).WillReturnResult(sqlmock.NewResult(1, 0))
 			},
-			expectedError: kts_errors.KTS_NOT_FOUND,
+			expectedError: kts_errors.KTS_MOVIE_NOT_FOUND,
 		},
 	}
 
@@ -451,7 +451,7 @@ func TestDeleteMovie(t *testing.T) {
 			setExpectations: func(mock sqlmock.Sqlmock, movieId *uuid.UUID) {
 				mock.ExpectExec(query).WithArgs(utils.EqUUID(movieId)).WillReturnResult(sqlmock.NewResult(1, 0))
 			},
-			expectedError: kts_errors.KTS_NOT_FOUND,
+			expectedError: kts_errors.KTS_MOVIE_NOT_FOUND,
 		},
 	}
 
@@ -509,7 +509,7 @@ func TestGetMovieByIdWithGenre(t *testing.T) {
 				)
 			},
 			expectedMovie: nil,
-			expectedError: kts_errors.KTS_NOT_FOUND,
+			expectedError: kts_errors.KTS_MOVIE_NOT_FOUND,
 		},
 		{
 			name: "Single movie",
@@ -592,7 +592,7 @@ func TestGetMoviesWithGenres(t *testing.T) {
 				)
 			},
 			expectedMoviesWithGerne: nil,
-			expectedError:           kts_errors.KTS_NOT_FOUND,
+			expectedError:           kts_errors.KTS_MOVIE_NOT_FOUND,
 		},
 		{
 			name: "Multiple movies",
@@ -677,7 +677,7 @@ func TestGetMovieByIdWithEverything(t *testing.T) {
 				)
 			},
 			expectedMovie: nil,
-			expectedError: kts_errors.KTS_NOT_FOUND,
+			expectedError: kts_errors.KTS_MOVIE_NOT_FOUND,
 		},
 		{
 			name: "Single movie",
