@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/.gen/KinoTicketSystem/model"
+	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/repositories"
 	"github.com/google/uuid"
@@ -61,45 +62,32 @@ func (mc *MovieController) GetMovieByName(name *string) (*model.Movies, *models.
 
 func (mc *MovieController) CreateMovie(movie *model.Movies) *models.KTSError {
 	// Add Method AddMovieGenre
-	kts_errors := mc.MovieRepo.CreateMovie(movie)
-	if kts_errors != nil {
-		return kts_errors
-	}
-	return nil
+
+	// TODO: implement
+	return kts_errors.KTS_INTERNAL_ERROR
 }
 
 func (mc *MovieController) UpdateMovie(movie *model.Movies) *models.KTSError {
 	// Add Method RemoveMovieGenre
-	kts_errors := mc.MovieRepo.UpdateMovie(movie)
-	if kts_errors != nil {
-		return kts_errors
-	}
-	return nil
+
+	// TODO: implement
+	return kts_errors.KTS_INTERNAL_ERROR
 }
 
 func (mc *MovieController) DeleteMovie(movieId *uuid.UUID) *models.KTSError {
-	kts_errors := mc.MovieRepo.DeleteMovie(movieId)
-	if kts_errors != nil {
-		return kts_errors
-	}
-	return nil
+	// TODO: implement
+	return kts_errors.KTS_INTERNAL_ERROR
 }
 
 // Combine Movie and Genre
 // func (mc *MovieController) AddMovieGenre(movieId *uuid.UUID, genreId *uuid.UUID) *models.KTSError {
-// 	kts_errors := mc.MovieGenreRepo.AddMovieGenre(movieId, genreId)
-// 	if kts_errors != nil {
-// 		return kts_errors
-// 	}
-// 	return nil
+// 	// TODO: implement
+// 	   return kts_errors.KTS_INTERNAL_ERROR
 // }
 
 // func (mc *MovieController) RemoveMovieGenre(movieId *uuid.UUID, genreId *uuid.UUID) *models.KTSError {
-// 	kts_errors := mc.MovieGenreRepo.RemoveMovieGenre(movieId, genreId)
-// 	if kts_errors != nil {
-// 		return kts_errors
-// 	}
-// 	return nil
+// // TODO: implement
+// return kts_errors.KTS_INTERNAL_ERROR
 // }
 
 // One Movie with all Genres
