@@ -30,12 +30,6 @@ type ActorRepository struct {
 func (ar *ActorRepository) GetActorById(actorId *uuid.UUID) (*models.ActorDTO, *models.KTSError) {
 	var actor models.ActorDTO
 
-	mySqlId, err := utils.MysqlUuid(actorId)
-
-	if err != nil {
-		return nil, kts_errors.KTS_INTERNAL_ERROR
-	}
-
 	stmt := mysql.SELECT(
 		table.Actors.AllColumns,
 		table.ActorPictures.AllColumns,
@@ -48,10 +42,10 @@ func (ar *ActorRepository) GetActorById(actorId *uuid.UUID) (*models.ActorDTO, *
 				LEFT_JOIN(table.Movies, table.Movies.ID.EQ(table.MovieActors.MovieID)),
 		).
 		WHERE(
-			table.Actors.ID.EQ(mySqlId),
+			table.Actors.ID.EQ(utils.MysqlUuid(actorId)),
 		)
 
-	err = stmt.Query(ar.DatabaseManager.GetDatabaseConnection(), &actor)
+	err := stmt.Query(ar.DatabaseManager.GetDatabaseConnection(), &actor)
 
 	if err != nil {
 		return nil, kts_errors.KTS_NOT_FOUND
@@ -88,10 +82,8 @@ func (ar *ActorRepository) GetActors() (*[]models.GetActorsDTO, *models.KTSError
 func (ar *ActorRepository) CreateActor(actor *model.Actors) (*uuid.UUID, *models.KTSError) {
 	actor.ID = utils.NewUUID()
 
-	mySqlId, err := utils.MysqlUuid(actor.ID)
-
 	insertStmt := table.Actors.INSERT(table.Actors.AllColumns).VALUES(
-		mySqlId,
+		utils.MysqlUuid(actor.ID),
 		actor.Name,
 		actor.Birthdate,
 		actor.Description,
@@ -120,12 +112,9 @@ func (ar *ActorRepository) CreateActor(actor *model.Actors) (*uuid.UUID, *models
 func (ar *ActorRepository) CreateActorPicture(actorPicture *model.ActorPictures) (*uuid.UUID, *models.KTSError) {
 	actorPicture.ID = utils.NewUUID()
 
-	mySqlPicId, err := utils.MysqlUuid(actorPicture.ID)
-	mySqlActorId, err := utils.MysqlUuid(actorPicture.ActorID)
-
 	insertStmt := table.ActorPictures.INSERT(table.ActorPictures.AllColumns).VALUES(
-		mySqlPicId,
-		mySqlActorId,
+		utils.MysqlUuid(actorPicture.ID),
+		utils.MysqlUuid(actorPicture.ActorID),
 		actorPicture.PicURL,
 	)
 

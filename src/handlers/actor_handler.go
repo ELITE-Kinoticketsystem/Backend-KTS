@@ -16,7 +16,7 @@ func GetActorByIdHandler(actorController controllers.ActorControllerI) gin.Handl
 	return func(c *gin.Context) {
 		actorId, err := uuid.Parse(c.Param("id"))
 		if err != nil {
-			utils.HandleErrorAndAbort(c, kts_errors.KTS_INTERNAL_ERROR)
+			utils.HandleErrorAndAbort(c, kts_errors.KTS_BAD_REQUEST)
 			return
 		}
 		actor, kts_err := actorController.GetActorById(&actorId)
