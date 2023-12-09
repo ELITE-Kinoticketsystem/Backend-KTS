@@ -41,7 +41,7 @@ func (mr *MovieGenreRepository) AddMovieGenre(movieId *uuid.UUID, genreId *uuid.
 	}
 
 	if rowsAff == 0 {
-		return kts_errors.KTS_NOT_FOUND
+		return kts_errors.KTS_MOVIE_NOT_FOUND
 	}
 
 	return nil
@@ -70,7 +70,7 @@ func (mr *MovieGenreRepository) RemoveMovieGenre(movieId *uuid.UUID, genreId *uu
 	}
 
 	if rowsAff == 0 {
-		return kts_errors.KTS_NOT_FOUND
+		return kts_errors.KTS_MOVIE_NOT_FOUND
 	}
 
 	return nil

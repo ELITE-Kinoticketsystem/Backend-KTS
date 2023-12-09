@@ -54,7 +54,7 @@ func TestAddMovieGenre(t *testing.T) {
 			setExpectations: func(mock sqlmock.Sqlmock, movieId *uuid.UUID, genreId *uuid.UUID) {
 				mock.ExpectExec(query).WithArgs(utils.EqUUID(&uuid1), utils.EqUUID(&uuid2)).WillReturnResult(sqlmock.NewResult(1, 0))
 			},
-			expectedError: kts_errors.KTS_NOT_FOUND,
+			expectedError: kts_errors.KTS_MOVIE_NOT_FOUND,
 		},
 	}
 
@@ -134,7 +134,7 @@ func TestRemoveMovieGenre(t *testing.T) {
 			setExpectations: func(mock sqlmock.Sqlmock, movieId *uuid.UUID, genreId *uuid.UUID) {
 				mock.ExpectExec(query).WithArgs(utils.EqUUID(&uuid1), utils.EqUUID(&uuid2)).WillReturnResult(sqlmock.NewResult(1, 0))
 			},
-			expectedError: kts_errors.KTS_NOT_FOUND,
+			expectedError: kts_errors.KTS_MOVIE_NOT_FOUND,
 		},
 	}
 
