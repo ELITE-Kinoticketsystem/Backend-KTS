@@ -15,6 +15,7 @@ import (
 type Controllers struct {
 	UserController  controllers.UserControllerI
 	EventController controllers.EventControllerI
+	ActorController controllers.ActorControllerI
 }
 
 func createRouter(dbConnection *sql.DB) *gin.Engine {
@@ -48,6 +49,10 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 		DatabaseManager: databaseManager,
 	}
 
+	actorRepo := &repositories.ActorRepository{
+		DatabaseManager: databaseManager,
+	}
+
 	// Create controllers
 	controller := Controllers{
 		UserController: &controllers.UserController{
@@ -57,6 +62,9 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 			EventRepo:   eventRepo,
 			MovieRepo:   movieRepo,
 			TheatreRepo: theatreRepo,
+		},
+		ActorController: &controllers.ActorController{
+			ActorRepo: actorRepo,
 		},
 	}
 
@@ -79,6 +87,11 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 
 	// Should be only accessible for admins
 	securedRoutes.Handle(http.MethodDelete, "/events/:id", handlers.DeleteEventHandler(controller.EventController))
+
+	// Actors
+	router.Handle(http.MethodGet, "/actors/:id", handlers.GetActorByIdHandler(controller.ActorController))
+	router.Handle(http.MethodGet, "/actors/", handlers.GetActorsHandler(controller.ActorController))
+	router.Handle(http.MethodPost, "/actors/", handlers.CreateActorHandler(controller.ActorController))
 
 	return router
 }

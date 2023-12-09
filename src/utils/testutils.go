@@ -31,12 +31,12 @@ func GetSampleLoginData() models.LoginRequest {
 
 func GetSampleUser() model.Users {
 	id, _ := uuid.Parse("47CF752501DF45B7A3A9D3CB25AE939F")
-	username := "Collinho el niño" 
+	username := "Collinho el niño"
 	firstname := "Collin"
 	lastname := "Forslund"
 	return model.Users{
 		ID:        &id,
-		Username: &username,
+		Username:  &username,
 		Email:     "collin.forslund@gmail.com",
 		Password:  "$2a$10$vxXPPpLp5baQ7mzS1pNSEuk6ZW3mbx1Ej7u0tJnF5wferEFqT.qlK",
 		Firstname: &firstname,
