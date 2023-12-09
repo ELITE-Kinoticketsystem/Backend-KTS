@@ -2,17 +2,20 @@ package controllers
 
 import (
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/.gen/KinoTicketSystem/model"
+	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/repositories"
 )
 
 type GenreControllerI interface {
 	GetGenres() (*[]model.Genres, *models.KTSError)
-	GetGenreByName(name string) (*model.Genres, *models.KTSError)
-	CreateGenre(name string) *models.KTSError
+	GetGenreByName(name *string) (*model.Genres, *models.KTSError)
+	CreateGenre(name *string) *models.KTSError
+	UpdateGenre(name *string) *models.KTSError
+	DeleteGenre(name *string) *models.KTSError
 
 	// One Genre with all Movies
-	GetGenreByNameWithMovies(genreName string) (*models.GenreWithMovies, *models.KTSError)
+	GetGenreByNameWithMovies(genreName *string) (*models.GenreWithMovies, *models.KTSError)
 	// All Movies with all Genres - Grouped by Genre
 	GetGenresWithMovies() (*[]models.GenreWithMovies, *models.KTSError)
 }
@@ -29,7 +32,7 @@ func (mc *GenreController) GetGenres() (*[]model.Genres, *models.KTSError) {
 	return genres, nil
 }
 
-func (mc *GenreController) GetGenreByName(name string) (*model.Genres, *models.KTSError) {
+func (mc *GenreController) GetGenreByName(name *string) (*model.Genres, *models.KTSError) {
 	genre, kts_errors := mc.GenreRepo.GetGenreByName(name)
 	if kts_errors != nil {
 		return nil, kts_errors
@@ -37,16 +40,23 @@ func (mc *GenreController) GetGenreByName(name string) (*model.Genres, *models.K
 	return genre, nil
 }
 
-func (mc *GenreController) CreateGenre(name string) *models.KTSError {
-	kts_errors := mc.GenreRepo.CreateGenre(name)
-	if kts_errors != nil {
-		return kts_errors
-	}
-	return nil
+func (mc *GenreController) CreateGenre(name *string) *models.KTSError {
+	// TODO: implement
+	return kts_errors.KTS_INTERNAL_ERROR
+}
+
+func (mc *GenreController) UpdateGenre(name *string) *models.KTSError {
+	// TODO implement
+	return kts_errors.KTS_INTERNAL_ERROR
+}
+
+func (mc *GenreController) DeleteGenre(name *string) *models.KTSError {
+	// TODO implement
+	return kts_errors.KTS_INTERNAL_ERROR
 }
 
 // One Genre with all Movies
-func (mc *GenreController) GetGenreByNameWithMovies(genreName string) (*models.GenreWithMovies, *models.KTSError) {
+func (mc *GenreController) GetGenreByNameWithMovies(genreName *string) (*models.GenreWithMovies, *models.KTSError) {
 	genre, kts_errors := mc.GenreRepo.GetGenreByNameWithMovies(genreName)
 	if kts_errors != nil {
 		return nil, kts_errors
