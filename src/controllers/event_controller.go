@@ -39,7 +39,7 @@ func (ec *EventController) CreateEvent(eventDto *models.CreateEvtDTO) (*uuid.UUI
 
 	movies := eventDto.Movies
 
-	if movies == nil || len(movies) == 0 {
+	if len(movies) == 0 {
 		log.Printf("No movies provided for event: %v", eventId)
 		return nil, kts_errors.KTS_BAD_REQUEST
 	}
@@ -54,7 +54,7 @@ func (ec *EventController) CreateEvent(eventDto *models.CreateEvtDTO) (*uuid.UUI
 
 	eventSeatCategories := eventDto.EventSeatCategories
 
-	if eventSeatCategories == nil || len(eventSeatCategories) == 0 {
+	if len(eventSeatCategories) == 0 {
 		log.Printf("No event seat categories provided for event: %v", eventId)
 		return nil, kts_errors.KTS_BAD_REQUEST
 	}
