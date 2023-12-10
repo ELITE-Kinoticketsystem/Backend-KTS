@@ -119,43 +119,138 @@ func EqUUID(id *uuid.UUID) UUIDMatcher {
 	return UUIDMatcher{id: id}
 }
 
-func GetSampleProducers() *[]model.Producers {
-	var producers []model.Producers
+func GetSampleProducers() *[]models.GetProducersDTO {
+	var producers []models.GetProducersDTO
 
 	uuid1 := uuid.New()
 	uuid2 := uuid.New()
+	uuid3 := uuid.New()
+	uuid4 := uuid.New()
+	uuid5 := uuid.New()
+	uuid6 := uuid.New()
 
 	picUrl := "https://www.picture.google.com"
 
-	producers = append(producers, model.Producers{
-		ID:          &uuid1,
-		Name:        "Producer 1",
-		Birthdate:   time.Now(),
-		Description: "Description 1",
-		PicURL:      &picUrl,
+	producers = append(producers, models.GetProducersDTO{
+		Producers: model.Producers{
+			ID:          &uuid1,
+			Name:        "Producer 1",
+			Birthdate:   time.Now(),
+			Description: "Description 1",
+			PicURL:      &picUrl,
+		},
+		Pictures: []model.ProducerPictures{
+			{
+				ID:         &uuid2,
+				ProducerID: &uuid1,
+				PicURL:     &picUrl,
+			},
+			{
+				ID:         &uuid3,
+				ProducerID: &uuid1,
+				PicURL:     &picUrl,
+			},
+		},
 	})
 
-	producers = append(producers, model.Producers{
-		ID:          &uuid2,
-		Name:        "Producer 2",
-		Birthdate:   time.Now(),
-		Description: "Description 2",
-		PicURL:      &picUrl,
+	producers = append(producers, models.GetProducersDTO{
+		Producers: model.Producers{
+			ID:          &uuid4,
+			Name:        "Producer 1",
+			Birthdate:   time.Now(),
+			Description: "Description 1",
+			PicURL:      &picUrl,
+		},
+		Pictures: []model.ProducerPictures{
+			{
+				ID:         &uuid5,
+				ProducerID: &uuid4,
+				PicURL:     &picUrl,
+			},
+			{
+				ID:         &uuid6,
+				ProducerID: &uuid4,
+				PicURL:     &picUrl,
+			},
+		},
 	})
 
 	return &producers
 }
 
-func GetSampleProducer() model.Producers {
+func GetSampleProducer() *model.Producers {
 	uuid1 := uuid.New()
 
 	picUrl := "https://www.picture.google.com"
 
-	return model.Producers{
+	return &model.Producers{
 		ID:          &uuid1,
 		Name:        "Producer 1",
 		Birthdate:   time.Now(),
 		Description: "Description 1",
 		PicURL:      &picUrl,
+	}
+}
+
+func GetSampleProducerDTO() *models.ProducerDTO {
+	uuid1 := uuid.New()
+	uuid2 := uuid.New()
+	uuid3 := uuid.New()
+	uuid4 := uuid.New()
+	uuid5 := uuid.New()
+
+	banner := "https://www.banner.google.com"
+	cover := "https://www.cover.google.com"
+	trailer_url := "https://www.trailer.google.com"
+	rating := 5.0
+
+	picUrl := "https://www.picture.google.com"
+
+	return &models.ProducerDTO{
+		Producers: model.Producers{
+			ID:          &uuid1,
+			Name:        "Producer 1",
+			Birthdate:   time.Now(),
+			Description: "Description 1",
+			PicURL:      &picUrl,
+		},
+		Pictures: []model.ProducerPictures{
+			{
+				ID:         &uuid2,
+				ProducerID: &uuid1,
+				PicURL:     &picUrl,
+			},
+			{
+				ID:         &uuid3,
+				ProducerID: &uuid1,
+				PicURL:     &picUrl,
+			},
+		},
+		Movies: []model.Movies{
+			{
+				ID:           &uuid4,
+				Title:        "Movie 1",
+				BannerPicURL: &banner,
+				CoverPicURL:  &cover,
+				TrailerURL:   &trailer_url,
+				Rating:       &rating,
+				Description:  "Description 1",
+				ReleaseDate:  time.Now(),
+				TimeInMin:    120,
+				Fsk:          12,
+			},
+			{
+				ID:           &uuid5,
+				Title:        "Movie 2",
+				BannerPicURL: &banner,
+				CoverPicURL:  &cover,
+				TrailerURL:   &trailer_url,
+				Rating:       &rating,
+				Description:  "Description 2",
+				ReleaseDate:  time.Now(),
+				TimeInMin:    120,
+				Fsk:          12,
+			},
+		},
 	}
 }

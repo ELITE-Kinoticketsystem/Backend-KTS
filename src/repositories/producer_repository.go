@@ -3,6 +3,7 @@ package repositories
 import (
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/.gen/KinoTicketSystem/table"
 	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
 
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/.gen/KinoTicketSystem/model"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/managers"
@@ -13,9 +14,10 @@ import (
 )
 
 type ProducerRepositoryI interface {
-	GetProducers() (*[]model.Producers, *models.KTSError)
-	GetProducerById(id *uuid.UUID) (*model.Producers, *models.KTSError)
-	CreateProducer(producer *model.Producers) *models.KTSError
+	GetProducers() (*[]models.GetProducersDTO, *models.KTSError)
+	GetProducerById(id *uuid.UUID) (*models.ProducerDTO, *models.KTSError)
+	CreateProducer(producer *models.CreateProducerDTO) *models.KTSError
+	CreateProducerPicture(producerPicture *model.ProducerPictures) *models.KTSError
 	UpdateProducer(producer *model.Producers) *models.KTSError
 	DeleteProducer(id *uuid.UUID) *models.KTSError
 }
@@ -24,15 +26,18 @@ type ProducerRepository struct {
 	DatabaseManager managers.DatabaseManagerI
 }
 
-func (pr *ProducerRepository) GetProducers() (*[]model.Producers, *models.KTSError) {
-	var producers []model.Producers
+func (pr *ProducerRepository) GetProducers() (*[]models.GetProducersDTO, *models.KTSError) {
+	var producers []models.GetProducersDTO
 
 	// Create the query
 	stmt := jet_mysql.SELECT(
 		table.Producers.AllColumns,
-	).FROM(
-		table.Producers,
-	)
+		table.ProducerPictures.AllColumns,
+	).
+		FROM(
+			table.Producers.
+				LEFT_JOIN(table.ProducerPictures, table.ProducerPictures.ProducerID.EQ(table.Producers.ID)),
+		)
 
 	// Execute the query
 	err := stmt.Query(pr.DatabaseManager.GetDatabaseConnection(), &producers)
@@ -47,23 +52,60 @@ func (pr *ProducerRepository) GetProducers() (*[]model.Producers, *models.KTSErr
 	return &producers, nil
 }
 
-func (pr *ProducerRepository) GetProducerById(id *uuid.UUID) (*model.Producers, *models.KTSError) {
-	var producer model.Producers
-
-	binary_id, _ := id.MarshalBinary()
-
+func (pr *ProducerRepository) GetProducerById(id *uuid.UUID) (*models.ProducerDTO, *models.KTSError) {
+	var producer models.ProducerDTO
 	// Create the query
 	stmt := jet_mysql.SELECT(
 		table.Producers.AllColumns,
-	).FROM(
-		table.Producers,
-	).WHERE(
-		table.Producers.ID.EQ(jet_mysql.String(string(binary_id))),
-	)
+		table.ProducerPictures.AllColumns,
+		table.Movies.AllColumns,
+	).
+		FROM(
+			table.Producers.
+				LEFT_JOIN(table.ProducerPictures, table.ProducerPictures.ProducerID.EQ(table.Producers.ID)).
+				LEFT_JOIN(table.MovieProducers, table.MovieProducers.ProducerID.EQ(table.Producers.ID)).
+				LEFT_JOIN(table.Movies, table.Movies.ID.EQ(table.MovieProducers.MovieID)),
+		).
+		WHERE(
+			table.Actors.ID.EQ(utils.MysqlUuid(id)),
+		)
 
 	// Execute the query
 	err := stmt.Query(pr.DatabaseManager.GetDatabaseConnection(), &producer)
 	if err != nil {
+		if err.Error() == "qrm: no rows in result set" {
+			return nil, kts_errors.KTS_NOT_FOUND
+		}
+		return nil, kts_errors.KTS_INTERNAL_ERROR
+	}
+
+	return &producer, nil
+}
+
+func (pr *ProducerRepository) GetProducerByName(name *string) (*models.ProducerDTO, *models.KTSError) {
+	var producer models.ProducerDTO
+	// Create the query
+	stmt := jet_mysql.SELECT(
+		table.Producers.AllColumns,
+		table.ProducerPictures.AllColumns,
+		table.Movies.AllColumns,
+	).
+		FROM(
+			table.Producers.
+				LEFT_JOIN(table.ProducerPictures, table.ProducerPictures.ProducerID.EQ(table.Producers.ID)).
+				LEFT_JOIN(table.MovieProducers, table.MovieProducers.ProducerID.EQ(table.Producers.ID)).
+				LEFT_JOIN(table.Movies, table.Movies.ID.EQ(table.MovieProducers.MovieID)),
+		).
+		WHERE(
+			table.Producers.Name.EQ(jet_mysql.String(*name)),
+		)
+
+	// Execute the query
+	err := stmt.Query(pr.DatabaseManager.GetDatabaseConnection(), &producer)
+	if err != nil {
+		if err.Error() == "qrm: no rows in result set" {
+			return nil, kts_errors.KTS_NOT_FOUND
+		}
 		return nil, kts_errors.KTS_INTERNAL_ERROR
 	}
 
@@ -75,11 +117,10 @@ func (pr *ProducerRepository) CreateProducer(producer *model.Producers) *models.
 	stmt := table.Producers.INSERT(
 		table.Producers.AllColumns,
 	).VALUES(
-		table.Producers.ID.SET(jet_mysql.String(producer.ID.String())),
-		table.Producers.Name.SET(jet_mysql.String(producer.Name)),
-		table.Producers.Birthdate.SET(jet_mysql.Date(producer.Birthdate.Year(), producer.Birthdate.Month(), producer.Birthdate.Day())),
-		table.Producers.Description.SET(jet_mysql.String(producer.Description)),
-		table.Producers.PicURL.SET(jet_mysql.String((*producer.PicURL))),
+		producer.Name,
+		producer.Birthdate,
+		producer.Description,
+		producer.PicURL,
 	)
 
 	// Execute the query
@@ -88,68 +129,95 @@ func (pr *ProducerRepository) CreateProducer(producer *model.Producers) *models.
 		return kts_errors.KTS_INTERNAL_ERROR
 	}
 
+	rowsAff, err := rows.RowsAffected()
+	if err != nil {
+		return kts_errors.KTS_INTERNAL_ERROR
+	}
+
+	if rowsAff == 0 {
+		return kts_errors.KTS_NOT_FOUND
+	}
+
+	return nil
+}
+
+func (pr *ProducerRepository) CreateProducerPicture(producerPicture *model.ProducerPictures) *models.KTSError {
+
+	insertStmt := table.ProducerPictures.INSERT(table.ProducerPictures.AllColumns).VALUES(
+		utils.MysqlUuid(producerPicture.ProducerID),
+		producerPicture.PicURL,
+	)
+
+	rows, err := insertStmt.Exec(pr.DatabaseManager.GetDatabaseConnection())
+	if err != nil {
+		return kts_errors.KTS_INTERNAL_ERROR
+	}
+
 	rowsAffected, err := rows.RowsAffected()
+
 	if err != nil {
 		return kts_errors.KTS_INTERNAL_ERROR
 	}
 
 	if rowsAffected == 0 {
-		return kts_errors.KTS_NOT_FOUND
+		return kts_errors.KTS_INTERNAL_ERROR
 	}
 
 	return nil
 }
 
 func (pr *ProducerRepository) UpdateProducer(producer *model.Producers) *models.KTSError {
-	// Create the query
-	stmt := table.Producers.UPDATE(
-		table.Producers.AllColumns,
-	).SET(
-		table.Producers.ID.SET(jet_mysql.String(producer.ID.String())),
-		table.Producers.Name.SET(jet_mysql.String(producer.Name)),
-		table.Producers.Birthdate.SET(jet_mysql.Date(producer.Birthdate.Year(), producer.Birthdate.Month(), producer.Birthdate.Day())),
-		table.Producers.Description.SET(jet_mysql.String(producer.Description)),
-		table.Producers.PicURL.SET(jet_mysql.String((*producer.PicURL))),
-	).WHERE(
-		table.Producers.ID.EQ(jet_mysql.String(producer.ID.String())),
-	)
 
-	// Execute the query
-	rows, err := stmt.Exec(pr.DatabaseManager.GetDatabaseConnection())
-	if err != nil {
-		return kts_errors.KTS_INTERNAL_ERROR
-	}
+	// binary_id, _ := producer.ID.MarshalBinary()
 
-	rowsAffected, err := rows.RowsAffected()
-	if err != nil {
-		return kts_errors.KTS_INTERNAL_ERROR
-	}
+	// // Create the query
+	// stmt := table.Producers.UPDATE(
+	// 	table.Producers.AllColumns,
+	// ).SET(
+	// 	table.Producers.Name.SET(jet_mysql.String(producer.Name)),
+	// 	table.Producers.Birthdate.SET(jet_mysql.Date(producer.Birthdate.Year(), producer.Birthdate.Month(), producer.Birthdate.Day())),
+	// 	table.Producers.Description.SET(jet_mysql.String(producer.Description)),
+	// 	table.Producers.PicURL.SET(jet_mysql.String((*producer.PicURL))),
+	// ).WHERE(
+	// 	table.Producers.ID.EQ(jet_mysql.String(string(binary_id))),
+	// )
 
-	if rowsAffected == 0 {
-		return kts_errors.KTS_NOT_FOUND
-	}
+	// // Execute the query
+	// rows, err := stmt.Exec(pr.DatabaseManager.GetDatabaseConnection())
+	// if err != nil {
+	// 	return kts_errors.KTS_INTERNAL_ERROR
+	// }
+
+	// rowsAffected, err := rows.RowsAffected()
+	// if err != nil {
+	// 	return kts_errors.KTS_INTERNAL_ERROR
+	// }
+
+	// if rowsAffected == 0 {
+	// 	return kts_errors.KTS_NOT_FOUND
+	// }
 
 	return nil
 }
 
 func (pr *ProducerRepository) DeleteProducer(id *uuid.UUID) *models.KTSError {
-	// Create the query
-	stmt := table.Producers.DELETE().WHERE(table.Producers.ID.EQ(jet_mysql.String(id.String())))
+	// // Create the query
+	// stmt := table.Producers.DELETE().WHERE(table.Producers.ID.EQ(jet_mysql.String(id.String())))
 
-	// Execute the query
-	rows, err := stmt.Exec(pr.DatabaseManager.GetDatabaseConnection())
-	if err != nil {
-		return kts_errors.KTS_INTERNAL_ERROR
-	}
+	// // Execute the query
+	// rows, err := stmt.Exec(pr.DatabaseManager.GetDatabaseConnection())
+	// if err != nil {
+	// 	return kts_errors.KTS_INTERNAL_ERROR
+	// }
 
-	rowsAffected, err := rows.RowsAffected()
-	if err != nil {
-		return kts_errors.KTS_INTERNAL_ERROR
-	}
+	// rowsAffected, err := rows.RowsAffected()
+	// if err != nil {
+	// 	return kts_errors.KTS_INTERNAL_ERROR
+	// }
 
-	if rowsAffected == 0 {
-		return kts_errors.KTS_NOT_FOUND
-	}
+	// if rowsAffected == 0 {
+	// 	return kts_errors.KTS_NOT_FOUND
+	// }
 
 	return nil
 }
