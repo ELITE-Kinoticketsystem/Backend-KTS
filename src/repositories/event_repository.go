@@ -1,93 +1,130 @@
 package repositories
 
 import (
-	"errors"
-
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/.gen/KinoTicketSystem/model"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/.gen/KinoTicketSystem/table"
+	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/managers"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
+	"github.com/go-jet/jet/v2/mysql"
 	"github.com/google/uuid"
 )
 
+const (
+	showing = "showing"
+	special = "special event"
+)
+
 type EventRepo interface {
-	CreateEvent(event *model.Events) (*uuid.UUID, error)
-	DeleteEvent(*uuid.UUID) error
-	GetEventsForMovieId(movieId *uuid.UUID) ([]*model.Events, error)
-	GetSpecialEvents() ([]*models.EventDTO, error)
+	CreateEvent(event *model.Events) (*uuid.UUID, *models.KTSError)
+	GetEventsForMovie(movieId *uuid.UUID) ([]*model.Events, *models.KTSError)
 
-	CreatePriceCategory(priceCategory *model.PriceCategories) error
+	AddEventMovie(eventId *uuid.UUID, movieId *uuid.UUID) *models.KTSError
 
-	AddEventMovie(eventId *uuid.UUID, movieId *uuid.UUID) error
-	DeleteEventMovies(eventId *uuid.UUID) error
+	GetSpecialEvents() (*[]models.GetSpecialEventsDTO, *models.KTSError)
+	CreateEventSeat(eventSeat *model.EventSeats) *models.KTSError
 
-	CreateEventSeatCategory(eventSeatCategory *model.EventSeatCategories) error
-	DeleteEventSeatCategoryByEventId(eventId *uuid.UUID) error
-	CreateEventSeat(eventSeat *model.EventSeats) error
-	DeleteEventSeatsByEventId(eventId *uuid.UUID) error
+	CreateEventSeatCategory(eventSeatCategory *model.EventSeatCategories) *models.KTSError
 }
 
 type EventRepository struct {
 	DatabaseManager managers.DatabaseManagerI
 }
 
-func (er *EventRepository) CreateEvent(event *model.Events) error {
+func (er *EventRepository) CreateEvent(event *model.Events) (*uuid.UUID, *models.KTSError) {
+	event.ID = utils.NewUUID()
 
+	stmt := table.Events.INSERT(table.Events.AllColumns).VALUES(
+		utils.MysqlUuid(event.ID),
+		event.Title,
+		event.Start,
+		event.End,
+		event.Description,
+		event.EventType,
+		utils.MysqlUuid(event.CinemaHallID),
+	)
+
+	kts_err := utils.ExcecuteInsertStatement(stmt, er.DatabaseManager.GetDatabaseConnection())
+
+	if kts_err != nil {
+		return nil, kts_err
+	}
+
+	return event.ID, nil
 }
 
-func (er *EventRepository) DeleteEvent(id *uuid.UUID) error {
-	// TODO: implement
-	return errors.New("not implemented")
+func (er *EventRepository) CreateEventSeatCategory(eventSeatCategory *model.EventSeatCategories) *models.KTSError {
+	insertStmt := table.EventSeatCategories.INSERT(table.EventSeatCategories.AllColumns).VALUES(
+		utils.MysqlUuid(eventSeatCategory.EventID),
+		utils.MysqlUuid(eventSeatCategory.SeatCategoryID),
+		eventSeatCategory.Price,
+	)
+
+	return utils.ExcecuteInsertStatement(insertStmt, er.DatabaseManager.GetDatabaseConnection())
 }
 
-func (er *EventRepository) GetEventsForMovieId(movieId *uuid.UUID) ([]*model.Events, error) {
-	// TODO: implement
-	return nil, errors.New("not implemented")
+func (er *EventRepository) AddEventMovie(eventId *uuid.UUID, movieId *uuid.UUID) *models.KTSError {
+	insertStmt := table.EventMovies.INSERT(table.EventMovies.EventID, table.EventMovies.MovieID).VALUES(
+		utils.MysqlUuid(eventId),
+		utils.MysqlUuid(movieId),
+	)
+
+	return utils.ExcecuteInsertStatement(insertStmt, er.DatabaseManager.GetDatabaseConnection())
 }
 
-func (er *EventRepository) GetEventsForCinemaHallId(cinemaHallId *uuid.UUID) ([]*model.Events, error) {
-	// TODO: implement
-	return nil, errors.New("not implemented")
+func (er *EventRepository) CreateEventSeat(eventSeat *model.EventSeats) *models.KTSError {
+	insertStmt := table.EventSeats.INSERT(table.EventSeats.ID, table.EventSeats.EventID, table.EventSeats.SeatID, table.EventSeats.Booked).VALUES(
+		utils.MysqlUuid(eventSeat.ID),
+		utils.MysqlUuid(eventSeat.EventID),
+		utils.MysqlUuid(eventSeat.SeatID),
+		eventSeat.Booked,
+	)
+
+	return utils.ExcecuteInsertStatement(insertStmt, er.DatabaseManager.GetDatabaseConnection())
 }
 
-func (er *EventRepository) GetSpecialEvents() ([]*models.EventDTO, error) {
-	// TODO: implement
-	return nil, errors.New("not implemented")
+func (er *EventRepository) GetSpecialEvents() (*[]models.GetSpecialEventsDTO, *models.KTSError) {
+	var specialEvents []models.GetSpecialEventsDTO
+
+	stmt := mysql.SELECT(
+		table.Events.AllColumns,
+		table.Movies.AllColumns,
+	).
+		FROM(
+			table.Events.
+				LEFT_JOIN(table.EventMovies, table.EventMovies.EventID.EQ(table.Events.ID)).
+				LEFT_JOIN(table.Movies, table.Movies.ID.EQ(table.EventMovies.MovieID)),
+		).
+		WHERE(
+			table.Events.EventType.EQ(utils.MySqlString(special)),
+		).WHERE(
+		table.Events.Start.GT(utils.MysqlTimeNow()),
+	)
+
+	err := stmt.Query(er.DatabaseManager.GetDatabaseConnection(), &specialEvents)
+
+	if err != nil {
+		return nil, kts_errors.KTS_INTERNAL_ERROR
+	}
+
+	if len(specialEvents) == 0 {
+		return nil, kts_errors.KTS_NOT_FOUND
+	}
+
+	return &specialEvents, nil
 }
 
-func (er *EventRepository) CreatePriceCategory(priceCategory *model.PriceCategories) error {
-	// TODO: implement
-	return errors.New("not implemented")
-}
+func (er *EventRepository) GetEventsForMovie(movieId *uuid.UUID) ([]*model.Events, *models.KTSError) {
+	stmt := table.Events.SELECT(table.Events.AllColumns).FROM(table.Events.FULL_JOIN(table.EventMovies, table.EventMovies.EventID.EQ(table.Events.ID))).WHERE(table.EventMovies.MovieID.EQ(utils.MysqlUuid(movieId))).WHERE(table.Events.Start.GT(utils.MysqlTimeNow())).WHERE(table.Events.EventType.EQ(utils.MySqlString(showing)))
 
-func (er *EventRepository) AddEventMovie(eventId *uuid.UUID, movieId *uuid.UUID) error {
-	// TODO: implement
-	return errors.New("not implemented")
-}
+	var events []*model.Events
 
-func (er *EventRepository) DeleteEventMovies(eventId *uuid.UUID) error {
-	// TODO: implement
-	return errors.New("not implemented")
-}
+	err := stmt.Query(er.DatabaseManager.GetDatabaseConnection(), &events)
 
-func (er *EventRepository) CreateEventSeatCategory(eventSeatCategory *model.EventSeatCategories) error {
-	// TODO: implement
-	return errors.New("not implemented")
-}
+	if err != nil {
+		return nil, kts_errors.KTS_INTERNAL_ERROR
+	}
 
-func (er *EventRepository) CreateEventSeat(eventSeat *model.EventSeats) error {
-	// TODO: implement
-	return errors.New("not implemented")
-}
-
-func (er *EventRepository) DeleteEventMovie(eventId *uuid.UUID) error {
-	// TODO: implement
-	return errors.New("not implemented")
-}
-
-func (er *EventRepository) DeleteEventSeatCategoryByEventId(eventId *uuid.UUID) error {
-	return errors.New("not implemented")
-}
-
-func (er *EventRepository) DeleteEventSeatsByEventId(eventId *uuid.UUID) error {
-	return errors.New("not implemented")
+	return events, nil
 }

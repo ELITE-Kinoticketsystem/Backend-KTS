@@ -117,3 +117,7 @@ func (m UUIDMatcher) Match(v driver.Value) bool {
 func EqUUID(id *uuid.UUID) UUIDMatcher {
 	return UUIDMatcher{id: id}
 }
+
+func GetStringPointer(s string) *string {
+	return &s
+}

@@ -12,3 +12,9 @@ type CreateEvtDTO struct {
 
 	EventSeatCategories []model.EventSeatCategories
 }
+
+type GetSpecialEventsDTO struct {
+	model.Events
+
+	Movies []*model.Movies
+}
