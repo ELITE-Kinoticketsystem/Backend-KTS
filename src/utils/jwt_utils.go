@@ -4,6 +4,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/go-jet/jet/v2/mysql"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 )
@@ -76,4 +77,13 @@ func ExtractToken(authHeader string) (string, error) {
 
 	// Return token without "Bearer " prefix
 	return authHeader[7:], nil
+}
+
+func MysqlUuid(uuid *uuid.UUID) mysql.StringExpression {
+	binary_id, _ := uuid.MarshalBinary()
+	return mysql.String(string(binary_id))
+}
+
+func MySqlString(str string) mysql.StringExpression {
+	return mysql.String(str)
 }

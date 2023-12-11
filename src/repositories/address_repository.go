@@ -7,6 +7,7 @@ import (
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/.gen/KinoTicketSystem/model"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/managers"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
 
 	jet_mysql "github.com/go-jet/jet/v2/mysql"
 	"github.com/google/uuid"
@@ -24,7 +25,7 @@ type AddressRepository struct {
 	DatabaseManager managers.DatabaseManagerI
 }
 
-func (mr *MovieRepository) GetAddresses() (*[]model.Addresses, *models.KTSError) {
+func (ar *AddressRepository) GetAddresses() (*[]model.Addresses, *models.KTSError) {
 	var addresses []model.Addresses
 
 	// Create the query
@@ -35,7 +36,7 @@ func (mr *MovieRepository) GetAddresses() (*[]model.Addresses, *models.KTSError)
 	)
 
 	// Execute the query
-	err := stmt.Query(mr.DatabaseManager.GetDatabaseConnection(), &addresses)
+	err := stmt.Query(ar.DatabaseManager.GetDatabaseConnection(), &addresses)
 	if err != nil {
 		return nil, kts_errors.KTS_INTERNAL_ERROR
 	}
@@ -47,30 +48,30 @@ func (mr *MovieRepository) GetAddresses() (*[]model.Addresses, *models.KTSError)
 	return &addresses, nil
 }
 
-func (mr *MovieRepository) GetAddressById(id *uuid.UUID) (*model.Addresses, *models.KTSError) {
+func (ar *AddressRepository) GetAddressById(id *uuid.UUID) (*model.Addresses, *models.KTSError) {
 	var address model.Addresses
-
-	binary_id, _ := id.MarshalBinary()
-
 	// Create the query
 	stmt := jet_mysql.SELECT(
 		table.Addresses.AllColumns,
 	).FROM(
 		table.Addresses,
 	).WHERE(
-		table.Addresses.ID.EQ(jet_mysql.String(string(binary_id))),
+		table.Addresses.ID.EQ(utils.MysqlUuid(id)),
 	)
 
 	// Execute the query
-	err := stmt.Query(mr.DatabaseManager.GetDatabaseConnection(), &address)
+	err := stmt.Query(ar.DatabaseManager.GetDatabaseConnection(), &address)
 	if err != nil {
+		if err.Error() == "qrm: no rows in result set" {
+			return nil, kts_errors.KTS_NOT_FOUND
+		}
 		return nil, kts_errors.KTS_INTERNAL_ERROR
 	}
 
 	return &address, nil
 }
 
-func (mr *MovieRepository) CreateAddress(address *model.Addresses) *models.KTSError {
+func (ar *AddressRepository) CreateAddress(address *model.Addresses) *models.KTSError {
 	// Create the query
 	stmt := table.Addresses.INSERT(
 		table.Addresses.AllColumns,
@@ -84,7 +85,7 @@ func (mr *MovieRepository) CreateAddress(address *model.Addresses) *models.KTSEr
 	)
 
 	// Execute the query
-	rows, err := stmt.Exec(mr.DatabaseManager.GetDatabaseConnection())
+	rows, err := stmt.Exec(ar.DatabaseManager.GetDatabaseConnection())
 	if err != nil {
 		return kts_errors.KTS_INTERNAL_ERROR
 	}
@@ -101,7 +102,7 @@ func (mr *MovieRepository) CreateAddress(address *model.Addresses) *models.KTSEr
 	return nil
 }
 
-func (mr *MovieRepository) UpdateAddress(address *model.Addresses) *models.KTSError {
+func (ar *AddressRepository) UpdateAddress(address *model.Addresses) *models.KTSError {
 	// Create the query
 	stmt := table.Addresses.UPDATE(
 		table.Addresses.AllColumns,
@@ -113,11 +114,11 @@ func (mr *MovieRepository) UpdateAddress(address *model.Addresses) *models.KTSEr
 		table.Addresses.City.SET(jet_mysql.String(address.City)),
 		table.Addresses.Country.SET(jet_mysql.String(address.Country)),
 	).WHERE(
-		table.Addresses.ID.EQ(jet_mysql.String(address.ID.String())),
+		table.Addresses.ID.EQ(utils.MysqlUuid(address.ID)),
 	)
 
 	// Execute the query
-	rows, err := stmt.Exec(mr.DatabaseManager.GetDatabaseConnection())
+	rows, err := stmt.Exec(ar.DatabaseManager.GetDatabaseConnection())
 	if err != nil {
 		return kts_errors.KTS_INTERNAL_ERROR
 	}
@@ -134,12 +135,12 @@ func (mr *MovieRepository) UpdateAddress(address *model.Addresses) *models.KTSEr
 	return nil
 }
 
-func (mr *MovieRepository) DeleteAddress(id *uuid.UUID) *models.KTSError {
+func (ar *AddressRepository) DeleteAddress(id *uuid.UUID) *models.KTSError {
 	// Create the query
-	stmt := table.Addresses.DELETE().WHERE(table.Addresses.ID.EQ(jet_mysql.String(id.String())))
+	stmt := table.Addresses.DELETE().WHERE(table.Addresses.ID.EQ(utils.MysqlUuid(id)))
 
 	// Execute the query
-	rows, err := stmt.Exec(mr.DatabaseManager.GetDatabaseConnection())
+	rows, err := stmt.Exec(ar.DatabaseManager.GetDatabaseConnection())
 	if err != nil {
 		return kts_errors.KTS_INTERNAL_ERROR
 	}

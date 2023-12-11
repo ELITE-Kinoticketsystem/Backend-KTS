@@ -1,14 +1,15 @@
 package utils
 
 import (
+	"database/sql/driver"
 	"fmt"
 	"reflect"
 
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/.gen/KinoTicketSystem/model"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/google/uuid"
-	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/.gen/KinoTicketSystem/model"
 )
 
 func GetSampleRegistrationData() models.RegistrationRequest {
@@ -30,12 +31,12 @@ func GetSampleLoginData() models.LoginRequest {
 
 func GetSampleUser() model.Users {
 	id, _ := uuid.Parse("47CF752501DF45B7A3A9D3CB25AE939F")
-	username := "Collinho el niño" 
+	username := "Collinho el niño"
 	firstname := "Collin"
 	lastname := "Forslund"
 	return model.Users{
 		ID:        &id,
-		Username: &username,
+		Username:  &username,
 		Email:     "collin.forslund@gmail.com",
 		Password:  "$2a$10$vxXPPpLp5baQ7mzS1pNSEuk6ZW3mbx1Ej7u0tJnF5wferEFqT.qlK",
 		Firstname: &firstname,
@@ -75,4 +76,28 @@ func (m UserMatcher) String() string {
 
 func EqUserMatcher(u model.Users, password string) UserMatcher {
 	return UserMatcher{user: u, password: password}
+}
+
+type UUIDMatcher struct {
+	id *uuid.UUID
+}
+
+func (m UUIDMatcher) Match(v driver.Value) bool {
+	bytes, ok := v.(string)
+	if !ok {
+		return false
+	}
+	id, err := m.id.MarshalBinary()
+	if err != nil {
+		return false
+	}
+	return string(id) == bytes
+}
+
+func EqUUID(id *uuid.UUID) UUIDMatcher {
+	return UUIDMatcher{id: id}
+}
+
+func GetStringPointer(s string) *string {
+	return &s
 }
