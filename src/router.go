@@ -14,7 +14,6 @@ import (
 
 type Controllers struct {
 	UserController  controllers.UserControllerI
-	EventController controllers.EventControllerI
 	MovieController controllers.MovieControllerI
 	GenreController controllers.GenreControllerI
 }
@@ -38,14 +37,7 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 		DatabaseManager: databaseManager,
 	}
 
-	eventRepo := &repositories.EventRepository{
-		DatabaseManager: databaseManager,
-	}
-
 	movieRepo := &repositories.MovieRepository{
-		DatabaseManager: databaseManager,
-	}
-	theatreRepo := &repositories.TheatreRepository{
 		DatabaseManager: databaseManager,
 	}
 
@@ -66,15 +58,10 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 		UserController: &controllers.UserController{
 			UserRepo: userRepo,
 		},
-		EventController: &controllers.EventController{
-			EventRepo:   eventRepo,
-			TheatreRepo: theatreRepo,
-		},
 		MovieController: &controllers.MovieController{
 			MovieRepo:      movieRepo,
 			MovieGenreRepo: movieGenreRepo,
 		},
-
 		GenreController: &controllers.GenreController{
 			GenreRepo: genreRepo,
 		},
@@ -89,13 +76,6 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 	publicRoutes.Handle(http.MethodPost, "/auth/check-username", handlers.CheckUsernameHandler(controller.UserController))
 
 	securedRoutes.Handle(http.MethodGet, "/test", handlers.TestJwtToken)
-
-	securedRoutes.Handle(http.MethodPost, "/events", handlers.CreateEventHandler(controller.EventController))
-
-	// Get events for movieId
-	publicRoutes.Handle(http.MethodGet, "/events/movies/:id", handlers.GetEventsForMovieHandler(controller.EventController))
-	publicRoutes.Handle(http.MethodGet, "/events/special-events", handlers.GetSpecialEventsHandler(controller.EventController))
-	// TODO: Do we need to add update event handler because how would we proceed then?
 
 	router.Handle(http.MethodGet, "/movies", handlers.GetMovies(controller.MovieController))
 	router.Handle(http.MethodGet, "/movies/:id", handlers.GetMovieById(controller.MovieController))
@@ -113,9 +93,6 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 	router.Handle(http.MethodGet, "/movies/genres", handlers.GetMoviesWithGenres(controller.MovieController))
 
 	router.Handle(http.MethodGet, "/moviewitheverything/:id", handlers.GetMovieByIdWithEverything(controller.MovieController))
-
-	// Should be only accessible for admins
-	securedRoutes.Handle(http.MethodDelete, "/events/:id", handlers.DeleteEventHandler(controller.EventController))
 
 	return router
 }
