@@ -4,7 +4,6 @@ import (
 	"net/http"
 
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/controllers"
-	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
 	"github.com/gin-gonic/gin"
 )
@@ -34,20 +33,23 @@ func GetGenreByName(genreCtrl controllers.GenreControllerI) gin.HandlerFunc {
 }
 
 func CreateGenre(genreCtrl controllers.GenreControllerI) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		var genre model.Genres
-		err := c.ShouldBindJSON(&genre)
-		if err != nil || utils.ContainsEmptyString(genre.GenreName) {
-			utils.HandleErrorAndAbort(c, kts_errors.KTS_BAD_REQUEST)
-			return
-		}
+	// return func(c *gin.Context) {
+	// 	var genre model.Genres
+	// 	err := c.ShouldBindJSON(&genre)
+	// 	if err != nil || utils.ContainsEmptyString(genre.GenreName) {
+	// 		utils.HandleErrorAndAbort(c, kts_errors.KTS_BAD_REQUEST)
+	// 		return
+	// 	}
 
-		kts_err := genreCtrl.CreateGenre(&genre.GenreName)
-		if kts_err != nil {
-			utils.HandleErrorAndAbort(c, kts_err)
-			return
-		}
-		c.JSON(http.StatusCreated, genre)
+	// 	kts_err := genreCtrl.CreateGenre(&genre.GenreName)
+	// 	if kts_err != nil {
+	// 		utils.HandleErrorAndAbort(c, kts_err)
+	// 		return
+	// 	}
+	// 	c.JSON(http.StatusCreated, genre)
+	// }
+	return func(c *gin.Context) {
+		c.JSON(http.StatusNotImplemented, gin.H{"message": "Not implemented"})
 	}
 }
 
