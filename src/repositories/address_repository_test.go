@@ -9,54 +9,54 @@ import (
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/managers"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
 
-	// "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestGetAddresses(t *testing.T) {
-	// sampleAddresses := utils.GetSampleAddresses()
+	sampleAddresses := utils.GetSampleAddresses()
 
-	query := ""
+	query := "SELECT addresses.id AS \"addresses.id\", addresses.street AS \"addresses.street\", addresses.street_nr AS \"addresses.street_nr\", addresses.zipcode AS \"addresses.zipcode\", addresses.city AS \"addresses.city\", addresses.country AS \"addresses.country\" FROM `KinoTicketSystem`.addresses;"
 
 	testCases := []struct {
-		name            string
-		setExpectations func(mock sqlmock.Sqlmock)
-		expectedMovies  *[]model.Addresses
-		expectedError   *models.KTSError
+		name              string
+		setExpectations   func(mock sqlmock.Sqlmock)
+		expectedaddresses *[]model.Addresses
+		expectedError     *models.KTSError
 	}{
 		{
 			name: "Empty result",
 			setExpectations: func(mock sqlmock.Sqlmock) {
 				mock.ExpectQuery(query).WillReturnRows(
-					sqlmock.NewRows([]string{""}),
+					sqlmock.NewRows([]string{"addresses.id", "addresses.street", "addresses.street_nr", "addresses.zipcode", "addresses.city", "addresses.country"}),
 				)
 			},
-			expectedMovies: nil,
-			expectedError:  kts_errors.KTS_NOT_FOUND,
+			expectedaddresses: nil,
+			expectedError:     kts_errors.KTS_NOT_FOUND,
 		},
-		// {
-		// 	name: "Multiple movies",
-		// 	setExpectations: func(mock sqlmock.Sqlmock) {
-		// 		mock.ExpectQuery(query).WillReturnRows(
-		// 			sqlmock.NewRows(
-		// 				[]string{"movies.id", "movies.title", "movies.description", "movies.banner_pic_url", "movies.cover_pic_url", "movies.trailer_url", "movies.rating", "movies.release_date", "movies.time_in_min", "movies.fsk"},
-		// 			).AddRow(
-		// 				(*sampleMovies)[0].ID, (*sampleMovies)[0].Title, (*sampleMovies)[0].Description, (*sampleMovies)[0].BannerPicURL, (*sampleMovies)[0].CoverPicURL, (*sampleMovies)[0].TrailerURL, (*sampleMovies)[0].Rating, (*sampleMovies)[0].ReleaseDate, (*sampleMovies)[0].TimeInMin, (*sampleMovies)[0].Fsk,
-		// 			).AddRow(
-		// 				(*sampleMovies)[1].ID, (*sampleMovies)[1].Title, (*sampleMovies)[1].Description, (*sampleMovies)[1].BannerPicURL, (*sampleMovies)[1].CoverPicURL, (*sampleMovies)[1].TrailerURL, (*sampleMovies)[1].Rating, (*sampleMovies)[1].ReleaseDate, (*sampleMovies)[1].TimeInMin, (*sampleMovies)[1].Fsk,
-		// 			),
-		// 		)
-		// 	},
-		// 	expectedMovies: sampleMovies,
-		// 	expectedError:  nil,
-		// },
 		{
-			name: "Error while querying movies",
+			name: "Multiple addresses",
+			setExpectations: func(mock sqlmock.Sqlmock) {
+				mock.ExpectQuery(query).WillReturnRows(
+					sqlmock.NewRows(
+						[]string{"addresses.id", "addresses.street", "addresses.street_nr", "addresses.zipcode", "addresses.city", "addresses.country"},
+					).AddRow(
+						(*sampleAddresses)[0].ID, (*sampleAddresses)[0].Street, (*sampleAddresses)[0].StreetNr, (*sampleAddresses)[0].Zipcode, (*sampleAddresses)[0].City, (*sampleAddresses)[0].Country,
+					).AddRow(
+						(*sampleAddresses)[1].ID, (*sampleAddresses)[1].Street, (*sampleAddresses)[1].StreetNr, (*sampleAddresses)[1].Zipcode, (*sampleAddresses)[1].City, (*sampleAddresses)[1].Country,
+					),
+				)
+			},
+			expectedaddresses: sampleAddresses,
+			expectedError:     nil,
+		},
+		{
+			name: "Error while querying addresses",
 			setExpectations: func(mock sqlmock.Sqlmock) {
 				mock.ExpectQuery(query).WillReturnError(sqlmock.ErrCancelled)
 			},
-			expectedMovies: nil,
-			expectedError:  kts_errors.KTS_INTERNAL_ERROR,
+			expectedaddresses: nil,
+			expectedError:     kts_errors.KTS_INTERNAL_ERROR,
 		},
 	}
 
@@ -79,10 +79,10 @@ func TestGetAddresses(t *testing.T) {
 			tc.setExpectations(mock)
 
 			// Call the method under test
-			movies, kts_err := addressRepo.GetAddresses()
+			addresses, kts_err := addressRepo.GetAddresses()
 
 			// Verify the results
-			assert.Equal(t, tc.expectedMovies, movies)
+			assert.Equal(t, tc.expectedaddresses, addresses)
 			assert.Equal(t, tc.expectedError, kts_err)
 
 			// Verify that all expectations were met
