@@ -96,7 +96,7 @@ func TestGetGenres(t *testing.T) {
 }
 
 func TestGetGenreByName(t *testing.T) {
-	sampleGenre := utils.GetSampleGenreByName()
+	sampleGenre := utils.GetSampleGenre()
 
 	genreName := sampleGenre.GenreName
 
@@ -177,7 +177,7 @@ func TestGetGenreByName(t *testing.T) {
 }
 
 func TestCreateGenre(t *testing.T) {
-	sampleGenre := utils.GetSampleGenreByName()
+	sampleGenre := utils.GetSampleGenre()
 
 	genreName := sampleGenre.GenreName
 
@@ -254,7 +254,7 @@ func TestCreateGenre(t *testing.T) {
 }
 
 func TestUpdateGenre(t *testing.T) {
-	sampleGenre := utils.GetSampleGenreByName()
+	sampleGenre := utils.GetSampleGenre()
 
 	query := "UPDATE `KinoTicketSystem`.genres SET genre_name = ? WHERE genres.id = ?;"
 

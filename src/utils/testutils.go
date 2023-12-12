@@ -161,7 +161,7 @@ func GetSampleGenres() *[]model.Genres {
 	return &modelGenres
 }
 
-func GetSampleGenreByName() *model.Genres {
+func GetSampleGenre() *model.Genres {
 	modelGenres := model.Genres{}
 	uuid1 := uuid.MustParse("6ba7b820-9dad-11d1-80b4-00c04fd430c4")
 
