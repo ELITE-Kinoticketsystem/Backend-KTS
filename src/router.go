@@ -13,10 +13,12 @@ import (
 )
 
 type Controllers struct {
-	UserController  controllers.UserControllerI
-	MovieController controllers.MovieControllerI
-	GenreController controllers.GenreControllerI
-	ActorController controllers.ActorControllerI
+	UserController      controllers.UserControllerI
+	EventController     controllers.EventControllerI
+	ActorController     controllers.ActorControllerI
+	MovieController     controllers.MovieControllerI
+	EventSeatController controllers.EventSeatControllerI
+	GenreController     controllers.GenreControllerI
 	PriceCategories controllers.PriceCategoryControllerI
 }
 
@@ -67,6 +69,10 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 		DatabaseManager: databaseManager,
 	}
 
+	eventSeatRepo := &repositories.EventSeatRepository{
+		DatabaseManager: databaseManager,
+	}
+
 	// Create controllers
 	controller := Controllers{
 		UserController: &controllers.UserController{
@@ -86,6 +92,9 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 		},
 		PriceCategories: &controllers.PriceCategoryController{
 			PriceCategoryRepository: priceCategoryRepo,
+		},
+		EventSeatController: &controllers.EventSeatController{
+			EventSeatRepo: eventSeatRepo,
 		},
 	}
 
@@ -126,6 +135,10 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 	router.Handle(http.MethodPost, "/price-categories/", handlers.CreatePriceCategoryHandler(controller.PriceCategories))
 	router.Handle(http.MethodPut, "/price-categories/:id", handlers.UpdatePriceCategoryHandler(controller.PriceCategories))
 	router.Handle(http.MethodDelete, "/price-categories/:id", handlers.DeletePriceCategoryHandler(controller.PriceCategories))
+
+	// event seats
+	router.Handle(http.MethodGet, "/events/:id/seats", handlers.GetEventSeatsHandler(controller.EventSeatController))
+	router.Handle(http.MethodPost, "/eventseats/:seatId", handlers.BlockEventSeatHandler(controller.EventSeatController))
 
 	return router
 }
