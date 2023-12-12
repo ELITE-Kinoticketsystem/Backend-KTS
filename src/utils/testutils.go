@@ -563,3 +563,7 @@ func GetSampleMovieByIdWithEverything() *models.MovieWithEverything {
 
 	return &movieWithEverything
 }
+
+func GetStringPointer(s string) *string {
+	return &s
+}

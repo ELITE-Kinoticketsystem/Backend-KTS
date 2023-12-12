@@ -15,6 +15,8 @@ var (
 	KTS_USER_NOT_FOUND = &models.KTSError{ErrorMessage: "USER_NOT_FOUND", Status: 404}
 	// KTS_NOT_FOUND is used to indicate that the requested resource was not found
 	KTS_MOVIE_NOT_FOUND = &models.KTSError{ErrorMessage: "MOVIE_NOT_FOUND", Status: 404}
+	// KTS_NOT_FOUND is used to indicate that the requested resource was not found
+	KTS_NOT_FOUND = &models.KTSError{ErrorMessage: "NOT_FOUND", Status: 404}
 	// KTS_USER_EXISTS is used to indicate that the creation of a user failed because the user already exists
 	KTS_USER_EXISTS = &models.KTSError{ErrorMessage: "USER_EXISTS", Status: 409}
 	// KTS_EMAIL_EXISTS is used to indicate that the email already exists

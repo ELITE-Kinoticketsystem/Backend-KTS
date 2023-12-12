@@ -16,6 +16,7 @@ type Controllers struct {
 	UserController  controllers.UserControllerI
 	MovieController controllers.MovieControllerI
 	GenreController controllers.GenreControllerI
+	ActorController controllers.ActorControllerI
 }
 
 func createRouter(dbConnection *sql.DB) *gin.Engine {
@@ -49,9 +50,9 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 		DatabaseManager: databaseManager,
 	}
 
-	// theatreRepo := &repositories.TheatreRepository{
-	// 	DatabaseManager: databaseManager,
-	// }
+	actorRepo := &repositories.ActorRepository{
+		DatabaseManager: databaseManager,
+	}
 
 	// Create controllers
 	controller := Controllers{
@@ -64,6 +65,9 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 		},
 		GenreController: &controllers.GenreController{
 			GenreRepo: genreRepo,
+		},
+		ActorController: &controllers.ActorController{
+			ActorRepo: actorRepo,
 		},
 	}
 
@@ -86,7 +90,7 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 	// router.Handle(http.MethodPost, "/movies", handlers.CreateMovie(controller.MovieController))
 	// router.Handle(http.MethodPut, "/movies", handlers.UpdateMovie(controller.MovieController))
 	// router.Handle(http.MethodDelete, "/movies/:id", handlers.DeleteMovie(controller.MovieController))
-	
+
 	router.Handle(http.MethodGet, "/genres", handlers.GetGenres(controller.GenreController))
 	router.Handle(http.MethodGet, "/genres/:name", handlers.GetGenreByName(controller.GenreController))
 	router.Handle(http.MethodGet, "/genres/movies", handlers.GetGenresWithMovies(controller.GenreController))
@@ -94,6 +98,10 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 	// Will be implemented later
 	// router.Handle(http.MethodPost, "/genres", handlers.CreateGenre(controller.GenreController))
 
+	// Actors
+	router.Handle(http.MethodGet, "/actors/:id", handlers.GetActorByIdHandler(controller.ActorController))
+	router.Handle(http.MethodGet, "/actors/", handlers.GetActorsHandler(controller.ActorController))
+	router.Handle(http.MethodPost, "/actors/", handlers.CreateActorHandler(controller.ActorController))
 
 	return router
 }

@@ -12,6 +12,7 @@ import (
 	reflect "reflect"
 
 	model "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/.gen/KinoTicketSystem/model"
+	models "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
 	uuid "github.com/google/uuid"
 	gomock "go.uber.org/mock/gomock"
 )
@@ -40,11 +41,11 @@ func (m *MockTheaterRepoI) EXPECT() *MockTheaterRepoIMockRecorder {
 }
 
 // GetSeatsForCinemaHall mocks base method.
-func (m *MockTheaterRepoI) GetSeatsForCinemaHall(cinemaHallId *uuid.UUID) ([]model.Seats, error) {
+func (m *MockTheaterRepoI) GetSeatsForCinemaHall(cinemaHallId *uuid.UUID) ([]model.Seats, *models.KTSError) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetSeatsForCinemaHall", cinemaHallId)
 	ret0, _ := ret[0].([]model.Seats)
-	ret1, _ := ret[1].(error)
+	ret1, _ := ret[1].(*models.KTSError)
 	return ret0, ret1
 }
 
