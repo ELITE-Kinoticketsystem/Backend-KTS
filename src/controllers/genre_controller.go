@@ -14,8 +14,6 @@ type GenreControllerI interface {
 	UpdateGenre(genre *model.Genres) *models.KTSError
 	DeleteGenre(genre_id *uuid.UUID) *models.KTSError
 
-	// One Genre with all Movies
-	GetGenreByNameWithMovies(genreName *string) (*models.GenreWithMovies, *models.KTSError)
 	// All Movies with all Genres - Grouped by Genre
 	GetGenresWithMovies() (*[]models.GenreWithMovies, *models.KTSError)
 }
@@ -62,15 +60,6 @@ func (mc *GenreController) DeleteGenre(genre_id *uuid.UUID) *models.KTSError {
 		return kts_errors
 	}
 	return nil
-}
-
-// One Genre with all Movies
-func (mc *GenreController) GetGenreByNameWithMovies(genreName *string) (*models.GenreWithMovies, *models.KTSError) {
-	genre, kts_errors := mc.GenreRepo.GetGenreByNameWithMovies(genreName)
-	if kts_errors != nil {
-		return nil, kts_errors
-	}
-	return genre, nil
 }
 
 // All Movies with all Genres - Grouped by Genre

@@ -93,7 +93,6 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 	router.Handle(http.MethodGet, "/genres", handlers.GetGenres(controller.GenreController))
 	router.Handle(http.MethodGet, "/genres/:name", handlers.GetGenreByName(controller.GenreController))
 	router.Handle(http.MethodGet, "/genres/movies", handlers.GetGenresWithMovies(controller.GenreController))
-	router.Handle(http.MethodGet, "/genres/:name/movies", handlers.GetGenreByNameWithMovies(controller.GenreController))
 	router.Handle(http.MethodPost, "/genres", handlers.CreateGenre(controller.GenreController))
 	router.Handle(http.MethodPut, "/genres", handlers.UpdateGenre(controller.GenreController))
 	router.Handle(http.MethodDelete, "/genres/:id", handlers.DeleteGenre(controller.GenreController))

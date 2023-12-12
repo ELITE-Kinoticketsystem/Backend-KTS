@@ -134,66 +134,6 @@ func TestGetGenreByName(t *testing.T) {
 	}
 }
 
-func TestGetGenreByNameWithMovies(t *testing.T) {
-	sampleGenre := utils.GetSampleGenreByNameWithMovies()
-
-	genreName := sampleGenre.GenreName
-
-	testCases := []struct {
-		name            string
-		setExpectations func(mockRepo mocks.MockGenreRepositoryI, genreName *string)
-		expectedGenre   *models.GenreWithMovies
-		expectedError   *models.KTSError
-	}{
-		{
-			name: "Empty result",
-			setExpectations: func(mockRepo mocks.MockGenreRepositoryI, genreName *string) {
-				mockRepo.EXPECT().GetGenreByNameWithMovies(genreName).Return(nil, kts_errors.KTS_NOT_FOUND)
-			},
-			expectedGenre: nil,
-			expectedError: kts_errors.KTS_NOT_FOUND,
-		},
-		{
-			name: "One GenreWithMovies",
-			setExpectations: func(mockRepo mocks.MockGenreRepositoryI, genreName *string) {
-				mockRepo.EXPECT().GetGenreByNameWithMovies(genreName).Return(sampleGenre, nil)
-			},
-			expectedGenre: sampleGenre,
-			expectedError: nil,
-		},
-		{
-			name: "Error while querying genreWithMovie",
-			setExpectations: func(mockRepo mocks.MockGenreRepositoryI, genreName *string) {
-				mockRepo.EXPECT().GetGenreByNameWithMovies(genreName).Return(nil, kts_errors.KTS_INTERNAL_ERROR)
-			},
-			expectedGenre: nil,
-			expectedError: kts_errors.KTS_INTERNAL_ERROR,
-		},
-	}
-
-	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
-			// GIVEN
-			mockCtrl := gomock.NewController(t)
-			defer mockCtrl.Finish()
-			genreRepoMock := mocks.NewMockGenreRepositoryI(mockCtrl)
-			genreController := GenreController{
-				GenreRepo: genreRepoMock,
-			}
-
-			// define expectations
-			tc.setExpectations(*genreRepoMock, &genreName)
-
-			// WHEN
-			genreWithMovie, kts_err := genreController.GetGenreByNameWithMovies(&genreName)
-
-			// THEN
-			assert.Equal(t, tc.expectedGenre, genreWithMovie)
-			assert.Equal(t, tc.expectedError, kts_err)
-		})
-	}
-}
-
 func TestGetGenresWithMovies(t *testing.T) {
 	sampleGenre := utils.GetSampleGenresWithMovies()
 

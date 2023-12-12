@@ -84,19 +84,6 @@ func DeleteGenre(genreCtrl controllers.GenreControllerI) gin.HandlerFunc {
 	}
 }
 
-func GetGenreByNameWithMovies(genreCtrl controllers.GenreControllerI) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		genreName := c.Param("name")
-
-		genre, kts_err := genreCtrl.GetGenreByNameWithMovies(&genreName)
-		if kts_err != nil {
-			utils.HandleErrorAndAbort(c, kts_err)
-			return
-		}
-		c.JSON(http.StatusOK, genre)
-	}
-}
-
 func GetGenresWithMovies(genreCtrl controllers.GenreControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		genres, kts_err := genreCtrl.GetGenresWithMovies()

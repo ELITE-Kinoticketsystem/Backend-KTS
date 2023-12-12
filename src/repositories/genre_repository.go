@@ -21,9 +21,6 @@ type GenreRepositoryI interface {
 
 	// All Movies with all Genres - Grouped by Genre
 	GetGenresWithMovies() (*[]models.GenreWithMovies, *models.KTSError)
-
-	// One Genre with all Movies
-	GetGenreByNameWithMovies(genreName *string) (*models.GenreWithMovies, *models.KTSError)
 }
 
 type GenreRepository struct {
@@ -127,11 +124,10 @@ func (mr *GenreRepository) UpdateGenre(genre *model.Genres) *models.KTSError {
 }
 
 func (mr *GenreRepository) DeleteGenre(genreId *uuid.UUID) *models.KTSError {
-	
 
 	// Create the delete statement
 	deleteQuery := table.Genres.DELETE().
-	WHERE(table.Genres.ID.EQ(utils.MysqlUuid(genreId)))
+		WHERE(table.Genres.ID.EQ(utils.MysqlUuid(genreId)))
 
 	// Execute the query
 	rows, err := deleteQuery.Exec(mr.DatabaseManager.GetDatabaseConnection())
@@ -149,34 +145,6 @@ func (mr *GenreRepository) DeleteGenre(genreId *uuid.UUID) *models.KTSError {
 	}
 
 	return nil
-}
-
-// One Genre with all table.Movies
-func (mr *GenreRepository) GetGenreByNameWithMovies(genreName *string) (*models.GenreWithMovies, *models.KTSError) {
-	var movies models.GenreWithMovies
-
-	// Create the query
-	stmt := mysql.SELECT(
-		table.Movies.AllColumns,
-		table.Genres.AllColumns,
-	).FROM(
-		table.MovieGenres.
-			INNER_JOIN(table.Movies, table.Movies.ID.EQ(table.MovieGenres.MovieID)).
-			INNER_JOIN(table.Genres, table.Genres.ID.EQ(table.MovieGenres.GenreID)),
-	).WHERE(
-		table.Genres.GenreName.EQ(utils.MySqlString(*genreName)),
-	)
-
-	// Execute the query
-	err := stmt.Query(mr.DatabaseManager.GetDatabaseConnection(), &movies)
-	if err != nil {
-		if err.Error() == "qrm: no rows in result set" {
-			return nil, kts_errors.KTS_NOT_FOUND
-		}
-		return nil, kts_errors.KTS_INTERNAL_ERROR
-	}
-
-	return &movies, nil
 }
 
 // All Movies with all Genres - Grouped by Genre
