@@ -48,7 +48,7 @@ func (mr *GenreRepository) GetGenres() (*[]model.Genres, *models.KTSError) {
 	}
 
 	if len(genres) == 0 {
-		return nil, kts_errors.KTS_MOVIE_NOT_FOUND
+		return nil, kts_errors.KTS_NOT_FOUND
 	}
 
 	return &genres, nil
@@ -70,7 +70,7 @@ func (mr *GenreRepository) GetGenreByName(name *string) (*model.Genres, *models.
 	err := stmt.Query(mr.DatabaseManager.GetDatabaseConnection(), &genre)
 	if err != nil {
 		if err.Error() == "qrm: no rows in result set" {
-			return nil, kts_errors.KTS_MOVIE_NOT_FOUND
+			return nil, kts_errors.KTS_NOT_FOUND
 		}
 		return nil, kts_errors.KTS_INTERNAL_ERROR
 	}
@@ -95,7 +95,7 @@ func (mr *GenreRepository) CreateGenre(name *string) *models.KTSError {
 	}
 
 	if rowsAff == 0 {
-		return kts_errors.KTS_MOVIE_NOT_FOUND
+		return kts_errors.KTS_NOT_FOUND
 	}
 
 	return nil
@@ -120,7 +120,7 @@ func (mr *GenreRepository) UpdateGenre(genre *model.Genres) *models.KTSError {
 	}
 
 	if rowsAff == 0 {
-		return kts_errors.KTS_MOVIE_NOT_FOUND
+		return kts_errors.KTS_NOT_FOUND
 	}
 
 	return nil
@@ -145,7 +145,7 @@ func (mr *GenreRepository) DeleteGenre(genreId *uuid.UUID) *models.KTSError {
 	}
 
 	if rowsAff == 0 {
-		return kts_errors.KTS_MOVIE_NOT_FOUND
+		return kts_errors.KTS_NOT_FOUND
 	}
 
 	return nil
@@ -171,7 +171,7 @@ func (mr *GenreRepository) GetGenreByNameWithMovies(genreName *string) (*models.
 	err := stmt.Query(mr.DatabaseManager.GetDatabaseConnection(), &movies)
 	if err != nil {
 		if err.Error() == "qrm: no rows in result set" {
-			return nil, kts_errors.KTS_MOVIE_NOT_FOUND
+			return nil, kts_errors.KTS_NOT_FOUND
 		}
 		return nil, kts_errors.KTS_INTERNAL_ERROR
 	}
@@ -200,7 +200,7 @@ func (mr *GenreRepository) GetGenresWithMovies() (*[]models.GenreWithMovies, *mo
 	}
 
 	if len(genresWithMovies) == 0 {
-		return nil, kts_errors.KTS_MOVIE_NOT_FOUND
+		return nil, kts_errors.KTS_NOT_FOUND
 	}
 
 	return &genresWithMovies, nil

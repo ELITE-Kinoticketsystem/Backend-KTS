@@ -11,7 +11,6 @@ import (
 	"github.com/google/uuid"
 )
 
-// Genre
 func GetGenres(genreCtrl controllers.GenreControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		genres, kts_err := genreCtrl.GetGenres()

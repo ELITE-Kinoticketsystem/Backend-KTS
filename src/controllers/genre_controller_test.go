@@ -25,13 +25,13 @@ func TestGetGenres(t *testing.T) {
 		{
 			name: "Empty result",
 			setExpectations: func(mockRepo mocks.MockGenreRepositoryI) {
-				mockRepo.EXPECT().GetGenres().Return(nil, kts_errors.KTS_MOVIE_NOT_FOUND)
+				mockRepo.EXPECT().GetGenres().Return(nil, kts_errors.KTS_NOT_FOUND)
 			},
 			expectedGenre: nil,
-			expectedError: kts_errors.KTS_MOVIE_NOT_FOUND,
+			expectedError: kts_errors.KTS_NOT_FOUND,
 		},
 		{
-			name: "Multiple movies",
+			name: "Multiple genres",
 			setExpectations: func(mockRepo mocks.MockGenreRepositoryI) {
 				mockRepo.EXPECT().GetGenres().Return(sampleGenre, nil)
 			},
@@ -39,7 +39,7 @@ func TestGetGenres(t *testing.T) {
 			expectedError: nil,
 		},
 		{
-			name: "Error while querying movies",
+			name: "Error while querying genre",
 			setExpectations: func(mockRepo mocks.MockGenreRepositoryI) {
 				mockRepo.EXPECT().GetGenres().Return(nil, kts_errors.KTS_INTERNAL_ERROR)
 			},
@@ -51,7 +51,7 @@ func TestGetGenres(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// GIVEN
-			// create mock user repo
+			// create mock genre repo
 			mockCtrl := gomock.NewController(t)
 			defer mockCtrl.Finish()
 			genreRepoMock := mocks.NewMockGenreRepositoryI(mockCtrl)
@@ -63,12 +63,11 @@ func TestGetGenres(t *testing.T) {
 			tc.setExpectations(*genreRepoMock)
 
 			// WHEN
-			// call RegisterUser with registrationData
-			movies, kts_err := genreController.GetGenres()
+			genres, kts_err := genreController.GetGenres()
 
 			// THEN
-			// check expected error and user
-			assert.Equal(t, tc.expectedGenre, movies)
+			// check expected error and genres
+			assert.Equal(t, tc.expectedGenre, genres)
 			assert.Equal(t, tc.expectedError, kts_err)
 		})
 	}
@@ -88,13 +87,13 @@ func TestGetGenreByName(t *testing.T) {
 		{
 			name: "Empty result",
 			setExpectations: func(mockRepo mocks.MockGenreRepositoryI, genreName *string) {
-				mockRepo.EXPECT().GetGenreByName(genreName).Return(nil, kts_errors.KTS_MOVIE_NOT_FOUND)
+				mockRepo.EXPECT().GetGenreByName(genreName).Return(nil, kts_errors.KTS_NOT_FOUND)
 			},
 			expectedGenre: nil,
-			expectedError: kts_errors.KTS_MOVIE_NOT_FOUND,
+			expectedError: kts_errors.KTS_NOT_FOUND,
 		},
 		{
-			name: "Multiple movies",
+			name: "One genre",
 			setExpectations: func(mockRepo mocks.MockGenreRepositoryI, genreName *string) {
 				mockRepo.EXPECT().GetGenreByName(genreName).Return(sampleGenre, nil)
 			},
@@ -102,7 +101,7 @@ func TestGetGenreByName(t *testing.T) {
 			expectedError: nil,
 		},
 		{
-			name: "Error while querying movies",
+			name: "Error while querying genre",
 			setExpectations: func(mockRepo mocks.MockGenreRepositoryI, genreName *string) {
 				mockRepo.EXPECT().GetGenreByName(genreName).Return(nil, kts_errors.KTS_INTERNAL_ERROR)
 			},
@@ -114,7 +113,7 @@ func TestGetGenreByName(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// GIVEN
-			// create mock user repo
+			// create mock genre repo
 			mockCtrl := gomock.NewController(t)
 			defer mockCtrl.Finish()
 			genreRepoMock := mocks.NewMockGenreRepositoryI(mockCtrl)
@@ -126,12 +125,10 @@ func TestGetGenreByName(t *testing.T) {
 			tc.setExpectations(*genreRepoMock, &genreName)
 
 			// WHEN
-			// call RegisterUser with registrationData
-			movies, kts_err := genreController.GetGenreByName(&genreName)
+			genre, kts_err := genreController.GetGenreByName(&genreName)
 
 			// THEN
-			// check expected error and user
-			assert.Equal(t, tc.expectedGenre, movies)
+			assert.Equal(t, tc.expectedGenre, genre)
 			assert.Equal(t, tc.expectedError, kts_err)
 		})
 	}
@@ -151,13 +148,13 @@ func TestGetGenreByNameWithMovies(t *testing.T) {
 		{
 			name: "Empty result",
 			setExpectations: func(mockRepo mocks.MockGenreRepositoryI, genreName *string) {
-				mockRepo.EXPECT().GetGenreByNameWithMovies(genreName).Return(nil, kts_errors.KTS_MOVIE_NOT_FOUND)
+				mockRepo.EXPECT().GetGenreByNameWithMovies(genreName).Return(nil, kts_errors.KTS_NOT_FOUND)
 			},
 			expectedGenre: nil,
-			expectedError: kts_errors.KTS_MOVIE_NOT_FOUND,
+			expectedError: kts_errors.KTS_NOT_FOUND,
 		},
 		{
-			name: "Multiple movies",
+			name: "One GenreWithMovies",
 			setExpectations: func(mockRepo mocks.MockGenreRepositoryI, genreName *string) {
 				mockRepo.EXPECT().GetGenreByNameWithMovies(genreName).Return(sampleGenre, nil)
 			},
@@ -165,7 +162,7 @@ func TestGetGenreByNameWithMovies(t *testing.T) {
 			expectedError: nil,
 		},
 		{
-			name: "Error while querying movies",
+			name: "Error while querying genreWithMovie",
 			setExpectations: func(mockRepo mocks.MockGenreRepositoryI, genreName *string) {
 				mockRepo.EXPECT().GetGenreByNameWithMovies(genreName).Return(nil, kts_errors.KTS_INTERNAL_ERROR)
 			},
@@ -177,7 +174,6 @@ func TestGetGenreByNameWithMovies(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// GIVEN
-			// create mock user repo
 			mockCtrl := gomock.NewController(t)
 			defer mockCtrl.Finish()
 			genreRepoMock := mocks.NewMockGenreRepositoryI(mockCtrl)
@@ -189,12 +185,10 @@ func TestGetGenreByNameWithMovies(t *testing.T) {
 			tc.setExpectations(*genreRepoMock, &genreName)
 
 			// WHEN
-			// call RegisterUser with registrationData
-			movies, kts_err := genreController.GetGenreByNameWithMovies(&genreName)
+			genreWithMovie, kts_err := genreController.GetGenreByNameWithMovies(&genreName)
 
 			// THEN
-			// check expected error and user
-			assert.Equal(t, tc.expectedGenre, movies)
+			assert.Equal(t, tc.expectedGenre, genreWithMovie)
 			assert.Equal(t, tc.expectedError, kts_err)
 		})
 	}
@@ -212,13 +206,13 @@ func TestGetGenresWithMovies(t *testing.T) {
 		{
 			name: "Empty result",
 			setExpectations: func(mockRepo mocks.MockGenreRepositoryI) {
-				mockRepo.EXPECT().GetGenresWithMovies().Return(nil, kts_errors.KTS_MOVIE_NOT_FOUND)
+				mockRepo.EXPECT().GetGenresWithMovies().Return(nil, kts_errors.KTS_NOT_FOUND)
 			},
 			expectedGenre: nil,
-			expectedError: kts_errors.KTS_MOVIE_NOT_FOUND,
+			expectedError: kts_errors.KTS_NOT_FOUND,
 		},
 		{
-			name: "Multiple movies",
+			name: "Multiple GenresWithMovies",
 			setExpectations: func(mockRepo mocks.MockGenreRepositoryI) {
 				mockRepo.EXPECT().GetGenresWithMovies().Return(sampleGenre, nil)
 			},
@@ -226,7 +220,7 @@ func TestGetGenresWithMovies(t *testing.T) {
 			expectedError: nil,
 		},
 		{
-			name: "Error while querying movies",
+			name: "Error while querying GenresWithMovies",
 			setExpectations: func(mockRepo mocks.MockGenreRepositoryI) {
 				mockRepo.EXPECT().GetGenresWithMovies().Return(nil, kts_errors.KTS_INTERNAL_ERROR)
 			},
@@ -238,7 +232,6 @@ func TestGetGenresWithMovies(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// GIVEN
-			// create mock user repo
 			mockCtrl := gomock.NewController(t)
 			defer mockCtrl.Finish()
 			genreRepoMock := mocks.NewMockGenreRepositoryI(mockCtrl)
@@ -250,12 +243,10 @@ func TestGetGenresWithMovies(t *testing.T) {
 			tc.setExpectations(*genreRepoMock)
 
 			// WHEN
-			// call RegisterUser with registrationData
-			movies, kts_err := genreController.GetGenresWithMovies()
+			genresWithMovies, kts_err := genreController.GetGenresWithMovies()
 
 			// THEN
-			// check expected error and user
-			assert.Equal(t, tc.expectedGenre, movies)
+			assert.Equal(t, tc.expectedGenre, genresWithMovies)
 			assert.Equal(t, tc.expectedError, kts_err)
 		})
 	}
@@ -272,9 +263,9 @@ func TestCreateGenre(t *testing.T) {
 		{
 			name: "Empty result",
 			setExpectations: func(mockRepo mocks.MockGenreRepositoryI, genreName *string) {
-				mockRepo.EXPECT().CreateGenre(genreName).Return(kts_errors.KTS_MOVIE_NOT_FOUND)
+				mockRepo.EXPECT().CreateGenre(genreName).Return(kts_errors.KTS_NOT_FOUND)
 			},
-			expectedError: kts_errors.KTS_MOVIE_NOT_FOUND,
+			expectedError: kts_errors.KTS_NOT_FOUND,
 		},
 		{
 			name: "Create genre",
@@ -295,7 +286,6 @@ func TestCreateGenre(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// GIVEN
-			// create mock user repo
 			mockCtrl := gomock.NewController(t)
 			defer mockCtrl.Finish()
 			genreRepoMock := mocks.NewMockGenreRepositoryI(mockCtrl)
@@ -307,11 +297,9 @@ func TestCreateGenre(t *testing.T) {
 			tc.setExpectations(*genreRepoMock, &sampleGenre.GenreName)
 
 			// WHEN
-			// call RegisterUser with registrationData
 			kts_err := genreController.CreateGenre(&sampleGenre.GenreName)
 
 			// THEN
-			// check expected error and user
 			assert.Equal(t, tc.expectedError, kts_err)
 		})
 	}
@@ -328,9 +316,9 @@ func TestUpdateGenre(t *testing.T) {
 		{
 			name: "Empty result",
 			setExpectations: func(mockRepo mocks.MockGenreRepositoryI, genre *model.Genres) {
-				mockRepo.EXPECT().UpdateGenre(genre).Return(kts_errors.KTS_MOVIE_NOT_FOUND)
+				mockRepo.EXPECT().UpdateGenre(genre).Return(kts_errors.KTS_NOT_FOUND)
 			},
-			expectedError: kts_errors.KTS_MOVIE_NOT_FOUND,
+			expectedError: kts_errors.KTS_NOT_FOUND,
 		},
 		{
 			name: "Update genre",
@@ -351,7 +339,6 @@ func TestUpdateGenre(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// GIVEN
-			// create mock user repo
 			mockCtrl := gomock.NewController(t)
 			defer mockCtrl.Finish()
 			genreRepoMock := mocks.NewMockGenreRepositoryI(mockCtrl)
@@ -363,11 +350,9 @@ func TestUpdateGenre(t *testing.T) {
 			tc.setExpectations(*genreRepoMock, sampleGenre)
 
 			// WHEN
-			// call RegisterUser with registrationData
 			kts_err := genreController.UpdateGenre(sampleGenre)
 
 			// THEN
-			// check expected error and user
 			assert.Equal(t, tc.expectedError, kts_err)
 		})
 	}
@@ -386,9 +371,9 @@ func TestDeleteGenre(t *testing.T) {
 		{
 			name: "Empty result",
 			setExpectations: func(mockRepo mocks.MockGenreRepositoryI, genreID *uuid.UUID) {
-				mockRepo.EXPECT().DeleteGenre(genreID).Return(kts_errors.KTS_MOVIE_NOT_FOUND)
+				mockRepo.EXPECT().DeleteGenre(genreID).Return(kts_errors.KTS_NOT_FOUND)
 			},
-			expectedError: kts_errors.KTS_MOVIE_NOT_FOUND,
+			expectedError: kts_errors.KTS_NOT_FOUND,
 		},
 		{
 			name: "Delete genre",
@@ -409,7 +394,6 @@ func TestDeleteGenre(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// GIVEN
-			// create mock user repo
 			mockCtrl := gomock.NewController(t)
 			defer mockCtrl.Finish()
 			genreRepoMock := mocks.NewMockGenreRepositoryI(mockCtrl)
@@ -421,11 +405,9 @@ func TestDeleteGenre(t *testing.T) {
 			tc.setExpectations(*genreRepoMock, genreID)
 
 			// WHEN
-			// call RegisterUser with registrationData
 			kts_err := genreController.DeleteGenre(genreID)
 
 			// THEN
-			// check expected error and user
 			assert.Equal(t, tc.expectedError, kts_err)
 		})
 	}

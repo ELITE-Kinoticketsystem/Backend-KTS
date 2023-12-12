@@ -52,7 +52,7 @@ func (mr *MovieRepository) GetMovies() (*[]model.Movies, *models.KTSError) {
 	}
 
 	if len(movies) == 0 {
-		return nil, kts_errors.KTS_MOVIE_NOT_FOUND
+		return nil, kts_errors.KTS_NOT_FOUND
 	}
 
 	return &movies, nil
@@ -75,7 +75,7 @@ func (mr *MovieRepository) GetMovieById(movieId *uuid.UUID) (*model.Movies, *mod
 	err := stmt.Query(mr.DatabaseManager.GetDatabaseConnection(), &movie)
 	if err != nil {
 		if err.Error() == "qrm: no rows in result set" {
-			return nil, kts_errors.KTS_MOVIE_NOT_FOUND
+			return nil, kts_errors.KTS_NOT_FOUND
 		}
 		return nil, kts_errors.KTS_INTERNAL_ERROR
 	}
@@ -100,7 +100,7 @@ func (mr *MovieRepository) GetMovieByName(movieName *string) (*model.Movies, *mo
 	err := stmt.Query(mr.DatabaseManager.GetDatabaseConnection(), &movie)
 	if err != nil {
 		if err.Error() == "qrm: no rows in result set" {
-			return nil, kts_errors.KTS_MOVIE_NOT_FOUND
+			return nil, kts_errors.KTS_NOT_FOUND
 		}
 		return nil, kts_errors.KTS_INTERNAL_ERROR
 	}
@@ -142,7 +142,7 @@ func (mr *MovieRepository) CreateMovie(movie *model.Movies) *models.KTSError {
 	}
 
 	if rowsAff == 0 {
-		return kts_errors.KTS_MOVIE_NOT_FOUND
+		return kts_errors.KTS_NOT_FOUND
 	}
 
 	return nil
@@ -177,7 +177,7 @@ func (mr *MovieRepository) UpdateMovie(movie *model.Movies) *models.KTSError {
 	}
 
 	if rowsAff == 0 {
-		return kts_errors.KTS_MOVIE_NOT_FOUND
+		return kts_errors.KTS_NOT_FOUND
 	}
 
 	return nil
@@ -199,7 +199,7 @@ func (mr *MovieRepository) DeleteMovie(movieId *uuid.UUID) *models.KTSError {
 	}
 
 	if rowsAff == 0 {
-		return kts_errors.KTS_MOVIE_NOT_FOUND
+		return kts_errors.KTS_NOT_FOUND
 	}
 
 	return nil
@@ -225,7 +225,7 @@ func (mr *MovieRepository) GetMovieByIdWithGenre(movieId *uuid.UUID) (*models.Mo
 	err := stmt.Query(mr.DatabaseManager.GetDatabaseConnection(), &movie)
 	if err != nil {
 		if err.Error() == "qrm: no rows in result set" {
-			return nil, kts_errors.KTS_MOVIE_NOT_FOUND
+			return nil, kts_errors.KTS_NOT_FOUND
 		}
 		return nil, kts_errors.KTS_INTERNAL_ERROR
 	}
@@ -254,7 +254,7 @@ func (mr *MovieRepository) GetMoviesWithGenres() (*[]models.MovieWithGenres, *mo
 	}
 
 	if len(moviesWithGenres) == 0 {
-		return nil, kts_errors.KTS_MOVIE_NOT_FOUND
+		return nil, kts_errors.KTS_NOT_FOUND
 	}
 
 	return &moviesWithGenres, nil
@@ -287,7 +287,7 @@ func (mr *MovieRepository) GetMovieByIdWithEverything(movieId *uuid.UUID) (*mode
 	err := stmt.Query(mr.DatabaseManager.GetDatabaseConnection(), &movie)
 	if err != nil {
 		if err.Error() == "qrm: no rows in result set" {
-			return nil, kts_errors.KTS_MOVIE_NOT_FOUND
+			return nil, kts_errors.KTS_NOT_FOUND
 		}
 		return nil, kts_errors.KTS_INTERNAL_ERROR
 	}

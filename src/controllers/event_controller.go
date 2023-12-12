@@ -18,10 +18,8 @@ type EventControllerI interface {
 }
 
 type EventController struct {
-	EventRepo      repositories.EventRepo
-	MovieRepo      repositories.MovieRepositoryI
-	MovieGenreRepo repositories.MovieGenreRepositoryI
-	TheatreRepo    repositories.TheaterRepoI
+	EventRepo   repositories.EventRepo
+	TheatreRepo repositories.TheaterRepoI
 }
 
 func (ec *EventController) CreateEvent(eventDto *models.CreateEvtDTO) (*uuid.UUID, *models.KTSError) {

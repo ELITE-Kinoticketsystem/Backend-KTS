@@ -27,14 +27,14 @@ func TestAddMovieGenre(t *testing.T) {
 		expectedError   *models.KTSError
 	}{
 		{
-			name: "Create movie",
+			name: "Create movieGenre",
 			setExpectations: func(mock sqlmock.Sqlmock, movieId *uuid.UUID, genreId *uuid.UUID) {
 				mock.ExpectExec(query).WithArgs(utils.EqUUID(&uuid1), utils.EqUUID(&uuid2)).WillReturnResult(sqlmock.NewResult(1, 1))
 			},
 			expectedError: nil,
 		},
 		{
-			name: "Error while creating movie",
+			name: "Error while creating movieGenre",
 			setExpectations: func(mock sqlmock.Sqlmock, movieId *uuid.UUID, genreId *uuid.UUID) {
 				mock.ExpectExec(query).WithArgs(utils.EqUUID(&uuid1), utils.EqUUID(&uuid2)).WillReturnError(sqlmock.ErrCancelled)
 			},
@@ -50,11 +50,11 @@ func TestAddMovieGenre(t *testing.T) {
 			expectedError: kts_errors.KTS_INTERNAL_ERROR,
 		},
 		{
-			name: "Movie not found",
+			name: "movieGenre not found",
 			setExpectations: func(mock sqlmock.Sqlmock, movieId *uuid.UUID, genreId *uuid.UUID) {
 				mock.ExpectExec(query).WithArgs(utils.EqUUID(&uuid1), utils.EqUUID(&uuid2)).WillReturnResult(sqlmock.NewResult(1, 0))
 			},
-			expectedError: kts_errors.KTS_MOVIE_NOT_FOUND,
+			expectedError: kts_errors.KTS_NOT_FOUND,
 		},
 	}
 
@@ -62,13 +62,12 @@ func TestAddMovieGenre(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			// Create a new mock database connection
 			db, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
-			// db, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
 			if err != nil {
 				t.Fatalf("Failed to create mock database connection: %v", err)
 			}
 			defer db.Close()
 
-			// Create a new instance of the MovieRepository with the mock database connection
+			// Create a new instance of the MovieGenreRepository with the mock database connection
 			movieGenreRepo := MovieGenreRepository{
 				DatabaseManager: &managers.DatabaseManager{
 					Connection: db,
@@ -134,7 +133,7 @@ func TestRemoveMovieGenre(t *testing.T) {
 			setExpectations: func(mock sqlmock.Sqlmock, movieId *uuid.UUID, genreId *uuid.UUID) {
 				mock.ExpectExec(query).WithArgs(utils.EqUUID(&uuid1), utils.EqUUID(&uuid2)).WillReturnResult(sqlmock.NewResult(1, 0))
 			},
-			expectedError: kts_errors.KTS_MOVIE_NOT_FOUND,
+			expectedError: kts_errors.KTS_NOT_FOUND,
 		},
 	}
 

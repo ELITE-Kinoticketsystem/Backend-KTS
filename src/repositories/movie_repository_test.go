@@ -33,7 +33,7 @@ func TestGetMovies(t *testing.T) {
 				)
 			},
 			expectedMovies: nil,
-			expectedError:  kts_errors.KTS_MOVIE_NOT_FOUND,
+			expectedError:  kts_errors.KTS_NOT_FOUND,
 		},
 		{
 			name: "Multiple movies",
@@ -116,7 +116,7 @@ func TestGetMovieById(t *testing.T) {
 				)
 			},
 			expectedMovie: nil,
-			expectedError: kts_errors.KTS_MOVIE_NOT_FOUND,
+			expectedError: kts_errors.KTS_NOT_FOUND,
 		},
 		{
 			name: "Single movie",
@@ -146,7 +146,6 @@ func TestGetMovieById(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			// Create a new mock database connection
 			db, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
-			// db, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
 			if err != nil {
 				t.Fatalf("Failed to create mock database connection: %v", err)
 			}
@@ -198,7 +197,7 @@ func TestGetMovieByName(t *testing.T) {
 				)
 			},
 			expectedMovie: nil,
-			expectedError: kts_errors.KTS_MOVIE_NOT_FOUND,
+			expectedError: kts_errors.KTS_NOT_FOUND,
 		},
 		{
 			name: "Single movie",
@@ -228,7 +227,6 @@ func TestGetMovieByName(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			// Create a new mock database connection
 			db, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
-			// db, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
 			if err != nil {
 				t.Fatalf("Failed to create mock database connection: %v", err)
 			}
@@ -297,7 +295,7 @@ func TestCreateMovie(t *testing.T) {
 			setExpectations: func(mock sqlmock.Sqlmock, movie *model.Movies) {
 				mock.ExpectExec(query).WithArgs(movie.Title, movie.Description, movie.BannerPicURL, movie.CoverPicURL, movie.TrailerURL, movie.Rating, movie.ReleaseDate, movie.TimeInMin, movie.Fsk).WillReturnResult(sqlmock.NewResult(1, 0))
 			},
-			expectedError: kts_errors.KTS_MOVIE_NOT_FOUND,
+			expectedError: kts_errors.KTS_NOT_FOUND,
 		},
 	}
 
@@ -305,7 +303,6 @@ func TestCreateMovie(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			// Create a new mock database connection
 			db, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
-			// db, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
 			if err != nil {
 				t.Fatalf("Failed to create mock database connection: %v", err)
 			}
@@ -339,7 +336,6 @@ func TestCreateMovie(t *testing.T) {
 func TestUpdateMovie(t *testing.T) {
 	sampleMovie := utils.GetSampleMovieById()
 
-	// query := "UPDATE `KinoTicketSystem`.movies SET title = ?, description = ?, banner_pic_url = ?, cover_pic_url = ?, trailer_url = ?, rating = ?, release_date = ?, time_in_min = ?, fsk = ? WHERE movies.id = ?;\n"
 	query := "\nUPDATE `KinoTicketSystem`.movies\nSET title = ?,\n    description = ?,\n    banner_pic_url = ?,\n    cover_pic_url = ?,\n    trailer_url = ?,\n    rating = ?,\n    release_date = CAST(? AS DATE),\n    time_in_min = ?,\n    fsk = ?\nWHERE movies.id = ?;\n"
 
 	testCases := []struct {
@@ -375,7 +371,7 @@ func TestUpdateMovie(t *testing.T) {
 			setExpectations: func(mock sqlmock.Sqlmock, movie *model.Movies) {
 				mock.ExpectExec(query).WithArgs(movie.Title, movie.Description, movie.BannerPicURL, movie.CoverPicURL, movie.TrailerURL, movie.Rating, movie.ReleaseDate, movie.TimeInMin, movie.Fsk, utils.EqUUID(movie.ID)).WillReturnResult(sqlmock.NewResult(1, 0))
 			},
-			expectedError: kts_errors.KTS_MOVIE_NOT_FOUND,
+			expectedError: kts_errors.KTS_NOT_FOUND,
 		},
 	}
 
@@ -451,7 +447,7 @@ func TestDeleteMovie(t *testing.T) {
 			setExpectations: func(mock sqlmock.Sqlmock, movieId *uuid.UUID) {
 				mock.ExpectExec(query).WithArgs(utils.EqUUID(movieId)).WillReturnResult(sqlmock.NewResult(1, 0))
 			},
-			expectedError: kts_errors.KTS_MOVIE_NOT_FOUND,
+			expectedError: kts_errors.KTS_NOT_FOUND,
 		},
 	}
 
@@ -509,7 +505,7 @@ func TestGetMovieByIdWithGenre(t *testing.T) {
 				)
 			},
 			expectedMovie: nil,
-			expectedError: kts_errors.KTS_MOVIE_NOT_FOUND,
+			expectedError: kts_errors.KTS_NOT_FOUND,
 		},
 		{
 			name: "Single movie",
@@ -541,7 +537,6 @@ func TestGetMovieByIdWithGenre(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			// Create a new mock database connection
 			db, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
-			// db, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
 			if err != nil {
 				t.Fatalf("Failed to create mock database connection: %v", err)
 			}
@@ -592,7 +587,7 @@ func TestGetMoviesWithGenres(t *testing.T) {
 				)
 			},
 			expectedMoviesWithGerne: nil,
-			expectedError:           kts_errors.KTS_MOVIE_NOT_FOUND,
+			expectedError:           kts_errors.KTS_NOT_FOUND,
 		},
 		{
 			name: "Multiple movies",
@@ -677,7 +672,7 @@ func TestGetMovieByIdWithEverything(t *testing.T) {
 				)
 			},
 			expectedMovie: nil,
-			expectedError: kts_errors.KTS_MOVIE_NOT_FOUND,
+			expectedError: kts_errors.KTS_NOT_FOUND,
 		},
 		{
 			name: "Single movie",

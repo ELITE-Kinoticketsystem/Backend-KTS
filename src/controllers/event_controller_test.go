@@ -38,14 +38,14 @@ func TestEventController_CreateEvent(t *testing.T) {
 
 	tests := []struct {
 		name            string
-		expectFuncs     func(mockEventRepo *mocks.MockEventRepo, mockMovieRepo *mocks.MockMovieRepositoryI, mockTheatreRepo *mocks.MockTheaterRepoI, t *testing.T)
+		expectFuncs     func(mockEventRepo *mocks.MockEventRepo, mockTheatreRepo *mocks.MockTheaterRepoI, t *testing.T)
 		expectedError   *models.KTSError
 		expectedEventId *uuid.UUID
 		eventRequest    *models.CreateEvtDTO
 	}{
 		{
 			name: "Create Event",
-			expectFuncs: func(mockEventRepo *mocks.MockEventRepo, mockMovieRepo *mocks.MockMovieRepositoryI, mockTheatreRepo *mocks.MockTheaterRepoI, t *testing.T) {
+			expectFuncs: func(mockEventRepo *mocks.MockEventRepo,mockTheatreRepo *mocks.MockTheaterRepoI, t *testing.T) {
 				mockEventRepo.EXPECT().CreateEvent(&eventRequest.Events).Return(eventRequest.Events.ID, nil)
 				mockEventRepo.EXPECT().AddEventMovie(eventRequest.Events.ID, eventRequest.Movies[0]).Return(nil)
 				mockEventRepo.EXPECT().CreateEventSeatCategory(&eventRequest.EventSeatCategories[0]).Return(nil)
@@ -66,7 +66,7 @@ func TestEventController_CreateEvent(t *testing.T) {
 		},
 		{
 			name: "Create Event returns error",
-			expectFuncs: func(mockEventRepo *mocks.MockEventRepo, mockMovieRepo *mocks.MockMovieRepositoryI, mockTheatreRepo *mocks.MockTheaterRepoI, t *testing.T) {
+			expectFuncs: func(mockEventRepo *mocks.MockEventRepo,mockTheatreRepo *mocks.MockTheaterRepoI, t *testing.T) {
 				mockEventRepo.EXPECT().CreateEvent(&eventRequest.Events).Return(nil, kts_errors.KTS_INTERNAL_ERROR)
 			},
 			expectedError:   kts_errors.KTS_INTERNAL_ERROR,
@@ -75,7 +75,7 @@ func TestEventController_CreateEvent(t *testing.T) {
 		},
 		{
 			name: "Add Event Movie returns error",
-			expectFuncs: func(mockEventRepo *mocks.MockEventRepo, mockMovieRepo *mocks.MockMovieRepositoryI, mockTheatreRepo *mocks.MockTheaterRepoI, t *testing.T) {
+			expectFuncs: func(mockEventRepo *mocks.MockEventRepo,mockTheatreRepo *mocks.MockTheaterRepoI, t *testing.T) {
 				mockEventRepo.EXPECT().CreateEvent(&eventRequest.Events).Return(eventRequest.Events.ID, nil)
 				mockEventRepo.EXPECT().AddEventMovie(eventRequest.Events.ID, eventRequest.Movies[0]).Return(kts_errors.KTS_INTERNAL_ERROR)
 			},
@@ -85,7 +85,7 @@ func TestEventController_CreateEvent(t *testing.T) {
 		},
 		{
 			name: "Create Event Seat Category returns error",
-			expectFuncs: func(mockEventRepo *mocks.MockEventRepo, mockMovieRepo *mocks.MockMovieRepositoryI, mockTheatreRepo *mocks.MockTheaterRepoI, t *testing.T) {
+			expectFuncs: func(mockEventRepo *mocks.MockEventRepo,mockTheatreRepo *mocks.MockTheaterRepoI, t *testing.T) {
 				mockEventRepo.EXPECT().CreateEvent(&eventRequest.Events).Return(eventRequest.Events.ID, nil)
 				mockEventRepo.EXPECT().AddEventMovie(eventRequest.Events.ID, eventRequest.Movies[0]).Return(nil)
 				mockEventRepo.EXPECT().CreateEventSeatCategory(&eventRequest.EventSeatCategories[0]).Return(kts_errors.KTS_INTERNAL_ERROR)
@@ -96,7 +96,7 @@ func TestEventController_CreateEvent(t *testing.T) {
 		},
 		{
 			name: "Get Seats For Cinema Hall returns error",
-			expectFuncs: func(mockEventRepo *mocks.MockEventRepo, mockMovieRepo *mocks.MockMovieRepositoryI, mockTheatreRepo *mocks.MockTheaterRepoI, t *testing.T) {
+			expectFuncs: func(mockEventRepo *mocks.MockEventRepo,mockTheatreRepo *mocks.MockTheaterRepoI, t *testing.T) {
 				mockEventRepo.EXPECT().CreateEvent(&eventRequest.Events).Return(eventRequest.Events.ID, nil)
 				mockEventRepo.EXPECT().AddEventMovie(eventRequest.Events.ID, eventRequest.Movies[0]).Return(nil)
 				mockEventRepo.EXPECT().CreateEventSeatCategory(&eventRequest.EventSeatCategories[0]).Return(nil)
@@ -108,7 +108,7 @@ func TestEventController_CreateEvent(t *testing.T) {
 		},
 		{
 			name: "Create Event Seat returns error",
-			expectFuncs: func(mockEventRepo *mocks.MockEventRepo, mockMovieRepo *mocks.MockMovieRepositoryI, mockTheatreRepo *mocks.MockTheaterRepoI, t *testing.T) {
+			expectFuncs: func(mockEventRepo *mocks.MockEventRepo,mockTheatreRepo *mocks.MockTheaterRepoI, t *testing.T) {
 				mockEventRepo.EXPECT().CreateEvent(&eventRequest.Events).Return(eventRequest.Events.ID, nil)
 				mockEventRepo.EXPECT().AddEventMovie(eventRequest.Events.ID, eventRequest.Movies[0]).Return(nil)
 				mockEventRepo.EXPECT().CreateEventSeatCategory(&eventRequest.EventSeatCategories[0]).Return(nil)
@@ -129,7 +129,7 @@ func TestEventController_CreateEvent(t *testing.T) {
 		},
 		{
 			name: "Nil eventDto",
-			expectFuncs: func(mockEventRepo *mocks.MockEventRepo, mockMovieRepo *mocks.MockMovieRepositoryI, mockTheatreRepo *mocks.MockTheaterRepoI, t *testing.T) {
+			expectFuncs: func(mockEventRepo *mocks.MockEventRepo,mockTheatreRepo *mocks.MockTheaterRepoI, t *testing.T) {
 			},
 			expectedError:   kts_errors.KTS_BAD_REQUEST,
 			expectedEventId: nil,
@@ -137,7 +137,7 @@ func TestEventController_CreateEvent(t *testing.T) {
 		},
 		{
 			name: "Movies nil or empty",
-			expectFuncs: func(mockEventRepo *mocks.MockEventRepo, mockMovieRepo *mocks.MockMovieRepositoryI, mockTheatreRepo *mocks.MockTheaterRepoI, t *testing.T) {
+			expectFuncs: func(mockEventRepo *mocks.MockEventRepo,mockTheatreRepo *mocks.MockTheaterRepoI, t *testing.T) {
 				mockEventRepo.EXPECT().CreateEvent(&eventRequest.Events).Return(eventRequest.Events.ID, nil)
 			},
 			expectedError:   kts_errors.KTS_BAD_REQUEST,
@@ -148,7 +148,7 @@ func TestEventController_CreateEvent(t *testing.T) {
 		},
 		{
 			name: "EventSeatCategories nil or empty",
-			expectFuncs: func(mockEventRepo *mocks.MockEventRepo, mockMovieRepo *mocks.MockMovieRepositoryI, mockTheatreRepo *mocks.MockTheaterRepoI, t *testing.T) {
+			expectFuncs: func(mockEventRepo *mocks.MockEventRepo,mockTheatreRepo *mocks.MockTheaterRepoI, t *testing.T) {
 				mockEventRepo.EXPECT().CreateEvent(&eventRequest.Events).Return(eventRequest.Events.ID, nil)
 				mockEventRepo.EXPECT().AddEventMovie(eventRequest.Events.ID, eventRequest.Movies[0]).Return(nil)
 			},
@@ -167,18 +167,15 @@ func TestEventController_CreateEvent(t *testing.T) {
 			mockCtrl := gomock.NewController(t)
 			defer mockCtrl.Finish()
 
-			mockMovieRepo := mocks.NewMockMovieRepositoryI(mockCtrl)
+			
 			mockEventRepo := mocks.NewMockEventRepo(mockCtrl)
 			mockTheatreRepo := mocks.NewMockTheaterRepoI(mockCtrl)
-			mockMovieGenreRepo := mocks.NewMockMovieGenreRepositoryI(mockCtrl)
 
-			tt.expectFuncs(mockEventRepo, mockMovieRepo, mockTheatreRepo, t)
+			tt.expectFuncs(mockEventRepo, mockTheatreRepo, t)
 
 			eventController := &EventController{
-				EventRepo:      mockEventRepo,
-				MovieRepo:      mockMovieRepo,
-				TheatreRepo:    mockTheatreRepo,
-				MovieGenreRepo: mockMovieGenreRepo,
+				EventRepo:   mockEventRepo,
+				TheatreRepo: mockTheatreRepo,
 			}
 
 			// // when
@@ -194,18 +191,6 @@ func TestEventController_CreateEvent(t *testing.T) {
 			}
 		})
 	}
-}
-
-func ExpectAddMovieGenreWorks(mockMovieGenreRepo *mocks.MockMovieGenreRepositoryI, t *testing.T) {
-	mockMovieGenreRepo.EXPECT().AddMovieGenre(gomock.Any(), gomock.Any()).DoAndReturn(func(movieId *uuid.UUID, genreId *uuid.UUID) error {
-		if movieId == nil {
-			t.Errorf("Movie Id is nil")
-		}
-		if genreId == nil {
-			t.Errorf("Genre Id is nil")
-		}
-		return nil
-	}).AnyTimes()
 }
 
 func TestEventController_GetEventsForMovie(t *testing.T) {
