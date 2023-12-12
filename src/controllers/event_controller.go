@@ -19,7 +19,6 @@ type EventControllerI interface {
 
 type EventController struct {
 	EventRepo   repositories.EventRepo
-	MovieRepo   repositories.MovieRepoI
 	TheatreRepo repositories.TheaterRepoI
 }
 
