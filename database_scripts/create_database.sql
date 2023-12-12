@@ -133,7 +133,7 @@ CREATE TABLE users
      id         BINARY(16) DEFAULT (Uuid_to_bin(Uuid(), 1)),
      username   VARCHAR(50),
      email      VARCHAR(80) NOT NULL,
-     password   VARCHAR(50) NOT NULL,
+     password   VARCHAR(60) NOT NULL,
      firstname  VARCHAR(50),
      lastname   VARCHAR(50),
      PRIMARY KEY (id)
