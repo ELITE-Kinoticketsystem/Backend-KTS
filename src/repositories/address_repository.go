@@ -76,7 +76,6 @@ func (ar *AddressRepository) CreateAddress(address *model.Addresses) *models.KTS
 	stmt := table.Addresses.INSERT(
 		table.Addresses.AllColumns,
 	).VALUES(
-		table.Addresses.ID.SET(jet_mysql.String(address.ID.String())),
 		table.Addresses.Street.SET(jet_mysql.String(address.Street)),
 		table.Addresses.StreetNr.SET(jet_mysql.String(address.StreetNr)),
 		table.Addresses.Zipcode.SET(jet_mysql.String(address.Zipcode)),
