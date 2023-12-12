@@ -32,7 +32,7 @@ func JwtAuthMiddleware() gin.HandlerFunc {
 		}
 
 		// add userId to request context
-		ctx := context.WithValue(c.Request.Context(), "userId", userId)
+		ctx := context.WithValue(c.Request.Context(), utils.UserIdKey, userId)
 		c.Request = c.Request.WithContext(ctx)
 
 		c.Next()
