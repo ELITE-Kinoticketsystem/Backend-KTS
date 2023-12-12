@@ -1,6 +1,8 @@
 package repositories
 
 import (
+	"log"
+
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/.gen/KinoTicketSystem/model"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/.gen/KinoTicketSystem/table"
 	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
@@ -26,6 +28,7 @@ func (tr *TheatreRepository) GetSeatsForCinemaHall(cinemaHallId *uuid.UUID) ([]m
 	err := stmt.Query(tr.DatabaseManager.GetDatabaseConnection(), &seats)
 
 	if err != nil {
+		log.Println(err.Error())
 		return nil, kts_errors.KTS_INTERNAL_ERROR
 	}
 

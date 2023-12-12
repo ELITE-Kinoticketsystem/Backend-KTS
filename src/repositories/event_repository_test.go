@@ -36,7 +36,7 @@ func TestCreateEvent(t *testing.T) {
 		{
 			name: "Create event",
 			setExpectations: func(mock sqlmock.Sqlmock) {
-				mock.ExpectExec("INSERT INTO `KinoTicketSystem`.events .*").WillReturnResult(sqlmock.NewResult(1, 1))
+				mock.ExpectExec("INSERT INTO `KinoTicketSystem`.events .*").WithArgs(sqlmock.AnyArg(), event.Title, sqlmock.AnyArg(), sqlmock.AnyArg(), event.Description, event.EventType, sqlmock.AnyArg()).WillReturnResult(sqlmock.NewResult(1, 1))
 			},
 			expectEventID: true,
 			expectedError: nil,
@@ -44,7 +44,7 @@ func TestCreateEvent(t *testing.T) {
 		{
 			name: "Create event sql error",
 			setExpectations: func(mock sqlmock.Sqlmock) {
-				mock.ExpectExec("INSERT INTO `KinoTicketSystem`.events .*").WillReturnError(sql.ErrConnDone)
+				mock.ExpectExec("INSERT INTO `KinoTicketSystem`.events .*").WithArgs(sqlmock.AnyArg(), event.Title, sqlmock.AnyArg(), sqlmock.AnyArg(), event.Description, event.EventType, sqlmock.AnyArg()).WillReturnError(sql.ErrConnDone)
 			},
 			expectEventID: false,
 			expectedError: kts_errors.KTS_INTERNAL_ERROR,
@@ -52,7 +52,7 @@ func TestCreateEvent(t *testing.T) {
 		{
 			name: "Create event no rows affected",
 			setExpectations: func(mock sqlmock.Sqlmock) {
-				mock.ExpectExec("INSERT INTO `KinoTicketSystem`.events .*").WillReturnResult(sqlmock.NewResult(1, 0))
+				mock.ExpectExec("INSERT INTO `KinoTicketSystem`.events .*").WithArgs(sqlmock.AnyArg(), event.Title, sqlmock.AnyArg(), sqlmock.AnyArg(), event.Description, event.EventType, sqlmock.AnyArg()).WillReturnResult(sqlmock.NewResult(1, 0))
 			},
 			expectEventID: false,
 			expectedError: kts_errors.KTS_INTERNAL_ERROR,
@@ -107,7 +107,7 @@ func TestCreateEventSeatCategory(t *testing.T) {
 		{
 			name: "Create event seat category",
 			setExpectations: func(mock sqlmock.Sqlmock) {
-				mock.ExpectExec("INSERT INTO `KinoTicketSystem`.event_seat_categories .*").WillReturnResult(sqlmock.NewResult(1, 1))
+				mock.ExpectExec("INSERT INTO `KinoTicketSystem`.event_seat_categories .*").WithArgs(sqlmock.AnyArg(), sqlmock.AnyArg(), eventSeatCategory.Price).WillReturnResult(sqlmock.NewResult(1, 1))
 			},
 			expectError:   false,
 			expectedError: nil,
@@ -115,7 +115,7 @@ func TestCreateEventSeatCategory(t *testing.T) {
 		{
 			name: "Create event seat category sql error",
 			setExpectations: func(mock sqlmock.Sqlmock) {
-				mock.ExpectExec("INSERT INTO `KinoTicketSystem`.event_seat_categories .*").WillReturnError(sql.ErrConnDone)
+				mock.ExpectExec("INSERT INTO `KinoTicketSystem`.event_seat_categories .*").WithArgs(sqlmock.AnyArg(), sqlmock.AnyArg(), eventSeatCategory.Price).WillReturnError(sql.ErrConnDone)
 			},
 			expectError:   true,
 			expectedError: kts_errors.KTS_INTERNAL_ERROR,
@@ -123,7 +123,7 @@ func TestCreateEventSeatCategory(t *testing.T) {
 		{
 			name: "Create event seat category no rows affected",
 			setExpectations: func(mock sqlmock.Sqlmock) {
-				mock.ExpectExec("INSERT INTO `KinoTicketSystem`.event_seat_categories .*").WillReturnResult(sqlmock.NewResult(1, 0))
+				mock.ExpectExec("INSERT INTO `KinoTicketSystem`.event_seat_categories .*").WithArgs(sqlmock.AnyArg(), sqlmock.AnyArg(), eventSeatCategory.Price).WillReturnResult(sqlmock.NewResult(1, 0))
 			},
 			expectError:   true,
 			expectedError: kts_errors.KTS_INTERNAL_ERROR,
@@ -175,21 +175,21 @@ func TestAddEventMovie(t *testing.T) {
 		{
 			name: "Add event movie",
 			setExpectations: func(mock sqlmock.Sqlmock) {
-				mock.ExpectExec("INSERT INTO `KinoTicketSystem`.event_movies .*").WillReturnResult(sqlmock.NewResult(1, 1))
+				mock.ExpectExec("INSERT INTO `KinoTicketSystem`.event_movies .*").WithArgs(sqlmock.AnyArg(), sqlmock.AnyArg()).WillReturnResult(sqlmock.NewResult(1, 1))
 			},
 			expectedError: nil,
 		},
 		{
 			name: "Add event movie sql error",
 			setExpectations: func(mock sqlmock.Sqlmock) {
-				mock.ExpectExec("INSERT INTO `KinoTicketSystem`.event_movies .*").WillReturnError(sql.ErrConnDone)
+				mock.ExpectExec("INSERT INTO `KinoTicketSystem`.event_movies .*").WithArgs(sqlmock.AnyArg(), sqlmock.AnyArg()).WillReturnError(sql.ErrConnDone)
 			},
 			expectedError: kts_errors.KTS_INTERNAL_ERROR,
 		},
 		{
 			name: "Add event movie no rows affected",
 			setExpectations: func(mock sqlmock.Sqlmock) {
-				mock.ExpectExec("INSERT INTO `KinoTicketSystem`.event_movies .*").WillReturnResult(sqlmock.NewResult(1, 0))
+				mock.ExpectExec("INSERT INTO `KinoTicketSystem`.event_movies .*").WithArgs(sqlmock.AnyArg(), sqlmock.AnyArg()).WillReturnResult(sqlmock.NewResult(1, 0))
 			},
 			expectedError: kts_errors.KTS_INTERNAL_ERROR,
 		},
@@ -229,7 +229,7 @@ func TestCreateEventSeat(t *testing.T) {
 		ID:      utils.NewUUID(),
 		EventID: utils.NewUUID(),
 		SeatID:  utils.NewUUID(),
-		Booked:  true,
+		Booked:  false,
 	}
 
 	testCases := []struct {
@@ -240,21 +240,21 @@ func TestCreateEventSeat(t *testing.T) {
 		{
 			name: "Create event seat",
 			setExpectations: func(mock sqlmock.Sqlmock) {
-				mock.ExpectExec("INSERT INTO `KinoTicketSystem`.event_seats .*").WillReturnResult(sqlmock.NewResult(1, 1))
+				mock.ExpectExec("INSERT INTO `KinoTicketSystem`.event_seats .*").WithArgs(sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), eventSeat.Booked).WillReturnResult(sqlmock.NewResult(1, 1))
 			},
 			expectedError: nil,
 		},
 		{
 			name: "Create event seat sql error",
 			setExpectations: func(mock sqlmock.Sqlmock) {
-				mock.ExpectExec("INSERT INTO `KinoTicketSystem`.event_seats .*").WillReturnError(sql.ErrConnDone)
+				mock.ExpectExec("INSERT INTO `KinoTicketSystem`.event_seats .*").WithArgs(sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), eventSeat.Booked).WillReturnError(sql.ErrConnDone)
 			},
 			expectedError: kts_errors.KTS_INTERNAL_ERROR,
 		},
 		{
 			name: "Create event seat no rows affected",
 			setExpectations: func(mock sqlmock.Sqlmock) {
-				mock.ExpectExec("INSERT INTO `KinoTicketSystem`.event_seats .*").WillReturnResult(sqlmock.NewResult(1, 0))
+				mock.ExpectExec("INSERT INTO `KinoTicketSystem`.event_seats .*").WithArgs(sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), eventSeat.Booked).WillReturnResult(sqlmock.NewResult(1, 0))
 			},
 			expectedError: kts_errors.KTS_INTERNAL_ERROR,
 		},
@@ -321,7 +321,7 @@ func TestGetEventsForMovie(t *testing.T) {
 		{
 			name: "Get events for movie",
 			setExpectations: func(mock sqlmock.Sqlmock) {
-				mock.ExpectQuery("SELECT .* FROM `KinoTicketSystem`.events .*").WillReturnRows(
+				mock.ExpectQuery("SELECT .* FROM `KinoTicketSystem`.events .*").WithArgs(sqlmock.AnyArg()).WillReturnRows(
 					sqlmock.NewRows([]string{"events.id", "events.title", "events.start", "events.end", "events.description", "events.event_type", "events.cinema_hall_id"}).
 						AddRow(expectedEvents[0].ID, expectedEvents[0].Title, expectedEvents[0].Start, expectedEvents[0].End, expectedEvents[0].Description, expectedEvents[0].EventType, expectedEvents[0].CinemaHallID).
 						AddRow(expectedEvents[1].ID, expectedEvents[1].Title, expectedEvents[1].Start, expectedEvents[1].End, expectedEvents[1].Description, expectedEvents[1].EventType, expectedEvents[1].CinemaHallID),
@@ -333,7 +333,7 @@ func TestGetEventsForMovie(t *testing.T) {
 		{
 			name: "Get events for movie sql error",
 			setExpectations: func(mock sqlmock.Sqlmock) {
-				mock.ExpectQuery("SELECT .* FROM `KinoTicketSystem`.events .*").WillReturnError(sql.ErrConnDone)
+				mock.ExpectQuery("SELECT .* FROM `KinoTicketSystem`.events .*").WithArgs(sqlmock.AnyArg()).WillReturnError(sql.ErrConnDone)
 			},
 			expectedEvents: nil,
 			expectedError:  kts_errors.KTS_INTERNAL_ERROR,

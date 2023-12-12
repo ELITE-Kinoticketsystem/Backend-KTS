@@ -42,7 +42,7 @@ func TestGetSeatsForCinemaHall(t *testing.T) {
 		{
 			name: "Get seats for cinema hall",
 			setExpectations: func(mock sqlmock.Sqlmock) {
-				mock.ExpectQuery("SELECT .* FROM `KinoTicketSystem`.seats .*").WillReturnRows(
+				mock.ExpectQuery("SELECT .* FROM `KinoTicketSystem`.seats .*").WithArgs(sqlmock.AnyArg()).WillReturnRows(
 					sqlmock.NewRows([]string{"seats.id", "seats.cinema_hall_id", "seats.row_nr", "seats.column_nr", "seats.seat_category_id"}).
 						AddRow(expectedSeats[0].ID, expectedSeats[0].CinemaHallID, expectedSeats[0].RowNr, expectedSeats[0].ColumnNr, expectedSeats[0].SeatCategoryID).
 						AddRow(expectedSeats[1].ID, expectedSeats[1].CinemaHallID, expectedSeats[1].RowNr, expectedSeats[1].ColumnNr, expectedSeats[1].SeatCategoryID),
@@ -54,7 +54,7 @@ func TestGetSeatsForCinemaHall(t *testing.T) {
 		{
 			name: "Get seats for cinema hall sql error",
 			setExpectations: func(mock sqlmock.Sqlmock) {
-				mock.ExpectQuery("SELECT .* FROM `KinoTicketSystem`.seats .*").WillReturnError(sql.ErrConnDone)
+				mock.ExpectQuery("SELECT .* FROM `KinoTicketSystem`.seats .*").WithArgs(sqlmock.AnyArg()).WillReturnError(sql.ErrConnDone)
 			},
 			expectedSeats: nil,
 			expectedError: kts_errors.KTS_INTERNAL_ERROR,
