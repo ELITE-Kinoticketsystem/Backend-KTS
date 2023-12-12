@@ -16,18 +16,15 @@ import (
 type MovieRepositoryI interface {
 	// Movie
 	GetMovies() (*[]model.Movies, *models.KTSError)
-	GetMovieById(movieId *uuid.UUID) (*model.Movies, *models.KTSError)
+	GetMovieById(movieId *uuid.UUID) (*models.MovieWithEverything, *models.KTSError)
 	GetMovieByName(movieName *string) (*model.Movies, *models.KTSError)
 	CreateMovie(movie *model.Movies) *models.KTSError
 	UpdateMovie(movie *model.Movies) *models.KTSError
 	DeleteMovie(movieId *uuid.UUID) *models.KTSError
 
-	// One Movie with all Genres
-	GetMovieByIdWithGenre(movieId *uuid.UUID) (*models.MovieWithGenres, *models.KTSError)
 	// All Movies with all Genres - Grouped by Movie
 	GetMoviesWithGenres() (*[]models.MovieWithGenres, *models.KTSError)
 
-	GetMovieByIdWithEverything(movieId *uuid.UUID) (*models.MovieWithEverything, *models.KTSError)
 }
 
 type MovieRepository struct {
@@ -56,31 +53,6 @@ func (mr *MovieRepository) GetMovies() (*[]model.Movies, *models.KTSError) {
 	}
 
 	return &movies, nil
-}
-
-func (mr *MovieRepository) GetMovieById(movieId *uuid.UUID) (*model.Movies, *models.KTSError) {
-	// Prepare vairables
-	var movie model.Movies
-
-	// Create the query
-	stmt := mysql.SELECT(
-		table.Movies.AllColumns,
-	).FROM(
-		table.Movies,
-	).WHERE(
-		table.Movies.ID.EQ(utils.MysqlUuid(movieId)),
-	)
-
-	// Execute the query
-	err := stmt.Query(mr.DatabaseManager.GetDatabaseConnection(), &movie)
-	if err != nil {
-		if err.Error() == "qrm: no rows in result set" {
-			return nil, kts_errors.KTS_NOT_FOUND
-		}
-		return nil, kts_errors.KTS_INTERNAL_ERROR
-	}
-
-	return &movie, nil
 }
 
 func (mr *MovieRepository) GetMovieByName(movieName *string) (*model.Movies, *models.KTSError) {
@@ -205,34 +177,6 @@ func (mr *MovieRepository) DeleteMovie(movieId *uuid.UUID) *models.KTSError {
 	return nil
 }
 
-// One Movie with all Genres
-func (mr *MovieRepository) GetMovieByIdWithGenre(movieId *uuid.UUID) (*models.MovieWithGenres, *models.KTSError) {
-	var movie models.MovieWithGenres
-
-	// Create the query
-	stmt := mysql.SELECT(
-		table.Movies.AllColumns,
-		table.Genres.AllColumns,
-	).FROM(
-		table.MovieGenres.
-			INNER_JOIN(table.Movies, table.Movies.ID.EQ(table.MovieGenres.MovieID)).
-			INNER_JOIN(table.Genres, table.Genres.ID.EQ(table.MovieGenres.GenreID)),
-	).WHERE(
-		table.Movies.ID.EQ(utils.MysqlUuid(movieId)),
-	)
-
-	// Execute the query
-	err := stmt.Query(mr.DatabaseManager.GetDatabaseConnection(), &movie)
-	if err != nil {
-		if err.Error() == "qrm: no rows in result set" {
-			return nil, kts_errors.KTS_NOT_FOUND
-		}
-		return nil, kts_errors.KTS_INTERNAL_ERROR
-	}
-
-	return &movie, nil
-}
-
 // All Movies with all Genres - Grouped by Movie
 func (mr *MovieRepository) GetMoviesWithGenres() (*[]models.MovieWithGenres, *models.KTSError) {
 	var moviesWithGenres []models.MovieWithGenres
@@ -260,7 +204,7 @@ func (mr *MovieRepository) GetMoviesWithGenres() (*[]models.MovieWithGenres, *mo
 	return &moviesWithGenres, nil
 }
 
-func (mr *MovieRepository) GetMovieByIdWithEverything(movieId *uuid.UUID) (*models.MovieWithEverything, *models.KTSError) {
+func (mr *MovieRepository) GetMovieById(movieId *uuid.UUID) (*models.MovieWithEverything, *models.KTSError) {
 	var movie models.MovieWithEverything
 
 	// Create the query

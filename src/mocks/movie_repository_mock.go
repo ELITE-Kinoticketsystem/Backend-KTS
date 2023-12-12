@@ -69,10 +69,10 @@ func (mr *MockMovieRepositoryIMockRecorder) DeleteMovie(movieId any) *gomock.Cal
 }
 
 // GetMovieById mocks base method.
-func (m *MockMovieRepositoryI) GetMovieById(movieId *uuid.UUID) (*model.Movies, *models.KTSError) {
+func (m *MockMovieRepositoryI) GetMovieById(movieId *uuid.UUID) (*models.MovieWithEverything, *models.KTSError) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetMovieById", movieId)
-	ret0, _ := ret[0].(*model.Movies)
+	ret0, _ := ret[0].(*models.MovieWithEverything)
 	ret1, _ := ret[1].(*models.KTSError)
 	return ret0, ret1
 }
@@ -81,36 +81,6 @@ func (m *MockMovieRepositoryI) GetMovieById(movieId *uuid.UUID) (*model.Movies, 
 func (mr *MockMovieRepositoryIMockRecorder) GetMovieById(movieId any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetMovieById", reflect.TypeOf((*MockMovieRepositoryI)(nil).GetMovieById), movieId)
-}
-
-// GetMovieByIdWithEverything mocks base method.
-func (m *MockMovieRepositoryI) GetMovieByIdWithEverything(movieId *uuid.UUID) (*models.MovieWithEverything, *models.KTSError) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetMovieByIdWithEverything", movieId)
-	ret0, _ := ret[0].(*models.MovieWithEverything)
-	ret1, _ := ret[1].(*models.KTSError)
-	return ret0, ret1
-}
-
-// GetMovieByIdWithEverything indicates an expected call of GetMovieByIdWithEverything.
-func (mr *MockMovieRepositoryIMockRecorder) GetMovieByIdWithEverything(movieId any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetMovieByIdWithEverything", reflect.TypeOf((*MockMovieRepositoryI)(nil).GetMovieByIdWithEverything), movieId)
-}
-
-// GetMovieByIdWithGenre mocks base method.
-func (m *MockMovieRepositoryI) GetMovieByIdWithGenre(movieId *uuid.UUID) (*models.MovieWithGenres, *models.KTSError) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetMovieByIdWithGenre", movieId)
-	ret0, _ := ret[0].(*models.MovieWithGenres)
-	ret1, _ := ret[1].(*models.KTSError)
-	return ret0, ret1
-}
-
-// GetMovieByIdWithGenre indicates an expected call of GetMovieByIdWithGenre.
-func (mr *MockMovieRepositoryIMockRecorder) GetMovieByIdWithGenre(movieId any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetMovieByIdWithGenre", reflect.TypeOf((*MockMovieRepositoryI)(nil).GetMovieByIdWithGenre), movieId)
 }
 
 // GetMovieByName mocks base method.

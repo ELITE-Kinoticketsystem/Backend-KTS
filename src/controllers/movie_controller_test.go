@@ -74,71 +74,6 @@ func TestGetMovies(t *testing.T) {
 	}
 }
 
-func TestGetMovieById(t *testing.T) {
-	sampleMovie := utils.GetSampleMovieById()
-
-	id := sampleMovie.ID
-
-	testCases := []struct {
-		name            string
-		setExpectations func(mockRepo mocks.MockMovieRepositoryI, movieId *uuid.UUID)
-		expectedMovies  *model.Movies
-		expectedError   *models.KTSError
-	}{
-		{
-			name: "Empty result",
-			setExpectations: func(mockRepo mocks.MockMovieRepositoryI, movieId *uuid.UUID) {
-				mockRepo.EXPECT().GetMovieById(id).Return(nil, kts_errors.KTS_MOVIE_NOT_FOUND)
-			},
-			expectedMovies: nil,
-			expectedError:  kts_errors.KTS_MOVIE_NOT_FOUND,
-		},
-		{
-			name: "Multiple movies",
-			setExpectations: func(mockRepo mocks.MockMovieRepositoryI, movieId *uuid.UUID) {
-				mockRepo.EXPECT().GetMovieById(id).Return(sampleMovie, nil)
-			},
-			expectedMovies: sampleMovie,
-			expectedError:  nil,
-		},
-		{
-			name: "Error while querying movies",
-			setExpectations: func(mockRepo mocks.MockMovieRepositoryI, movieId *uuid.UUID) {
-				mockRepo.EXPECT().GetMovieById(id).Return(nil, kts_errors.KTS_INTERNAL_ERROR)
-			},
-			expectedMovies: nil,
-			expectedError:  kts_errors.KTS_INTERNAL_ERROR,
-		},
-	}
-
-	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
-			// GIVEN
-			// create mock user repo
-			mockCtrl := gomock.NewController(t)
-			defer mockCtrl.Finish()
-			movieRepoMock := mocks.NewMockMovieRepositoryI(mockCtrl)
-
-			movieController := MovieController{
-				MovieRepo: movieRepoMock,
-			}
-
-			// define expectations
-			tc.setExpectations(*movieRepoMock, id)
-
-			// WHEN
-			// call RegisterUser with registrationData
-			movies, kts_err := movieController.GetMovieById(id)
-
-			// THEN
-			// check expected error and user
-			assert.Equal(t, tc.expectedMovies, movies)
-			assert.Equal(t, tc.expectedError, kts_err)
-		})
-	}
-}
-
-
 func TestGetMovieByName(t *testing.T) {
 	sampleMovie := utils.GetSampleMovieById()
 
@@ -194,70 +129,6 @@ func TestGetMovieByName(t *testing.T) {
 			// WHEN
 			// call RegisterUser with registrationData
 			movies, kts_err := movieController.GetMovieByName(&name)
-
-			// THEN
-			// check expected error and user
-			assert.Equal(t, tc.expectedMovies, movies)
-			assert.Equal(t, tc.expectedError, kts_err)
-		})
-	}
-}
-
-func TestGetMovieByIdWithGenre(t *testing.T) {
-	sampleMovie := utils.GetSampleMovieByIdWithGenre()
-
-	id := sampleMovie.ID
-
-	testCases := []struct {
-		name            string
-		setExpectations func(mockRepo mocks.MockMovieRepositoryI, movieId *uuid.UUID)
-		expectedMovies  *models.MovieWithGenres
-		expectedError   *models.KTSError
-	}{
-		{
-			name: "Empty result",
-			setExpectations: func(mockRepo mocks.MockMovieRepositoryI, movieId *uuid.UUID) {
-				mockRepo.EXPECT().GetMovieByIdWithGenre(id).Return(nil, kts_errors.KTS_MOVIE_NOT_FOUND)
-			},
-			expectedMovies: nil,
-			expectedError:  kts_errors.KTS_MOVIE_NOT_FOUND,
-		},
-		{
-			name: "Multiple movies",
-			setExpectations: func(mockRepo mocks.MockMovieRepositoryI, movieId *uuid.UUID) {
-				mockRepo.EXPECT().GetMovieByIdWithGenre(id).Return(sampleMovie, nil)
-			},
-			expectedMovies: sampleMovie,
-			expectedError:  nil,
-		},
-		{
-			name: "Error while querying movies",
-			setExpectations: func(mockRepo mocks.MockMovieRepositoryI, movieId *uuid.UUID) {
-				mockRepo.EXPECT().GetMovieByIdWithGenre(id).Return(nil, kts_errors.KTS_INTERNAL_ERROR)
-			},
-			expectedMovies: nil,
-			expectedError:  kts_errors.KTS_INTERNAL_ERROR,
-		},
-	}
-
-	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
-			// GIVEN
-			// create mock user repo
-			mockCtrl := gomock.NewController(t)
-			defer mockCtrl.Finish()
-			movieRepoMock := mocks.NewMockMovieRepositoryI(mockCtrl)
-
-			movieController := MovieController{
-				MovieRepo: movieRepoMock,
-			}
-
-			// define expectations
-			tc.setExpectations(*movieRepoMock, id)
-
-			// WHEN
-			// call RegisterUser with registrationData
-			movies, kts_err := movieController.GetMovieByIdWithGenre(id)
 
 			// THEN
 			// check expected error and user
@@ -328,7 +199,7 @@ func TestGetMoviesWithGenres(t *testing.T) {
 	}
 }
 
-func TestGetMovieByIdWithEverything(t *testing.T) {
+func TestGetMovieById(t *testing.T) {
 	sampleMovie := utils.GetSampleMovieByIdWithEverything()
 
 	id := sampleMovie.ID
@@ -342,7 +213,7 @@ func TestGetMovieByIdWithEverything(t *testing.T) {
 		{
 			name: "Empty result",
 			setExpectations: func(mockRepo mocks.MockMovieRepositoryI, movieId *uuid.UUID) {
-				mockRepo.EXPECT().GetMovieByIdWithEverything(id).Return(nil, kts_errors.KTS_MOVIE_NOT_FOUND)
+				mockRepo.EXPECT().GetMovieById(id).Return(nil, kts_errors.KTS_MOVIE_NOT_FOUND)
 			},
 			expectedMovies: nil,
 			expectedError:  kts_errors.KTS_MOVIE_NOT_FOUND,
@@ -350,7 +221,7 @@ func TestGetMovieByIdWithEverything(t *testing.T) {
 		{
 			name: "Multiple movies",
 			setExpectations: func(mockRepo mocks.MockMovieRepositoryI, movieId *uuid.UUID) {
-				mockRepo.EXPECT().GetMovieByIdWithEverything(id).Return(sampleMovie, nil)
+				mockRepo.EXPECT().GetMovieById(id).Return(sampleMovie, nil)
 			},
 			expectedMovies: sampleMovie,
 			expectedError:  nil,
@@ -358,7 +229,7 @@ func TestGetMovieByIdWithEverything(t *testing.T) {
 		{
 			name: "Error while querying movies",
 			setExpectations: func(mockRepo mocks.MockMovieRepositoryI, movieId *uuid.UUID) {
-				mockRepo.EXPECT().GetMovieByIdWithEverything(id).Return(nil, kts_errors.KTS_INTERNAL_ERROR)
+				mockRepo.EXPECT().GetMovieById(id).Return(nil, kts_errors.KTS_INTERNAL_ERROR)
 			},
 			expectedMovies: nil,
 			expectedError:  kts_errors.KTS_INTERNAL_ERROR,
@@ -382,7 +253,7 @@ func TestGetMovieByIdWithEverything(t *testing.T) {
 
 			// WHEN
 			// call RegisterUser with registrationData
-			movies, kts_err := movieController.GetMovieByIdWithEverything(id)
+			movies, kts_err := movieController.GetMovieById(id)
 
 			// THEN
 			// check expected error and user

@@ -13,6 +13,7 @@ import (
 
 	model "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/.gen/KinoTicketSystem/model"
 	models "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
+	uuid "github.com/google/uuid"
 	gomock "go.uber.org/mock/gomock"
 )
 
@@ -54,17 +55,17 @@ func (mr *MockGenreControllerIMockRecorder) CreateGenre(name any) *gomock.Call {
 }
 
 // DeleteGenre mocks base method.
-func (m *MockGenreControllerI) DeleteGenre(name *string) *models.KTSError {
+func (m *MockGenreControllerI) DeleteGenre(genre_id *uuid.UUID) *models.KTSError {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "DeleteGenre", name)
+	ret := m.ctrl.Call(m, "DeleteGenre", genre_id)
 	ret0, _ := ret[0].(*models.KTSError)
 	return ret0
 }
 
 // DeleteGenre indicates an expected call of DeleteGenre.
-func (mr *MockGenreControllerIMockRecorder) DeleteGenre(name any) *gomock.Call {
+func (mr *MockGenreControllerIMockRecorder) DeleteGenre(genre_id any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteGenre", reflect.TypeOf((*MockGenreControllerI)(nil).DeleteGenre), name)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteGenre", reflect.TypeOf((*MockGenreControllerI)(nil).DeleteGenre), genre_id)
 }
 
 // GetGenreByName mocks base method.
@@ -128,15 +129,15 @@ func (mr *MockGenreControllerIMockRecorder) GetGenresWithMovies() *gomock.Call {
 }
 
 // UpdateGenre mocks base method.
-func (m *MockGenreControllerI) UpdateGenre(name *string) *models.KTSError {
+func (m *MockGenreControllerI) UpdateGenre(genre *model.Genres) *models.KTSError {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "UpdateGenre", name)
+	ret := m.ctrl.Call(m, "UpdateGenre", genre)
 	ret0, _ := ret[0].(*models.KTSError)
 	return ret0
 }
 
 // UpdateGenre indicates an expected call of UpdateGenre.
-func (mr *MockGenreControllerIMockRecorder) UpdateGenre(name any) *gomock.Call {
+func (mr *MockGenreControllerIMockRecorder) UpdateGenre(genre any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateGenre", reflect.TypeOf((*MockGenreControllerI)(nil).UpdateGenre), name)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateGenre", reflect.TypeOf((*MockGenreControllerI)(nil).UpdateGenre), genre)
 }
