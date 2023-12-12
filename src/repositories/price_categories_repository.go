@@ -5,6 +5,7 @@ import (
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/.gen/KinoTicketSystem/table"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/managers"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
 	"github.com/google/uuid"
 
 	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
@@ -24,7 +25,7 @@ type PriceCategoryRepository struct {
 	DatabaseManager managers.DatabaseManagerI
 }
 
-func (mr *MovieRepository) GetPriceCategories() (*[]model.PriceCategories, *models.KTSError) {
+func (pcr *PriceCategoryRepository) GetPriceCategories() (*[]model.PriceCategories, *models.KTSError) {
 	var priceCategory []model.PriceCategories
 
 	// Create the query
@@ -35,7 +36,7 @@ func (mr *MovieRepository) GetPriceCategories() (*[]model.PriceCategories, *mode
 	)
 
 	// Execute the query
-	err := stmt.Query(mr.DatabaseManager.GetDatabaseConnection(), &priceCategory)
+	err := stmt.Query(pcr.DatabaseManager.GetDatabaseConnection(), &priceCategory)
 	if err != nil {
 		return nil, kts_errors.KTS_INTERNAL_ERROR
 	}
@@ -47,10 +48,8 @@ func (mr *MovieRepository) GetPriceCategories() (*[]model.PriceCategories, *mode
 	return &priceCategory, nil
 }
 
-func (mr *MovieRepository) GetPriceCategoryById(id *uuid.UUID) (*model.PriceCategories, *models.KTSError) {
+func (pcr *PriceCategoryRepository) GetPriceCategoryById(id *uuid.UUID) (*model.PriceCategories, *models.KTSError) {
 	var priceCategory model.PriceCategories
-
-	binary_id, _ := id.MarshalBinary()
 
 	// Create the query
 	stmt := jet_mysql.SELECT(
@@ -58,30 +57,32 @@ func (mr *MovieRepository) GetPriceCategoryById(id *uuid.UUID) (*model.PriceCate
 	).FROM(
 		table.PriceCategories,
 	).WHERE(
-		table.PriceCategories.ID.EQ(jet_mysql.String(string(binary_id))),
+		table.PriceCategories.ID.EQ(utils.MysqlUuid(id)),
 	)
 
 	// Execute the query
-	err := stmt.Query(mr.DatabaseManager.GetDatabaseConnection(), &priceCategory)
+	err := stmt.Query(pcr.DatabaseManager.GetDatabaseConnection(), &priceCategory)
 	if err != nil {
+		if err.Error() == "qrm: no rows in result set" {
+			return nil, kts_errors.KTS_NOT_FOUND
+		}
 		return nil, kts_errors.KTS_INTERNAL_ERROR
 	}
 
 	return &priceCategory, nil
 }
 
-func (mr *MovieRepository) CreatePriceCategory(priceCategory *model.PriceCategories) *models.KTSError {
+func (pcr *PriceCategoryRepository) CreatePriceCategory(priceCategory *model.PriceCategories) *models.KTSError {
 	// Create the query
 	stmt := table.PriceCategories.INSERT(
 		table.PriceCategories.AllColumns,
 	).VALUES(
-		table.PriceCategories.ID.SET(jet_mysql.String(priceCategory.ID.String())),
 		table.PriceCategories.CategoryName.SET(jet_mysql.String(priceCategory.CategoryName)),
 		table.PriceCategories.Price.SET(jet_mysql.Int32(priceCategory.Price)),
 	)
 
 	// Execute the query
-	rows, err := stmt.Exec(mr.DatabaseManager.GetDatabaseConnection())
+	rows, err := stmt.Exec(pcr.DatabaseManager.GetDatabaseConnection())
 	if err != nil {
 		return kts_errors.KTS_INTERNAL_ERROR
 	}
@@ -98,7 +99,7 @@ func (mr *MovieRepository) CreatePriceCategory(priceCategory *model.PriceCategor
 	return nil
 }
 
-func (mr *MovieRepository) UpdatePriceCategory(priceCategory *model.PriceCategories) *models.KTSError {
+func (pcr *PriceCategoryRepository) UpdatePriceCategory(priceCategory *model.PriceCategories) *models.KTSError {
 	// Create the query
 	stmt := table.PriceCategories.UPDATE(
 		table.PriceCategories.AllColumns,
@@ -107,11 +108,11 @@ func (mr *MovieRepository) UpdatePriceCategory(priceCategory *model.PriceCategor
 		table.PriceCategories.CategoryName.SET(jet_mysql.String(priceCategory.CategoryName)),
 		table.PriceCategories.Price.SET(jet_mysql.Int32(priceCategory.Price)),
 	).WHERE(
-		table.PriceCategories.ID.EQ(jet_mysql.String(priceCategory.ID.String())),
+		table.PriceCategories.ID.EQ(utils.MysqlUuid(priceCategory.ID)),
 	)
 
 	// Execute the query
-	rows, err := stmt.Exec(mr.DatabaseManager.GetDatabaseConnection())
+	rows, err := stmt.Exec(pcr.DatabaseManager.GetDatabaseConnection())
 	if err != nil {
 		return kts_errors.KTS_INTERNAL_ERROR
 	}
@@ -128,12 +129,12 @@ func (mr *MovieRepository) UpdatePriceCategory(priceCategory *model.PriceCategor
 	return nil
 }
 
-func (mr *MovieRepository) DeletePriceCategory(id *uuid.UUID) *models.KTSError {
+func (pcr *PriceCategoryRepository) DeletePriceCategory(id *uuid.UUID) *models.KTSError {
 	// Create the query
-	stmt := table.PriceCategories.DELETE().WHERE(table.PriceCategories.ID.EQ(jet_mysql.String(id.String())))
+	stmt := table.PriceCategories.DELETE().WHERE(table.PriceCategories.ID.EQ(utils.MysqlUuid(id)))
 
 	// Execute the query
-	rows, err := stmt.Exec(mr.DatabaseManager.GetDatabaseConnection())
+	rows, err := stmt.Exec(pcr.DatabaseManager.GetDatabaseConnection())
 	if err != nil {
 		return kts_errors.KTS_INTERNAL_ERROR
 	}
