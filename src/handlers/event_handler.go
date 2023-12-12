@@ -13,7 +13,7 @@ import (
 
 func CreateEventHandler(eventController controllers.EventControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var eventData models.EventDTO
+		var eventData models.CreateEvtDTO
 		if err := c.ShouldBindJSON(&eventData); err != nil {
 			utils.HandleErrorAndAbort(c, kts_errors.KTS_BAD_REQUEST)
 			return
@@ -29,18 +29,6 @@ func CreateEventHandler(eventController controllers.EventControllerI) gin.Handle
 	}
 }
 
-func DeleteEventHandler(eventController controllers.EventControllerI) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		eventId := uuid.MustParse(c.Param("eventId"))
-		err := eventController.DeleteEvent(&eventId)
-		if err != nil {
-			utils.HandleErrorAndAbort(c, err)
-			return
-		}
-
-		c.Status(http.StatusNoContent)
-	}
-}
 
 func GetEventsForMovieHandler(eventController controllers.EventControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {

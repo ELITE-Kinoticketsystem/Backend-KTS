@@ -19,8 +19,9 @@ type producersTable struct {
 	// Columns
 	ID          mysql.ColumnString
 	Name        mysql.ColumnString
-	Age         mysql.ColumnInteger
+	Birthdate   mysql.ColumnDate
 	Description mysql.ColumnString
+	PicURL      mysql.ColumnString
 
 	AllColumns     mysql.ColumnList
 	MutableColumns mysql.ColumnList
@@ -63,10 +64,11 @@ func newProducersTableImpl(schemaName, tableName, alias string) producersTable {
 	var (
 		IDColumn          = mysql.StringColumn("id")
 		NameColumn        = mysql.StringColumn("name")
-		AgeColumn         = mysql.IntegerColumn("age")
+		BirthdateColumn   = mysql.DateColumn("birthdate")
 		DescriptionColumn = mysql.StringColumn("description")
-		allColumns        = mysql.ColumnList{IDColumn, NameColumn, AgeColumn, DescriptionColumn}
-		mutableColumns    = mysql.ColumnList{NameColumn, AgeColumn, DescriptionColumn}
+		PicURLColumn      = mysql.StringColumn("pic_url")
+		allColumns        = mysql.ColumnList{IDColumn, NameColumn, BirthdateColumn, DescriptionColumn, PicURLColumn}
+		mutableColumns    = mysql.ColumnList{NameColumn, BirthdateColumn, DescriptionColumn, PicURLColumn}
 	)
 
 	return producersTable{
@@ -75,8 +77,9 @@ func newProducersTableImpl(schemaName, tableName, alias string) producersTable {
 		//Columns
 		ID:          IDColumn,
 		Name:        NameColumn,
-		Age:         AgeColumn,
+		Birthdate:   BirthdateColumn,
 		Description: DescriptionColumn,
+		PicURL:      PicURLColumn,
 
 		AllColumns:     allColumns,
 		MutableColumns: mutableColumns,

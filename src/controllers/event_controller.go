@@ -3,90 +3,81 @@ package controllers
 import (
 	"log"
 
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/.gen/KinoTicketSystem/model"
 	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/repositories"
-	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/.gen/KinoTicketSystem/model"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
 	"github.com/google/uuid"
 )
 
 type EventControllerI interface {
-	CreateEvent(event *models.EventDTO) (*model.Events, *models.KTSError)
-	DeleteEvent(eventId *uuid.UUID) *models.KTSError
+	CreateEvent(event *models.CreateEvtDTO) (*uuid.UUID, *models.KTSError)
 	GetEventsForMovie(movieId *uuid.UUID) ([]*model.Events, *models.KTSError)
-	GetSpecialEvents() ([]*models.EventDTO, *models.KTSError)
+	GetSpecialEvents() (*[]models.GetSpecialEventsDTO, *models.KTSError)
 }
 
 type EventController struct {
 	EventRepo   repositories.EventRepo
-	MovieRepo   repositories.MovieRepoI
 	TheatreRepo repositories.TheaterRepoI
 }
 
-func (ec *EventController) CreateEvent(eventRequest *models.EventDTO) (*model.Events, *models.KTSError) {
-	eventId := uuid.New()
-	event := &model.Events{
-		ID:           &eventId,
-		Title:        eventRequest.Title,
-		Start:        eventRequest.Start,
-		End:          eventRequest.End,
-		EventType:  eventRequest.EventType,
-		CinemaHallID: eventRequest.CinemaHallId,
-	}
-	err := ec.EventRepo.CreateEvent(event)
-	if err != nil {
-		log.Printf("Error creating event: %v", err)
-		return nil, kts_errors.KTS_INTERNAL_ERROR
+func (ec *EventController) CreateEvent(eventDto *models.CreateEvtDTO) (*uuid.UUID, *models.KTSError) {
+	if eventDto == nil {
+		return nil, kts_errors.KTS_BAD_REQUEST
 	}
 
-	createdEventId := event.ID
+	event := eventDto.Events
 
-	err = ec.createMovies(eventRequest.Movies, createdEventId)
-	if err != nil {
-		log.Printf("Error creating movies: %v", err)
-		return nil, kts_errors.KTS_INTERNAL_ERROR
+	eventId, kts_err := ec.EventRepo.CreateEvent(&event)
+
+	if kts_err != nil {
+		log.Printf("Error creating event: %v", kts_err.ErrorMessage)
+		return nil, kts_err
 	}
 
-	err = ec.createEventSeatCategories(eventRequest.EventSeatCategories, createdEventId)
-	if err != nil {
-		log.Printf("Error creating event seat categories: %v", err)
-		return nil, kts_errors.KTS_INTERNAL_ERROR
+	movies := eventDto.Movies
+
+	if len(movies) == 0 {
+		log.Printf("No movies provided for event: %v", eventId)
+		return nil, kts_errors.KTS_BAD_REQUEST
 	}
 
-	err = ec.createEventSeats(eventRequest.CinemaHallId, createdEventId)
-	if err != nil {
-		log.Printf("Error creating event seats: %v", err)
-		return nil, kts_errors.KTS_INTERNAL_ERROR
+	for _, movie := range movies {
+		kts_err := ec.EventRepo.AddEventMovie(eventId, movie)
+		if kts_err != nil {
+			log.Printf("Error adding event movie: %v", kts_err.ErrorMessage)
+			return nil, kts_err
+		}
 	}
 
-	return event, nil
-}
+	eventSeatCategories := eventDto.EventSeatCategories
 
-func (ec *EventController) DeleteEvent(eventId *uuid.UUID) *models.KTSError {
-
-	err := ec.EventRepo.DeleteEvent(eventId)
-	if err != nil {
-		return kts_errors.KTS_INTERNAL_ERROR
-	}
-	err = ec.EventRepo.DeleteEventMovies(eventId)
-	if err != nil {
-		return kts_errors.KTS_INTERNAL_ERROR
-	}
-	err = ec.EventRepo.DeleteEventSeatCategoryByEventId(eventId)
-	if err != nil {
-		return kts_errors.KTS_INTERNAL_ERROR
+	if len(eventSeatCategories) == 0 {
+		log.Printf("No event seat categories provided for event: %v", eventId)
+		return nil, kts_errors.KTS_BAD_REQUEST
 	}
 
-	err = ec.EventRepo.DeleteEventSeatsByEventId(eventId)
-	if err != nil {
-		return kts_errors.KTS_INTERNAL_ERROR
+	for _, eventSeatCategory := range eventSeatCategories {
+		eventSeatCategory.EventID = eventId
+		kts_err := ec.EventRepo.CreateEventSeatCategory(&eventSeatCategory)
+		if kts_err != nil {
+			log.Printf("Error creating event seat category: %v", kts_err.ErrorMessage)
+			return nil, kts_err
+		}
 	}
 
-	return nil
+	kts_err = ec.createEventSeats(eventDto.CinemaHallID, eventId)
+	if kts_err != nil {
+		log.Printf("Error creating event seats: %v", kts_err)
+		return nil, kts_err
+	}
+
+	return eventId, nil
 }
 
 func (ec *EventController) GetEventsForMovie(movieId *uuid.UUID) ([]*model.Events, *models.KTSError) {
-	events, err := ec.EventRepo.GetEventsForMovieId(movieId)
+	events, err := ec.EventRepo.GetEventsForMovie(movieId)
 	if err != nil {
 		log.Printf("Error getting events for movie: %v", err)
 		return nil, kts_errors.KTS_INTERNAL_ERROR
@@ -95,135 +86,33 @@ func (ec *EventController) GetEventsForMovie(movieId *uuid.UUID) ([]*model.Event
 	return events, nil
 }
 
-func (ec *EventController) GetSpecialEvents() ([]*models.EventDTO, *models.KTSError) {
-	events, err := ec.EventRepo.GetSpecialEvents()
+func (ec *EventController) GetSpecialEvents() (*[]models.GetSpecialEventsDTO, *models.KTSError) {
+	specialEvents, err := ec.EventRepo.GetSpecialEvents()
 	if err != nil {
 		log.Printf("Error getting special events: %v", err)
 		return nil, kts_errors.KTS_INTERNAL_ERROR
 	}
 
-	return events, nil
+	return specialEvents, nil
 }
 
-func (ec *EventController) createMovies(movies []models.MovieDTO, eventId *uuid.UUID) error {
-	// TODO: still not completely though trough
-	// Currently when the id field is not set, we create a new movie
-	// How do we know we dont already have this movie in the database?
-
-	for _, movie := range movies {
-		var movieId uuid.UUID
-		if movie.Id == nil {
-			createdMovie, err := ec.createNewMovie(&movie)
-			if err != nil {
-				return err
-			}
-			movieId = *createdMovie.ID
-		} else {
-			movieId = *movie.Id
-		}
-		err := ec.EventRepo.AddEventMovie(eventId, &movieId)
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-func (ec *EventController) createNewMovie(movieRequest *models.MovieDTO) (*model.Movies, error) {
-	movieId := uuid.New()
-	genreNames := movieRequest.GenreNames
-
-	movie := &model.Movies{
-		ID:          &movieId,
-		Title:       movieRequest.Title,
-		Description: movieRequest.Description,
-		ReleaseDate: movieRequest.ReleaseDate,
-		TimeInMin:   movieRequest.TimeInMin,
-		Fsk:         movieRequest.Fsk,
-	}
-
-	err := ec.MovieRepo.CreateMovie(movie)
-	if err != nil {
-		return nil, err
-	}
-
-	createdMovieId := movie.ID
-	if createdMovieId == nil {
-		return nil, err
-	}
-
-	err = ec.createGenres(genreNames, createdMovieId)
-	if err != nil {
-		return nil, err
-	}
-	return movie, nil
-}
-
-func (ec *EventController) createGenres(genreNames []string, movieId *uuid.UUID) error {
-	for _, genreName := range genreNames {
-		genre, err := ec.MovieRepo.GetGenreByName(genreName)
-		if err != nil {
-			return err
-		}
-		var genreId uuid.UUID
-		if genre == nil {
-			genreId = uuid.New()
-			genre := &model.Genres{
-				ID:        &genreId,
-				GenreName: genreName,
-			}
-			err := ec.MovieRepo.CreateGenre(genre)
-			if err != nil {
-				return err
-			}
-		}
-
-		err = ec.MovieRepo.AddMovieGenre(movieId, &genreId)
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-func (ec *EventController) createEventSeatCategories(eventSeatCategories []models.EventSeatCategoryDTO, eventId *uuid.UUID) error {
-	for _, eventSeatCategory := range eventSeatCategories {
-		seatCategoryId := uuid.New()
-		eventSeatCategory := &model.EventSeatCategories{
-			Price:          eventSeatCategory.Price,
-			EventID:        eventId,
-			SeatCategoryID: &seatCategoryId,
-		}
-		err := ec.EventRepo.CreateEventSeatCategory(eventSeatCategory)
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-func (ec *EventController) createEventSeats(cinemaHallId *uuid.UUID, eventId *uuid.UUID) error {
-	seats, err := ec.TheatreRepo.GetSeatsForCinemaHall(cinemaHallId)
-	if err != nil {
-		return err
+func (ec *EventController) createEventSeats(cinemaHallId *uuid.UUID, eventId *uuid.UUID) *models.KTSError {
+	seats, kts_err := ec.TheatreRepo.GetSeatsForCinemaHall(cinemaHallId)
+	if kts_err != nil {
+		return kts_err
 	}
 
 	for _, seat := range seats {
-		eventSeatId := uuid.New()
+		eventSeatId := utils.NewUUID()
 		eventSeat := &model.EventSeats{
-			ID:           &eventSeatId,
-			Booked:       false,
-			BlockedUntil: nil,
-			UserID:       nil,
-			SeatID:       seat.ID,
-			EventID:      eventId,
+			ID:      eventSeatId,
+			EventID: eventId,
+			SeatID:  seat.ID,
+			Booked:  false,
 		}
-		err := ec.EventRepo.CreateEventSeat(eventSeat)
-		if err != nil {
-			return err
+		kts_err := ec.EventRepo.CreateEventSeat(eventSeat)
+		if kts_err != nil {
+			return kts_err
 		}
 	}
 

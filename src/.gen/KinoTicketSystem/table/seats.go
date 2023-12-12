@@ -22,6 +22,7 @@ type seatsTable struct {
 	ColumnNr       mysql.ColumnInteger
 	SeatCategoryID mysql.ColumnString
 	CinemaHallID   mysql.ColumnString
+	Type           mysql.ColumnString
 
 	AllColumns     mysql.ColumnList
 	MutableColumns mysql.ColumnList
@@ -67,8 +68,9 @@ func newSeatsTableImpl(schemaName, tableName, alias string) seatsTable {
 		ColumnNrColumn       = mysql.IntegerColumn("column_nr")
 		SeatCategoryIDColumn = mysql.StringColumn("seat_category_id")
 		CinemaHallIDColumn   = mysql.StringColumn("cinema_hall_id")
-		allColumns           = mysql.ColumnList{IDColumn, RowNrColumn, ColumnNrColumn, SeatCategoryIDColumn, CinemaHallIDColumn}
-		mutableColumns       = mysql.ColumnList{RowNrColumn, ColumnNrColumn, SeatCategoryIDColumn, CinemaHallIDColumn}
+		TypeColumn           = mysql.StringColumn("type")
+		allColumns           = mysql.ColumnList{IDColumn, RowNrColumn, ColumnNrColumn, SeatCategoryIDColumn, CinemaHallIDColumn, TypeColumn}
+		mutableColumns       = mysql.ColumnList{RowNrColumn, ColumnNrColumn, SeatCategoryIDColumn, CinemaHallIDColumn, TypeColumn}
 	)
 
 	return seatsTable{
@@ -80,6 +82,7 @@ func newSeatsTableImpl(schemaName, tableName, alias string) seatsTable {
 		ColumnNr:       ColumnNrColumn,
 		SeatCategoryID: SeatCategoryIDColumn,
 		CinemaHallID:   CinemaHallIDColumn,
+		Type:           TypeColumn,
 
 		AllColumns:     allColumns,
 		MutableColumns: mutableColumns,

@@ -4,7 +4,6 @@ import (
 	"os"
 	"time"
 
-	"github.com/go-jet/jet/v2/mysql"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 )
@@ -15,6 +14,10 @@ const tokenLifespan = 15 * 60                 // 15 minutes
 const refreshTokenLifeSpan = 3 * 24 * 60 * 60 // 3 days
 const leeway = 5 * 60                         // 5 minutes
 const issuer = "KTS"
+
+type keyType string
+
+const UserIdKey keyType = "userId"
 
 func GenerateJWT(userId *uuid.UUID) (string, string, error) {
 	now := time.Now()
@@ -49,7 +52,7 @@ func GenerateJWT(userId *uuid.UUID) (string, string, error) {
 	return signedToken, signedRefreshToken, err
 }
 
-func ValidateToken(tokenString string) error {
+func ValidateToken(tokenString string) (*uuid.UUID, error) {
 	validMethodsOption := jwt.WithValidMethods([]string{jwt.SigningMethodHS256.Alg()})
 	leewayOption := jwt.WithLeeway(time.Duration(leeway) * time.Second)
 	issuerOption := jwt.WithIssuer(issuer)
@@ -60,14 +63,22 @@ func ValidateToken(tokenString string) error {
 	}, validMethodsOption, leewayOption, issuerOption, issuedAtOption)
 
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	if !token.Valid {
-		return err
+	var claims jwt.MapClaims
+	var ok bool
+
+	if claims, ok = token.Claims.(jwt.MapClaims); !ok || !token.Valid {
+		return nil, jwt.ErrTokenUnverifiable
 	}
 
-	return nil
+	userId, err := uuid.Parse(claims["sub"].(string))
+	if err != nil {
+		return nil, err
+	}
+
+	return &userId, nil
 }
 
 func ExtractToken(authHeader string) (string, error) {
@@ -77,13 +88,4 @@ func ExtractToken(authHeader string) (string, error) {
 
 	// Return token without "Bearer " prefix
 	return authHeader[7:], nil
-}
-
-func MysqlUuid(uuid *uuid.UUID) mysql.StringExpression {
-	binary_id, _ := uuid.MarshalBinary()
-	return mysql.String(string(binary_id))
-}
-
-func MySqlString(str string) mysql.StringExpression {
-	return mysql.String(str)
 }

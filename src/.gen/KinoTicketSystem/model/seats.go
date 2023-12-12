@@ -17,4 +17,5 @@ type Seats struct {
 	ColumnNr       int32
 	SeatCategoryID *uuid.UUID
 	CinemaHallID   *uuid.UUID
+	Type           string
 }
