@@ -66,7 +66,7 @@ func ValidateToken(tokenString string) (*uuid.UUID, error) {
 	var ok bool
 
 	if claims, ok = token.Claims.(jwt.MapClaims); !ok || !token.Valid {
-		return nil, err
+		return nil, jwt.ErrTokenUnverifiable
 	}
 
 	userId, err := uuid.Parse(claims["sub"].(string))
