@@ -197,6 +197,7 @@ CREATE TABLE seats
      column_nr        INT NOT NULL,
      seat_category_id BINARY(16) NOT NULL,
      cinema_hall_id   BINARY(16) NOT NULL,
+     type             VARCHAR(15) NOT NULL,
      PRIMARY KEY (id),
      FOREIGN KEY (seat_category_id) REFERENCES seat_categories(id),
      FOREIGN KEY (cinema_hall_id) REFERENCES cinema_halls(id)
