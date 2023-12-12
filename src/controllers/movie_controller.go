@@ -79,17 +79,6 @@ func (mc *MovieController) DeleteMovie(movieId *uuid.UUID) *models.KTSError {
 	return kts_errors.KTS_INTERNAL_ERROR
 }
 
-// Combine Movie and Genre
-// func (mc *MovieController) AddMovieGenre(movieId *uuid.UUID, genreId *uuid.UUID) *models.KTSError {
-// 	// TODO: implement
-// 	   return kts_errors.KTS_INTERNAL_ERROR
-// }
-
-// func (mc *MovieController) RemoveMovieGenre(movieId *uuid.UUID, genreId *uuid.UUID) *models.KTSError {
-// // TODO: implement
-// return kts_errors.KTS_INTERNAL_ERROR
-// }
-
 // One Movie with all Genres
 func (mc *MovieController) GetMovieByIdWithGenre(movieId *uuid.UUID) (*models.MovieWithGenres, *models.KTSError) {
 	movie, kts_errors := mc.MovieRepo.GetMovieByIdWithGenre(movieId)

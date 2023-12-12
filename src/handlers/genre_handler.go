@@ -3,7 +3,6 @@ package handlers
 import (
 	"net/http"
 
-	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/.gen/KinoTicketSystem/model"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/controllers"
 	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
@@ -54,7 +53,7 @@ func CreateGenre(genreCtrl controllers.GenreControllerI) gin.HandlerFunc {
 
 func GetGenreByNameWithMovies(genreCtrl controllers.GenreControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		genreName := c.Param("genreName")
+		genreName := c.Param("name")
 
 		genre, kts_err := genreCtrl.GetGenreByNameWithMovies(&genreName)
 		if kts_err != nil {

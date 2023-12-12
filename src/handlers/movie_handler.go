@@ -113,38 +113,9 @@ func DeleteMovie(movieCtrl controllers.MovieControllerI) gin.HandlerFunc {
 	}
 }
 
-// Combine Movie and Genre
-// func AddMovieGenre(movieCtrl controllers.MovieControllerI) gin.HandlerFunc {
-// 	return func(c *gin.Context) {
-// 		movieId := uuid.MustParse(c.Param("movieId"))
-// 		genreId := uuid.MustParse(c.Param("genreId"))
-
-// 		kts_err := movieCtrl.AddMovieGenre(&movieId, &genreId)
-// 		if kts_err != nil {
-// 			utils.HandleErrorAndAbort(c, kts_err)
-// 			return
-// 		}
-// 		c.Status(http.StatusNoContent)
-// 	}
-// }
-
-// func RemoveMovieGenre(movieCtrl controllers.MovieControllerI) gin.HandlerFunc {
-// 	return func(c *gin.Context) {
-// 		movieId := uuid.MustParse(c.Param("movieId"))
-// 		genreId := uuid.MustParse(c.Param("genreId"))
-
-// 		kts_err := movieCtrl.RemoveMovieGenre(movieId, genreId)
-// 		if kts_err != nil {
-// 			utils.HandleErrorAndAbort(c, kts_err)
-// 			return
-// 		}
-// 		c.Status(http.StatusNoContent)
-// 	}
-// }
-
 func GetMovieByIdWithGenre(movieCtrl controllers.MovieControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		movieId := uuid.MustParse(c.Param("movieId"))
+		movieId := uuid.MustParse(c.Param("id"))
 
 		movie, kts_err := movieCtrl.GetMovieByIdWithGenre(&movieId)
 		if kts_err != nil {
