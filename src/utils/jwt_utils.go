@@ -15,6 +15,10 @@ const refreshTokenLifeSpan = 3 * 24 * 60 * 60 // 3 days
 const leeway = 5 * 60                         // 5 minutes
 const issuer = "KTS"
 
+type keyType string
+
+const UserIdKey keyType = "userId"
+
 func GenerateJWT(userId *uuid.UUID) (string, string, error) {
 	now := time.Now()
 
@@ -48,7 +52,7 @@ func GenerateJWT(userId *uuid.UUID) (string, string, error) {
 	return signedToken, signedRefreshToken, err
 }
 
-func ValidateToken(tokenString string) error {
+func ValidateToken(tokenString string) (*uuid.UUID, error) {
 	validMethodsOption := jwt.WithValidMethods([]string{jwt.SigningMethodHS256.Alg()})
 	leewayOption := jwt.WithLeeway(time.Duration(leeway) * time.Second)
 	issuerOption := jwt.WithIssuer(issuer)
@@ -59,14 +63,22 @@ func ValidateToken(tokenString string) error {
 	}, validMethodsOption, leewayOption, issuerOption, issuedAtOption)
 
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	if !token.Valid {
-		return err
+	var claims jwt.MapClaims
+	var ok bool
+
+	if claims, ok = token.Claims.(jwt.MapClaims); !ok || !token.Valid {
+		return nil, jwt.ErrTokenUnverifiable
 	}
 
-	return nil
+	userId, err := uuid.Parse(claims["sub"].(string))
+	if err != nil {
+		return nil, err
+	}
+
+	return &userId, nil
 }
 
 func ExtractToken(authHeader string) (string, error) {
