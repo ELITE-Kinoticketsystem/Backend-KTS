@@ -6,7 +6,8 @@ import (
 	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/managers"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
-	jet_mysql "github.com/go-jet/jet/v2/mysql"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
+	"github.com/go-jet/jet/v2/mysql"
 	"github.com/google/uuid"
 )
 
@@ -34,7 +35,7 @@ func (mr *GenreRepository) GetGenres() (*[]model.Genres, *models.KTSError) {
 	var genres []model.Genres
 
 	// Create the query
-	stmt := jet_mysql.SELECT(
+	stmt := mysql.SELECT(
 		table.Genres.AllColumns,
 	).FROM(
 		table.Genres,
@@ -57,12 +58,12 @@ func (mr *GenreRepository) GetGenreByName(name *string) (*model.Genres, *models.
 	var genre model.Genres
 
 	// Create the query
-	stmt := jet_mysql.SELECT(
+	stmt := mysql.SELECT(
 		table.Genres.AllColumns,
 	).FROM(
 		table.Genres,
 	).WHERE(
-		table.Genres.GenreName.EQ(jet_mysql.String((*name))),
+		table.Genres.GenreName.EQ(utils.MySqlString(*name)),
 	)
 
 	// Execute the query
@@ -101,12 +102,11 @@ func (mr *GenreRepository) CreateGenre(name *string) *models.KTSError {
 }
 
 func (mr *GenreRepository) UpdateGenre(genre *model.Genres) *models.KTSError {
-	binary_id, _ := genre.ID.MarshalBinary()
 
 	// Create the update statement
 	updateQuery := table.Genres.UPDATE(table.Genres.GenreName).
 		SET(genre.GenreName).
-		WHERE(table.Genres.ID.EQ(jet_mysql.String(string(binary_id))))
+		WHERE(table.Genres.ID.EQ(utils.MysqlUuid(genre.ID)))
 
 	// Execute the query
 	rows, err := updateQuery.Exec(mr.DatabaseManager.GetDatabaseConnection())
@@ -127,11 +127,11 @@ func (mr *GenreRepository) UpdateGenre(genre *model.Genres) *models.KTSError {
 }
 
 func (mr *GenreRepository) DeleteGenre(genreId *uuid.UUID) *models.KTSError {
-	binary_id, _ := genreId.MarshalBinary()
+	
 
 	// Create the delete statement
 	deleteQuery := table.Genres.DELETE().
-		WHERE(table.Genres.ID.EQ(jet_mysql.String(string(binary_id))))
+	WHERE(table.Genres.ID.EQ(utils.MysqlUuid(genreId)))
 
 	// Execute the query
 	rows, err := deleteQuery.Exec(mr.DatabaseManager.GetDatabaseConnection())
@@ -156,7 +156,7 @@ func (mr *GenreRepository) GetGenreByNameWithMovies(genreName *string) (*models.
 	var movies models.GenreWithMovies
 
 	// Create the query
-	stmt := jet_mysql.SELECT(
+	stmt := mysql.SELECT(
 		table.Movies.AllColumns,
 		table.Genres.AllColumns,
 	).FROM(
@@ -164,7 +164,7 @@ func (mr *GenreRepository) GetGenreByNameWithMovies(genreName *string) (*models.
 			INNER_JOIN(table.Movies, table.Movies.ID.EQ(table.MovieGenres.MovieID)).
 			INNER_JOIN(table.Genres, table.Genres.ID.EQ(table.MovieGenres.GenreID)),
 	).WHERE(
-		table.Genres.GenreName.EQ(jet_mysql.String((*genreName))),
+		table.Genres.GenreName.EQ(utils.MySqlString(*genreName)),
 	)
 
 	// Execute the query
@@ -184,7 +184,7 @@ func (mr *GenreRepository) GetGenresWithMovies() (*[]models.GenreWithMovies, *mo
 	var genresWithMovies []models.GenreWithMovies
 
 	// Create the query
-	stmt := jet_mysql.SELECT(
+	stmt := mysql.SELECT(
 		table.Movies.AllColumns,
 		table.Genres.AllColumns,
 	).FROM(

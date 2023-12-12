@@ -5,7 +5,7 @@ import (
 	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/managers"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
-	jet_mysql "github.com/go-jet/jet/v2/mysql"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
 	"github.com/google/uuid"
 )
 
@@ -22,12 +22,9 @@ type MovieGenreRepository struct {
 // Combine Movie and Genre
 func (mr *MovieGenreRepository) AddMovieGenre(movieId *uuid.UUID, genreId *uuid.UUID) *models.KTSError {
 
-	binary_movie_id, _ := movieId.MarshalBinary()
-	binary_genre_id, _ := genreId.MarshalBinary()
-
 	// Create the insert statement
 	insertQuery := table.MovieGenres.INSERT(table.MovieGenres.MovieID, table.MovieGenres.GenreID).
-		VALUES(jet_mysql.String(string(binary_movie_id)), jet_mysql.String(string(binary_genre_id)))
+		VALUES(utils.MysqlUuid(movieId), utils.MysqlUuid(genreId))
 
 	// Execute the query
 	rows, err := insertQuery.Exec(mr.DatabaseManager.GetDatabaseConnection())
@@ -49,12 +46,9 @@ func (mr *MovieGenreRepository) AddMovieGenre(movieId *uuid.UUID, genreId *uuid.
 
 func (mr *MovieGenreRepository) RemoveMovieGenre(movieId *uuid.UUID, genreId *uuid.UUID) *models.KTSError {
 
-	binaryMovieID, _ := movieId.MarshalBinary()
-	binaryGenreID, _ := genreId.MarshalBinary()
-
 	deleteQuery := table.MovieGenres.DELETE().WHERE(
-		table.MovieGenres.MovieID.EQ(jet_mysql.String(string(binaryMovieID))).AND(
-			table.MovieGenres.GenreID.EQ(jet_mysql.String(string(binaryGenreID))),
+		table.MovieGenres.MovieID.EQ(utils.MysqlUuid(movieId)).AND(
+			table.MovieGenres.GenreID.EQ(utils.MysqlUuid(genreId)),
 		),
 	)
 
