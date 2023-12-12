@@ -25,10 +25,10 @@ func TestGetMovies(t *testing.T) {
 		{
 			name: "Empty result",
 			setExpectations: func(mockRepo mocks.MockMovieRepositoryI) {
-				mockRepo.EXPECT().GetMovies().Return(nil, kts_errors.KTS_MOVIE_NOT_FOUND)
+				mockRepo.EXPECT().GetMovies().Return(nil, kts_errors.KTS_NOT_FOUND)
 			},
 			expectedMovies: nil,
-			expectedError:  kts_errors.KTS_MOVIE_NOT_FOUND,
+			expectedError:  kts_errors.KTS_NOT_FOUND,
 		},
 		{
 			name: "Multiple movies",
@@ -88,10 +88,10 @@ func TestGetMovieByName(t *testing.T) {
 		{
 			name: "Empty result",
 			setExpectations: func(mockRepo mocks.MockMovieRepositoryI, name *string) {
-				mockRepo.EXPECT().GetMovieByName(name).Return(nil, kts_errors.KTS_MOVIE_NOT_FOUND)
+				mockRepo.EXPECT().GetMovieByName(name).Return(nil, kts_errors.KTS_NOT_FOUND)
 			},
 			expectedMovies: nil,
-			expectedError:  kts_errors.KTS_MOVIE_NOT_FOUND,
+			expectedError:  kts_errors.KTS_NOT_FOUND,
 		},
 		{
 			name: "Multiple movies",
@@ -150,10 +150,10 @@ func TestGetMoviesWithGenres(t *testing.T) {
 		{
 			name: "Empty result",
 			setExpectations: func(mockRepo mocks.MockMovieRepositoryI) {
-				mockRepo.EXPECT().GetMoviesWithGenres().Return(nil, kts_errors.KTS_MOVIE_NOT_FOUND)
+				mockRepo.EXPECT().GetMoviesWithGenres().Return(nil, kts_errors.KTS_NOT_FOUND)
 			},
 			expectedMovies: nil,
-			expectedError:  kts_errors.KTS_MOVIE_NOT_FOUND,
+			expectedError:  kts_errors.KTS_NOT_FOUND,
 		},
 		{
 			name: "Multiple movies",
@@ -213,10 +213,10 @@ func TestGetMovieById(t *testing.T) {
 		{
 			name: "Empty result",
 			setExpectations: func(mockRepo mocks.MockMovieRepositoryI, movieId *uuid.UUID) {
-				mockRepo.EXPECT().GetMovieById(id).Return(nil, kts_errors.KTS_MOVIE_NOT_FOUND)
+				mockRepo.EXPECT().GetMovieById(id).Return(nil, kts_errors.KTS_NOT_FOUND)
 			},
 			expectedMovies: nil,
-			expectedError:  kts_errors.KTS_MOVIE_NOT_FOUND,
+			expectedError:  kts_errors.KTS_NOT_FOUND,
 		},
 		{
 			name: "Multiple movies",
