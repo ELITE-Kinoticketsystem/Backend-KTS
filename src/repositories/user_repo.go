@@ -64,8 +64,13 @@ func (ur *UserRepository) CreateUser(user model.Users) *models.KTSError {
 		table.Users.Password,
 		table.Users.Firstname,
 		table.Users.Lastname,
-	).MODEL(
-		user,
+	).VALUES(
+		user.ID[:],
+		user.Username,
+		user.Email,
+		user.Password,
+		user.Firstname,
+		user.Lastname,
 	)
 
 	_, err := stmt.Exec(ur.DatabaseManager.GetDatabaseConnection())

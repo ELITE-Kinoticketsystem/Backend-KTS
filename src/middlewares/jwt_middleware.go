@@ -2,6 +2,7 @@ package middlewares
 
 import (
 	"context"
+	"net/http"
 
 	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
@@ -11,21 +12,17 @@ import (
 
 func JwtAuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		// Check if Authorization header is set
-		authHeader := c.GetHeader("Authorization")
-		if authHeader == "" {
-			utils.HandleErrorAndAbort(c, kts_errors.KTS_UNAUTHORIZED)
-			return
-		}
-
-		// Check if Authorization header is valid
-		tokenString, err := utils.ExtractToken(authHeader)
+		// check if cookie is set
+		token, err := c.Cookie("token")
 		if err != nil {
-			utils.HandleErrorAndAbort(c, kts_errors.KTS_UNAUTHORIZED)
-			return
+			if err == http.ErrNoCookie {
+				utils.HandleErrorAndAbort(c, kts_errors.KTS_UNAUTHORIZED)
+				return
+			}
+			utils.HandleErrorAndAbort(c, kts_errors.KTS_BAD_REQUEST)
 		}
 
-		userId, err := utils.ValidateToken(tokenString)
+		userId, err := utils.ValidateToken(token)
 		if err != nil {
 			utils.HandleErrorAndAbort(c, kts_errors.KTS_UNAUTHORIZED)
 			return

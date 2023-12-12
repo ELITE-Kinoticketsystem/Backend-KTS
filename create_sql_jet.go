@@ -54,6 +54,9 @@ func GenerateJetMySQL(dbMySQLConnection mysql2.DBConnection) {
 									case "[]byte":
 										defaultTableModelField.Type = template.NewType(&uuid.UUID{})
 									}
+									if columnMetaData.Name == "password" {
+										defaultTableModelField = defaultTableModelField.UseTags("json:\"-\"")
+									}
 									return defaultTableModelField
 								})
 						}),

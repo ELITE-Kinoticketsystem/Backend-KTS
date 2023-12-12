@@ -80,12 +80,3 @@ func ValidateToken(tokenString string) (*uuid.UUID, error) {
 
 	return &userId, nil
 }
-
-func ExtractToken(authHeader string) (string, error) {
-	if len(authHeader) < 7 {
-		return "", jwt.ErrInvalidKey
-	}
-
-	// Return token without "Bearer " prefix
-	return authHeader[7:], nil
-}
