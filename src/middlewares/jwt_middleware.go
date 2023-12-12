@@ -1,6 +1,8 @@
 package middlewares
 
 import (
+	"context"
+
 	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
 
@@ -23,11 +25,15 @@ func JwtAuthMiddleware() gin.HandlerFunc {
 			return
 		}
 
-		err = utils.ValidateToken(tokenString)
+		userId, err := utils.ValidateToken(tokenString)
 		if err != nil {
 			utils.HandleErrorAndAbort(c, kts_errors.KTS_UNAUTHORIZED)
 			return
 		}
+
+		// add userId to request context
+		ctx := context.WithValue(c.Request.Context(), utils.UserIdKey, userId)
+		c.Request = c.Request.WithContext(ctx)
 
 		c.Next()
 	}
