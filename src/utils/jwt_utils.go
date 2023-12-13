@@ -4,6 +4,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 )
@@ -79,4 +80,23 @@ func ValidateToken(tokenString string) (*uuid.UUID, error) {
 	}
 
 	return &userId, nil
+}
+
+func RefreshTokens(refreshToken string) (string, string, error) {
+	userId, err := ValidateToken(refreshToken)
+	if err != nil {
+		return "", "", nil
+	}
+
+	return GenerateJWT(userId)
+}
+
+func SetJWTCookies(c *gin.Context, token string, refreshToken string) {
+	// for development
+	c.SetCookie("token", token, 60*15, "/", "localhost", false, true)
+	c.SetCookie("refreshToken", refreshToken, 60*60*24*7, "/", "localhost", false, true)
+
+	// for production
+	c.SetCookie("token", token, 60*15, "/", "cinemika.tech", false, true)
+	c.SetCookie("refreshToken", refreshToken, 60*60*24*7, "/", "cinemika.tech", false, true)
 }
