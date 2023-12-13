@@ -18,7 +18,7 @@ type MovieRepositoryI interface {
 	GetMovies() (*[]model.Movies, *models.KTSError)
 	GetMovieById(movieId *uuid.UUID) (*models.MovieWithEverything, *models.KTSError)
 	GetMovieByName(movieName *string) (*model.Movies, *models.KTSError)
-	CreateMovie(movie *model.Movies) *models.KTSError
+	CreateMovie(movie *model.Movies) (*uuid.UUID, *models.KTSError)
 	UpdateMovie(movie *model.Movies) *models.KTSError
 	DeleteMovie(movieId *uuid.UUID) *models.KTSError
 

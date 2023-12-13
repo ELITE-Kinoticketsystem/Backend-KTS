@@ -181,42 +181,47 @@ func TestCreateGenre(t *testing.T) {
 
 	genreName := sampleGenre.GenreName
 
-	query := "INSERT INTO `KinoTicketSystem`.genres (genre_name) VALUES (?);"
+	query := "INSERT INTO `KinoTicketSystem`.genres (id, genre_name) VALUES (?, ?);"
 
 	testCases := []struct {
 		name            string
 		setExpectations func(mock sqlmock.Sqlmock, genreName *string)
+		expectedGenreId bool
 		expectedError   *models.KTSError
 	}{
 		{
 			name: "Successful creation",
 			setExpectations: func(mock sqlmock.Sqlmock, genreName *string) {
-				mock.ExpectExec(query).WithArgs(genreName).WillReturnResult(sqlmock.NewResult(1, 1))
+				mock.ExpectExec(query).WithArgs(sqlmock.AnyArg(), genreName).WillReturnResult(sqlmock.NewResult(1, 1))
 			},
-			expectedError: nil,
+			expectedGenreId: true,
+			expectedError:   nil,
 		},
 		{
 			name: "Error while creating genre",
 			setExpectations: func(mock sqlmock.Sqlmock, genreName *string) {
-				mock.ExpectExec(query).WithArgs(genreName).WillReturnError(sqlmock.ErrCancelled)
+				mock.ExpectExec(query).WithArgs(sqlmock.AnyArg(), genreName).WillReturnError(sqlmock.ErrCancelled)
 			},
-			expectedError: kts_errors.KTS_INTERNAL_ERROR,
+			expectedGenreId: false,
+			expectedError:   kts_errors.KTS_INTERNAL_ERROR,
 		},
 		{
 			name: "Error while converting rows affected",
 			setExpectations: func(mock sqlmock.Sqlmock, genreName *string) {
-				mock.ExpectExec(query).WithArgs(genreName).WillReturnResult(
+				mock.ExpectExec(query).WithArgs(sqlmock.AnyArg(), genreName).WillReturnResult(
 					sqlmock.NewErrorResult(errors.New("rows affected conversion did not work")),
 				)
 			},
-			expectedError: kts_errors.KTS_INTERNAL_ERROR,
+			expectedGenreId: false,
+			expectedError:   kts_errors.KTS_INTERNAL_ERROR,
 		},
 		{
 			name: "Genre not found",
 			setExpectations: func(mock sqlmock.Sqlmock, genreName *string) {
-				mock.ExpectExec(query).WithArgs(genreName).WillReturnResult(sqlmock.NewResult(1, 0))
+				mock.ExpectExec(query).WithArgs(sqlmock.AnyArg(), genreName).WillReturnResult(sqlmock.NewResult(1, 0))
 			},
-			expectedError: kts_errors.KTS_NOT_FOUND,
+			expectedGenreId: false,
+			expectedError:   kts_errors.KTS_NOT_FOUND,
 		},
 	}
 
@@ -239,13 +244,16 @@ func TestCreateGenre(t *testing.T) {
 			tc.setExpectations(mock, &genreName)
 
 			// Call the method under test
-			kts_err := genreRepo.CreateGenre(&genreName)
+			genreId, kts_err := genreRepo.CreateGenre(&genreName)
 
 			// Verify the results
 			assert.Equal(t, tc.expectedError, kts_err)
 
-			// Verify that all expectations were met
-			if err = mock.ExpectationsWereMet(); err != nil {
+			if tc.expectedGenreId && genreId == nil {
+				t.Error("Expected actor ID, got nil")
+			}
+
+			if err := mock.ExpectationsWereMet(); err != nil {
 				t.Errorf("There were unfulfilled expectations: %s", err)
 			}
 
