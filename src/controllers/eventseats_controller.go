@@ -4,10 +4,8 @@ import (
 	"slices"
 	"time"
 
-	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/repositories"
-	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
 	"github.com/google/uuid"
 )
 
