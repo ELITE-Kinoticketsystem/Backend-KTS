@@ -137,7 +137,7 @@ func TestCreateUser(t *testing.T) {
 					"INSERT INTO `KinoTicketSystem`.users (id, username, email, password, firstname, lastname)\n"+
 						"VALUES (?, ?, ?, ?, ?, ?);",
 				).WithArgs(
-					user.ID, user.Username, user.Email, user.Password, user.Firstname, user.Lastname,
+					utils.EqUUID(user.ID), user.Username, user.Email, user.Password, user.Firstname, user.Lastname,
 				).WillReturnResult(sqlmock.NewResult(1, 1))
 			},
 			expectedError: nil,
@@ -150,7 +150,7 @@ func TestCreateUser(t *testing.T) {
 					"INSERT INTO `KinoTicketSystem`.users (id, username, email, password, firstname, lastname)\n"+
 						"VALUES (?, ?, ?, ?, ?, ?);",
 				).WithArgs(
-					user.ID, user.Username, user.Email, user.Password, user.Firstname, user.Lastname,
+					utils.EqUUID(user.ID), user.Username, user.Email, user.Password, user.Firstname, user.Lastname,
 				).WillReturnError(sqlmock.ErrCancelled)
 			},
 			expectedError: kts_errors.KTS_INTERNAL_ERROR,

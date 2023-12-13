@@ -36,12 +36,8 @@ func TestRegisterUser(t *testing.T) {
 						/* RefreshToken */
 					}, nil)
 			},
-			expectedResponseBody: models.LoginResponse{
-				User: utils.GetSampleUser(),
-				/* Token */
-				/* RefreshToken */
-			},
-			expectedStatus: http.StatusCreated,
+			expectedResponseBody: utils.GetSampleUser(),
+			expectedStatus:       http.StatusCreated,
 		},
 		{
 			name: "Internal Error",
@@ -208,12 +204,8 @@ func TestLoginUser(t *testing.T) {
 						/* RefreshToken */
 					}, nil)
 			},
-			expectedResponseBody: models.LoginResponse{
-				User: utils.GetSampleUser(),
-				/* Token */
-				/* RefreshToken */
-			},
-			expectedStatus: http.StatusOK,
+			expectedResponseBody: utils.GetSampleUser(),
+			expectedStatus:       http.StatusOK,
 		},
 	}
 

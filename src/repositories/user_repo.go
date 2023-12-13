@@ -2,12 +2,14 @@ package repositories
 
 import (
 	"database/sql"
+	"fmt"
 
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/.gen/KinoTicketSystem/model"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/.gen/KinoTicketSystem/table"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/managers"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
 	"github.com/go-jet/jet/v2/mysql"
 )
 
@@ -65,16 +67,17 @@ func (ur *UserRepository) CreateUser(user model.Users) *models.KTSError {
 		table.Users.Firstname,
 		table.Users.Lastname,
 	).VALUES(
-		user.ID[:],
+		utils.MysqlUuid(user.ID),
 		user.Username,
 		user.Email,
 		user.Password,
 		user.Firstname,
 		user.Lastname,
 	)
-
+	fmt.Println(stmt.Sql())
 	_, err := stmt.Exec(ur.DatabaseManager.GetDatabaseConnection())
 
+	fmt.Println(err)
 	if err != nil {
 		return kts_errors.KTS_INTERNAL_ERROR
 	}
