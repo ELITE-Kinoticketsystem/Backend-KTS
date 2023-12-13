@@ -4,6 +4,7 @@ import (
 	"context"
 
 	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
 
 	"github.com/gin-gonic/gin"
@@ -37,7 +38,7 @@ func JwtAuthMiddleware() gin.HandlerFunc {
 		}
 
 		// add userId to request context
-		ctx := context.WithValue(c.Request.Context(), utils.UserIdKey, userId)
+		ctx := context.WithValue(c.Request.Context(), models.ContextKeyUserID, userId)
 		c.Request = c.Request.WithContext(ctx)
 
 		c.Next()

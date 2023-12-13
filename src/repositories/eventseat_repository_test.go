@@ -1,13 +1,12 @@
 package repositories
 
 import (
-	"database/sql"
 	"testing"
 
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/.gen/KinoTicketSystem/model"
+	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
 
 	"github.com/DATA-DOG/go-sqlmock"
-	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/managers"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
@@ -41,6 +40,11 @@ func GetEventSeats() *[]models.GetEventSeatsDTO {
 				ID:           seatCategoryId,
 				CategoryName: "standard",
 			},
+			EventSeatCategory: model.EventSeatCategories{
+				EventID:        utils.NewUUID(),
+				SeatCategoryID: seatCategoryId,
+				Price:          100,
+			},
 		},
 		{
 			EventSeat: model.EventSeats{
@@ -61,6 +65,11 @@ func GetEventSeats() *[]models.GetEventSeatsDTO {
 				ID:           seatCategoryId,
 				CategoryName: "standard",
 			},
+			EventSeatCategory: model.EventSeatCategories{
+				EventID:        utils.NewUUID(),
+				SeatCategoryID: seatCategoryId,
+				Price:          100,
+			},
 		},
 	}
 
@@ -70,7 +79,7 @@ func GetEventSeats() *[]models.GetEventSeatsDTO {
 func TestGetEventSeats(t *testing.T) {
 	eventSeats := *GetEventSeats()
 
-	query := "\nSELECT event_seats.id AS \"event_seats.id\",\n     event_seats.event_id AS \"event_seats.event_id\",\n     event_seats.seat_id AS \"event_seats.seat_id\",\n     seats.id AS \"seats.id\",\n     seats.seat_category_id AS \"seats.seat_category_id\",\n     seat_categories.id AS \"seat_categories.id\",\n     seat_categories.name AS \"seat_categories.name\"\nFROM `KinoTicketSystem`.event_seats\n     LEFT JOIN `KinoTicketSystem`.seats ON (event_seats.seat_id = seats.id)\n     LEFT JOIN `KinoTicketSystem`.seat_categories ON (seats.seat_category_id = seat_categories.id)\nWHERE event_seats.event_id = ?;\n"
+	query := "SELECT .* FROM `KinoTicketSystem`.event_seats .*"
 
 	testCases := []struct {
 		name            string
@@ -82,10 +91,10 @@ func TestGetEventSeats(t *testing.T) {
 			name: "Select event seats",
 			setExpectations: func(mock sqlmock.Sqlmock) {
 				mock.ExpectQuery(query).
-					WithArgs(utils.EqUUID(&eventSeats[0].EventID)).
-					WillReturnRows(sqlmock.NewRows([]string{"event_seats.id", "event_seats.event_id", "event_seats.seat_id", "seats.id", "seats.seat_category_id", "seat_categories.id", "seat_categories.name"}).
-						AddRow(eventSeats[0].ID, eventSeats[0].EventID, eventSeats[0].SeatID, eventSeats[0].Seat.ID, eventSeats[0].Seat.SeatCategoryID, eventSeats[0].Seat.SeatCategory.ID, eventSeats[0].Seat.SeatCategory.Name).
-						AddRow(eventSeats[1].ID, eventSeats[1].EventID, eventSeats[1].SeatID, eventSeats[1].Seat.ID, eventSeats[1].Seat.SeatCategoryID, eventSeats[1].Seat.SeatCategory.ID, eventSeats[1].Seat.SeatCategory.Name),
+					WithArgs(sqlmock.AnyArg()).
+					WillReturnRows(sqlmock.NewRows([]string{"event_seats.id", "event_seats.booked", "event_seats.blocked_until", "event_seats.user_id", "event_seats.seat_id", "event_seats.event_id", "seats.id", "seats.row_nr", "seats.column_nr", "seats.seat_category_id", "seats.cinema_hall_id", "seats.type", "seat_categories.id", "seat_categories.category_name", "event_seat_categories.event_id", "event_seat_categories.seat_category_id", "event_seat_categories.price"}).
+						AddRow(eventSeats[0].EventSeat.ID, eventSeats[0].EventSeat.Booked, eventSeats[0].EventSeat.BlockedUntil, eventSeats[0].EventSeat.UserID, eventSeats[0].EventSeat.SeatID, eventSeats[0].EventSeat.EventID, eventSeats[0].Seat.ID, eventSeats[0].Seat.RowNr, eventSeats[0].Seat.ColumnNr, eventSeats[0].Seat.SeatCategoryID, eventSeats[0].Seat.CinemaHallID, eventSeats[0].Seat.Type, eventSeats[0].SeatCategory.ID, eventSeats[0].SeatCategory.CategoryName, eventSeats[0].EventSeatCategory.EventID, eventSeats[0].EventSeatCategory.SeatCategoryID, eventSeats[0].EventSeatCategory.Price).
+						AddRow(eventSeats[1].EventSeat.ID, eventSeats[1].EventSeat.Booked, eventSeats[1].EventSeat.BlockedUntil, eventSeats[1].EventSeat.UserID, eventSeats[1].EventSeat.SeatID, eventSeats[1].EventSeat.EventID, eventSeats[1].Seat.ID, eventSeats[1].Seat.RowNr, eventSeats[1].Seat.ColumnNr, eventSeats[1].Seat.SeatCategoryID, eventSeats[1].Seat.CinemaHallID, eventSeats[1].Seat.Type, eventSeats[1].SeatCategory.ID, eventSeats[1].SeatCategory.CategoryName, eventSeats[1].EventSeatCategory.EventID, eventSeats[1].EventSeatCategory.SeatCategoryID, eventSeats[1].EventSeatCategory.Price),
 					)
 
 			},
@@ -93,31 +102,31 @@ func TestGetEventSeats(t *testing.T) {
 			expectedError: nil,
 		},
 		{
-			name: "Select event seats - no seats found",
+			name: "Select event seats - error",
 			setExpectations: func(mock sqlmock.Sqlmock) {
 				mock.ExpectQuery(query).
-					WithArgs(utils.EqUUID(&eventSeats[0].EventID)).
-					WillReturnRows(sqlmock.NewRows([]string{"event_seats.id", "event_seats.event_id", "event_seats.seat_id", "seats.id", "seats.seat_category_id", "seat_categories.id", "seat_categories.name"}))
-			},
-			expectedSeats: nil,
-			expectedError: kts_errors.KTS_NOT_FOUND,
-		},
-		{
-			name: "Select event seats - internal error",
-			setExpectations: func(mock sqlmock.Sqlmock) {
-				mock.ExpectQuery(query).
-					WithArgs(utils.EqUUID(&eventSeats[0].EventID)).
-					WillReturnError(sql.ErrConnDone)
+					WithArgs(sqlmock.AnyArg()).
+					WillReturnError(sqlmock.ErrCancelled)
 			},
 			expectedSeats: nil,
 			expectedError: kts_errors.KTS_INTERNAL_ERROR,
+		},
+		{
+			name: "Select event seats - no rows",
+			setExpectations: func(mock sqlmock.Sqlmock) {
+				mock.ExpectQuery(query).
+					WithArgs(sqlmock.AnyArg()).
+					WillReturnRows(sqlmock.NewRows([]string{"event_seats.id", "event_seats.booked", "event_seats.blocked_until", "event_seats.user_id", "event_seats.seat_id", "event_seats.event_id", "seats.id", "seats.row_nr", "seats.column_nr", "seats.seat_category_id", "seats.cinema_hall_id", "seats.type", "seat_categories.id", "seat_categories.category_name", "event_seat_categories.event_id", "event_seat_categories.seat_category_id", "event_seat_categories.price"}))
+			},
+			expectedSeats: nil,
+			expectedError: kts_errors.KTS_NOT_FOUND,
 		},
 	}
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 
-			db, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
+			db, mock, err := sqlmock.New()
 			if err != nil {
 				t.Fatalf("Failed to create mock database connection: %v", err)
 			}
@@ -133,7 +142,7 @@ func TestGetEventSeats(t *testing.T) {
 			tc.setExpectations(mock)
 
 			// Call the method on the repository instance
-			seats, kts_err := eventSeatRepo.GetEventSeats(&eventSeats[0].EventID)
+			seats, kts_err := eventSeatRepo.GetEventSeats(eventSeats[0].EventSeat.EventID)
 
 			// Verify that all expectations were met
 

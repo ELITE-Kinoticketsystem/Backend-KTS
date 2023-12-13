@@ -10,3 +10,5 @@
 ~/go/bin/mockgen -source=./src/controllers/theatre_controller.go -destination=./src/mocks/theatre_controller_mock.go -package=mocks
 ~/go/bin/mockgen -source=./src/repositories/theatre_repository.go -destination=./src/mocks/theatre_repository_mock.go -package=mocks
 ~/go/bin/mockgen -source=./src/repositories/price_category_repository.go -destination=./src/mocks/price_category_repository_mock.go -package=mocks
+~/go/bin/mockgen -source=./src/repositories/eventseat_repository.go -destination=./src/mocks/eventseat_repository_mock.go -package=mocks
+~/go/bin/mockgen -source=./src/controllers/eventseats_controller.go -destination=./src/mocks/eventseats_controller_mock.go -package=mocks
