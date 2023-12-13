@@ -24,7 +24,6 @@ type MovieRepositoryI interface {
 
 	// All Movies with all Genres - Grouped by Movie
 	GetMoviesWithGenres() (*[]models.MovieWithGenres, *models.KTSError)
-
 }
 
 type MovieRepository struct {
@@ -80,9 +79,13 @@ func (mr *MovieRepository) GetMovieByName(movieName *string) (*model.Movies, *mo
 	return &movie, nil
 }
 
-func (mr *MovieRepository) CreateMovie(movie *model.Movies) *models.KTSError {
+func (mr *MovieRepository) CreateMovie(movie *model.Movies) (*uuid.UUID, *models.KTSError) {
+	newId := uuid.New()
+	movie.ID = &newId
+
 	// Create the insert statement
 	insertQuery := table.Movies.INSERT(
+		table.Movies.ID,
 		table.Movies.Title,
 		table.Movies.Description,
 		table.Movies.BannerPicURL,
@@ -91,33 +94,36 @@ func (mr *MovieRepository) CreateMovie(movie *model.Movies) *models.KTSError {
 		table.Movies.Rating,
 		table.Movies.ReleaseDate,
 		table.Movies.TimeInMin,
-		table.Movies.Fsk).
-		VALUES(movie.Title,
-			movie.Description,
-			movie.BannerPicURL,
-			movie.CoverPicURL,
-			movie.TrailerURL,
-			movie.Rating,
-			movie.ReleaseDate,
-			movie.TimeInMin,
-			movie.Fsk)
+		table.Movies.Fsk,
+	).VALUES(
+		utils.MysqlUuid(movie.ID),
+		movie.Title,
+		movie.Description,
+		movie.BannerPicURL,
+		movie.CoverPicURL,
+		movie.TrailerURL,
+		movie.Rating,
+		movie.ReleaseDate,
+		movie.TimeInMin,
+		movie.Fsk,
+	)
 
 	// Execute the query
 	rows, err := insertQuery.Exec(mr.DatabaseManager.GetDatabaseConnection())
 	if err != nil {
-		return kts_errors.KTS_INTERNAL_ERROR
+		return nil, kts_errors.KTS_INTERNAL_ERROR
 	}
 
 	rowsAff, err := rows.RowsAffected()
 	if err != nil {
-		return kts_errors.KTS_INTERNAL_ERROR
+		return nil, kts_errors.KTS_INTERNAL_ERROR
 	}
 
 	if rowsAff == 0 {
-		return kts_errors.KTS_NOT_FOUND
+		return nil, kts_errors.KTS_NOT_FOUND
 	}
 
-	return nil
+	return movie.ID, nil
 }
 
 func (mr *MovieRepository) UpdateMovie(movie *model.Movies) *models.KTSError {
