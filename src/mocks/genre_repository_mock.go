@@ -41,11 +41,12 @@ func (m *MockGenreRepositoryI) EXPECT() *MockGenreRepositoryIMockRecorder {
 }
 
 // CreateGenre mocks base method.
-func (m *MockGenreRepositoryI) CreateGenre(name *string) *models.KTSError {
+func (m *MockGenreRepositoryI) CreateGenre(name *string) (*uuid.UUID, *models.KTSError) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateGenre", name)
-	ret0, _ := ret[0].(*models.KTSError)
-	return ret0
+	ret0, _ := ret[0].(*uuid.UUID)
+	ret1, _ := ret[1].(*models.KTSError)
+	return ret0, ret1
 }
 
 // CreateGenre indicates an expected call of CreateGenre.
@@ -81,21 +82,6 @@ func (m *MockGenreRepositoryI) GetGenreByName(name *string) (*model.Genres, *mod
 func (mr *MockGenreRepositoryIMockRecorder) GetGenreByName(name any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetGenreByName", reflect.TypeOf((*MockGenreRepositoryI)(nil).GetGenreByName), name)
-}
-
-// GetGenreByNameWithMovies mocks base method.
-func (m *MockGenreRepositoryI) GetGenreByNameWithMovies(genreName *string) (*models.GenreWithMovies, *models.KTSError) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetGenreByNameWithMovies", genreName)
-	ret0, _ := ret[0].(*models.GenreWithMovies)
-	ret1, _ := ret[1].(*models.KTSError)
-	return ret0, ret1
-}
-
-// GetGenreByNameWithMovies indicates an expected call of GetGenreByNameWithMovies.
-func (mr *MockGenreRepositoryIMockRecorder) GetGenreByNameWithMovies(genreName any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetGenreByNameWithMovies", reflect.TypeOf((*MockGenreRepositoryI)(nil).GetGenreByNameWithMovies), genreName)
 }
 
 // GetGenres mocks base method.
