@@ -11,7 +11,68 @@ import (
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/managers"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
+	"github.com/stretchr/testify/assert"
 )
+
+func TestCreateTheatre(t *testing.T) {
+	testCases := []struct {
+		name            string
+		data            model.Theatres
+		setExpectations func(mock sqlmock.Sqlmock, theatre *model.Theatres)
+		expectedError   *models.KTSError
+	}{
+		{
+			name: "Success",
+			data: getSampleTheatre(),
+			setExpectations: func(mock sqlmock.Sqlmock, theatre *model.Theatres) {
+				mock.ExpectExec("INSERT INTO `KinoTicketSystem`.theatres").WithArgs(
+					theatre.ID, theatre.Name, theatre.AddressID,
+				).WillReturnResult(sqlmock.NewResult(1, 1))
+			},
+			expectedError: nil,
+		},
+		{
+			name: "Internal error",
+			data: getSampleTheatre(),
+			setExpectations: func(mock sqlmock.Sqlmock, theatre *model.Theatres) {
+				mock.ExpectExec("INSERT INTO `KinoTicketSystem`.theatres").WithArgs(
+					theatre.ID, theatre.Name, theatre.AddressID,
+				).WillReturnError(sql.ErrConnDone)
+			},
+			expectedError: kts_errors.KTS_INTERNAL_ERROR,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			// GIVEN
+			// create mock db manager
+			db, mock, err := sqlmock.New()
+			if err != nil {
+				t.Fatalf("error while setting up mock database: %s", err)
+			}
+			theatreRepo := TheatreRepository{
+				DatabaseManager: &managers.DatabaseManager{
+					Connection: db,
+				},
+			}
+
+			// define expectations
+			tc.setExpectations(mock, &tc.data)
+
+			// WHEN
+			// call CreateTheatre with user data
+			kts_err := theatreRepo.CreateTheatre(tc.data)
+
+			// THEN
+			// check expected error
+			assert.Equal(t, tc.expectedError, kts_err)
+			if err = mock.ExpectationsWereMet(); err != nil {
+				t.Errorf("There were unfulfilled expectations: %s", err)
+			}
+		})
+	}
+}
 
 func TestGetSeatsForCinemaHall(t *testing.T) {
 	cinemaHallID := utils.NewUUID()
@@ -40,7 +101,7 @@ func TestGetSeatsForCinemaHall(t *testing.T) {
 		expectedError   *models.KTSError
 	}{
 		{
-			name: "Get seats for cinema hall",
+			name: "Success",
 			setExpectations: func(mock sqlmock.Sqlmock) {
 				mock.ExpectQuery("SELECT .* FROM `KinoTicketSystem`.seats .*").WithArgs(sqlmock.AnyArg()).WillReturnRows(
 					sqlmock.NewRows([]string{"seats.id", "seats.cinema_hall_id", "seats.row_nr", "seats.column_nr", "seats.seat_category_id"}).
@@ -52,12 +113,20 @@ func TestGetSeatsForCinemaHall(t *testing.T) {
 			expectedError: nil,
 		},
 		{
-			name: "Get seats for cinema hall sql error",
+			name: "Internal error",
 			setExpectations: func(mock sqlmock.Sqlmock) {
 				mock.ExpectQuery("SELECT .* FROM `KinoTicketSystem`.seats .*").WithArgs(sqlmock.AnyArg()).WillReturnError(sql.ErrConnDone)
 			},
 			expectedSeats: nil,
 			expectedError: kts_errors.KTS_INTERNAL_ERROR,
+		},
+		{
+			name: "Not found",
+			setExpectations: func(mock sqlmock.Sqlmock) {
+				mock.ExpectQuery("SELECT .* FROM `KinoTicketSystem`.seats .*").WithArgs(sqlmock.AnyArg()).WillReturnError(sql.ErrNoRows)
+			},
+			expectedSeats: nil,
+			expectedError: kts_errors.KTS_NOT_FOUND,
 		},
 	}
 
@@ -91,5 +160,13 @@ func TestGetSeatsForCinemaHall(t *testing.T) {
 				t.Errorf("There were unfulfilled expectations: %s", err)
 			}
 		})
+	}
+}
+
+func getSampleTheatre() model.Theatres {
+	return model.Theatres{
+		/* ID */
+		Name: "Theatre",
+		/* AddressID */
 	}
 }
