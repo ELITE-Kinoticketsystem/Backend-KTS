@@ -111,21 +111,3 @@ func getSampleTheatre() model.Theatres {
 		/* AddressID */
 	}
 }
-func getSampleTheatreData() models.CreateTheatreRequest {
-	return models.CreateTheatreRequest{
-		Name: "Theatre",
-		Address: struct {
-			Street   string
-			StreetNr string
-			Zipcode  string
-			City     string
-			Country  string
-		}{
-			Street:   "Street",
-			StreetNr: "StreetNr",
-			Zipcode:  "Zipcode",
-			City:     "City",
-			Country:  "Country",
-		},
-	}
-}
