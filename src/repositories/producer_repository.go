@@ -89,7 +89,7 @@ func (pr *ProducerRepository) CreateProducer(producer *model.Producers) (*uuid.U
 	stmt := table.Producers.INSERT(
 		table.Producers.AllColumns,
 	).VALUES(
-		producer.ID,
+		utils.MysqlUuid(producer.ID),
 		producer.Name,
 		producer.Birthdate,
 		producer.Description,

@@ -13,10 +13,11 @@ import (
 )
 
 type Controllers struct {
-	UserController  controllers.UserControllerI
-	MovieController controllers.MovieControllerI
-	GenreController controllers.GenreControllerI
-	ActorController controllers.ActorControllerI
+	UserController     controllers.UserControllerI
+	MovieController    controllers.MovieControllerI
+	GenreController    controllers.GenreControllerI
+	ActorController    controllers.ActorControllerI
+	ProducerController controllers.ProducerControllerI
 }
 
 func createRouter(dbConnection *sql.DB) *gin.Engine {
@@ -62,6 +63,10 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 		DatabaseManager: databaseManager,
 	}
 
+	producerRepo := &repositories.ProducerRepository{
+		DatabaseManager: databaseManager,
+	}
+
 	// Create controllers
 	controller := Controllers{
 		UserController: &controllers.UserController{
@@ -78,6 +83,9 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 		},
 		ActorController: &controllers.ActorController{
 			ActorRepo: actorRepo,
+		},
+		ProducerController: &controllers.ProducerController{
+			ProducerRepo: producerRepo,
 		},
 	}
 
@@ -111,6 +119,11 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 	router.Handle(http.MethodGet, "/actors/:id", handlers.GetActorByIdHandler(controller.ActorController))
 	router.Handle(http.MethodGet, "/actors/", handlers.GetActorsHandler(controller.ActorController))
 	router.Handle(http.MethodPost, "/actors/", handlers.CreateActorHandler(controller.ActorController))
+
+	// Producers
+	router.Handle(http.MethodGet, "/producers", handlers.GetProducersHandler(controller.ProducerController))
+	router.Handle(http.MethodGet, "/producers/:id", handlers.GetProducerByIdHandler(controller.ProducerController))
+	router.Handle(http.MethodPost, "/producers", handlers.CreateProducerHandler(controller.ProducerController))
 
 	return router
 }

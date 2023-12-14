@@ -9,9 +9,9 @@ import (
 )
 
 type ProducerControllerI interface {
-	GetProducers() (*[]model.Producers, *models.KTSError)
-	GetProducerById(id *uuid.UUID) (*model.Producers, *models.KTSError)
-	CreateProducer(producer *model.Producers) *models.KTSError
+	GetProducers() (*[]models.GetProducersDTO, *models.KTSError)
+	GetProducerById(producerId *uuid.UUID) (*models.ProducerDTO, *models.KTSError)
+	CreateProducer(producerDto *models.CreateProducerDTO) (*uuid.UUID, *models.KTSError)
 }
 
 type ProducerController struct {
