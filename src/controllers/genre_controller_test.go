@@ -197,29 +197,46 @@ func TestCreateGenre(t *testing.T) {
 
 	testCases := []struct {
 		name            string
+		genreName       *string
 		setExpectations func(mockRepo mocks.MockGenreRepositoryI, genreName *string)
+		expectedGenreId bool
 		expectedError   *models.KTSError
 	}{
 		{
-			name: "Empty result",
+			name:      "Empty result",
+			genreName: &sampleGenre.GenreName,
 			setExpectations: func(mockRepo mocks.MockGenreRepositoryI, genreName *string) {
-				mockRepo.EXPECT().CreateGenre(genreName).Return(kts_errors.KTS_NOT_FOUND)
+				mockRepo.EXPECT().CreateGenre(genreName).Return(nil, kts_errors.KTS_NOT_FOUND)
 			},
-			expectedError: kts_errors.KTS_NOT_FOUND,
+			expectedGenreId: false,
+			expectedError:   kts_errors.KTS_NOT_FOUND,
 		},
 		{
-			name: "Create genre",
+			name:      "Create genre",
+			genreName: &sampleGenre.GenreName,
 			setExpectations: func(mockRepo mocks.MockGenreRepositoryI, genreName *string) {
-				mockRepo.EXPECT().CreateGenre(genreName).Return(nil)
+				mockRepo.EXPECT().CreateGenre(genreName).Return(sampleGenre.ID, nil)
 			},
-			expectedError: nil,
+			expectedGenreId: true,
+			expectedError:   nil,
 		},
 		{
-			name: "Error while creating genre",
+			name:      "Error while creating genre",
+			genreName: &sampleGenre.GenreName,
 			setExpectations: func(mockRepo mocks.MockGenreRepositoryI, genreName *string) {
-				mockRepo.EXPECT().CreateGenre(genreName).Return(kts_errors.KTS_INTERNAL_ERROR)
+				mockRepo.EXPECT().CreateGenre(genreName).Return(nil, kts_errors.KTS_INTERNAL_ERROR)
 			},
-			expectedError: kts_errors.KTS_INTERNAL_ERROR,
+			expectedGenreId: false,
+			expectedError:   kts_errors.KTS_INTERNAL_ERROR,
+		},
+		{
+			name:      "GenreName == nil",
+			genreName: nil,
+			setExpectations: func(mockRepo mocks.MockGenreRepositoryI, genreName *string) {
+
+			},
+			expectedGenreId: false,
+			expectedError:   kts_errors.KTS_BAD_REQUEST,
 		},
 	}
 
@@ -234,13 +251,19 @@ func TestCreateGenre(t *testing.T) {
 			}
 
 			// define expectations
-			tc.setExpectations(*genreRepoMock, &sampleGenre.GenreName)
+			tc.setExpectations(*genreRepoMock, tc.genreName)
 
 			// WHEN
-			kts_err := genreController.CreateGenre(&sampleGenre.GenreName)
+			genreId, kts_err := genreController.CreateGenre(tc.genreName)
 
 			// THEN
+			// Verify
 			assert.Equal(t, tc.expectedError, kts_err)
+
+			if tc.expectedGenreId && genreId == nil {
+				t.Error("Expected genre ID, got nil")
+			}
+
 		})
 	}
 }
