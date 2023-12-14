@@ -1,6 +1,8 @@
 package controllers
 
 import (
+	"log"
+
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/.gen/KinoTicketSystem/model"
 	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
@@ -13,7 +15,7 @@ type MovieControllerI interface {
 	GetMovies() (*[]model.Movies, *models.KTSError)
 	GetMovieById(movieId *uuid.UUID) (*models.MovieWithEverything, *models.KTSError)
 	GetMovieByName(name *string) (*model.Movies, *models.KTSError)
-	CreateMovie(movie *model.Movies) *models.KTSError
+	CreateMovie(movie *models.MovieDTOCreate) (*uuid.UUID, *models.KTSError)
 	UpdateMovie(movie *model.Movies) *models.KTSError
 	DeleteMovie(movieId *uuid.UUID) *models.KTSError
 
@@ -23,13 +25,13 @@ type MovieControllerI interface {
 
 	// All Movies with all Genres - Grouped by Movie
 	GetMoviesWithGenres() (*[]models.MovieWithGenres, *models.KTSError)
-
-	
 }
 
 type MovieController struct {
-	MovieRepo      repositories.MovieRepositoryI
-	MovieGenreRepo repositories.MovieGenreRepositoryI
+	MovieRepo         repositories.MovieRepositoryI
+	MovieGenreRepo    repositories.MovieGenreRepositoryI
+	MovieActorRepo    repositories.MovieActorRepositoryI
+	MovieProducerRepo repositories.MovieProducerRepositoryI
 }
 
 // Movie
@@ -49,11 +51,55 @@ func (mc *MovieController) GetMovieByName(name *string) (*model.Movies, *models.
 	return movie, nil
 }
 
-func (mc *MovieController) CreateMovie(movie *model.Movies) *models.KTSError {
-	// Add Method AddMovieGenre
+func (mc *MovieController) CreateMovie(movie *models.MovieDTOCreate) (*uuid.UUID, *models.KTSError) {
+	if movie.Movies == (model.Movies{}) {
+		log.Print("Movie is nil")
+		return nil, kts_errors.KTS_BAD_REQUEST
+	}
 
-	// TODO: implement
-	return kts_errors.KTS_INTERNAL_ERROR
+	// Movie
+	movieId, kts_errors := mc.MovieRepo.CreateMovie(&movie.Movies)
+	if kts_errors != nil {
+		log.Print("Movie was not created")
+		return nil, kts_errors
+	}
+
+	// Add genre to movie
+	movieGenres := movie.GenresID
+	for _, movieGenre := range movieGenres {
+		kts_err := mc.MovieGenreRepo.AddMovieGenre(movieId, movieGenre.ID)
+
+		if kts_err != nil {
+			log.Print("Genre was not added to movie")
+			return nil, kts_err
+		}
+	}
+
+	// Add actors to movie
+	movieActors := movie.ActorsID
+	log.Print("MovieActors: ", movieActors)
+	for _, movieActor := range movieActors {
+		kts_err := mc.MovieActorRepo.AddMovieActor(movieId, movieActor.ID)
+
+		if kts_err != nil {
+			log.Print("Actor was not added to movie")
+			return nil, kts_err
+		}
+	}
+
+	// Add producers to movie
+	movieProducers := movie.ProducersID
+	for _, movieProducer := range movieProducers {
+		kts_err := mc.MovieProducerRepo.AddMovieProducer(movieId, movieProducer.ID)
+
+		if kts_err != nil {
+			log.Print("Producer was not added to movie")
+			return nil, kts_err
+		}
+	}
+
+	log.Print("Movie was created")
+	return movieId, nil
 }
 
 func (mc *MovieController) UpdateMovie(movie *model.Movies) *models.KTSError {

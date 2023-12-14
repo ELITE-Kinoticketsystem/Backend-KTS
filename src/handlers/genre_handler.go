@@ -43,11 +43,13 @@ func CreateGenre(genreCtrl controllers.GenreControllerI) gin.HandlerFunc {
 			return
 		}
 
-		kts_err := genreCtrl.CreateGenre(&genre.GenreName)
+		genreId, kts_err := genreCtrl.CreateGenre(&genre.GenreName)
 		if kts_err != nil {
 			utils.HandleErrorAndAbort(c, kts_err)
 			return
 		}
+		genre.ID = genreId
+
 		c.JSON(http.StatusCreated, genre)
 	}
 }

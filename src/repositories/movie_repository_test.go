@@ -179,42 +179,47 @@ func TestGetMovieByName(t *testing.T) {
 func TestCreateMovie(t *testing.T) {
 	sampleMovie := utils.GetSampleMovieById()
 
-	query := "INSERT INTO `KinoTicketSystem`.movies (title, description, banner_pic_url, cover_pic_url, trailer_url, rating, release_date, time_in_min, fsk) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);\n"
+	query := "INSERT INTO `KinoTicketSystem`.movies (id, title, description, banner_pic_url, cover_pic_url, trailer_url, rating, release_date, time_in_min, fsk) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);"
 
 	testCases := []struct {
 		name            string
 		setExpectations func(mock sqlmock.Sqlmock, movie *model.Movies)
+		expectedMovieId bool
 		expectedError   *models.KTSError
 	}{
 		{
 			name: "Create movie",
 			setExpectations: func(mock sqlmock.Sqlmock, movie *model.Movies) {
-				mock.ExpectExec(query).WithArgs(movie.Title, movie.Description, movie.BannerPicURL, movie.CoverPicURL, movie.TrailerURL, movie.Rating, movie.ReleaseDate, movie.TimeInMin, movie.Fsk).WillReturnResult(sqlmock.NewResult(1, 1))
+				mock.ExpectExec(query).WithArgs(sqlmock.AnyArg(), movie.Title, movie.Description, movie.BannerPicURL, movie.CoverPicURL, movie.TrailerURL, movie.Rating, movie.ReleaseDate, movie.TimeInMin, movie.Fsk).WillReturnResult(sqlmock.NewResult(1, 1))
 			},
-			expectedError: nil,
+			expectedMovieId: true,
+			expectedError:   nil,
 		},
 		{
 			name: "Error while creating movie",
 			setExpectations: func(mock sqlmock.Sqlmock, movie *model.Movies) {
-				mock.ExpectExec(query).WithArgs(movie.Title, movie.Description, movie.BannerPicURL, movie.CoverPicURL, movie.TrailerURL, movie.Rating, movie.ReleaseDate, movie.TimeInMin, movie.Fsk).WillReturnError(sqlmock.ErrCancelled)
+				mock.ExpectExec(query).WithArgs(sqlmock.AnyArg(), movie.Title, movie.Description, movie.BannerPicURL, movie.CoverPicURL, movie.TrailerURL, movie.Rating, movie.ReleaseDate, movie.TimeInMin, movie.Fsk).WillReturnError(sqlmock.ErrCancelled)
 			},
-			expectedError: kts_errors.KTS_INTERNAL_ERROR,
+			expectedMovieId: false,
+			expectedError:   kts_errors.KTS_INTERNAL_ERROR,
 		},
 		{
 			name: "Error while converting rows affected",
 			setExpectations: func(mock sqlmock.Sqlmock, movie *model.Movies) {
-				mock.ExpectExec(query).WithArgs(movie.Title, movie.Description, movie.BannerPicURL, movie.CoverPicURL, movie.TrailerURL, movie.Rating, movie.ReleaseDate, movie.TimeInMin, movie.Fsk).WillReturnResult(
+				mock.ExpectExec(query).WithArgs(sqlmock.AnyArg(), movie.Title, movie.Description, movie.BannerPicURL, movie.CoverPicURL, movie.TrailerURL, movie.Rating, movie.ReleaseDate, movie.TimeInMin, movie.Fsk).WillReturnResult(
 					sqlmock.NewErrorResult(errors.New("rows affected conversion did not work")),
 				)
 			},
-			expectedError: kts_errors.KTS_INTERNAL_ERROR,
+			expectedMovieId: false,
+			expectedError:   kts_errors.KTS_INTERNAL_ERROR,
 		},
 		{
 			name: "Movie not found",
 			setExpectations: func(mock sqlmock.Sqlmock, movie *model.Movies) {
-				mock.ExpectExec(query).WithArgs(movie.Title, movie.Description, movie.BannerPicURL, movie.CoverPicURL, movie.TrailerURL, movie.Rating, movie.ReleaseDate, movie.TimeInMin, movie.Fsk).WillReturnResult(sqlmock.NewResult(1, 0))
+				mock.ExpectExec(query).WithArgs(sqlmock.AnyArg(), movie.Title, movie.Description, movie.BannerPicURL, movie.CoverPicURL, movie.TrailerURL, movie.Rating, movie.ReleaseDate, movie.TimeInMin, movie.Fsk).WillReturnResult(sqlmock.NewResult(1, 0))
 			},
-			expectedError: kts_errors.KTS_NOT_FOUND,
+			expectedMovieId: false,
+			expectedError:   kts_errors.KTS_NOT_FOUND,
 		},
 	}
 
@@ -237,13 +242,16 @@ func TestCreateMovie(t *testing.T) {
 			tc.setExpectations(mock, sampleMovie)
 
 			// Call the method under test
-			kts_err := movieRepo.CreateMovie(sampleMovie)
+			movieId, kts_err := movieRepo.CreateMovie(sampleMovie)
 
 			// Verify
 			assert.Equal(t, tc.expectedError, kts_err)
 
-			// Verify that all expectations were met
-			if err = mock.ExpectationsWereMet(); err != nil {
+			if tc.expectedMovieId && movieId == nil {
+				t.Error("Expected actor ID, got nil")
+			}
+
+			if err := mock.ExpectationsWereMet(); err != nil {
 				t.Errorf("There were unfulfilled expectations: %s", err)
 			}
 

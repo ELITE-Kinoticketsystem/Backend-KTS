@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/.gen/KinoTicketSystem/model"
+	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/repositories"
 	"github.com/google/uuid"
@@ -10,7 +11,7 @@ import (
 type GenreControllerI interface {
 	GetGenres() (*[]model.Genres, *models.KTSError)
 	GetGenreByName(name *string) (*model.Genres, *models.KTSError)
-	CreateGenre(name *string) *models.KTSError
+	CreateGenre(name *string) (*uuid.UUID, *models.KTSError)
 	UpdateGenre(genre *model.Genres) *models.KTSError
 	DeleteGenre(genre_id *uuid.UUID) *models.KTSError
 
@@ -38,12 +39,16 @@ func (mc *GenreController) GetGenreByName(name *string) (*model.Genres, *models.
 	return genre, nil
 }
 
-func (mc *GenreController) CreateGenre(name *string) *models.KTSError {
-	kts_errors := mc.GenreRepo.CreateGenre(name)
-	if kts_errors != nil {
-		return kts_errors
+func (mc *GenreController) CreateGenre(name *string) (*uuid.UUID, *models.KTSError) {
+	if name == nil {
+		return nil, kts_errors.KTS_BAD_REQUEST
 	}
-	return nil
+
+	genreId, kts_errors := mc.GenreRepo.CreateGenre(name)
+	if kts_errors != nil {
+		return nil, kts_errors
+	}
+	return genreId, nil
 }
 
 func (mc *GenreController) UpdateGenre(genre *model.Genres) *models.KTSError {

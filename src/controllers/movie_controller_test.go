@@ -262,3 +262,136 @@ func TestGetMovieById(t *testing.T) {
 		})
 	}
 }
+
+func TestCreateMovie(t *testing.T) {
+	sampleMovie := utils.GetSampleMovieDTOCreate()
+
+	testCases := []struct {
+		name             string
+		movieDTOModel    *models.MovieDTOCreate
+		setExpectations  func(mockMovieRepo mocks.MockMovieRepositoryI, mockMovieGenreRepo mocks.MockMovieGenreRepositoryI, mockMovieActorRepo mocks.MockMovieActorRepositoryI, mockMovieProducerRepo mocks.MockMovieProducerRepositoryI, movie *models.MovieDTOCreate)
+		expectedMoviesId bool
+		expectedError    *models.KTSError
+	}{
+		{ // Done
+			name:          "Bad Request",
+			movieDTOModel: &models.MovieDTOCreate{},
+			setExpectations: func(mockMovieRepo mocks.MockMovieRepositoryI, mockMovieGenreRepo mocks.MockMovieGenreRepositoryI, mockMovieActorRepo mocks.MockMovieActorRepositoryI, mockMovieProducerRepo mocks.MockMovieProducerRepositoryI, movie *models.MovieDTOCreate) {
+
+			},
+			expectedMoviesId: false,
+			expectedError:    kts_errors.KTS_BAD_REQUEST,
+		},
+		{
+			name: "Movie failed",
+			movieDTOModel: &models.MovieDTOCreate{
+				Movies: sampleMovie.Movies,
+			},
+			setExpectations: func(mockMovieRepo mocks.MockMovieRepositoryI, mockMovieGenreRepo mocks.MockMovieGenreRepositoryI, mockMovieActorRepo mocks.MockMovieActorRepositoryI, mockMovieProducerRepo mocks.MockMovieProducerRepositoryI, movie *models.MovieDTOCreate) {
+				mockMovieRepo.EXPECT().CreateMovie(&movie.Movies).Return(nil, kts_errors.KTS_INTERNAL_ERROR)
+			},
+			expectedMoviesId: false,
+			expectedError:    kts_errors.KTS_INTERNAL_ERROR,
+		},
+		{
+			name: "Genre failed",
+			movieDTOModel: &models.MovieDTOCreate{
+				Movies: sampleMovie.Movies,
+
+				GenresID: sampleMovie.GenresID,
+			},
+			setExpectations: func(mockMovieRepo mocks.MockMovieRepositoryI, mockMovieGenreRepo mocks.MockMovieGenreRepositoryI, mockMovieActorRepo mocks.MockMovieActorRepositoryI, mockMovieProducerRepo mocks.MockMovieProducerRepositoryI, movie *models.MovieDTOCreate) {
+				mockMovieRepo.EXPECT().CreateMovie(&movie.Movies).Return(sampleMovie.ID, nil)
+				mockMovieGenreRepo.EXPECT().AddMovieGenre(sampleMovie.ID, gomock.Any()).Return(kts_errors.KTS_INTERNAL_ERROR)
+			},
+			expectedMoviesId: false,
+			expectedError:    kts_errors.KTS_INTERNAL_ERROR,
+		},
+		{
+			name: "Actor failed",
+			movieDTOModel: &models.MovieDTOCreate{
+				Movies: sampleMovie.Movies,
+
+				GenresID: sampleMovie.GenresID,
+				ActorsID: sampleMovie.ActorsID,
+			},
+			setExpectations: func(mockMovieRepo mocks.MockMovieRepositoryI, mockMovieGenreRepo mocks.MockMovieGenreRepositoryI, mockMovieActorRepo mocks.MockMovieActorRepositoryI, mockMovieProducerRepo mocks.MockMovieProducerRepositoryI, movie *models.MovieDTOCreate) {
+				mockMovieRepo.EXPECT().CreateMovie(&movie.Movies).Return(sampleMovie.ID, nil)
+				mockMovieGenreRepo.EXPECT().AddMovieGenre(sampleMovie.ID, gomock.Any()).Return(nil)
+				mockMovieActorRepo.EXPECT().AddMovieActor(sampleMovie.ID, gomock.Any()).Return(kts_errors.KTS_INTERNAL_ERROR)
+			},
+			expectedMoviesId: false,
+			expectedError:    kts_errors.KTS_INTERNAL_ERROR,
+		},
+		{
+			name: "Producer failed",
+			movieDTOModel: &models.MovieDTOCreate{
+				Movies: sampleMovie.Movies,
+
+				GenresID:    sampleMovie.GenresID,
+				ActorsID:    sampleMovie.ActorsID,
+				ProducersID: sampleMovie.ProducersID,
+			},
+			setExpectations: func(mockMovieRepo mocks.MockMovieRepositoryI, mockMovieGenreRepo mocks.MockMovieGenreRepositoryI, mockMovieActorRepo mocks.MockMovieActorRepositoryI, mockMovieProducerRepo mocks.MockMovieProducerRepositoryI, movie *models.MovieDTOCreate) {
+				mockMovieRepo.EXPECT().CreateMovie(&movie.Movies).Return(sampleMovie.ID, nil)
+				mockMovieGenreRepo.EXPECT().AddMovieGenre(sampleMovie.ID, gomock.Any()).Return(nil)
+				mockMovieActorRepo.EXPECT().AddMovieActor(sampleMovie.ID, gomock.Any()).Return(nil)
+				mockMovieProducerRepo.EXPECT().AddMovieProducer(sampleMovie.ID, gomock.Any()).Return(kts_errors.KTS_INTERNAL_ERROR)
+			},
+			expectedMoviesId: false,
+			expectedError:    kts_errors.KTS_INTERNAL_ERROR,
+		},
+		{
+			name: "Movie successfuly created",
+			movieDTOModel: &models.MovieDTOCreate{
+				Movies: sampleMovie.Movies,
+
+				GenresID:    sampleMovie.GenresID,
+				ActorsID:    sampleMovie.ActorsID,
+				ProducersID: sampleMovie.ProducersID,
+			},
+			setExpectations: func(mockMovieRepo mocks.MockMovieRepositoryI, mockMovieGenreRepo mocks.MockMovieGenreRepositoryI, mockMovieActorRepo mocks.MockMovieActorRepositoryI, mockMovieProducerRepo mocks.MockMovieProducerRepositoryI, movie *models.MovieDTOCreate) {
+				mockMovieRepo.EXPECT().CreateMovie(&movie.Movies).Return(sampleMovie.ID, nil)
+				mockMovieGenreRepo.EXPECT().AddMovieGenre(sampleMovie.ID, gomock.Any()).Return(nil)
+				mockMovieActorRepo.EXPECT().AddMovieActor(sampleMovie.ID, gomock.Any()).Return(nil)
+				mockMovieProducerRepo.EXPECT().AddMovieProducer(sampleMovie.ID, gomock.Any()).Return(nil)
+			},
+			expectedMoviesId: true,
+			expectedError:    nil,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			// GIVEN
+			// create mock user repo
+			mockCtrl := gomock.NewController(t)
+			defer mockCtrl.Finish()
+			movieRepoMock := mocks.NewMockMovieRepositoryI(mockCtrl)
+			genreRepoMock := mocks.NewMockMovieGenreRepositoryI(mockCtrl)
+			actorRepoMock := mocks.NewMockMovieActorRepositoryI(mockCtrl)
+			producerRepoMock := mocks.NewMockMovieProducerRepositoryI(mockCtrl)
+
+			movieController := MovieController{
+				MovieRepo:         movieRepoMock,
+				MovieGenreRepo:    genreRepoMock,
+				MovieActorRepo:    actorRepoMock,
+				MovieProducerRepo: producerRepoMock,
+			}
+
+			// define expectations
+			tc.setExpectations(*movieRepoMock, *genreRepoMock, *actorRepoMock, *producerRepoMock, tc.movieDTOModel)
+
+			// WHEN
+			// call RegisterUser with registrationData
+			movieId, kts_err := movieController.CreateMovie(tc.movieDTOModel)
+
+			// THEN
+			assert.Equal(t, tc.expectedError, kts_err)
+
+			if tc.expectedMoviesId && movieId == nil {
+				t.Error("Expected genre ID, got nil")
+			}
+		})
+	}
+}

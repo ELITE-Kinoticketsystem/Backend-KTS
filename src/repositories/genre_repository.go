@@ -15,7 +15,7 @@ type GenreRepositoryI interface {
 	// Genre
 	GetGenres() (*[]model.Genres, *models.KTSError)
 	GetGenreByName(name *string) (*model.Genres, *models.KTSError)
-	CreateGenre(name *string) *models.KTSError
+	CreateGenre(name *string) (*uuid.UUID, *models.KTSError)
 	UpdateGenre(genre *model.Genres) *models.KTSError
 	DeleteGenre(genreId *uuid.UUID) *models.KTSError
 
@@ -75,27 +75,35 @@ func (mr *GenreRepository) GetGenreByName(name *string) (*model.Genres, *models.
 	return &genre, nil
 }
 
-func (mr *GenreRepository) CreateGenre(name *string) *models.KTSError {
+func (mr *GenreRepository) CreateGenre(name *string) (*uuid.UUID, *models.KTSError) {
+	uuid := uuid.New()
+
 	// Create the insert statement
-	insertQuery := table.Genres.INSERT(table.Genres.GenreName).
-		VALUES(name)
+	insertQuery := table.Genres.INSERT(
+		table.Genres.ID,
+		table.Genres.GenreName,
+	).
+		VALUES(
+			utils.MysqlUuid(&uuid),
+			name,
+		)
 
 	// Execute the query
 	rows, err := insertQuery.Exec(mr.DatabaseManager.GetDatabaseConnection())
 	if err != nil {
-		return kts_errors.KTS_INTERNAL_ERROR
+		return nil, kts_errors.KTS_INTERNAL_ERROR
 	}
 
 	rowsAff, err := rows.RowsAffected()
 	if err != nil {
-		return kts_errors.KTS_INTERNAL_ERROR
+		return nil, kts_errors.KTS_INTERNAL_ERROR
 	}
 
 	if rowsAff == 0 {
-		return kts_errors.KTS_NOT_FOUND
+		return nil, kts_errors.KTS_NOT_FOUND
 	}
 
-	return nil
+	return &uuid, nil
 }
 
 func (mr *GenreRepository) UpdateGenre(genre *model.Genres) *models.KTSError {

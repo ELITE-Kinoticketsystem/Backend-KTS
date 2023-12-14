@@ -41,11 +41,12 @@ func (m *MockMovieRepositoryI) EXPECT() *MockMovieRepositoryIMockRecorder {
 }
 
 // CreateMovie mocks base method.
-func (m *MockMovieRepositoryI) CreateMovie(movie *model.Movies) *models.KTSError {
+func (m *MockMovieRepositoryI) CreateMovie(movie *model.Movies) (*uuid.UUID, *models.KTSError) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateMovie", movie)
-	ret0, _ := ret[0].(*models.KTSError)
-	return ret0
+	ret0, _ := ret[0].(*uuid.UUID)
+	ret1, _ := ret[1].(*models.KTSError)
+	return ret0, ret1
 }
 
 // CreateMovie indicates an expected call of CreateMovie.
