@@ -1,7 +1,7 @@
 package repositories
 
 import (
-	"log"
+	"time"
 
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/.gen/KinoTicketSystem/table"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/managers"
@@ -40,8 +40,6 @@ func (esr *EventSeatRepository) GetEventSeats(eventId *uuid.UUID) (*[]models.Get
 		WHERE(table.EventSeats.EventID.EQ(utils.MysqlUuid(eventId))).ORDER_BY(table.Seats.ColumnNr.ASC(), table.Seats.RowNr.ASC())
 
 	err := stmt.Query(esr.DatabaseManager.GetDatabaseConnection(), &eventSeats)
-
-	log.Println(stmt.DebugSql())
 
 	if err != nil {
 		return nil, kts_errors.KTS_INTERNAL_ERROR
