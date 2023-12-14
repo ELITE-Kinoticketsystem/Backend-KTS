@@ -39,12 +39,10 @@ func CreateMovie(movieCtrl controllers.MovieControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var movie models.MovieDTOCreate
 		err := c.ShouldBindJSON(&movie)
-		if err != nil {
-			// ||
-			// 	utils.ContainsEmptyString(
-			// 		movie.Title, movie.Description, movie.ReleaseDate.String(),
-			// 	)
-			// {
+		if err != nil ||
+			utils.ContainsEmptyString(
+				movie.ReleaseDate.String(),
+			) {
 			log.Print("Failed to bind JSON")
 			log.Print(err)
 			utils.HandleErrorAndAbort(c, kts_errors.KTS_BAD_REQUEST)
@@ -84,7 +82,7 @@ func CreateMovie(movieCtrl controllers.MovieControllerI) gin.HandlerFunc {
 			utils.HandleErrorAndAbort(c, kts_err)
 			return
 		}
-		
+
 		log.Print("Movie was created")
 		c.JSON(http.StatusCreated, movieId)
 	}
