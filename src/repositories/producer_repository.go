@@ -16,7 +16,7 @@ import (
 type ProducerRepositoryI interface {
 	GetProducers() (*[]models.GetProducersDTO, *models.KTSError)
 	GetProducerById(id *uuid.UUID) (*models.ProducerDTO, *models.KTSError)
-	CreateProducer(producer *models.CreateProducerDTO) (*uuid.UUID, *models.KTSError)
+	CreateProducer(producer *model.Producers) (*uuid.UUID, *models.KTSError)
 	CreateProducerPicture(producerPicture *model.ProducerPictures) (*uuid.UUID, *models.KTSError)
 	UpdateProducer(producer *model.Producers) (*uuid.UUID, *models.KTSError)
 	DeleteProducer(id *uuid.UUID) *models.KTSError
