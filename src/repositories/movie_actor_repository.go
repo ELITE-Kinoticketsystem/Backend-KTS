@@ -1,8 +1,6 @@
 package repositories
 
 import (
-	"log"
-
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/.gen/KinoTicketSystem/table"
 	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/managers"
@@ -22,7 +20,6 @@ type MovieActorRepository struct {
 
 // Combine Movie and Genre
 func (mar *MovieActorRepository) AddMovieActor(movieId *uuid.UUID, actorId *uuid.UUID) *models.KTSError {
-	log.Print("Adding movieActor: Start")
 	// Create the insert statement
 	insertQuery := table.MovieActors.INSERT(table.MovieActors.MovieID, table.MovieActors.ActorID).
 		VALUES(
@@ -30,10 +27,8 @@ func (mar *MovieActorRepository) AddMovieActor(movieId *uuid.UUID, actorId *uuid
 			utils.MysqlUuid(actorId),
 		)
 
-	log.Print("Adding movieActor: Executing query")
 	// Execute the query
 	rows, err := insertQuery.Exec(mar.DatabaseManager.GetDatabaseConnection())
-	log.Print("Inserting movieActor Error: ", err)
 	if err != nil {
 		return kts_errors.KTS_INTERNAL_ERROR
 	}

@@ -66,9 +66,7 @@ func (mc *MovieController) CreateMovie(movie *models.MovieDTO) (*uuid.UUID, *mod
 
 	// Add genre to movie
 	movieGenres := movie.Genres
-	log.Print("MovieGenres: ", movieGenres)
 	for _, movieGenre := range movieGenres {
-		log.Println("MovieGenre: ", movieGenre)
 		kts_err := mc.MovieGenreRepo.AddMovieGenre(movieId, movieGenre.ID)
 
 		if kts_err != nil {
@@ -81,12 +79,6 @@ func (mc *MovieController) CreateMovie(movie *models.MovieDTO) (*uuid.UUID, *mod
 	movieActors := movie.Actors
 	log.Print("MovieActors: ", movieActors)
 	for _, movieActor := range movieActors {
-		log.Println("MovieActor: ", movieActor, "\t", movieActor.ID, "\t", movieId)
-
-		if mc.MovieActorRepo == nil {
-			log.Print("MovieActorRepo is nil")
-		}
-
 		kts_err := mc.MovieActorRepo.AddMovieActor(movieId, movieActor.ID)
 
 		if kts_err != nil {
@@ -95,20 +87,18 @@ func (mc *MovieController) CreateMovie(movie *models.MovieDTO) (*uuid.UUID, *mod
 		}
 	}
 
-	// // Add producers to movie
-	// movieProducers := movie.Producers
-	// log.Print("MovieProducers: ", movieProducers)
-	// for _, movieProducer := range movieProducers {
-	// 	log.Println("MovieProducer: ", movieProducer)
-	// 	kts_err := mc.MovieProducerRepo.AddMovieProducer(movieId, movieProducer.ID)
+	// Add producers to movie
+	movieProducers := movie.Producers
+	for _, movieProducer := range movieProducers {
+		kts_err := mc.MovieProducerRepo.AddMovieProducer(movieId, movieProducer.ID)
 
-	// 	if kts_err != nil {
-	// 		log.Print("Producer was not added to movie")
-	// 		return nil, kts_err
-	// 	}
-	// }
+		if kts_err != nil {
+			log.Print("Producer was not added to movie")
+			return nil, kts_err
+		}
+	}
+
 	log.Print("Movie was created")
-
 	return movieId, nil
 }
 

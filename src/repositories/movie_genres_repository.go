@@ -1,8 +1,6 @@
 package repositories
 
 import (
-	"log"
-
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/.gen/KinoTicketSystem/table"
 	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/managers"
@@ -23,7 +21,6 @@ type MovieGenreRepository struct {
 
 // Combine Movie and Genre
 func (mgr *MovieGenreRepository) AddMovieGenre(movieId *uuid.UUID, genreId *uuid.UUID) *models.KTSError {
-	log.Print("Adding movieGenre: Start")
 	// Create the insert statement
 	insertQuery := table.MovieGenres.INSERT(table.MovieGenres.MovieID, table.MovieGenres.GenreID).
 		VALUES(utils.MysqlUuid(movieId), utils.MysqlUuid(genreId))
