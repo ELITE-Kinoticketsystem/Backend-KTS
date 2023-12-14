@@ -133,7 +133,7 @@ CREATE TABLE users
      id         BINARY(16) DEFAULT (Uuid_to_bin(Uuid(), 1)),
      username   VARCHAR(50),
      email      VARCHAR(80) NOT NULL,
-     password   VARCHAR(50) NOT NULL,
+     password   VARCHAR(60) NOT NULL,
      firstname  VARCHAR(50),
      lastname   VARCHAR(50),
      PRIMARY KEY (id)
@@ -197,6 +197,7 @@ CREATE TABLE seats
      column_nr        INT NOT NULL,
      seat_category_id BINARY(16) NOT NULL,
      cinema_hall_id   BINARY(16) NOT NULL,
+     type             VARCHAR(15) DEFAULT "regular" NOT NULL,
      PRIMARY KEY (id),
      FOREIGN KEY (seat_category_id) REFERENCES seat_categories(id),
      FOREIGN KEY (cinema_hall_id) REFERENCES cinema_halls(id)

@@ -310,6 +310,7 @@ func GetActors() *[]models.GetActorsDTO {
 func TestCreateActor(t *testing.T) {
 
 	actor := &model.Actors{
+
 		Name:        "John Doe",
 		Description: "Test actor",
 		Birthdate:   time.Now(),
@@ -324,7 +325,7 @@ func TestCreateActor(t *testing.T) {
 		{
 			name: "Create actor",
 			setExpectations: func(mock sqlmock.Sqlmock) {
-				mock.ExpectExec("INSERT INTO `KinoTicketSystem`.actors .*").WillReturnResult(sqlmock.NewResult(1, 1))
+				mock.ExpectExec("INSERT INTO `KinoTicketSystem`.actors .*").WithArgs(sqlmock.AnyArg(), actor.Name, actor.Birthdate, actor.Description, nil).WillReturnResult(sqlmock.NewResult(1, 1))
 			},
 			expectActorId: true,
 			expectedError: nil,
@@ -332,7 +333,7 @@ func TestCreateActor(t *testing.T) {
 		{
 			name: "Create actor sql error",
 			setExpectations: func(mock sqlmock.Sqlmock) {
-				mock.ExpectExec("INSERT INTO `KinoTicketSystem`.actors .*").WillReturnError(sql.ErrConnDone)
+				mock.ExpectExec("INSERT INTO `KinoTicketSystem`.actors .*").WithArgs(sqlmock.AnyArg(), actor.Name, actor.Birthdate, actor.Description, nil).WillReturnError(sql.ErrConnDone)
 			},
 			expectActorId: false,
 			expectedError: kts_errors.KTS_INTERNAL_ERROR,
@@ -340,7 +341,7 @@ func TestCreateActor(t *testing.T) {
 		{
 			name: "Create actor no rows affected",
 			setExpectations: func(mock sqlmock.Sqlmock) {
-				mock.ExpectExec("INSERT INTO `KinoTicketSystem`.actors .*").WillReturnResult(sqlmock.NewResult(1, 0))
+				mock.ExpectExec("INSERT INTO `KinoTicketSystem`.actors .*").WithArgs(sqlmock.AnyArg(), actor.Name, actor.Birthdate, actor.Description, nil).WillReturnResult(sqlmock.NewResult(1, 0))
 			},
 			expectActorId: false,
 			expectedError: kts_errors.KTS_INTERNAL_ERROR,
@@ -400,7 +401,7 @@ func TestCreateActorPicture(t *testing.T) {
 		{
 			name: "Create actor picture",
 			setExpectations: func(mock sqlmock.Sqlmock) {
-				mock.ExpectExec("INSERT INTO `KinoTicketSystem`.actor_pictures .*").WillReturnResult(sqlmock.NewResult(1, 1))
+				mock.ExpectExec("INSERT INTO `KinoTicketSystem`.actor_pictures .*").WithArgs(sqlmock.AnyArg(), sqlmock.AnyArg(), picUrl).WillReturnResult(sqlmock.NewResult(1, 1))
 			},
 			expectActorPictureId: true,
 			expectedError:        nil,
@@ -408,7 +409,7 @@ func TestCreateActorPicture(t *testing.T) {
 		{
 			name: "Create actor picture sql error",
 			setExpectations: func(mock sqlmock.Sqlmock) {
-				mock.ExpectExec("INSERT INTO `KinoTicketSystem`.actor_pictures .*").WillReturnError(sql.ErrConnDone)
+				mock.ExpectExec("INSERT INTO `KinoTicketSystem`.actor_pictures .*").WithArgs(sqlmock.AnyArg(), sqlmock.AnyArg(), picUrl).WillReturnError(sql.ErrConnDone)
 			},
 			expectActorPictureId: false,
 			expectedError:        kts_errors.KTS_INTERNAL_ERROR,
@@ -416,7 +417,7 @@ func TestCreateActorPicture(t *testing.T) {
 		{
 			name: "Create actor picture no rows affected",
 			setExpectations: func(mock sqlmock.Sqlmock) {
-				mock.ExpectExec("INSERT INTO `KinoTicketSystem`.actor_pictures .*").WillReturnResult(sqlmock.NewResult(1, 0))
+				mock.ExpectExec("INSERT INTO `KinoTicketSystem`.actor_pictures .*").WithArgs(sqlmock.AnyArg(), sqlmock.AnyArg(), picUrl).WillReturnResult(sqlmock.NewResult(1, 0))
 			},
 			expectActorPictureId: false,
 			expectedError:        kts_errors.KTS_INTERNAL_ERROR,

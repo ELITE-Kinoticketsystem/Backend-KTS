@@ -14,7 +14,8 @@ import (
 
 type Controllers struct {
 	UserController  controllers.UserControllerI
-	EventController controllers.EventControllerI
+	MovieController controllers.MovieControllerI
+	GenreController controllers.GenreControllerI
 	ActorController controllers.ActorControllerI
 }
 
@@ -37,15 +38,23 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 		DatabaseManager: databaseManager,
 	}
 
-	eventRepo := &repositories.EventRepository{
-		DatabaseManager: databaseManager,
-	}
-
 	movieRepo := &repositories.MovieRepository{
 		DatabaseManager: databaseManager,
 	}
 
-	theatreRepo := &repositories.TheatreRepository{
+	genreRepo := &repositories.GenreRepository{
+		DatabaseManager: databaseManager,
+	}
+
+	movieGenreRepo := &repositories.MovieGenreRepository{
+		DatabaseManager: databaseManager,
+	}
+
+	movieActorRepo := &repositories.MovieActorRepository{
+		DatabaseManager: databaseManager,
+	}
+
+	movieProducerRepo := &repositories.MovieProducerRepository{
 		DatabaseManager: databaseManager,
 	}
 
@@ -58,10 +67,14 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 		UserController: &controllers.UserController{
 			UserRepo: userRepo,
 		},
-		EventController: &controllers.EventController{
-			EventRepo:   eventRepo,
-			MovieRepo:   movieRepo,
-			TheatreRepo: theatreRepo,
+		MovieController: &controllers.MovieController{
+			MovieRepo:         movieRepo,
+			MovieGenreRepo:    movieGenreRepo,
+			MovieActorRepo:    movieActorRepo,
+			MovieProducerRepo: movieProducerRepo,
+		},
+		GenreController: &controllers.GenreController{
+			GenreRepo: genreRepo,
 		},
 		ActorController: &controllers.ActorController{
 			ActorRepo: actorRepo,
@@ -78,15 +91,21 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 
 	securedRoutes.Handle(http.MethodGet, "/test", handlers.TestJwtToken)
 
-	securedRoutes.Handle(http.MethodPost, "/events", handlers.CreateEventHandler(controller.EventController))
+	router.Handle(http.MethodGet, "/movies", handlers.GetMovies(controller.MovieController))
+	router.Handle(http.MethodGet, "/movies/genres", handlers.GetMoviesWithGenres(controller.MovieController))
+	router.Handle(http.MethodGet, "/movies/:id", handlers.GetMovieById(controller.MovieController))
 
-	// Get events for movieId
-	publicRoutes.Handle(http.MethodGet, "/events/movies/:id", handlers.GetEventsForMovieHandler(controller.EventController))
-	publicRoutes.Handle(http.MethodGet, "/events/special-events", handlers.GetSpecialEventsHandler(controller.EventController))
-	// TODO: Do we need to add update event handler because how would we proceed then?
+	// Will be implemented later
+	router.Handle(http.MethodPost, "/movies", handlers.CreateMovie(controller.MovieController))
+	// router.Handle(http.MethodPut, "/movies", handlers.UpdateMovie(controller.MovieController))
+	// router.Handle(http.MethodDelete, "/movies/:id", handlers.DeleteMovie(controller.MovieController))
 
-	// Should be only accessible for admins
-	securedRoutes.Handle(http.MethodDelete, "/events/:id", handlers.DeleteEventHandler(controller.EventController))
+	router.Handle(http.MethodGet, "/genres", handlers.GetGenres(controller.GenreController))
+	router.Handle(http.MethodGet, "/genres/:name", handlers.GetGenreByName(controller.GenreController))
+	router.Handle(http.MethodGet, "/genres/movies", handlers.GetGenresWithMovies(controller.GenreController))
+	router.Handle(http.MethodPost, "/genres", handlers.CreateGenre(controller.GenreController))
+	router.Handle(http.MethodPut, "/genres", handlers.UpdateGenre(controller.GenreController))
+	router.Handle(http.MethodDelete, "/genres/:id", handlers.DeleteGenre(controller.GenreController))
 
 	// Actors
 	router.Handle(http.MethodGet, "/actors/:id", handlers.GetActorByIdHandler(controller.ActorController))

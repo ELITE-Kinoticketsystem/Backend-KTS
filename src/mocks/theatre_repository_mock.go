@@ -12,6 +12,7 @@ import (
 	reflect "reflect"
 
 	model "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/.gen/KinoTicketSystem/model"
+	models "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
 	uuid "github.com/google/uuid"
 	gomock "go.uber.org/mock/gomock"
 )
@@ -39,12 +40,40 @@ func (m *MockTheaterRepoI) EXPECT() *MockTheaterRepoIMockRecorder {
 	return m.recorder
 }
 
+// CreateAddress mocks base method.
+func (m *MockTheaterRepoI) CreateAddress(address model.Addresses) *models.KTSError {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateAddress", address)
+	ret0, _ := ret[0].(*models.KTSError)
+	return ret0
+}
+
+// CreateAddress indicates an expected call of CreateAddress.
+func (mr *MockTheaterRepoIMockRecorder) CreateAddress(address any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateAddress", reflect.TypeOf((*MockTheaterRepoI)(nil).CreateAddress), address)
+}
+
+// CreateTheatre mocks base method.
+func (m *MockTheaterRepoI) CreateTheatre(theatre model.Theatres) *models.KTSError {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateTheatre", theatre)
+	ret0, _ := ret[0].(*models.KTSError)
+	return ret0
+}
+
+// CreateTheatre indicates an expected call of CreateTheatre.
+func (mr *MockTheaterRepoIMockRecorder) CreateTheatre(theatre any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateTheatre", reflect.TypeOf((*MockTheaterRepoI)(nil).CreateTheatre), theatre)
+}
+
 // GetSeatsForCinemaHall mocks base method.
-func (m *MockTheaterRepoI) GetSeatsForCinemaHall(cinemaHallId *uuid.UUID) ([]model.Seats, error) {
+func (m *MockTheaterRepoI) GetSeatsForCinemaHall(cinemaHallId *uuid.UUID) ([]model.Seats, *models.KTSError) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetSeatsForCinemaHall", cinemaHallId)
 	ret0, _ := ret[0].([]model.Seats)
-	ret1, _ := ret[1].(error)
+	ret1, _ := ret[1].(*models.KTSError)
 	return ret0, ret1
 }
 
