@@ -67,7 +67,7 @@ func (pr *ProducerRepository) GetProducerById(id *uuid.UUID) (*models.ProducerDT
 				LEFT_JOIN(table.Movies, table.Movies.ID.EQ(table.MovieProducers.MovieID)),
 		).
 		WHERE(
-			table.Actors.ID.EQ(utils.MysqlUuid(id)),
+			table.Producers.ID.EQ(utils.MysqlUuid(id)),
 		)
 
 	// Execute the query
