@@ -16,9 +16,9 @@ import (
 type ProducerRepositoryI interface {
 	GetProducers() (*[]models.GetProducersDTO, *models.KTSError)
 	GetProducerById(id *uuid.UUID) (*models.ProducerDTO, *models.KTSError)
-	CreateProducer(producer *models.CreateProducerDTO) *models.KTSError
-	CreateProducerPicture(producerPicture *model.ProducerPictures) *models.KTSError
-	UpdateProducer(producer *model.Producers) *models.KTSError
+	CreateProducer(producer *models.CreateProducerDTO) (*uuid.UUID, *models.KTSError)
+	CreateProducerPicture(producerPicture *model.ProducerPictures) (*uuid.UUID, *models.KTSError)
+	UpdateProducer(producer *model.Producers) (*uuid.UUID, *models.KTSError)
 	DeleteProducer(id *uuid.UUID) *models.KTSError
 }
 
@@ -88,16 +88,13 @@ func (pr *ProducerRepository) GetProducerByName(name *string) (*models.ProducerD
 	stmt := jet_mysql.SELECT(
 		table.Producers.AllColumns,
 		table.ProducerPictures.AllColumns,
-		table.Movies.AllColumns,
 	).
 		FROM(
 			table.Producers.
-				LEFT_JOIN(table.ProducerPictures, table.ProducerPictures.ProducerID.EQ(table.Producers.ID)).
-				LEFT_JOIN(table.MovieProducers, table.MovieProducers.ProducerID.EQ(table.Producers.ID)).
-				LEFT_JOIN(table.Movies, table.Movies.ID.EQ(table.MovieProducers.MovieID)),
+				LEFT_JOIN(table.ProducerPictures, table.ProducerPictures.ProducerID.EQ(table.Producers.ID)),
 		).
 		WHERE(
-			table.Producers.Name.EQ(jet_mysql.String(*name)),
+			table.Producers.Name.EQ(utils.MySqlString(*name)),
 		)
 
 	// Execute the query
@@ -112,11 +109,14 @@ func (pr *ProducerRepository) GetProducerByName(name *string) (*models.ProducerD
 	return &producer, nil
 }
 
-func (pr *ProducerRepository) CreateProducer(producer *model.Producers) *models.KTSError {
+func (pr *ProducerRepository) CreateProducer(producer *model.Producers) (*uuid.UUID, *models.KTSError) {
+	producer.ID = utils.NewUUID()
+
 	// Create the query
 	stmt := table.Producers.INSERT(
 		table.Producers.AllColumns,
 	).VALUES(
+		producer.ID,
 		producer.Name,
 		producer.Birthdate,
 		producer.Description,
@@ -126,47 +126,49 @@ func (pr *ProducerRepository) CreateProducer(producer *model.Producers) *models.
 	// Execute the query
 	rows, err := stmt.Exec(pr.DatabaseManager.GetDatabaseConnection())
 	if err != nil {
-		return kts_errors.KTS_INTERNAL_ERROR
+		return nil, kts_errors.KTS_INTERNAL_ERROR
 	}
 
 	rowsAff, err := rows.RowsAffected()
 	if err != nil {
-		return kts_errors.KTS_INTERNAL_ERROR
+		return nil, kts_errors.KTS_INTERNAL_ERROR
 	}
 
 	if rowsAff == 0 {
-		return kts_errors.KTS_NOT_FOUND
+		return nil, kts_errors.KTS_NOT_FOUND
 	}
 
-	return nil
+	return producer.ID, nil
 }
 
-func (pr *ProducerRepository) CreateProducerPicture(producerPicture *model.ProducerPictures) *models.KTSError {
+func (pr *ProducerRepository) CreateProducerPicture(producerPicture *model.ProducerPictures) (*uuid.UUID, *models.KTSError) {
+	producerPicture.ID = utils.NewUUID()
 
 	insertStmt := table.ProducerPictures.INSERT(table.ProducerPictures.AllColumns).VALUES(
+		utils.MysqlUuid(producerPicture.ID),
 		utils.MysqlUuid(producerPicture.ProducerID),
 		producerPicture.PicURL,
 	)
 
 	rows, err := insertStmt.Exec(pr.DatabaseManager.GetDatabaseConnection())
 	if err != nil {
-		return kts_errors.KTS_INTERNAL_ERROR
+		return nil, kts_errors.KTS_INTERNAL_ERROR
 	}
 
 	rowsAffected, err := rows.RowsAffected()
 
 	if err != nil {
-		return kts_errors.KTS_INTERNAL_ERROR
+		return nil, kts_errors.KTS_INTERNAL_ERROR
 	}
 
 	if rowsAffected == 0 {
-		return kts_errors.KTS_INTERNAL_ERROR
+		return nil, kts_errors.KTS_INTERNAL_ERROR
 	}
 
-	return nil
+	return producerPicture.ProducerID, nil
 }
 
-func (pr *ProducerRepository) UpdateProducer(producer *model.Producers) *models.KTSError {
+func (pr *ProducerRepository) UpdateProducer(producer *model.Producers) (*uuid.UUID, *models.KTSError) {
 
 	// binary_id, _ := producer.ID.MarshalBinary()
 
@@ -197,7 +199,7 @@ func (pr *ProducerRepository) UpdateProducer(producer *model.Producers) *models.
 	// 	return kts_errors.KTS_NOT_FOUND
 	// }
 
-	return nil
+	return nil, nil
 }
 
 func (pr *ProducerRepository) DeleteProducer(id *uuid.UUID) *models.KTSError {

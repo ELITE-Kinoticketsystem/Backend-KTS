@@ -188,7 +188,7 @@ func TestGetProducerById(t *testing.T) {
 func TestGetProducerByName(t *testing.T) {
 	sampleProducers := utils.GetSampleProducerDTO()
 
-	query := "SELECT producers.id AS \"producers.id\", producers.name AS \"producers.name\", producers.birthdate AS \"producers.birthdate\", producers.description AS \"producers.description\", producers.pic_url AS \"producers.pic_url\", producer_pictures.id AS \"producer_pictures.id\", producer_pictures.producer_id AS \"producer_pictures.producer_id\", producer_pictures.pic_url AS \"producer_pictures.pic_url\", movies.id AS \"movies.id\", movies.title AS \"movies.title\", movies.description AS \"movies.description\", movies.banner_pic_url AS \"movies.banner_pic_url\", movies.cover_pic_url AS \"movies.cover_pic_url\", movies.trailer_url AS \"movies.trailer_url\", movies.rating AS \"movies.rating\", movies.release_date AS \"movies.release_date\", movies.time_in_min AS \"movies.time_in_min\", movies.fsk AS \"movies.fsk\" FROM `KinoTicketSystem`.producers LEFT JOIN `KinoTicketSystem`.producer_pictures ON (producer_pictures.producer_id = producers.id) LEFT JOIN `KinoTicketSystem`.movie_producers ON (movie_producers.producer_id = producers.id) LEFT JOIN `KinoTicketSystem`.movies ON (movies.id = movie_producers.movie_id) WHERE producers.name = ?;"
+	query := "SELECT producers.id AS \"producers.id\", producers.name AS \"producers.name\", producers.birthdate AS \"producers.birthdate\", producers.description AS \"producers.description\", producers.pic_url AS \"producers.pic_url\", producer_pictures.id AS \"producer_pictures.id\", producer_pictures.producer_id AS \"producer_pictures.producer_id\", producer_pictures.pic_url AS \"producer_pictures.pic_url\" FROM `KinoTicketSystem`.producers LEFT JOIN `KinoTicketSystem`.producer_pictures ON (producer_pictures.producer_id = producers.id) WHERE producers.name = ?;"
 
 	producer_name := sampleProducers.Name
 
@@ -270,42 +270,47 @@ func TestGetProducerByName(t *testing.T) {
 func TestCreateProducer(t *testing.T) {
 	sampleProducer := utils.GetSampleProducer()
 
-	query := "INSERT INTO `KinoTicketSystem`.producers (id, name, birthdate, description, pic_url) VALUES (?, ?, ?, ?);"
+	query := "INSERT INTO `KinoTicketSystem`.producers (id, name, birthdate, description, pic_url) VALUES (?, ?, ?, ?, ?);"
 
 	testCases := []struct {
-		name            string
-		setExpectations func(mock sqlmock.Sqlmock, producer *model.Producers)
-		expectedError   *models.KTSError
+		name               string
+		setExpectations    func(mock sqlmock.Sqlmock, producer *model.Producers)
+		expectedProducerId bool
+		expectedError      *models.KTSError
 	}{
 		{
 			name: "Successful creation",
 			setExpectations: func(mock sqlmock.Sqlmock, producer *model.Producers) {
-				mock.ExpectExec(query).WithArgs(sampleProducer.Name, sampleProducer.Birthdate, sampleProducer.Description, sampleProducer.PicURL).WillReturnResult(sqlmock.NewResult(1, 1))
+				mock.ExpectExec(query).WithArgs(sqlmock.AnyArg(), sampleProducer.Name, sampleProducer.Birthdate, sampleProducer.Description, sampleProducer.PicURL).WillReturnResult(sqlmock.NewResult(1, 1))
 			},
-			expectedError: nil,
+			expectedProducerId: true,
+			expectedError:      nil,
 		},
 		{
 			name: "Error while creating producer",
 			setExpectations: func(mock sqlmock.Sqlmock, producer *model.Producers) {
-				mock.ExpectExec(query).WithArgs(sampleProducer.Name, sampleProducer.Birthdate, sampleProducer.Description, sampleProducer.PicURL).WillReturnError(sqlmock.ErrCancelled)
+				mock.ExpectExec(query).WithArgs(sqlmock.AnyArg(), sampleProducer.Name, sampleProducer.Birthdate, sampleProducer.Description, sampleProducer.PicURL).WillReturnError(sqlmock.ErrCancelled)
 			},
-			expectedError: kts_errors.KTS_INTERNAL_ERROR,
+			expectedProducerId: false,
+			expectedError:      kts_errors.KTS_INTERNAL_ERROR,
 		},
 		{
 			name: "Error while converting rows affected",
 			setExpectations: func(mock sqlmock.Sqlmock, producer *model.Producers) {
-				mock.ExpectExec(query).WithArgs(sampleProducer.Name, sampleProducer.Birthdate, sampleProducer.Description, sampleProducer.PicURL).WillReturnResult(
+				mock.ExpectExec(query).WithArgs(sqlmock.AnyArg(), sampleProducer.Name, sampleProducer.Birthdate, sampleProducer.Description, sampleProducer.PicURL).WillReturnResult(
 					sqlmock.NewErrorResult(errors.New("rows affected conversion did not work")),
 				)
 			},
-			expectedError: kts_errors.KTS_INTERNAL_ERROR,
+			expectedProducerId: false,
+			expectedError:      kts_errors.KTS_INTERNAL_ERROR,
 		},
 		{
 			name: "Producer not found",
 			setExpectations: func(mock sqlmock.Sqlmock, producer *model.Producers) {
-				mock.ExpectExec(query).WithArgs(sampleProducer.Name, sampleProducer.Birthdate, sampleProducer.Description, sampleProducer.PicURL).WillReturnResult(sqlmock.NewResult(1, 0))
+				mock.ExpectExec(query).WithArgs(sqlmock.AnyArg(), sampleProducer.Name, sampleProducer.Birthdate, sampleProducer.Description, sampleProducer.PicURL).WillReturnResult(sqlmock.NewResult(1, 0))
 			},
-			expectedError: kts_errors.KTS_NOT_FOUND,
+			expectedProducerId: false,
+			expectedError:      kts_errors.KTS_NOT_FOUND,
 		},
 	}
 
@@ -328,10 +333,14 @@ func TestCreateProducer(t *testing.T) {
 			tc.setExpectations(mock, sampleProducer)
 
 			// Call the method under test
-			kts_err := producerRepo.CreateProducer(sampleProducer)
+			producerId, kts_err := producerRepo.CreateProducer(sampleProducer)
 
 			// Verify the results
 			assert.Equal(t, tc.expectedError, kts_err)
+
+			if tc.expectedProducerId && producerId == nil {
+				t.Error("Expected actor ID, got nil")
+			}
 
 			// Verify that all expectations were met
 			if err = mock.ExpectationsWereMet(); err != nil {
