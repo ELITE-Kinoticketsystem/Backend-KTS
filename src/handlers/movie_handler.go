@@ -37,7 +37,7 @@ func GetMovieByName(movieCtrl controllers.MovieControllerI) gin.HandlerFunc {
 
 func CreateMovie(movieCtrl controllers.MovieControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var movie models.MovieDTO
+		var movie models.MovieDTOCreate
 		err := c.ShouldBindJSON(&movie)
 		if err != nil {
 			// ||
@@ -53,24 +53,24 @@ func CreateMovie(movieCtrl controllers.MovieControllerI) gin.HandlerFunc {
 
 		log.Print(movie)
 
-		for _, genre := range movie.Genres {
-			if utils.ContainsEmptyString(genre.ID.String(), genre.GenreName) {
+		for _, genre := range movie.GenresID {
+			if utils.ContainsEmptyString(genre.ID.String()) {
 				log.Print("Genre is empty")
 				utils.HandleErrorAndAbort(c, kts_errors.KTS_BAD_REQUEST)
 				return
 			}
 		}
 
-		for _, actor := range movie.Actors {
-			if utils.ContainsEmptyString(actor.ID.String(), actor.Name, actor.Description, actor.Birthdate.String(), *actor.PicURL) {
+		for _, actor := range movie.ActorsID {
+			if utils.ContainsEmptyString(actor.ID.String()) {
 				log.Print("Actor is empty")
 				utils.HandleErrorAndAbort(c, kts_errors.KTS_BAD_REQUEST)
 				return
 			}
 		}
 
-		for _, producer := range movie.Producers {
-			if utils.ContainsEmptyString(producer.ID.String(), producer.Name, producer.Description, producer.Birthdate.String(), *producer.PicURL) {
+		for _, producer := range movie.ProducersID {
+			if utils.ContainsEmptyString(producer.ID.String()) {
 				log.Print("Producer is empty")
 				utils.HandleErrorAndAbort(c, kts_errors.KTS_BAD_REQUEST)
 				return
@@ -84,9 +84,9 @@ func CreateMovie(movieCtrl controllers.MovieControllerI) gin.HandlerFunc {
 			utils.HandleErrorAndAbort(c, kts_err)
 			return
 		}
-
-		movie.ID = movieId
-		c.JSON(http.StatusCreated, movie)
+		
+		log.Print("Movie was created")
+		c.JSON(http.StatusCreated, movieId)
 	}
 }
 

@@ -2,6 +2,7 @@ package models
 
 import (
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/.gen/KinoTicketSystem/model"
+	"github.com/google/uuid"
 )
 
 type MovieWithGenres struct {
@@ -53,5 +54,21 @@ type MovieDTO struct {
 
 	Producers []struct {
 		model.Producers
+	}
+}
+
+type MovieDTOCreate struct {
+	model.Movies
+
+	GenresID []struct {
+		ID *uuid.UUID
+	}
+
+	ActorsID []struct {
+		ID *uuid.UUID
+	}
+
+	ProducersID []struct {
+		ID *uuid.UUID
 	}
 }

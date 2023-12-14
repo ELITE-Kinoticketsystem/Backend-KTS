@@ -564,8 +564,59 @@ func GetSampleMovieByIdWithEverything() *models.MovieWithEverything {
 	return &movieWithEverything
 }
 
+func GetSampleMovieDTOCreate() *models.MovieDTOCreate {
+	movieDTO := models.MovieDTOCreate{}
 
-func GetSampleMovieDTOCreate() *models.MovieDTO {
+	uuid1 := uuid.MustParse("6ba7b820-9dad-11d1-80b4-00c04fd430c4")
+	uuid2 := uuid.MustParse("6ba7b827-9dad-11d1-80b4-00c04fd430c1")
+	uuid5 := uuid.MustParse("6ba7b829-9dad-11d1-80b4-00c04fd430c3")
+	uuid7 := uuid.MustParse("6ba7b82b-9dad-11d1-80b4-00c04fd430c5")
+
+	banner := ""
+	cover := ""
+	trailer := ""
+	rating := 5.0
+
+	movieDTO = models.MovieDTOCreate{
+		Movies: model.Movies{
+			ID:           &uuid1,
+			Title:        "Test Movie 1",
+			Description:  "Test Description 1",
+			BannerPicURL: &banner,
+			CoverPicURL:  &cover,
+			TrailerURL:   &trailer,
+			Rating:       &rating,
+			ReleaseDate:  time.Now(),
+			TimeInMin:    120,
+			Fsk:          18,
+		},
+		GenresID: []struct {
+			ID *uuid.UUID
+		}{
+			{
+				ID: &uuid2,
+			},
+		},
+		ActorsID: []struct {
+			ID *uuid.UUID
+		}{
+			{
+				ID: &uuid5,
+			},
+		},
+		ProducersID: []struct {
+			ID *uuid.UUID
+		}{
+			{
+				ID: &uuid7,
+			},
+		},
+	}
+
+	return &movieDTO
+}
+
+func GetSampleMovieDTO() *models.MovieDTO {
 	movieDTO := models.MovieDTO{}
 
 	uuid1 := uuid.MustParse("6ba7b820-9dad-11d1-80b4-00c04fd430c4")

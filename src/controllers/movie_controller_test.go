@@ -268,15 +268,15 @@ func TestCreateMovie(t *testing.T) {
 
 	testCases := []struct {
 		name             string
-		movieDTOModel    *models.MovieDTO
-		setExpectations  func(mockMovieRepo mocks.MockMovieRepositoryI, mockMovieGenreRepo mocks.MockMovieGenreRepositoryI, mockMovieActorRepo mocks.MockMovieActorRepositoryI, mockMovieProducerRepo mocks.MockMovieProducerRepositoryI, movie *models.MovieDTO)
+		movieDTOModel    *models.MovieDTOCreate
+		setExpectations  func(mockMovieRepo mocks.MockMovieRepositoryI, mockMovieGenreRepo mocks.MockMovieGenreRepositoryI, mockMovieActorRepo mocks.MockMovieActorRepositoryI, mockMovieProducerRepo mocks.MockMovieProducerRepositoryI, movie *models.MovieDTOCreate)
 		expectedMoviesId bool
 		expectedError    *models.KTSError
 	}{
 		{ // Done
 			name:          "Bad Request",
-			movieDTOModel: &models.MovieDTO{},
-			setExpectations: func(mockMovieRepo mocks.MockMovieRepositoryI, mockMovieGenreRepo mocks.MockMovieGenreRepositoryI, mockMovieActorRepo mocks.MockMovieActorRepositoryI, mockMovieProducerRepo mocks.MockMovieProducerRepositoryI, movie *models.MovieDTO) {
+			movieDTOModel: &models.MovieDTOCreate{},
+			setExpectations: func(mockMovieRepo mocks.MockMovieRepositoryI, mockMovieGenreRepo mocks.MockMovieGenreRepositoryI, mockMovieActorRepo mocks.MockMovieActorRepositoryI, mockMovieProducerRepo mocks.MockMovieProducerRepositoryI, movie *models.MovieDTOCreate) {
 
 			},
 			expectedMoviesId: false,
@@ -284,10 +284,10 @@ func TestCreateMovie(t *testing.T) {
 		},
 		{
 			name: "Movie failed",
-			movieDTOModel: &models.MovieDTO{
+			movieDTOModel: &models.MovieDTOCreate{
 				Movies: sampleMovie.Movies,
 			},
-			setExpectations: func(mockMovieRepo mocks.MockMovieRepositoryI, mockMovieGenreRepo mocks.MockMovieGenreRepositoryI, mockMovieActorRepo mocks.MockMovieActorRepositoryI, mockMovieProducerRepo mocks.MockMovieProducerRepositoryI, movie *models.MovieDTO) {
+			setExpectations: func(mockMovieRepo mocks.MockMovieRepositoryI, mockMovieGenreRepo mocks.MockMovieGenreRepositoryI, mockMovieActorRepo mocks.MockMovieActorRepositoryI, mockMovieProducerRepo mocks.MockMovieProducerRepositoryI, movie *models.MovieDTOCreate) {
 				mockMovieRepo.EXPECT().CreateMovie(&movie.Movies).Return(nil, kts_errors.KTS_INTERNAL_ERROR)
 			},
 			expectedMoviesId: false,
@@ -295,12 +295,12 @@ func TestCreateMovie(t *testing.T) {
 		},
 		{
 			name: "Genre failed",
-			movieDTOModel: &models.MovieDTO{
+			movieDTOModel: &models.MovieDTOCreate{
 				Movies: sampleMovie.Movies,
 
-				Genres: sampleMovie.Genres,
+				GenresID: sampleMovie.GenresID,
 			},
-			setExpectations: func(mockMovieRepo mocks.MockMovieRepositoryI, mockMovieGenreRepo mocks.MockMovieGenreRepositoryI, mockMovieActorRepo mocks.MockMovieActorRepositoryI, mockMovieProducerRepo mocks.MockMovieProducerRepositoryI, movie *models.MovieDTO) {
+			setExpectations: func(mockMovieRepo mocks.MockMovieRepositoryI, mockMovieGenreRepo mocks.MockMovieGenreRepositoryI, mockMovieActorRepo mocks.MockMovieActorRepositoryI, mockMovieProducerRepo mocks.MockMovieProducerRepositoryI, movie *models.MovieDTOCreate) {
 				mockMovieRepo.EXPECT().CreateMovie(&movie.Movies).Return(sampleMovie.ID, nil)
 				mockMovieGenreRepo.EXPECT().AddMovieGenre(sampleMovie.ID, gomock.Any()).Return(kts_errors.KTS_INTERNAL_ERROR)
 			},
@@ -309,13 +309,13 @@ func TestCreateMovie(t *testing.T) {
 		},
 		{
 			name: "Actor failed",
-			movieDTOModel: &models.MovieDTO{
+			movieDTOModel: &models.MovieDTOCreate{
 				Movies: sampleMovie.Movies,
 
-				Genres: sampleMovie.Genres,
-				Actors: sampleMovie.Actors,
+				GenresID: sampleMovie.GenresID,
+				ActorsID: sampleMovie.ActorsID,
 			},
-			setExpectations: func(mockMovieRepo mocks.MockMovieRepositoryI, mockMovieGenreRepo mocks.MockMovieGenreRepositoryI, mockMovieActorRepo mocks.MockMovieActorRepositoryI, mockMovieProducerRepo mocks.MockMovieProducerRepositoryI, movie *models.MovieDTO) {
+			setExpectations: func(mockMovieRepo mocks.MockMovieRepositoryI, mockMovieGenreRepo mocks.MockMovieGenreRepositoryI, mockMovieActorRepo mocks.MockMovieActorRepositoryI, mockMovieProducerRepo mocks.MockMovieProducerRepositoryI, movie *models.MovieDTOCreate) {
 				mockMovieRepo.EXPECT().CreateMovie(&movie.Movies).Return(sampleMovie.ID, nil)
 				mockMovieGenreRepo.EXPECT().AddMovieGenre(sampleMovie.ID, gomock.Any()).Return(nil)
 				mockMovieActorRepo.EXPECT().AddMovieActor(sampleMovie.ID, gomock.Any()).Return(kts_errors.KTS_INTERNAL_ERROR)
@@ -325,14 +325,14 @@ func TestCreateMovie(t *testing.T) {
 		},
 		{
 			name: "Producer failed",
-			movieDTOModel: &models.MovieDTO{
+			movieDTOModel: &models.MovieDTOCreate{
 				Movies: sampleMovie.Movies,
 
-				Genres:    sampleMovie.Genres,
-				Actors:    sampleMovie.Actors,
-				Producers: sampleMovie.Producers,
+				GenresID:    sampleMovie.GenresID,
+				ActorsID:    sampleMovie.ActorsID,
+				ProducersID: sampleMovie.ProducersID,
 			},
-			setExpectations: func(mockMovieRepo mocks.MockMovieRepositoryI, mockMovieGenreRepo mocks.MockMovieGenreRepositoryI, mockMovieActorRepo mocks.MockMovieActorRepositoryI, mockMovieProducerRepo mocks.MockMovieProducerRepositoryI, movie *models.MovieDTO) {
+			setExpectations: func(mockMovieRepo mocks.MockMovieRepositoryI, mockMovieGenreRepo mocks.MockMovieGenreRepositoryI, mockMovieActorRepo mocks.MockMovieActorRepositoryI, mockMovieProducerRepo mocks.MockMovieProducerRepositoryI, movie *models.MovieDTOCreate) {
 				mockMovieRepo.EXPECT().CreateMovie(&movie.Movies).Return(sampleMovie.ID, nil)
 				mockMovieGenreRepo.EXPECT().AddMovieGenre(sampleMovie.ID, gomock.Any()).Return(nil)
 				mockMovieActorRepo.EXPECT().AddMovieActor(sampleMovie.ID, gomock.Any()).Return(nil)
@@ -343,14 +343,14 @@ func TestCreateMovie(t *testing.T) {
 		},
 		{
 			name: "Movie successfuly created",
-			movieDTOModel: &models.MovieDTO{
+			movieDTOModel: &models.MovieDTOCreate{
 				Movies: sampleMovie.Movies,
 
-				Genres:    sampleMovie.Genres,
-				Actors:    sampleMovie.Actors,
-				Producers: sampleMovie.Producers,
+				GenresID:    sampleMovie.GenresID,
+				ActorsID:    sampleMovie.ActorsID,
+				ProducersID: sampleMovie.ProducersID,
 			},
-			setExpectations: func(mockMovieRepo mocks.MockMovieRepositoryI, mockMovieGenreRepo mocks.MockMovieGenreRepositoryI, mockMovieActorRepo mocks.MockMovieActorRepositoryI, mockMovieProducerRepo mocks.MockMovieProducerRepositoryI, movie *models.MovieDTO) {
+			setExpectations: func(mockMovieRepo mocks.MockMovieRepositoryI, mockMovieGenreRepo mocks.MockMovieGenreRepositoryI, mockMovieActorRepo mocks.MockMovieActorRepositoryI, mockMovieProducerRepo mocks.MockMovieProducerRepositoryI, movie *models.MovieDTOCreate) {
 				mockMovieRepo.EXPECT().CreateMovie(&movie.Movies).Return(sampleMovie.ID, nil)
 				mockMovieGenreRepo.EXPECT().AddMovieGenre(sampleMovie.ID, gomock.Any()).Return(nil)
 				mockMovieActorRepo.EXPECT().AddMovieActor(sampleMovie.ID, gomock.Any()).Return(nil)

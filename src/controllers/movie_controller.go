@@ -15,7 +15,7 @@ type MovieControllerI interface {
 	GetMovies() (*[]model.Movies, *models.KTSError)
 	GetMovieById(movieId *uuid.UUID) (*models.MovieWithEverything, *models.KTSError)
 	GetMovieByName(name *string) (*model.Movies, *models.KTSError)
-	CreateMovie(movie *models.MovieDTO) (*uuid.UUID, *models.KTSError)
+	CreateMovie(movie *models.MovieDTOCreate) (*uuid.UUID, *models.KTSError)
 	UpdateMovie(movie *model.Movies) *models.KTSError
 	DeleteMovie(movieId *uuid.UUID) *models.KTSError
 
@@ -51,7 +51,7 @@ func (mc *MovieController) GetMovieByName(name *string) (*model.Movies, *models.
 	return movie, nil
 }
 
-func (mc *MovieController) CreateMovie(movie *models.MovieDTO) (*uuid.UUID, *models.KTSError) {
+func (mc *MovieController) CreateMovie(movie *models.MovieDTOCreate) (*uuid.UUID, *models.KTSError) {
 	if movie.Movies == (model.Movies{}) {
 		log.Print("Movie is nil")
 		return nil, kts_errors.KTS_BAD_REQUEST
@@ -65,7 +65,7 @@ func (mc *MovieController) CreateMovie(movie *models.MovieDTO) (*uuid.UUID, *mod
 	}
 
 	// Add genre to movie
-	movieGenres := movie.Genres
+	movieGenres := movie.GenresID
 	for _, movieGenre := range movieGenres {
 		kts_err := mc.MovieGenreRepo.AddMovieGenre(movieId, movieGenre.ID)
 
@@ -76,7 +76,7 @@ func (mc *MovieController) CreateMovie(movie *models.MovieDTO) (*uuid.UUID, *mod
 	}
 
 	// Add actors to movie
-	movieActors := movie.Actors
+	movieActors := movie.ActorsID
 	log.Print("MovieActors: ", movieActors)
 	for _, movieActor := range movieActors {
 		kts_err := mc.MovieActorRepo.AddMovieActor(movieId, movieActor.ID)
@@ -88,7 +88,7 @@ func (mc *MovieController) CreateMovie(movie *models.MovieDTO) (*uuid.UUID, *mod
 	}
 
 	// Add producers to movie
-	movieProducers := movie.Producers
+	movieProducers := movie.ProducersID
 	for _, movieProducer := range movieProducers {
 		kts_err := mc.MovieProducerRepo.AddMovieProducer(movieId, movieProducer.ID)
 
