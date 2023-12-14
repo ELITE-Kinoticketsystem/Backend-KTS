@@ -86,7 +86,7 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 	router.Handle(http.MethodGet, "/movies/:id", handlers.GetMovieById(controller.MovieController))
 
 	// Will be implemented later
-	// router.Handle(http.MethodPost, "/movies", handlers.CreateMovie(controller.MovieController))
+	router.Handle(http.MethodPost, "/movies", handlers.CreateMovie(controller.MovieController))
 	// router.Handle(http.MethodPut, "/movies", handlers.UpdateMovie(controller.MovieController))
 	// router.Handle(http.MethodDelete, "/movies/:id", handlers.DeleteMovie(controller.MovieController))
 

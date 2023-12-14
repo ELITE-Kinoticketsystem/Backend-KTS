@@ -1,6 +1,8 @@
 package repositories
 
 import (
+	"log"
+
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/.gen/KinoTicketSystem/table"
 	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/managers"
@@ -20,14 +22,14 @@ type MovieGenreRepository struct {
 }
 
 // Combine Movie and Genre
-func (mr *MovieGenreRepository) AddMovieGenre(movieId *uuid.UUID, genreId *uuid.UUID) *models.KTSError {
-
+func (mgr *MovieGenreRepository) AddMovieGenre(movieId *uuid.UUID, genreId *uuid.UUID) *models.KTSError {
+	log.Print("Adding movieGenre: Start")
 	// Create the insert statement
 	insertQuery := table.MovieGenres.INSERT(table.MovieGenres.MovieID, table.MovieGenres.GenreID).
 		VALUES(utils.MysqlUuid(movieId), utils.MysqlUuid(genreId))
 
 	// Execute the query
-	rows, err := insertQuery.Exec(mr.DatabaseManager.GetDatabaseConnection())
+	rows, err := insertQuery.Exec(mgr.DatabaseManager.GetDatabaseConnection())
 	if err != nil {
 		return kts_errors.KTS_INTERNAL_ERROR
 	}
@@ -44,7 +46,7 @@ func (mr *MovieGenreRepository) AddMovieGenre(movieId *uuid.UUID, genreId *uuid.
 	return nil
 }
 
-func (mr *MovieGenreRepository) RemoveMovieGenre(movieId *uuid.UUID, genreId *uuid.UUID) *models.KTSError {
+func (mgr *MovieGenreRepository) RemoveMovieGenre(movieId *uuid.UUID, genreId *uuid.UUID) *models.KTSError {
 
 	deleteQuery := table.MovieGenres.DELETE().WHERE(
 		table.MovieGenres.MovieID.EQ(utils.MysqlUuid(movieId)).AND(
@@ -53,7 +55,7 @@ func (mr *MovieGenreRepository) RemoveMovieGenre(movieId *uuid.UUID, genreId *uu
 	)
 
 	// Execute the query
-	rows, err := deleteQuery.Exec(mr.DatabaseManager.GetDatabaseConnection())
+	rows, err := deleteQuery.Exec(mgr.DatabaseManager.GetDatabaseConnection())
 	if err != nil {
 		return kts_errors.KTS_INTERNAL_ERROR
 	}

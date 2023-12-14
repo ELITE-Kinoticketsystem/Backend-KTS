@@ -564,6 +564,74 @@ func GetSampleMovieByIdWithEverything() *models.MovieWithEverything {
 	return &movieWithEverything
 }
 
+
+func GetSampleMovieDTOCreate() *models.MovieDTO {
+	movieDTO := models.MovieDTO{}
+
+	uuid1 := uuid.MustParse("6ba7b820-9dad-11d1-80b4-00c04fd430c4")
+	uuid2 := uuid.MustParse("6ba7b827-9dad-11d1-80b4-00c04fd430c1")
+	uuid5 := uuid.MustParse("6ba7b829-9dad-11d1-80b4-00c04fd430c3")
+	uuid7 := uuid.MustParse("6ba7b82b-9dad-11d1-80b4-00c04fd430c5")
+
+	banner := ""
+	cover := ""
+	trailer := ""
+	rating := 5.0
+
+	movieDTO = models.MovieDTO{
+		Movies: model.Movies{
+			ID:           &uuid1,
+			Title:        "Test Movie 1",
+			Description:  "Test Description 1",
+			BannerPicURL: &banner,
+			CoverPicURL:  &cover,
+			TrailerURL:   &trailer,
+			Rating:       &rating,
+			ReleaseDate:  time.Now(),
+			TimeInMin:    120,
+			Fsk:          18,
+		},
+		Genres: []struct {
+			model.Genres
+		}{
+			{
+				model.Genres{
+					ID:        &uuid2,
+					GenreName: "Action",
+				},
+			},
+		},
+		Actors: []struct {
+			model.Actors
+		}{
+			{
+				model.Actors{
+					ID:          &uuid5,
+					Name:        "MaxActor Mustermann",
+					Birthdate:   time.Now(),
+					Description: "This is a description",
+					PicURL:      &banner,
+				},
+			},
+		},
+		Producers: []struct {
+			model.Producers
+		}{
+			{
+				model.Producers{
+					ID:          &uuid7,
+					Name:        "MaxProducer Mustermann",
+					Birthdate:   time.Now(),
+					Description: "This is a description",
+					PicURL:      &banner,
+				},
+			},
+		},
+	}
+
+	return &movieDTO
+}
+
 func GetStringPointer(s string) *string {
 	return &s
 }

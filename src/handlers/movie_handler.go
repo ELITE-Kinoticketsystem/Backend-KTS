@@ -1,9 +1,12 @@
 package handlers
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/controllers"
+	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -33,28 +36,57 @@ func GetMovieByName(movieCtrl controllers.MovieControllerI) gin.HandlerFunc {
 }
 
 func CreateMovie(movieCtrl controllers.MovieControllerI) gin.HandlerFunc {
-	// return func(c *gin.Context) {
-	// 	var movie *model.Movies
-	// 	err := c.ShouldBindJSON(&movie)
-	// 	if err != nil ||
-	// 		utils.ContainsEmptyString(
-	// 			movie.Title, movie.Description, *movie.BannerPicURL, *movie.CoverPicURL, *movie.TrailerURL,
-	// 		) {
-	// 		utils.HandleErrorAndAbort(c, kts_errors.KTS_BAD_REQUEST)
-	// 		return
-	// 	}
-
-	// 	kts_err := movieCtrl.CreateMovie(movie)
-	// 	if kts_err != nil {
-	// 		utils.HandleErrorAndAbort(c, kts_err)
-	// 		return
-	// 	}
-	// 	c.JSON(http.StatusCreated, movie)
-	// }
-
-	// TODO: implement
 	return func(c *gin.Context) {
-		c.JSON(http.StatusNotImplemented, gin.H{"message": "Not implemented"})
+		var movie models.MovieDTO
+		err := c.ShouldBindJSON(&movie)
+		if err != nil {
+			// ||
+			// 	utils.ContainsEmptyString(
+			// 		movie.Title, movie.Description, movie.ReleaseDate.String(),
+			// 	)
+			// {
+			log.Print("Failed to bind JSON")
+			log.Print(err)
+			utils.HandleErrorAndAbort(c, kts_errors.KTS_BAD_REQUEST)
+			return
+		}
+
+		log.Print(movie)
+
+		for _, genre := range movie.Genres {
+			if utils.ContainsEmptyString(genre.ID.String(), genre.GenreName) {
+				log.Print("Genre is empty")
+				utils.HandleErrorAndAbort(c, kts_errors.KTS_BAD_REQUEST)
+				return
+			}
+		}
+
+		for _, actor := range movie.Actors {
+			if utils.ContainsEmptyString(actor.ID.String(), actor.Name, actor.Description, actor.Birthdate.String(), *actor.PicURL) {
+				log.Print("Actor is empty")
+				utils.HandleErrorAndAbort(c, kts_errors.KTS_BAD_REQUEST)
+				return
+			}
+		}
+
+		for _, producer := range movie.Producers {
+			if utils.ContainsEmptyString(producer.ID.String(), producer.Name, producer.Description, producer.Birthdate.String(), *producer.PicURL) {
+				log.Print("Producer is empty")
+				utils.HandleErrorAndAbort(c, kts_errors.KTS_BAD_REQUEST)
+				return
+			}
+		}
+
+		log.Print("Passed validation")
+		movieId, kts_err := movieCtrl.CreateMovie(&movie)
+		if kts_err != nil {
+			log.Print("Movie was not created")
+			utils.HandleErrorAndAbort(c, kts_err)
+			return
+		}
+
+		movie.ID = movieId
+		c.JSON(http.StatusCreated, movie)
 	}
 }
 
