@@ -41,17 +41,18 @@ func (m *MockEventSeatControllerI) EXPECT() *MockEventSeatControllerIMockRecorde
 }
 
 // BlockEventSeat mocks base method.
-func (m *MockEventSeatControllerI) BlockEventSeat(eventSeatId, userId *uuid.UUID) *models.KTSError {
+func (m *MockEventSeatControllerI) BlockEventSeat(eventId, eventSeatId, userId *uuid.UUID) (*time.Time, *models.KTSError) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "BlockEventSeat", eventSeatId, userId)
-	ret0, _ := ret[0].(*models.KTSError)
-	return ret0
+	ret := m.ctrl.Call(m, "BlockEventSeat", eventId, eventSeatId, userId)
+	ret0, _ := ret[0].(*time.Time)
+	ret1, _ := ret[1].(*models.KTSError)
+	return ret0, ret1
 }
 
 // BlockEventSeat indicates an expected call of BlockEventSeat.
-func (mr *MockEventSeatControllerIMockRecorder) BlockEventSeat(eventSeatId, userId any) *gomock.Call {
+func (mr *MockEventSeatControllerIMockRecorder) BlockEventSeat(eventId, eventSeatId, userId any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "BlockEventSeat", reflect.TypeOf((*MockEventSeatControllerI)(nil).BlockEventSeat), eventSeatId, userId)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "BlockEventSeat", reflect.TypeOf((*MockEventSeatControllerI)(nil).BlockEventSeat), eventId, eventSeatId, userId)
 }
 
 // GetEventSeats mocks base method.

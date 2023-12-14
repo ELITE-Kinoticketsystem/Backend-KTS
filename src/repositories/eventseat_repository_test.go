@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"testing"
+	"time"
 
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/.gen/KinoTicketSystem/model"
 	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
@@ -156,6 +157,149 @@ func TestGetEventSeats(t *testing.T) {
 
 			assert.Equal(t, tc.expectedSeats, seats)
 
+		})
+	}
+}
+
+func TestBlockEventSeatIfAvailable(t *testing.T) {
+	eventId := utils.NewUUID()
+	seatId := utils.NewUUID()
+	userId := utils.NewUUID()
+	blockedUntil := time.Now()
+
+	query := "UPDATE `KinoTicketSystem`.event_seats SET .* WHERE .*"
+
+	testCases := []struct {
+		name            string
+		setExpectations func(mock sqlmock.Sqlmock)
+		expectedError   *models.KTSError
+	}{
+		{
+			name: "Block event seat if available",
+			setExpectations: func(mock sqlmock.Sqlmock) {
+				mock.ExpectExec(query).
+					WithArgs(&blockedUntil, sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg()).
+					WillReturnResult(sqlmock.NewResult(1, 1))
+			},
+			expectedError: nil,
+		},
+		{
+			name: "Block event seat if available - no rows affected",
+			setExpectations: func(mock sqlmock.Sqlmock) {
+				mock.ExpectExec(query).
+					WithArgs(&blockedUntil, sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg()).
+					WillReturnResult(sqlmock.NewResult(0, 0))
+
+			},
+			expectedError: kts_errors.KTS_CONFLICT,
+		},
+		{
+			name: "Block event seat if available - error",
+			setExpectations: func(mock sqlmock.Sqlmock) {
+				mock.ExpectExec(query).
+					WithArgs(&blockedUntil, sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg()).
+					WillReturnError(sqlmock.ErrCancelled)
+			},
+			expectedError: kts_errors.KTS_INTERNAL_ERROR,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			// Given
+			db, mock, err := sqlmock.New()
+			if err != nil {
+				t.Fatalf("Failed to create mock database connection: %v", err)
+			}
+			defer db.Close()
+
+			eventRepo := &EventRepository{
+				DatabaseManager: &managers.DatabaseManager{
+					Connection: db,
+				},
+			}
+
+			tc.setExpectations(mock)
+
+			// When
+			ktsErr := eventRepo.BlockEventSeatIfAvailable(eventId, seatId, userId, &blockedUntil)
+
+			// Then
+			if err := mock.ExpectationsWereMet(); err != nil {
+				t.Errorf("There were unfulfilled expectations: %s", err)
+			}
+
+			assert.Equal(t, tc.expectedError, ktsErr)
+		})
+	}
+}
+func TestUpdateBlockedUntilTimeForUserEventSeats(t *testing.T) {
+	eventId := utils.NewUUID()
+	userId := utils.NewUUID()
+	blockedUntil := time.Now()
+
+	query := "UPDATE `KinoTicketSystem`.event_seats SET .* WHERE .*"
+
+	testCases := []struct {
+		name            string
+		setExpectations func(mock sqlmock.Sqlmock)
+		expectedError   *models.KTSError
+	}{
+		{
+			name: "Update blocked until time for user event seats",
+			setExpectations: func(mock sqlmock.Sqlmock) {
+				mock.ExpectExec(query).
+					WithArgs(blockedUntil, sqlmock.AnyArg(), sqlmock.AnyArg()).
+					WillReturnResult(sqlmock.NewResult(1, 1))
+			},
+			expectedError: nil,
+		},
+		{
+			name: "Update blocked until time for user event seats - no rows affected",
+			setExpectations: func(mock sqlmock.Sqlmock) {
+				mock.ExpectExec(query).
+					WithArgs(blockedUntil, sqlmock.AnyArg(), sqlmock.AnyArg()).
+					WillReturnResult(sqlmock.NewResult(0, 0))
+			},
+			expectedError: kts_errors.KTS_NOT_FOUND,
+		},
+		{
+			name: "Update blocked until time for user event seats - error",
+			setExpectations: func(mock sqlmock.Sqlmock) {
+				mock.ExpectExec(query).
+					WithArgs(blockedUntil, sqlmock.AnyArg(), sqlmock.AnyArg()).
+					WillReturnError(sqlmock.ErrCancelled)
+			},
+			expectedError: kts_errors.KTS_INTERNAL_ERROR,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			// Given
+			db, mock, err := sqlmock.New()
+			if err != nil {
+				t.Fatalf("Failed to create mock database connection: %v", err)
+			}
+			defer db.Close()
+
+			esr := &EventSeatRepository{
+				DatabaseManager: &managers.DatabaseManager{
+					Connection: db,
+				},
+			}
+
+			tc.setExpectations(mock)
+
+			// When
+			ktsErr := esr.UpdateBlockedUntilTimeForUserEventSeats(eventId, userId, &blockedUntil)
+
+			// Then
+			if err := mock.ExpectationsWereMet(); err != nil {
+				t.Errorf("There were unfulfilled expectations: %s", err)
+			}
+
+			assert.Equal(t, tc.expectedError, ktsErr)
 		})
 	}
 }

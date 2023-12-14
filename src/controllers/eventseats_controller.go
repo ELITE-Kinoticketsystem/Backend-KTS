@@ -6,11 +6,13 @@ import (
 
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/repositories"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
 	"github.com/google/uuid"
 )
 
 type EventSeatControllerI interface {
 	GetEventSeats(eventId *uuid.UUID, userId *uuid.UUID) (*[][]models.GetSeatsForSeatSelectorDTO, *[]models.GetSeatsForSeatSelectorDTO, *time.Time, *models.KTSError)
+	BlockEventSeat(eventId *uuid.UUID, eventSeatId *uuid.UUID, userId *uuid.UUID) (*time.Time, *models.KTSError)
 }
 
 type EventSeatController struct {
@@ -49,6 +51,25 @@ func (esc *EventSeatController) GetEventSeats(eventId *uuid.UUID, userId *uuid.U
 	}
 
 	return seatMapToSlice(seatRows), &currentUserSeats, blockedUntil, nil
+}
+
+func (esc *EventSeatController) BlockEventSeat(eventId *uuid.UUID, eventSeatId *uuid.UUID, userId *uuid.UUID) (*time.Time, *models.KTSError) {
+	currentTime := time.Now()
+	blockedUntil := currentTime.Add(utils.BLOCKED_TICKET_TIME)
+
+	err := esc.EventSeatRepo.BlockEventSeatIfAvailable(eventId, eventSeatId, userId, &blockedUntil)
+
+	if err != nil {
+		return nil, err
+	}
+
+	err = esc.EventSeatRepo.UpdateBlockedUntilTimeForUserEventSeats(eventId, userId, &blockedUntil)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &blockedUntil, nil
 }
 
 func seatMapToSlice(seatMap map[int32][]models.GetSeatsForSeatSelectorDTO) *[][]models.GetSeatsForSeatSelectorDTO {

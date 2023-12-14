@@ -209,3 +209,64 @@ func TestEventSeatController_GetEventSeats(t *testing.T) {
 	}
 
 }
+
+func TestEventSeatController_BlockEventSeat(t *testing.T) {
+	eventId := utils.NewUUID()
+	eventSeatId := utils.NewUUID()
+	userId := utils.NewUUID()
+
+	tests := []struct {
+		name          string
+		expectFuncs   func(mockEventSeatRepo *mocks.MockEventSeatRepoI, t *testing.T)
+		expectedError *models.KTSError
+		expectTime    bool
+	}{
+		{
+			name: "Block event seat",
+			expectFuncs: func(mockEventSeatRepo *mocks.MockEventSeatRepoI, t *testing.T) {
+				mockEventSeatRepo.EXPECT().BlockEventSeatIfAvailable(eventId, eventSeatId, userId, gomock.Any()).Return(nil)
+				mockEventSeatRepo.EXPECT().UpdateBlockedUntilTimeForUserEventSeats(eventId, userId, gomock.Any()).Return(nil)
+			},
+			expectedError: nil,
+			expectTime:    true,
+		},
+		{
+			name: "Block event seat - error",
+			expectFuncs: func(mockEventSeatRepo *mocks.MockEventSeatRepoI, t *testing.T) {
+				mockEventSeatRepo.EXPECT().BlockEventSeatIfAvailable(eventId, eventSeatId, userId, gomock.Any()).Return(kts_errors.KTS_INTERNAL_ERROR)
+			},
+			expectedError: kts_errors.KTS_INTERNAL_ERROR,
+			expectTime:    false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Given
+			mockCtrl := gomock.NewController(t)
+			defer mockCtrl.Finish()
+
+			mockEventSeatRepo := mocks.NewMockEventSeatRepoI(mockCtrl)
+
+			tt.expectFuncs(mockEventSeatRepo, t)
+
+			eventSeatController := EventSeatController{
+				EventSeatRepo: mockEventSeatRepo,
+			}
+
+			// When
+			blockedUntil, err := eventSeatController.BlockEventSeat(eventId, eventSeatId, userId)
+
+			// Then
+			if err != tt.expectedError {
+				t.Errorf("Unexpected error: %v", err)
+			}
+
+			if tt.expectTime && blockedUntil == nil {
+				t.Errorf("Expected blocked until time but got nil")
+			} else if !tt.expectTime && blockedUntil != nil {
+				t.Errorf("Expected nil but got blocked until time")
+			}
+		})
+	}
+}

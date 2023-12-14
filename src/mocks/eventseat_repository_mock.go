@@ -12,7 +12,6 @@ import (
 	reflect "reflect"
 	time "time"
 
-	model "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/.gen/KinoTicketSystem/model"
 	models "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
 	uuid "github.com/google/uuid"
 	gomock "go.uber.org/mock/gomock"
@@ -41,33 +40,18 @@ func (m *MockEventSeatRepoI) EXPECT() *MockEventSeatRepoIMockRecorder {
 	return m.recorder
 }
 
-// BlockEventSeat mocks base method.
-func (m *MockEventSeatRepoI) BlockEventSeat(eventSeatId, userId *uuid.UUID, blockedUntil *time.Time) *models.KTSError {
+// BlockEventSeatIfAvailable mocks base method.
+func (m *MockEventSeatRepoI) BlockEventSeatIfAvailable(eventId, seatId, userId *uuid.UUID, blockedUntil *time.Time) *models.KTSError {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "BlockEventSeat", eventSeatId, userId, blockedUntil)
+	ret := m.ctrl.Call(m, "BlockEventSeatIfAvailable", eventId, seatId, userId, blockedUntil)
 	ret0, _ := ret[0].(*models.KTSError)
 	return ret0
 }
 
-// BlockEventSeat indicates an expected call of BlockEventSeat.
-func (mr *MockEventSeatRepoIMockRecorder) BlockEventSeat(eventSeatId, userId, blockedUntil any) *gomock.Call {
+// BlockEventSeatIfAvailable indicates an expected call of BlockEventSeatIfAvailable.
+func (mr *MockEventSeatRepoIMockRecorder) BlockEventSeatIfAvailable(eventId, seatId, userId, blockedUntil any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "BlockEventSeat", reflect.TypeOf((*MockEventSeatRepoI)(nil).BlockEventSeat), eventSeatId, userId, blockedUntil)
-}
-
-// GetEventSeat mocks base method.
-func (m *MockEventSeatRepoI) GetEventSeat(eventSeatId *uuid.UUID) (*model.EventSeats, *models.KTSError) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetEventSeat", eventSeatId)
-	ret0, _ := ret[0].(*model.EventSeats)
-	ret1, _ := ret[1].(*models.KTSError)
-	return ret0, ret1
-}
-
-// GetEventSeat indicates an expected call of GetEventSeat.
-func (mr *MockEventSeatRepoIMockRecorder) GetEventSeat(eventSeatId any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetEventSeat", reflect.TypeOf((*MockEventSeatRepoI)(nil).GetEventSeat), eventSeatId)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "BlockEventSeatIfAvailable", reflect.TypeOf((*MockEventSeatRepoI)(nil).BlockEventSeatIfAvailable), eventId, seatId, userId, blockedUntil)
 }
 
 // GetEventSeats mocks base method.
@@ -85,16 +69,16 @@ func (mr *MockEventSeatRepoIMockRecorder) GetEventSeats(eventId any) *gomock.Cal
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetEventSeats", reflect.TypeOf((*MockEventSeatRepoI)(nil).GetEventSeats), eventId)
 }
 
-// ResetTimerOnUserSeats mocks base method.
-func (m *MockEventSeatRepoI) ResetTimerOnUserSeats(userId *uuid.UUID, currentTime, blockedUntil *time.Time) *models.KTSError {
+// UpdateBlockedUntilTimeForUserEventSeats mocks base method.
+func (m *MockEventSeatRepoI) UpdateBlockedUntilTimeForUserEventSeats(eventId, userId *uuid.UUID, blockedUntil *time.Time) *models.KTSError {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ResetTimerOnUserSeats", userId, currentTime, blockedUntil)
+	ret := m.ctrl.Call(m, "UpdateBlockedUntilTimeForUserEventSeats", eventId, userId, blockedUntil)
 	ret0, _ := ret[0].(*models.KTSError)
 	return ret0
 }
 
-// ResetTimerOnUserSeats indicates an expected call of ResetTimerOnUserSeats.
-func (mr *MockEventSeatRepoIMockRecorder) ResetTimerOnUserSeats(userId, currentTime, blockedUntil any) *gomock.Call {
+// UpdateBlockedUntilTimeForUserEventSeats indicates an expected call of UpdateBlockedUntilTimeForUserEventSeats.
+func (mr *MockEventSeatRepoIMockRecorder) UpdateBlockedUntilTimeForUserEventSeats(eventId, userId, blockedUntil any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ResetTimerOnUserSeats", reflect.TypeOf((*MockEventSeatRepoI)(nil).ResetTimerOnUserSeats), userId, currentTime, blockedUntil)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateBlockedUntilTimeForUserEventSeats", reflect.TypeOf((*MockEventSeatRepoI)(nil).UpdateBlockedUntilTimeForUserEventSeats), eventId, userId, blockedUntil)
 }
