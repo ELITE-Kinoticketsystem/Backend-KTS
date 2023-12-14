@@ -82,33 +82,6 @@ func (pr *ProducerRepository) GetProducerById(id *uuid.UUID) (*models.ProducerDT
 	return &producer, nil
 }
 
-func (pr *ProducerRepository) GetProducerByName(name *string) (*models.ProducerDTO, *models.KTSError) {
-	var producer models.ProducerDTO
-	// Create the query
-	stmt := jet_mysql.SELECT(
-		table.Producers.AllColumns,
-		table.ProducerPictures.AllColumns,
-	).
-		FROM(
-			table.Producers.
-				LEFT_JOIN(table.ProducerPictures, table.ProducerPictures.ProducerID.EQ(table.Producers.ID)),
-		).
-		WHERE(
-			table.Producers.Name.EQ(utils.MySqlString(*name)),
-		)
-
-	// Execute the query
-	err := stmt.Query(pr.DatabaseManager.GetDatabaseConnection(), &producer)
-	if err != nil {
-		if err.Error() == "qrm: no rows in result set" {
-			return nil, kts_errors.KTS_NOT_FOUND
-		}
-		return nil, kts_errors.KTS_INTERNAL_ERROR
-	}
-
-	return &producer, nil
-}
-
 func (pr *ProducerRepository) CreateProducer(producer *model.Producers) (*uuid.UUID, *models.KTSError) {
 	producer.ID = utils.NewUUID()
 
