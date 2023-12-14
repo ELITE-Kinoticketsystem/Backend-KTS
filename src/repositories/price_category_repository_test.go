@@ -5,18 +5,17 @@ import (
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/.gen/KinoTicketSystem/model"
 	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
-	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/gen/KinoTicketSystem/model"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/managers"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
-	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/samples"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestGetPriceCategories(t *testing.T) {
-	samplePriceCategories := samples.GetSamplePriceCategories()
+	samplePriceCategories := utils.GetSamplePriceCategories()
 
 	query := "SELECT price_categories.id AS \"price_categories.id\", price_categories.category_name AS \"price_categories.category_name\", price_categories.price AS \"price_categories.price\" FROM `KinoTicketSystem`.price_categories;"
 
@@ -100,7 +99,7 @@ func TestGetPriceCategories(t *testing.T) {
 }
 
 func TestGetPriceCategoryById(t *testing.T) {
-	samplePriceCategory := samples.GetSamplePriceCategory()
+	samplePriceCategory := utils.GetSamplePriceCategory()
 
 	priceCategoryId := samplePriceCategory.ID
 
@@ -184,7 +183,7 @@ func TestGetPriceCategoryById(t *testing.T) {
 }
 
 func TestCreatePriceCategory(t *testing.T) {
-	samplePriceCategory := samples.GetSamplePriceCategory()
+	samplePriceCategory := utils.GetSamplePriceCategory()
 
 	query := "INSERT INTO `KinoTicketSystem`.price_categories (id, category_name, price) VALUES (?, ?, ?);"
 
@@ -267,7 +266,7 @@ func TestCreatePriceCategory(t *testing.T) {
 }
 
 func TestUpdatePriceCategory(t *testing.T) {
-	samplePriceCategory := samples.GetSamplePriceCategory()
+	samplePriceCategory := utils.GetSamplePriceCategory()
 
 	query := "UPDATE `KinoTicketSystem`.price_categories SET id = ?, category_name = ?, price = ? WHERE price_categories.id = ?;"
 
@@ -288,7 +287,7 @@ func TestUpdatePriceCategory(t *testing.T) {
 		{
 			name: "Error while updating PriceCategory",
 			setExpectations: func(mock sqlmock.Sqlmock, priceCategory *model.PriceCategories) {
-				mock.ExpectExec(query).WithArgs(sqlmock.AnyArg(), priceCategory.CategoryName, priceCategory.Price, utils.EqUUID(priceCategory.ID)).WillReturnError(sqlmock.ErrCancelled)
+				mock.ExpectExec(query).WithArgs(sqlmock.AnyArg(),  priceCategory.CategoryName, priceCategory.Price, utils.EqUUID(priceCategory.ID)).WillReturnError(sqlmock.ErrCancelled)
 			},
 			expectedPriceCategoryID: false,
 			expectedError:           kts_errors.KTS_INTERNAL_ERROR,
@@ -296,7 +295,7 @@ func TestUpdatePriceCategory(t *testing.T) {
 		{
 			name: "Error while converting rows affected",
 			setExpectations: func(mock sqlmock.Sqlmock, priceCategory *model.PriceCategories) {
-				mock.ExpectExec(query).WithArgs(sqlmock.AnyArg(), priceCategory.CategoryName, priceCategory.Price, utils.EqUUID(priceCategory.ID)).WillReturnResult(
+				mock.ExpectExec(query).WithArgs(sqlmock.AnyArg(),  priceCategory.CategoryName, priceCategory.Price, utils.EqUUID(priceCategory.ID)).WillReturnResult(
 					sqlmock.NewErrorResult(errors.New("rows affected conversion did not work")),
 				)
 			},
@@ -306,7 +305,7 @@ func TestUpdatePriceCategory(t *testing.T) {
 		{
 			name: "PriceCategory not found",
 			setExpectations: func(mock sqlmock.Sqlmock, priceCategory *model.PriceCategories) {
-				mock.ExpectExec(query).WithArgs(sqlmock.AnyArg(), priceCategory.CategoryName, priceCategory.Price, utils.EqUUID(priceCategory.ID)).WillReturnResult(sqlmock.NewResult(1, 0))
+				mock.ExpectExec(query).WithArgs(sqlmock.AnyArg(),  priceCategory.CategoryName, priceCategory.Price, utils.EqUUID(priceCategory.ID)).WillReturnResult(sqlmock.NewResult(1, 0))
 			},
 			expectedPriceCategoryID: false,
 			expectedError:           kts_errors.KTS_NOT_FOUND,
@@ -349,7 +348,7 @@ func TestUpdatePriceCategory(t *testing.T) {
 }
 
 func TestDeletePriceCategory(t *testing.T) {
-	samplePriceCategory := samples.GetSamplePriceCategory()
+	samplePriceCategory := utils.GetSamplePriceCategory()
 
 	priceCategoryId := samplePriceCategory.ID
 
