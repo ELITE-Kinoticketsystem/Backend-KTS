@@ -63,6 +63,7 @@ func TestGetPriceCategories(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
+			// GIVEN
 			// Create a new mock database connection
 			db, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
 			if err != nil {
@@ -79,9 +80,11 @@ func TestGetPriceCategories(t *testing.T) {
 
 			tc.setExpectations(mock)
 
+			// WHEN
 			// Call the method under test
 			priceCategories, kts_err := priceCategoryRepo.GetPriceCategories()
 
+			// THEN
 			// Verify the results
 			assert.Equal(t, tc.expectedpricecategories, priceCategories)
 			assert.Equal(t, tc.expectedError, kts_err)
@@ -144,6 +147,7 @@ func TestGetPriceCategoryById(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
+			// GIVEN
 			// Create a new mock database connection
 			db, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
 			if err != nil {
@@ -160,9 +164,11 @@ func TestGetPriceCategoryById(t *testing.T) {
 
 			tc.setExpectations(mock, priceCategoryId)
 
+			// WHEN
 			// Call the method under test
 			priceCategory, kts_err := priceCategoryRepo.GetPriceCategoryById(priceCategoryId)
 
+			// THEN
 			// Verify the results
 			assert.Equal(t, tc.expectedpricecategories, priceCategory)
 			assert.Equal(t, tc.expectedError, kts_err)
@@ -179,48 +185,53 @@ func TestGetPriceCategoryById(t *testing.T) {
 func TestCreatePriceCategory(t *testing.T) {
 	samplePriceCategory := utils.GetSamplePriceCategory()
 
-	query := "INSERT INTO `KinoTicketSystem`.price_categories (id, category_name, price) VALUES (category_name = ?, price = ?);"
+	query := "INSERT INTO `KinoTicketSystem`.price_categories (id, category_name, price) VALUES (?, ?, ?);"
 
 	testCases := []struct {
-		name            string
-		setExpectations func(mock sqlmock.Sqlmock, priceCategory *model.PriceCategories)
-		expectedError   *models.KTSError
+		name                    string
+		setExpectations         func(mock sqlmock.Sqlmock, priceCategory *model.PriceCategories)
+		expectedPriceCategoryID bool
+		expectedError           *models.KTSError
 	}{
 		{
 			name: "PriceCategory created",
 			setExpectations: func(mock sqlmock.Sqlmock, priceCategory *model.PriceCategories) {
-				mock.ExpectExec(query).WithArgs(priceCategory.CategoryName, priceCategory.Price).WillReturnResult(sqlmock.NewResult(1, 1))
+				mock.ExpectExec(query).WithArgs(sqlmock.AnyArg(), priceCategory.CategoryName, priceCategory.Price).WillReturnResult(sqlmock.NewResult(1, 1))
 			},
-			expectedError: nil,
+			expectedPriceCategoryID: true,
+			expectedError:           nil,
 		},
 		{
 			name: "Error while creating PriceCategory",
 			setExpectations: func(mock sqlmock.Sqlmock, priceCategory *model.PriceCategories) {
-				mock.ExpectExec(query).WithArgs(priceCategory.CategoryName, priceCategory.Price).WillReturnError(sqlmock.ErrCancelled)
+				mock.ExpectExec(query).WithArgs(sqlmock.AnyArg(), priceCategory.CategoryName, priceCategory.Price).WillReturnError(sqlmock.ErrCancelled)
 			},
-			expectedError: kts_errors.KTS_INTERNAL_ERROR,
+			expectedPriceCategoryID: false,
+			expectedError:           kts_errors.KTS_INTERNAL_ERROR,
 		},
 		{
 			name: "Error while converting rows affected",
 			setExpectations: func(mock sqlmock.Sqlmock, priceCategory *model.PriceCategories) {
-				mock.ExpectExec(query).WithArgs(priceCategory.CategoryName, priceCategory.Price).WillReturnResult(
+				mock.ExpectExec(query).WithArgs(sqlmock.AnyArg(), priceCategory.CategoryName, priceCategory.Price).WillReturnResult(
 					sqlmock.NewErrorResult(errors.New("rows affected conversion did not work")),
 				)
 			},
-			expectedError: kts_errors.KTS_INTERNAL_ERROR,
+			expectedPriceCategoryID: false,
+			expectedError:           kts_errors.KTS_INTERNAL_ERROR,
 		},
 		{
 			name: "PriceCategory not found",
 			setExpectations: func(mock sqlmock.Sqlmock, priceCategory *model.PriceCategories) {
-				mock.ExpectExec(query).WithArgs(priceCategory.CategoryName, priceCategory.Price).WillReturnResult(sqlmock.NewResult(1, 0))
+				mock.ExpectExec(query).WithArgs(sqlmock.AnyArg(), priceCategory.CategoryName, priceCategory.Price).WillReturnResult(sqlmock.NewResult(1, 0))
 			},
-			expectedError: kts_errors.KTS_NOT_FOUND,
+			expectedPriceCategoryID: false,
+			expectedError:           kts_errors.KTS_NOT_FOUND,
 		},
 	}
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			// Create a new mock database connection
+			// GIVEN
 			db, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
 			if err != nil {
 				t.Fatalf("Failed to create mock database connection: %v", err)
@@ -236,14 +247,17 @@ func TestCreatePriceCategory(t *testing.T) {
 
 			tc.setExpectations(mock, samplePriceCategory)
 
-			// Call the method under test
-			kts_err := priceCategoryRepo.CreatePriceCategory(samplePriceCategory)
+			// WHEN
+			priceCategoryID, kts_err := priceCategoryRepo.CreatePriceCategory(samplePriceCategory)
 
-			// Verify the results
+			// THEN
 			assert.Equal(t, tc.expectedError, kts_err)
+			if tc.expectedPriceCategoryID && priceCategoryID == nil {
+				t.Error("Expected actor ID, got nil")
+			}
 
 			// Verify that all expectations were met
-			if err = mock.ExpectationsWereMet(); err != nil {
+			if err := mock.ExpectationsWereMet(); err != nil {
 				t.Errorf("There were unfulfilled expectations: %s", err)
 			}
 
@@ -257,45 +271,50 @@ func TestUpdatePriceCategory(t *testing.T) {
 	query := "UPDATE `KinoTicketSystem`.price_categories SET id = ?, category_name = ?, price = ? WHERE price_categories.id = ?;"
 
 	testCases := []struct {
-		name            string
-		setExpectations func(mock sqlmock.Sqlmock, priceCategory *model.PriceCategories)
-		expectedError   *models.KTSError
+		name                    string
+		setExpectations         func(mock sqlmock.Sqlmock, priceCategory *model.PriceCategories)
+		expectedPriceCategoryID bool
+		expectedError           *models.KTSError
 	}{
 		{
 			name: "PriceCategory updated",
 			setExpectations: func(mock sqlmock.Sqlmock, priceCategory *model.PriceCategories) {
-				mock.ExpectExec(query).WithArgs(priceCategory.ID, priceCategory.CategoryName, priceCategory.Price, utils.EqUUID(priceCategory.ID)).WillReturnResult(sqlmock.NewResult(1, 1))
+				mock.ExpectExec(query).WithArgs(sqlmock.AnyArg(), priceCategory.CategoryName, priceCategory.Price, utils.EqUUID(priceCategory.ID)).WillReturnResult(sqlmock.NewResult(1, 1))
 			},
-			expectedError: nil,
+			expectedPriceCategoryID: true,
+			expectedError:           nil,
 		},
 		{
 			name: "Error while updating PriceCategory",
 			setExpectations: func(mock sqlmock.Sqlmock, priceCategory *model.PriceCategories) {
-				mock.ExpectExec(query).WithArgs(priceCategory.ID, priceCategory.CategoryName, priceCategory.Price, utils.EqUUID(priceCategory.ID)).WillReturnError(sqlmock.ErrCancelled)
+				mock.ExpectExec(query).WithArgs(sqlmock.AnyArg(),  priceCategory.CategoryName, priceCategory.Price, utils.EqUUID(priceCategory.ID)).WillReturnError(sqlmock.ErrCancelled)
 			},
-			expectedError: kts_errors.KTS_INTERNAL_ERROR,
+			expectedPriceCategoryID: false,
+			expectedError:           kts_errors.KTS_INTERNAL_ERROR,
 		},
 		{
 			name: "Error while converting rows affected",
 			setExpectations: func(mock sqlmock.Sqlmock, priceCategory *model.PriceCategories) {
-				mock.ExpectExec(query).WithArgs(priceCategory.ID, priceCategory.CategoryName, priceCategory.Price, utils.EqUUID(priceCategory.ID)).WillReturnResult(
+				mock.ExpectExec(query).WithArgs(sqlmock.AnyArg(),  priceCategory.CategoryName, priceCategory.Price, utils.EqUUID(priceCategory.ID)).WillReturnResult(
 					sqlmock.NewErrorResult(errors.New("rows affected conversion did not work")),
 				)
 			},
-			expectedError: kts_errors.KTS_INTERNAL_ERROR,
+			expectedPriceCategoryID: false,
+			expectedError:           kts_errors.KTS_INTERNAL_ERROR,
 		},
 		{
 			name: "PriceCategory not found",
 			setExpectations: func(mock sqlmock.Sqlmock, priceCategory *model.PriceCategories) {
-				mock.ExpectExec(query).WithArgs(priceCategory.ID, priceCategory.CategoryName, priceCategory.Price, utils.EqUUID(priceCategory.ID)).WillReturnResult(sqlmock.NewResult(1, 0))
+				mock.ExpectExec(query).WithArgs(sqlmock.AnyArg(),  priceCategory.CategoryName, priceCategory.Price, utils.EqUUID(priceCategory.ID)).WillReturnResult(sqlmock.NewResult(1, 0))
 			},
-			expectedError: kts_errors.KTS_NOT_FOUND,
+			expectedPriceCategoryID: false,
+			expectedError:           kts_errors.KTS_NOT_FOUND,
 		},
 	}
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			// Create a new mock database connection
+			// GIVEN
 			db, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
 			if err != nil {
 				t.Fatalf("Failed to create mock database connection: %v", err)
@@ -311,17 +330,19 @@ func TestUpdatePriceCategory(t *testing.T) {
 
 			tc.setExpectations(mock, samplePriceCategory)
 
-			// Call the method under test
-			kts_err := priceCategoryRepo.UpdatePriceCategory(samplePriceCategory)
+			// WHEN
+			priceCategoryID, kts_err := priceCategoryRepo.UpdatePriceCategory(samplePriceCategory)
 
-			// Verify the results
+			// THEN
 			assert.Equal(t, tc.expectedError, kts_err)
-
-			// Verify that all expectations were met
-			if err = mock.ExpectationsWereMet(); err != nil {
-				t.Errorf("There were unfulfilled expectations: %s", err)
+			if tc.expectedPriceCategoryID && priceCategoryID == nil {
+				t.Error("Expected actor ID, got nil")
 			}
 
+			// Verify that all expectations were met
+			if err := mock.ExpectationsWereMet(); err != nil {
+				t.Errorf("There were unfulfilled expectations: %s", err)
+			}
 		})
 	}
 }
@@ -372,6 +393,7 @@ func TestDeletePriceCategory(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
+			// GIVEN
 			// Create a new mock database connection
 			db, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
 			if err != nil {
@@ -388,9 +410,11 @@ func TestDeletePriceCategory(t *testing.T) {
 
 			tc.setExpectations(mock, priceCategoryId)
 
+			// WHEN
 			// Call the method under test
 			kts_err := priceCategoryRepo.DeletePriceCategory(priceCategoryId)
 
+			// THEN
 			// Verify the results
 			assert.Equal(t, tc.expectedError, kts_err)
 
