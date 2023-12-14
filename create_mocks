@@ -7,3 +7,5 @@
 ~/go/bin/mockgen -source=./src/repositories/movie_genres_repository.go -destination=./src/mocks/movie_genres_repository_mock.go -package=mocks
 ~/go/bin/mockgen -source=./src/repositories/movie_producer_repository.go -destination=./src/mocks/movie_producer_repository_mock.go -package=mocks
 ~/go/bin/mockgen -source=./src/repositories/movie_actor_repository.go -destination=./src/mocks/movie_actor_repository_mock.go -package=mocks
+~/go/bin/mockgen -source=./src/repositories/theatre_repository.go -destination=./src/mocks/theatre_repository_mock.go -package=mocks
+~/go/bin/mockgen -source=./src/controllers/theatre_controller.go -destination=./src/mocks/theatre_controller_mock.go -package=mocks
