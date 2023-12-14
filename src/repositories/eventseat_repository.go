@@ -50,7 +50,7 @@ func (esr *EventSeatRepository) GetEventSeats(eventId *uuid.UUID) (*[]models.Get
 	return &eventSeats, nil
 }
 
-func (esr *EventRepository) BlockEventSeatIfAvailable(eventId *uuid.UUID, seatId *uuid.UUID, userId *uuid.UUID, blockedUntil *time.Time) *models.KTSError {
+func (esr *EventSeatRepository) BlockEventSeatIfAvailable(eventId *uuid.UUID, seatId *uuid.UUID, userId *uuid.UUID, blockedUntil *time.Time) *models.KTSError {
 
 	stmt := table.EventSeats.UPDATE(table.EventSeats.BlockedUntil, table.EventSeats.UserID).
 		SET(blockedUntil, userId).

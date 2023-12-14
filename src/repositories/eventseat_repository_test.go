@@ -213,7 +213,7 @@ func TestBlockEventSeatIfAvailable(t *testing.T) {
 			}
 			defer db.Close()
 
-			eventRepo := &EventRepository{
+			eventRepo := &EventSeatRepository{
 				DatabaseManager: &managers.DatabaseManager{
 					Connection: db,
 				},
