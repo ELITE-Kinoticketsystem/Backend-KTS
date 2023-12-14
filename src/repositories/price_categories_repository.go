@@ -16,8 +16,8 @@ import (
 type PriceCategoryRepositoryI interface {
 	GetPriceCategories() (*[]model.PriceCategories, *models.KTSError)
 	GetPriceCategoryById(id *uuid.UUID) (*model.PriceCategories, *models.KTSError)
-	CreatePriceCategory(priceCategory *model.PriceCategories) *models.KTSError
-	UpdatePriceCategory(priceCategory *model.PriceCategories) *models.KTSError
+	CreatePriceCategory(priceCategory *model.PriceCategories) (*uuid.UUID, *models.KTSError)
+	UpdatePriceCategory(priceCategory *model.PriceCategories) (*uuid.UUID, *models.KTSError)
 	DeletePriceCategory(id *uuid.UUID) *models.KTSError
 }
 
@@ -72,41 +72,43 @@ func (pcr *PriceCategoryRepository) GetPriceCategoryById(id *uuid.UUID) (*model.
 	return &priceCategory, nil
 }
 
-func (pcr *PriceCategoryRepository) CreatePriceCategory(priceCategory *model.PriceCategories) *models.KTSError {
+func (pcr *PriceCategoryRepository) CreatePriceCategory(priceCategory *model.PriceCategories) (*uuid.UUID, *models.KTSError) {
+	priceCategory.ID = utils.NewUUID()
 	// Create the query
 	stmt := table.PriceCategories.INSERT(
 		table.PriceCategories.AllColumns,
 	).VALUES(
-		table.PriceCategories.CategoryName.SET(jet_mysql.String(priceCategory.CategoryName)),
-		table.PriceCategories.Price.SET(jet_mysql.Int32(priceCategory.Price)),
+		utils.MysqlUuid(priceCategory.ID),
+		priceCategory.CategoryName,
+		priceCategory.Price,
 	)
 
 	// Execute the query
 	rows, err := stmt.Exec(pcr.DatabaseManager.GetDatabaseConnection())
 	if err != nil {
-		return kts_errors.KTS_INTERNAL_ERROR
+		return nil, kts_errors.KTS_INTERNAL_ERROR
 	}
 
 	rowsAffected, err := rows.RowsAffected()
 	if err != nil {
-		return kts_errors.KTS_INTERNAL_ERROR
+		return nil, kts_errors.KTS_INTERNAL_ERROR
 	}
 
 	if rowsAffected == 0 {
-		return kts_errors.KTS_NOT_FOUND
+		return nil, kts_errors.KTS_NOT_FOUND
 	}
 
-	return nil
+	return priceCategory.ID, nil
 }
 
-func (pcr *PriceCategoryRepository) UpdatePriceCategory(priceCategory *model.PriceCategories) *models.KTSError {
+func (pcr *PriceCategoryRepository) UpdatePriceCategory(priceCategory *model.PriceCategories) (*uuid.UUID, *models.KTSError) {
 	// Create the query
 	stmt := table.PriceCategories.UPDATE(
 		table.PriceCategories.AllColumns,
 	).SET(
-		table.PriceCategories.ID.SET(jet_mysql.String(priceCategory.ID.String())),
-		table.PriceCategories.CategoryName.SET(jet_mysql.String(priceCategory.CategoryName)),
-		table.PriceCategories.Price.SET(jet_mysql.Int32(priceCategory.Price)),
+		utils.MysqlUuid(priceCategory.ID),
+		priceCategory.CategoryName,
+		priceCategory.Price,
 	).WHERE(
 		table.PriceCategories.ID.EQ(utils.MysqlUuid(priceCategory.ID)),
 	)
@@ -114,19 +116,19 @@ func (pcr *PriceCategoryRepository) UpdatePriceCategory(priceCategory *model.Pri
 	// Execute the query
 	rows, err := stmt.Exec(pcr.DatabaseManager.GetDatabaseConnection())
 	if err != nil {
-		return kts_errors.KTS_INTERNAL_ERROR
+		return nil, kts_errors.KTS_INTERNAL_ERROR
 	}
 
 	rowsAffected, err := rows.RowsAffected()
 	if err != nil {
-		return kts_errors.KTS_INTERNAL_ERROR
+		return nil, kts_errors.KTS_INTERNAL_ERROR
 	}
 
 	if rowsAffected == 0 {
-		return kts_errors.KTS_NOT_FOUND
+		return nil, kts_errors.KTS_NOT_FOUND
 	}
 
-	return nil
+	return priceCategory.ID, nil
 }
 
 func (pcr *PriceCategoryRepository) DeletePriceCategory(id *uuid.UUID) *models.KTSError {
