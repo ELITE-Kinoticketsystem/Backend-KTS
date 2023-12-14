@@ -16,7 +16,7 @@ import (
 type AddressRepositoryI interface {
 	GetAddresses() (*[]model.Addresses, *models.KTSError)
 	GetAddressById(id *uuid.UUID) (*model.Addresses, *models.KTSError)
-	CreateAddress(address *model.Addresses) *models.KTSError
+	CreateAddress(address *model.Addresses) (*uuid.UUID, *models.KTSError)
 	UpdateAddress(address *model.Addresses) *models.KTSError
 	DeleteAddress(id *uuid.UUID) *models.KTSError
 }
@@ -71,11 +71,15 @@ func (ar *AddressRepository) GetAddressById(id *uuid.UUID) (*model.Addresses, *m
 	return &address, nil
 }
 
-func (ar *AddressRepository) CreateAddress(address *model.Addresses) *models.KTSError {
+func (ar *AddressRepository) CreateAddress(address *model.Addresses) (*uuid.UUID, *models.KTSError) {
+	newId := uuid.New()
+	address.ID = &newId
+
 	// Create the query
 	stmt := table.Addresses.INSERT(
 		table.Addresses.AllColumns,
 	).VALUES(
+		table.Addresses.ID.SET(utils.MysqlUuid(address.ID)),
 		table.Addresses.Street.SET(jet_mysql.String(address.Street)),
 		table.Addresses.StreetNr.SET(jet_mysql.String(address.StreetNr)),
 		table.Addresses.Zipcode.SET(jet_mysql.String(address.Zipcode)),
@@ -86,19 +90,19 @@ func (ar *AddressRepository) CreateAddress(address *model.Addresses) *models.KTS
 	// Execute the query
 	rows, err := stmt.Exec(ar.DatabaseManager.GetDatabaseConnection())
 	if err != nil {
-		return kts_errors.KTS_INTERNAL_ERROR
+		return nil, kts_errors.KTS_INTERNAL_ERROR
 	}
 
 	rowsAffected, err := rows.RowsAffected()
 	if err != nil {
-		return kts_errors.KTS_INTERNAL_ERROR
+		return nil, kts_errors.KTS_INTERNAL_ERROR
 	}
 
 	if rowsAffected == 0 {
-		return kts_errors.KTS_NOT_FOUND
+		return nil, kts_errors.KTS_NOT_FOUND
 	}
 
-	return nil
+	return address.ID, nil
 }
 
 func (ar *AddressRepository) UpdateAddress(address *model.Addresses) *models.KTSError {
@@ -106,7 +110,7 @@ func (ar *AddressRepository) UpdateAddress(address *model.Addresses) *models.KTS
 	stmt := table.Addresses.UPDATE(
 		table.Addresses.AllColumns,
 	).SET(
-		table.Addresses.ID.SET(jet_mysql.String(address.ID.String())),
+		table.Addresses.ID.SET(utils.MysqlUuid(address.ID)),
 		table.Addresses.Street.SET(jet_mysql.String(address.Street)),
 		table.Addresses.StreetNr.SET(jet_mysql.String(address.StreetNr)),
 		table.Addresses.Zipcode.SET(jet_mysql.String(address.Zipcode)),

@@ -180,43 +180,48 @@ func TestGetAddressById(t *testing.T) {
 func TestCreateAddress(t *testing.T) {
 	sampleAddress := utils.GetSampleAddress()
 
-	query := "INSERT INTO `KinoTicketSystem`.addresses (id, street, street_nr, zipcode, city, country) VALUES (street = ?, street_nr = ?, zipcode = ?, city = ?, country = ?);"
+	query := "INSERT INTO `KinoTicketSystem`.addresses (id, street, street_nr, zipcode, city, country) VALUES (id = ?, street = ?, street_nr = ?, zipcode = ?, city = ?, country = ?);"
 
 	testCases := []struct {
-		name            string
-		setExpectations func(mock sqlmock.Sqlmock, address *model.Addresses)
-		expectedError   *models.KTSError
+		name              string
+		setExpectations   func(mock sqlmock.Sqlmock, address *model.Addresses)
+		expectedAddressId bool
+		expectedError     *models.KTSError
 	}{
 		{
 			name: "Address created",
 			setExpectations: func(mock sqlmock.Sqlmock, address *model.Addresses) {
-				mock.ExpectExec(query).WithArgs(address.Street, address.StreetNr, address.Zipcode, address.City, address.Country).WillReturnResult(sqlmock.NewResult(1, 1))
+				mock.ExpectExec(query).WithArgs(sqlmock.AnyArg(), address.Street, address.StreetNr, address.Zipcode, address.City, address.Country).WillReturnResult(sqlmock.NewResult(1, 1))
 			},
-			expectedError: nil,
+			expectedAddressId: true,
+			expectedError:     nil,
 		},
 		{
 			name: "Error while creating address",
 			setExpectations: func(mock sqlmock.Sqlmock, address *model.Addresses) {
-				mock.ExpectExec(query).WithArgs(address.Street, address.StreetNr, address.Zipcode, address.City, address.Country).WillReturnError(sqlmock.ErrCancelled)
+				mock.ExpectExec(query).WithArgs(sqlmock.AnyArg(), address.Street, address.StreetNr, address.Zipcode, address.City, address.Country).WillReturnError(sqlmock.ErrCancelled)
 			},
-			expectedError: kts_errors.KTS_INTERNAL_ERROR,
+			expectedAddressId: false,
+			expectedError:     kts_errors.KTS_INTERNAL_ERROR,
 		},
 
 		{
 			name: "Error while converting rows affected",
 			setExpectations: func(mock sqlmock.Sqlmock, address *model.Addresses) {
-				mock.ExpectExec(query).WithArgs(address.Street, address.StreetNr, address.Zipcode, address.City, address.Country).WillReturnResult(
+				mock.ExpectExec(query).WithArgs(sqlmock.AnyArg(), address.Street, address.StreetNr, address.Zipcode, address.City, address.Country).WillReturnResult(
 					sqlmock.NewErrorResult(errors.New("rows affected conversion did not work")),
 				)
 			},
-			expectedError: kts_errors.KTS_INTERNAL_ERROR,
+			expectedAddressId: false,
+			expectedError:     kts_errors.KTS_INTERNAL_ERROR,
 		},
 		{
 			name: "Movie not found",
 			setExpectations: func(mock sqlmock.Sqlmock, address *model.Addresses) {
-				mock.ExpectExec(query).WithArgs(address.Street, address.StreetNr, address.Zipcode, address.City, address.Country).WillReturnResult(sqlmock.NewResult(1, 0))
+				mock.ExpectExec(query).WithArgs(sqlmock.AnyArg(), address.Street, address.StreetNr, address.Zipcode, address.City, address.Country).WillReturnResult(sqlmock.NewResult(1, 0))
 			},
-			expectedError: kts_errors.KTS_NOT_FOUND,
+			expectedAddressId: false,
+			expectedError:     kts_errors.KTS_NOT_FOUND,
 		},
 	}
 
@@ -239,13 +244,16 @@ func TestCreateAddress(t *testing.T) {
 			tc.setExpectations(mock, sampleAddress)
 
 			// Call the method under test
-			kts_err := addressRepo.CreateAddress(sampleAddress)
+			addressId, kts_err := addressRepo.CreateAddress(sampleAddress)
 
 			// Verify the results
 			assert.Equal(t, tc.expectedError, kts_err)
 
-			// Verify that all expectations were met
-			if err = mock.ExpectationsWereMet(); err != nil {
+			if tc.expectedAddressId && addressId == nil {
+				t.Error("Expected actor ID, got nil")
+			}
+
+			if err := mock.ExpectationsWereMet(); err != nil {
 				t.Errorf("There were unfulfilled expectations: %s", err)
 			}
 
@@ -266,14 +274,14 @@ func TestUpdateAddress(t *testing.T) {
 		{
 			name: "Address updated",
 			setExpectations: func(mock sqlmock.Sqlmock, address *model.Addresses) {
-				mock.ExpectExec(query).WithArgs(address.ID, address.Street, address.StreetNr, address.Zipcode, address.City, address.Country, utils.EqUUID(address.ID)).WillReturnResult(sqlmock.NewResult(1, 1))
+				mock.ExpectExec(query).WithArgs(sqlmock.AnyArg(), address.Street, address.StreetNr, address.Zipcode, address.City, address.Country, utils.EqUUID(address.ID)).WillReturnResult(sqlmock.NewResult(1, 1))
 			},
 			expectedError: nil,
 		},
 		{
 			name: "Error while updating address",
 			setExpectations: func(mock sqlmock.Sqlmock, address *model.Addresses) {
-				mock.ExpectExec(query).WithArgs(address.ID, address.Street, address.StreetNr, address.Zipcode, address.City, address.Country, utils.EqUUID(address.ID)).WillReturnError(sqlmock.ErrCancelled)
+				mock.ExpectExec(query).WithArgs(sqlmock.AnyArg(), address.Street, address.StreetNr, address.Zipcode, address.City, address.Country, utils.EqUUID(address.ID)).WillReturnError(sqlmock.ErrCancelled)
 			},
 			expectedError: kts_errors.KTS_INTERNAL_ERROR,
 		},
@@ -281,7 +289,7 @@ func TestUpdateAddress(t *testing.T) {
 		{
 			name: "Error while converting rows affected",
 			setExpectations: func(mock sqlmock.Sqlmock, address *model.Addresses) {
-				mock.ExpectExec(query).WithArgs(address.ID, address.Street, address.StreetNr, address.Zipcode, address.City, address.Country, utils.EqUUID(address.ID)).WillReturnResult(
+				mock.ExpectExec(query).WithArgs(sqlmock.AnyArg(), address.Street, address.StreetNr, address.Zipcode, address.City, address.Country, utils.EqUUID(address.ID)).WillReturnResult(
 					sqlmock.NewErrorResult(errors.New("rows affected conversion did not work")),
 				)
 			},
@@ -290,7 +298,7 @@ func TestUpdateAddress(t *testing.T) {
 		{
 			name: "Movie not found",
 			setExpectations: func(mock sqlmock.Sqlmock, address *model.Addresses) {
-				mock.ExpectExec(query).WithArgs(address.ID, address.Street, address.StreetNr, address.Zipcode, address.City, address.Country, utils.EqUUID(address.ID)).WillReturnResult(sqlmock.NewResult(1, 0))
+				mock.ExpectExec(query).WithArgs(sqlmock.AnyArg(), address.Street, address.StreetNr, address.Zipcode, address.City, address.Country, utils.EqUUID(address.ID)).WillReturnResult(sqlmock.NewResult(1, 0))
 			},
 			expectedError: kts_errors.KTS_NOT_FOUND,
 		},

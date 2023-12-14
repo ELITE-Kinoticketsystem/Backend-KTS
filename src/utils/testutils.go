@@ -568,32 +568,6 @@ func GetStringPointer(s string) *string {
 	return &s
 }
 
-func GetSampleAddresses() *[]model.Addresses {
-	id1, _ := uuid.Parse("47CF752501DF45B7A3A9D3CB25AE939F")
-	id2, _ := uuid.Parse("47CF752501DF45B7A3A9D3CB25AE939E")
-
-	address1 := model.Addresses{
-		ID:       &id1,
-		Street:   "Hauptstraße",
-		StreetNr: "1",
-		Zipcode:  "12345",
-		City:     "Berlin",
-		Country:  "Deutschland",
-	}
-	address2 := model.Addresses{
-		ID:       &id2,
-		Street:   "Hauptstraße",
-		StreetNr: "2",
-		Zipcode:  "12345",
-		City:     "Berlin",
-		Country:  "Deutschland",
-	}
-
-	addresses := []model.Addresses{address1, address2}
-
-	return &addresses
-}
-
 func GetSampleAddress() *model.Addresses {
 	id, _ := uuid.Parse("47CF752501DF45B7A3A9D3CB25AE939F")
 	return &model.Addresses{
@@ -604,4 +578,31 @@ func GetSampleAddress() *model.Addresses {
 		City:     "Berlin",
 		Country:  "Deutschland",
 	}
+}
+
+func GetSampleAddresses() *[]model.Addresses {
+	addresses := []model.Addresses{}
+
+	uuid1 := uuid.New()
+	uuid2 := uuid.New()
+
+	addresses = append(addresses, model.Addresses{
+		ID:       &uuid1,
+		Street:   "Hauptstraße",
+		StreetNr: "1",
+		Zipcode:  "12345",
+		City:     "Berlin",
+		Country:  "Deutschland",
+	})
+
+	addresses = append(addresses, model.Addresses{
+		ID:       &uuid2,
+		Street:   "Hauptstraße",
+		StreetNr: "2",
+		Zipcode:  "12345",
+		City:     "Berlin",
+		Country:  "Deutschland",
+	})
+
+	return &addresses
 }
