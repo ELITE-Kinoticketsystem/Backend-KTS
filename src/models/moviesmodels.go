@@ -41,22 +41,6 @@ type MovieWithEverything struct {
 	}
 }
 
-type MovieDTO struct {
-	model.Movies
-
-	Genres []struct {
-		model.Genres
-	}
-
-	Actors []struct {
-		model.Actors
-	}
-
-	Producers []struct {
-		model.Producers
-	}
-}
-
 type MovieDTOCreate struct {
 	model.Movies
 
