@@ -17,6 +17,7 @@ type Controllers struct {
 	MovieController controllers.MovieControllerI
 	GenreController controllers.GenreControllerI
 	ActorController controllers.ActorControllerI
+	PriceCategories controllers.PriceCategoryControllerI
 }
 
 func createRouter(dbConnection *sql.DB) *gin.Engine {
@@ -62,6 +63,10 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 		DatabaseManager: databaseManager,
 	}
 
+	priceCategoryRepo := &repositories.PriceCategoryRepository{
+		DatabaseManager: databaseManager,
+	}
+
 	// Create controllers
 	controller := Controllers{
 		UserController: &controllers.UserController{
@@ -78,6 +83,9 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 		},
 		ActorController: &controllers.ActorController{
 			ActorRepo: actorRepo,
+		},
+		PriceCategories: &controllers.PriceCategoryController{
+			PriceCategoryRepository: priceCategoryRepo,
 		},
 	}
 
@@ -111,6 +119,13 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 	router.Handle(http.MethodGet, "/actors/:id", handlers.GetActorByIdHandler(controller.ActorController))
 	router.Handle(http.MethodGet, "/actors/", handlers.GetActorsHandler(controller.ActorController))
 	router.Handle(http.MethodPost, "/actors/", handlers.CreateActorHandler(controller.ActorController))
+
+	// Price Categories
+	router.Handle(http.MethodGet, "/price-categories/:id", handlers.GetPriceCategoryByIdHandler(controller.PriceCategories))
+	router.Handle(http.MethodGet, "/price-categories/", handlers.GetPriceCategoriesHandler(controller.PriceCategories))
+	router.Handle(http.MethodPost, "/price-categories/", handlers.CreatePriceCategoryHandler(controller.PriceCategories))
+	router.Handle(http.MethodPut, "/price-categories/:id", handlers.UpdatePriceCategoryHandler(controller.PriceCategories))
+	router.Handle(http.MethodDelete, "/price-categories/:id", handlers.DeletePriceCategoryHandler(controller.PriceCategories))
 
 	return router
 }
