@@ -138,7 +138,7 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 
 	// event seats
 	router.Handle(http.MethodGet, "/events/:id/seats", handlers.GetEventSeatsHandler(controller.EventSeatController))
-	router.Handle(http.MethodPatch, "/events/:eventId/seats/:seatId", handlers.BlockEventSeatHandler(controller.EventSeatController))
+	router.Handle(http.MethodPatch, "/events/:eventId/seats/:seatId/block", handlers.BlockEventSeatHandler(controller.EventSeatController))
 
 	return router
 }

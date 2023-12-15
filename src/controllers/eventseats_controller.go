@@ -4,6 +4,7 @@ import (
 	"slices"
 	"time"
 
+	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/repositories"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
@@ -13,6 +14,7 @@ import (
 type EventSeatControllerI interface {
 	GetEventSeats(eventId *uuid.UUID, userId *uuid.UUID) (*[][]models.GetSeatsForSeatSelectorDTO, *[]models.GetSeatsForSeatSelectorDTO, *time.Time, *models.KTSError)
 	BlockEventSeat(eventId *uuid.UUID, eventSeatId *uuid.UUID, userId *uuid.UUID) (*time.Time, *models.KTSError)
+	AreUserSeatsNextToEachOther(eventId *uuid.UUID, userId *uuid.UUID, eventSeatId *uuid.UUID) (bool, *models.KTSError)
 }
 
 type EventSeatController struct {
@@ -57,6 +59,12 @@ func (esc *EventSeatController) BlockEventSeat(eventId *uuid.UUID, eventSeatId *
 	currentTime := time.Now()
 	blockedUntil := currentTime.Add(utils.BLOCKED_TICKET_TIME)
 
+	if areUserSeatsNextToEachOther, err := esc.AreUserSeatsNextToEachOther(eventId, userId, eventSeatId); err != nil {
+		return nil, err
+	} else if !areUserSeatsNextToEachOther {
+		return nil, kts_errors.KTS_CONFLICT
+	}
+
 	err := esc.EventSeatRepo.BlockEventSeatIfAvailable(eventId, eventSeatId, userId, &blockedUntil)
 
 	if err != nil {
@@ -70,6 +78,58 @@ func (esc *EventSeatController) BlockEventSeat(eventId *uuid.UUID, eventSeatId *
 	}
 
 	return &blockedUntil, nil
+}
+
+func (esc *EventSeatController) AreUserSeatsNextToEachOther(eventId *uuid.UUID, userId *uuid.UUID, eventSeatId *uuid.UUID) (bool, *models.KTSError) {
+	seats, err := esc.EventSeatRepo.GetEventSeats(eventId)
+
+	if err != nil {
+		return false, err
+	}
+
+	var rowNr int32 = -1
+	var columnNrs []int32
+	var emtpySeatArray []models.GetEventSeatsDTO
+
+	for _, seat := range *seats {
+		if (seat.EventSeat.UserID == userId && !seat.EventSeat.Booked) || seat.EventSeat.ID == eventSeatId {
+			if rowNr == -1 {
+				rowNr = seat.Seat.RowNr
+			} else if rowNr != seat.Seat.RowNr {
+				return false, nil
+			}
+
+			columnNrs = append(columnNrs, seat.Seat.ColumnNr)
+
+			if seat.Seat.Type == string(utils.EMPTY) || seat.Seat.Type == string(utils.EMPTY_DOUBLE) {
+				emtpySeatArray = append(emtpySeatArray, seat)
+			}
+		}
+	}
+
+	if len(columnNrs) == 0 {
+		return false, kts_errors.KTS_NOT_FOUND
+	}
+
+	if rowNr == -1 {
+		return false, kts_errors.KTS_NOT_FOUND
+	}
+
+	slices.Sort[[]int32](columnNrs)
+
+	for i := columnNrs[0] + 1; i < columnNrs[len(columnNrs)-1]; i++ {
+		if slices.Contains(columnNrs, i) {
+			continue
+		}
+		for _, seat := range emtpySeatArray {
+			if seat.Seat.ColumnNr == i && seat.Seat.RowNr == rowNr {
+				continue
+			}
+		}
+		return false, kts_errors.KTS_CONFLICT
+	}
+
+	return true, nil
 }
 
 func seatMapToSlice(seatMap map[int32][]models.GetSeatsForSeatSelectorDTO) *[][]models.GetSeatsForSeatSelectorDTO {

@@ -65,3 +65,4 @@ func BlockEventSeatHandler(eventSeatController controllers.EventSeatControllerI)
 		})
 	}
 }
+

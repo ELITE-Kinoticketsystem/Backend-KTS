@@ -163,6 +163,7 @@ func TestEventSeatController_GetEventSeats(t *testing.T) {
 			name: "Get event seats - error",
 			expectFuncs: func(mockEventSeatRepo *mocks.MockEventSeatRepoI, t *testing.T) {
 				mockEventSeatRepo.EXPECT().GetEventSeats(eventId).Return(nil, kts_errors.KTS_INTERNAL_ERROR)
+
 			},
 			expectedError:            kts_errors.KTS_INTERNAL_ERROR,
 			expectedSeatRows:         nil,
@@ -268,5 +269,127 @@ func TestEventSeatController_BlockEventSeat(t *testing.T) {
 				t.Errorf("Expected nil but got blocked until time")
 			}
 		})
+	}
+}
+func TestEventSeatController_AreUserSeatsNextToEachOther(t *testing.T) {
+	eventId := utils.NewUUID()
+	userId := utils.NewUUID()
+	eventSeatId := utils.NewUUID()
+
+	eventSeats := []models.GetEventSeatsDTO{
+		{
+			EventSeat: model.EventSeats{
+				ID:           utils.NewUUID(),
+				Booked:       false,
+				BlockedUntil: nil,
+				UserID:       nil,
+				EventID:      eventId,
+				SeatID:       utils.NewUUID(),
+			},
+			Seat: model.Seats{
+				ID:             utils.NewUUID(),
+				RowNr:          1,
+				ColumnNr:       1,
+				SeatCategoryID: utils.NewUUID(),
+			},
+			SeatCategory: model.SeatCategories{
+				ID:           utils.NewUUID(),
+				CategoryName: "standard",
+			},
+			EventSeatCategory: model.EventSeatCategories{
+				Price:          100,
+				EventID:        eventId,
+				SeatCategoryID: utils.NewUUID(),
+			},
+		},
+		{
+			EventSeat: model.EventSeats{
+				ID:           utils.NewUUID(),
+				Booked:       false,
+				BlockedUntil: nil,
+				UserID:       nil,
+				EventID:      eventId,
+				SeatID:       utils.NewUUID(),
+			},
+			Seat: model.Seats{
+				ID:             utils.NewUUID(),
+				RowNr:          1,
+				ColumnNr:       2,
+				SeatCategoryID: utils.NewUUID(),
+			},
+			SeatCategory: model.SeatCategories{
+				ID:           utils.NewUUID(),
+				CategoryName: "standard",
+			},
+			EventSeatCategory: model.EventSeatCategories{
+				Price:          100,
+				EventID:        eventId,
+				SeatCategoryID: utils.NewUUID(),
+			},
+		},
+		{
+			EventSeat: model.EventSeats{
+				ID:           utils.NewUUID(),
+				Booked:       false,
+				BlockedUntil: nil,
+				UserID:       userId,
+				EventID:      eventId,
+				SeatID:       utils.NewUUID(),
+			},
+			Seat: model.Seats{
+				ID:             utils.NewUUID(),
+				RowNr:          2,
+				ColumnNr:       1,
+				SeatCategoryID: utils.NewUUID(),
+			},
+			SeatCategory: model.SeatCategories{
+				ID:           utils.NewUUID(),
+				CategoryName: "standard",
+			},
+			EventSeatCategory: model.EventSeatCategories{
+				Price:          100,
+				EventID:        eventId,
+				SeatCategoryID: utils.NewUUID(),
+			},
+		},
+	}
+
+	mockCtrl := gomock.NewController(t)
+	defer mockCtrl.Finish()
+
+	mockEventSeatRepo := mocks.NewMockEventSeatRepoI(mockCtrl)
+
+	eventSeatController := EventSeatController{
+		EventSeatRepo: mockEventSeatRepo,
+	}
+
+	mockEventSeatRepo.EXPECT().GetEventSeats(eventId).Return(&eventSeats, nil)
+
+	// Test when seats are next to each other
+	areNextToEachOther, err := eventSeatController.AreUserSeatsNextToEachOther(eventId, userId, eventSeatId)
+	if err != nil {
+		t.Errorf("Unexpected error: %v", err)
+	}
+	if !areNextToEachOther {
+		t.Errorf("Expected seats to be next to each other, but they are not")
+	}
+
+	// Test when seats are not next to each other
+	areNextToEachOther, err = eventSeatController.AreUserSeatsNextToEachOther(eventId, userId, utils.NewUUID())
+	if err != nil {
+		t.Errorf("Unexpected error: %v", err)
+	}
+	if areNextToEachOther {
+		t.Errorf("Expected seats to not be next to each other, but they are")
+	}
+
+	// Test when seats are not found
+	mockEventSeatRepo.EXPECT().GetEventSeats(eventId).Return(nil, kts_errors.KTS_NOT_FOUND)
+	areNextToEachOther, err = eventSeatController.AreUserSeatsNextToEachOther(eventId, userId, eventSeatId)
+	if err != kts_errors.KTS_NOT_FOUND {
+		t.Errorf("Expected error: %v, but got: %v", kts_errors.KTS_NOT_FOUND, err)
+	}
+	if areNextToEachOther {
+		t.Errorf("Expected seats to not be next to each other, but they are")
 	}
 }
