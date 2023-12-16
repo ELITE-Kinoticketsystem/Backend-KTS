@@ -100,10 +100,9 @@ func (esc *EventSeatController) AreUserSeatsNextToEachOther(eventId *uuid.UUID, 
 			}
 
 			columnNrs = append(columnNrs, seat.Seat.ColumnNr)
-
-			if seat.Seat.Type == string(utils.EMPTY) || seat.Seat.Type == string(utils.EMPTY_DOUBLE) {
-				emtpySeatArray = append(emtpySeatArray, seat)
-			}
+		}
+		if seat.Seat.Type == string(utils.EMPTY) || seat.Seat.Type == string(utils.EMPTY_DOUBLE) {
+			emtpySeatArray = append(emtpySeatArray, seat)
 		}
 	}
 
@@ -121,12 +120,16 @@ func (esc *EventSeatController) AreUserSeatsNextToEachOther(eventId *uuid.UUID, 
 		if slices.Contains(columnNrs, i) {
 			continue
 		}
+		found := false
 		for _, seat := range emtpySeatArray {
 			if seat.Seat.ColumnNr == i && seat.Seat.RowNr == rowNr {
-				continue
+				found = true
+				break
 			}
 		}
-		return false, kts_errors.KTS_CONFLICT
+		if !found {
+			return false, nil
+		}
 	}
 
 	return true, nil

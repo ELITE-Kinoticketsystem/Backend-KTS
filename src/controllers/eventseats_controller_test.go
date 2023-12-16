@@ -10,6 +10,7 @@ import (
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/mocks"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
+	"github.com/google/uuid"
 	"go.uber.org/mock/gomock"
 )
 
@@ -227,6 +228,9 @@ func TestEventSeatController_BlockEventSeat(t *testing.T) {
 			expectFuncs: func(mockEventSeatRepo *mocks.MockEventSeatRepoI, t *testing.T) {
 				mockEventSeatRepo.EXPECT().BlockEventSeatIfAvailable(eventId, eventSeatId, userId, gomock.Any()).Return(nil)
 				mockEventSeatRepo.EXPECT().UpdateBlockedUntilTimeForUserEventSeats(eventId, userId, gomock.Any()).Return(nil)
+				eventSeats := GetEventSeatsDTO(eventId, userId, eventSeatId)
+
+				mockEventSeatRepo.EXPECT().GetEventSeats(eventId).Return(&eventSeats, nil)
 			},
 			expectedError: nil,
 			expectTime:    true,
@@ -235,8 +239,23 @@ func TestEventSeatController_BlockEventSeat(t *testing.T) {
 			name: "Block event seat - error",
 			expectFuncs: func(mockEventSeatRepo *mocks.MockEventSeatRepoI, t *testing.T) {
 				mockEventSeatRepo.EXPECT().BlockEventSeatIfAvailable(eventId, eventSeatId, userId, gomock.Any()).Return(kts_errors.KTS_INTERNAL_ERROR)
+				eventSeats := GetEventSeatsDTO(eventId, userId, eventSeatId)
+
+				mockEventSeatRepo.EXPECT().GetEventSeats(eventId).Return(&eventSeats, nil)
 			},
 			expectedError: kts_errors.KTS_INTERNAL_ERROR,
+			expectTime:    false,
+		},
+		{
+			name: "Block event seat seats are not next to each other",
+			expectFuncs: func(mockEventSeatRepo *mocks.MockEventSeatRepoI, t *testing.T) {
+				eventSeats := GetEventSeatsDTO(eventId, userId, eventSeatId)
+
+				eventSeats[2].Seat.RowNr = 99
+
+				mockEventSeatRepo.EXPECT().GetEventSeats(eventId).Return(&eventSeats, nil)
+			},
+			expectedError: kts_errors.KTS_CONFLICT,
 			expectTime:    false,
 		},
 	}
@@ -272,11 +291,99 @@ func TestEventSeatController_BlockEventSeat(t *testing.T) {
 	}
 }
 func TestEventSeatController_AreUserSeatsNextToEachOther(t *testing.T) {
+
+	eventSeatId := utils.NewUUID()
 	eventId := utils.NewUUID()
 	userId := utils.NewUUID()
-	eventSeatId := utils.NewUUID()
 
-	eventSeats := []models.GetEventSeatsDTO{
+	test := []struct {
+		name           string
+		expectFuncs    func(mockEventSeatRepo *mocks.MockEventSeatRepoI, t *testing.T)
+		expectedError  *models.KTSError
+		expectedResult bool
+	}{
+		{
+			name: "Are user seats next to each other",
+			expectFuncs: func(mockEventSeatRepo *mocks.MockEventSeatRepoI, t *testing.T) {
+				eventSeats := GetEventSeatsDTO(eventId, userId, eventSeatId)
+
+				mockEventSeatRepo.EXPECT().GetEventSeats(eventId).Return(&eventSeats, nil)
+			},
+			expectedError:  nil,
+			expectedResult: true,
+		},
+		{
+			name: "Are user seats next to each other - error",
+			expectFuncs: func(mockEventSeatRepo *mocks.MockEventSeatRepoI, t *testing.T) {
+				mockEventSeatRepo.EXPECT().GetEventSeats(eventId).Return(nil, kts_errors.KTS_INTERNAL_ERROR)
+			},
+			expectedError:  kts_errors.KTS_INTERNAL_ERROR,
+			expectedResult: false,
+		},
+		{
+			name: "Are user seats next to each other wrong row nr - false",
+			expectFuncs: func(mockEventSeatRepo *mocks.MockEventSeatRepoI, t *testing.T) {
+				eventSeats := GetEventSeatsDTO(eventId, userId, eventSeatId)
+				eventSeats[2].Seat.RowNr = 99
+				mockEventSeatRepo.EXPECT().GetEventSeats(eventId).Return(&eventSeats, nil)
+			},
+			expectedError:  nil,
+			expectedResult: false,
+		},
+		{
+			name: "Are user seats next to each other wrong column nr - false",
+			expectFuncs: func(mockEventSeatRepo *mocks.MockEventSeatRepoI, t *testing.T) {
+				eventSeats := GetEventSeatsDTO(eventId, userId, eventSeatId)
+				eventSeats[2].Seat.ColumnNr = 99
+				mockEventSeatRepo.EXPECT().GetEventSeats(eventId).Return(&eventSeats, nil)
+			},
+			expectedError:  nil,
+			expectedResult: false,
+		},
+		{
+			name: "Are user seats next to each other empty seat in between",
+			expectFuncs: func(mockEventSeatRepo *mocks.MockEventSeatRepoI, t *testing.T) {
+				eventSeats := GetEventSeatsDTO(eventId, userId, eventSeatId)
+				eventSeats[3].Seat.Type = string(utils.EMPTY)
+				eventSeats[3].EventSeat.UserID = nil
+				mockEventSeatRepo.EXPECT().GetEventSeats(eventId).Return(&eventSeats, nil)
+			},
+			expectedError:  nil,
+			expectedResult: true,
+		},
+	}
+
+	for _, tt := range test {
+		t.Run(tt.name, func(t *testing.T) {
+			// Given
+
+			mockCtrl := gomock.NewController(t)
+			defer mockCtrl.Finish()
+
+			mockEventSeatRepo := mocks.NewMockEventSeatRepoI(mockCtrl)
+
+			eventSeatController := EventSeatController{
+				EventSeatRepo: mockEventSeatRepo,
+			}
+
+			tt.expectFuncs(mockEventSeatRepo, t)
+
+			// Test when seats are next to each other
+			areNextToEachOther, err := eventSeatController.AreUserSeatsNextToEachOther(eventId, userId, eventSeatId)
+
+			if err != tt.expectedError {
+				t.Errorf("Unexpected error: %v", err)
+			}
+
+			if areNextToEachOther != tt.expectedResult {
+				t.Errorf("Expected result: %v, but got: %v", tt.expectedResult, areNextToEachOther)
+			}
+		})
+	}
+}
+
+func GetEventSeatsDTO(eventId *uuid.UUID, userId *uuid.UUID, eventSeatId *uuid.UUID) []models.GetEventSeatsDTO {
+	return []models.GetEventSeatsDTO{
 		{
 			EventSeat: model.EventSeats{
 				ID:           utils.NewUUID(),
@@ -352,44 +459,55 @@ func TestEventSeatController_AreUserSeatsNextToEachOther(t *testing.T) {
 				SeatCategoryID: utils.NewUUID(),
 			},
 		},
-	}
-
-	mockCtrl := gomock.NewController(t)
-	defer mockCtrl.Finish()
-
-	mockEventSeatRepo := mocks.NewMockEventSeatRepoI(mockCtrl)
-
-	eventSeatController := EventSeatController{
-		EventSeatRepo: mockEventSeatRepo,
-	}
-
-	mockEventSeatRepo.EXPECT().GetEventSeats(eventId).Return(&eventSeats, nil)
-
-	// Test when seats are next to each other
-	areNextToEachOther, err := eventSeatController.AreUserSeatsNextToEachOther(eventId, userId, eventSeatId)
-	if err != nil {
-		t.Errorf("Unexpected error: %v", err)
-	}
-	if !areNextToEachOther {
-		t.Errorf("Expected seats to be next to each other, but they are not")
-	}
-
-	// Test when seats are not next to each other
-	areNextToEachOther, err = eventSeatController.AreUserSeatsNextToEachOther(eventId, userId, utils.NewUUID())
-	if err != nil {
-		t.Errorf("Unexpected error: %v", err)
-	}
-	if areNextToEachOther {
-		t.Errorf("Expected seats to not be next to each other, but they are")
-	}
-
-	// Test when seats are not found
-	mockEventSeatRepo.EXPECT().GetEventSeats(eventId).Return(nil, kts_errors.KTS_NOT_FOUND)
-	areNextToEachOther, err = eventSeatController.AreUserSeatsNextToEachOther(eventId, userId, eventSeatId)
-	if err != kts_errors.KTS_NOT_FOUND {
-		t.Errorf("Expected error: %v, but got: %v", kts_errors.KTS_NOT_FOUND, err)
-	}
-	if areNextToEachOther {
-		t.Errorf("Expected seats to not be next to each other, but they are")
+		{
+			EventSeat: model.EventSeats{
+				ID:           utils.NewUUID(),
+				Booked:       false,
+				BlockedUntil: nil,
+				UserID:       userId,
+				EventID:      eventId,
+				SeatID:       utils.NewUUID(),
+			},
+			Seat: model.Seats{
+				ID:             utils.NewUUID(),
+				RowNr:          2,
+				ColumnNr:       2,
+				SeatCategoryID: utils.NewUUID(),
+			},
+			SeatCategory: model.SeatCategories{
+				ID:           utils.NewUUID(),
+				CategoryName: "standard",
+			},
+			EventSeatCategory: model.EventSeatCategories{
+				Price:          100,
+				EventID:        eventId,
+				SeatCategoryID: utils.NewUUID(),
+			},
+		},
+		{
+			EventSeat: model.EventSeats{
+				ID:           utils.NewUUID(),
+				Booked:       false,
+				BlockedUntil: nil,
+				UserID:       userId,
+				EventID:      eventId,
+				SeatID:       utils.NewUUID(),
+			},
+			Seat: model.Seats{
+				ID:             utils.NewUUID(),
+				RowNr:          2,
+				ColumnNr:       3,
+				SeatCategoryID: utils.NewUUID(),
+			},
+			SeatCategory: model.SeatCategories{
+				ID:           utils.NewUUID(),
+				CategoryName: "standard",
+			},
+			EventSeatCategory: model.EventSeatCategories{
+				Price:          100,
+				EventID:        eventId,
+				SeatCategoryID: utils.NewUUID(),
+			},
+		},
 	}
 }
