@@ -25,7 +25,7 @@ jobs:
       run: go install honnef.co/go/tools/cmd/staticcheck@latest
 
     - name: Build project and verify dependencies
-      run: go build -v ./src && go mod verify
+      run: go build -v ./... && go mod verify
 
     - name: Test
       run: go test -v ./...
