@@ -46,8 +46,11 @@ func (esc *EventSeatController) GetEventSeats(eventId *uuid.UUID, userId *uuid.U
 		}
 
 		if seat.EventSeat.UserID == userId && !seat.EventSeat.Booked {
-			blockedUntil = seat.EventSeat.BlockedUntil
 			currentUserSeats = append(currentUserSeats, currentSeat)
+		}
+
+		if len(currentUserSeats) > 0 {
+			blockedUntil = seat.EventSeat.BlockedUntil
 		}
 
 		seatRow := seatRows[currentSeat.RowNr]
