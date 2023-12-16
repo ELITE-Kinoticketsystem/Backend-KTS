@@ -18,6 +18,7 @@ type EventSeatRepoI interface {
 	BlockEventSeatIfAvailable(eventId *uuid.UUID, seatId *uuid.UUID, userId *uuid.UUID, blockedUntil *time.Time) *models.KTSError
 	UnblockEventSeat(eventId *uuid.UUID, seatId *uuid.UUID, userId *uuid.UUID) *models.KTSError
 	UpdateBlockedUntilTimeForUserEventSeats(eventId *uuid.UUID, userId *uuid.UUID, blockedUntil *time.Time) *models.KTSError
+	GetSelectedSeats(eventId *uuid.UUID, userId *uuid.UUID) (*[]models.GetEventSeatsDTO, *models.KTSError)
 }
 
 type EventSeatRepository struct {
@@ -102,7 +103,6 @@ func (esr *EventSeatRepository) UpdateBlockedUntilTimeForUserEventSeats(eventId 
 	return nil
 }
 
-
 func (esr *EventSeatRepository) UnblockEventSeat(eventId *uuid.UUID, seatId *uuid.UUID, userId *uuid.UUID) *models.KTSError {
 	stmt := table.EventSeats.UPDATE(table.EventSeats.BlockedUntil, table.EventSeats.UserID).
 		SET(nil, nil).
@@ -126,4 +126,32 @@ func (esr *EventSeatRepository) UnblockEventSeat(eventId *uuid.UUID, seatId *uui
 	}
 
 	return nil
+}
+
+func (esr *EventSeatRepository) GetSelectedSeats(eventId *uuid.UUID, userId *uuid.UUID) (*[]models.GetEventSeatsDTO, *models.KTSError) {
+	selectedSeats := []models.GetEventSeatsDTO{}
+
+	stmt := mysql.SELECT(
+		table.EventSeats.AllColumns,
+		table.Seats.AllColumns,
+		table.SeatCategories.AllColumns,
+		table.EventSeatCategories.AllColumns,
+	).FROM(table.EventSeats.
+		LEFT_JOIN(table.Seats, table.EventSeats.SeatID.EQ(table.Seats.ID)).
+		LEFT_JOIN(table.SeatCategories, table.Seats.SeatCategoryID.EQ(table.SeatCategories.ID)).
+		LEFT_JOIN(table.EventSeatCategories, table.EventSeatCategories.EventID.EQ(table.EventSeats.EventID).AND(table.EventSeatCategories.SeatCategoryID.EQ(table.Seats.SeatCategoryID)))).
+		WHERE(table.EventSeats.EventID.EQ(utils.MysqlUuid(eventId)).AND(table.EventSeats.Booked.IS_FALSE()).AND(table.EventSeats.BlockedUntil.GT(mysql.CURRENT_TIMESTAMP()).AND(table.EventSeats.UserID.EQ(utils.MysqlUuid(userId))))).
+		ORDER_BY(table.Seats.ColumnNr.ASC(), table.Seats.RowNr.ASC())
+
+	err := stmt.Query(esr.DatabaseManager.GetDatabaseConnection(), &selectedSeats)
+
+	if err != nil {
+		return nil, kts_errors.KTS_INTERNAL_ERROR
+	}
+
+	if len(selectedSeats) == 0 {
+		return nil, kts_errors.KTS_NOT_FOUND
+	}
+
+	return &selectedSeats, nil
 }

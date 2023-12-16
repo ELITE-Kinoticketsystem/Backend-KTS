@@ -69,6 +69,21 @@ func (mr *MockEventSeatRepoIMockRecorder) GetEventSeats(eventId any) *gomock.Cal
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetEventSeats", reflect.TypeOf((*MockEventSeatRepoI)(nil).GetEventSeats), eventId)
 }
 
+// GetSelectedSeats mocks base method.
+func (m *MockEventSeatRepoI) GetSelectedSeats(eventId, userId *uuid.UUID) (*[]models.GetEventSeatsDTO, *models.KTSError) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetSelectedSeats", eventId, userId)
+	ret0, _ := ret[0].(*[]models.GetEventSeatsDTO)
+	ret1, _ := ret[1].(*models.KTSError)
+	return ret0, ret1
+}
+
+// GetSelectedSeats indicates an expected call of GetSelectedSeats.
+func (mr *MockEventSeatRepoIMockRecorder) GetSelectedSeats(eventId, userId any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSelectedSeats", reflect.TypeOf((*MockEventSeatRepoI)(nil).GetSelectedSeats), eventId, userId)
+}
+
 // UnblockEventSeat mocks base method.
 func (m *MockEventSeatRepoI) UnblockEventSeat(eventId, seatId, userId *uuid.UUID) *models.KTSError {
 	m.ctrl.T.Helper()
