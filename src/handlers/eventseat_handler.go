@@ -66,3 +66,32 @@ func BlockEventSeatHandler(eventSeatController controllers.EventSeatControllerI)
 	}
 }
 
+func UnblockEventSeatHandler(eventSeatController controllers.EventSeatControllerI) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		eventId, err := uuid.Parse(c.Param("eventId"))
+
+		if err != nil {
+			utils.HandleErrorAndAbort(c, kts_errors.KTS_BAD_REQUEST)
+			return
+		}
+
+		eventSeatId, err := uuid.Parse(c.Param("seatId"))
+
+		if err != nil {
+			utils.HandleErrorAndAbort(c, kts_errors.KTS_BAD_REQUEST)
+			return
+		}
+
+		userId := c.Request.Context().Value(models.ContextKeyUserID).(*uuid.UUID)
+
+		blockedUntil, kts_err := eventSeatController.UnblockEventSeat(&eventId, &eventSeatId, userId)
+		if kts_err != nil {
+			utils.HandleErrorAndAbort(c, kts_err)
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{
+			"blockedUntil": blockedUntil,
+		})
+	}
+}

@@ -40,6 +40,21 @@ func (m *MockEventSeatControllerI) EXPECT() *MockEventSeatControllerIMockRecorde
 	return m.recorder
 }
 
+// AreUserSeatsNextToEachOther mocks base method.
+func (m *MockEventSeatControllerI) AreUserSeatsNextToEachOther(eventId, userId, eventSeatId *uuid.UUID) (bool, *models.KTSError) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "AreUserSeatsNextToEachOther", eventId, userId, eventSeatId)
+	ret0, _ := ret[0].(bool)
+	ret1, _ := ret[1].(*models.KTSError)
+	return ret0, ret1
+}
+
+// AreUserSeatsNextToEachOther indicates an expected call of AreUserSeatsNextToEachOther.
+func (mr *MockEventSeatControllerIMockRecorder) AreUserSeatsNextToEachOther(eventId, userId, eventSeatId any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AreUserSeatsNextToEachOther", reflect.TypeOf((*MockEventSeatControllerI)(nil).AreUserSeatsNextToEachOther), eventId, userId, eventSeatId)
+}
+
 // BlockEventSeat mocks base method.
 func (m *MockEventSeatControllerI) BlockEventSeat(eventId, eventSeatId, userId *uuid.UUID) (*time.Time, *models.KTSError) {
 	m.ctrl.T.Helper()
@@ -70,4 +85,19 @@ func (m *MockEventSeatControllerI) GetEventSeats(eventId, userId *uuid.UUID) (*[
 func (mr *MockEventSeatControllerIMockRecorder) GetEventSeats(eventId, userId any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetEventSeats", reflect.TypeOf((*MockEventSeatControllerI)(nil).GetEventSeats), eventId, userId)
+}
+
+// UnblockEventSeat mocks base method.
+func (m *MockEventSeatControllerI) UnblockEventSeat(eventId, eventSeatId, userId *uuid.UUID) (*time.Time, *models.KTSError) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UnblockEventSeat", eventId, eventSeatId, userId)
+	ret0, _ := ret[0].(*time.Time)
+	ret1, _ := ret[1].(*models.KTSError)
+	return ret0, ret1
+}
+
+// UnblockEventSeat indicates an expected call of UnblockEventSeat.
+func (mr *MockEventSeatControllerIMockRecorder) UnblockEventSeat(eventId, eventSeatId, userId any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UnblockEventSeat", reflect.TypeOf((*MockEventSeatControllerI)(nil).UnblockEventSeat), eventId, eventSeatId, userId)
 }

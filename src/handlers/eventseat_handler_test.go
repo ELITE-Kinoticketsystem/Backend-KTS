@@ -112,6 +112,7 @@ func TestGetEventSeatsHandler(t *testing.T) {
 		})
 	}
 }
+
 func TestBlockEventSeatHandler(t *testing.T) {
 
 	resTime := time.Now()
@@ -192,6 +193,79 @@ func TestBlockEventSeatHandler(t *testing.T) {
 
 			// WHEN
 			handlers.BlockEventSeatHandler(eventSeatController)(c)
+
+			// THEN
+			assert.Equal(t, tc.expectedStatus, w.Code, "wrong HTTP status code")
+			assert.Regexp(t, tc.expectedBody, w.Body.String(), "wrong HTTP response body")
+		})
+	}
+}
+func TestUnblockEventSeatHandler(t *testing.T) {
+	resTime := time.Now()
+
+	testCases := []struct {
+		name            string
+		paramEventId    *uuid.UUID
+		paramSeatId     *uuid.UUID
+		setExpectations func(mockController *mocks.MockEventSeatControllerI, eventId *uuid.UUID, eventSeatId *uuid.UUID, userId *uuid.UUID)
+		expectedStatus  int
+		expectedBody    string
+	}{
+		{
+			name:         "Success",
+			paramEventId: utils.NewUUID(),
+			paramSeatId:  utils.NewUUID(),
+			setExpectations: func(mockController *mocks.MockEventSeatControllerI, eventId *uuid.UUID, eventSeatId *uuid.UUID, userId *uuid.UUID) {
+				mockController.EXPECT().UnblockEventSeat(gomock.Any(), gomock.Any(), gomock.Any()).Return(&resTime, nil)
+			},
+			expectedStatus: http.StatusOK,
+			expectedBody:   `{"blockedUntil":.*"}`,
+		},
+		{
+			name:         "Internal error",
+			paramEventId: utils.NewUUID(),
+			paramSeatId:  utils.NewUUID(),
+			setExpectations: func(mockController *mocks.MockEventSeatControllerI, eventId *uuid.UUID, eventSeatId *uuid.UUID, userId *uuid.UUID) {
+				mockController.EXPECT().UnblockEventSeat(gomock.Any(), gomock.Any(), gomock.Any()).Return(nil, kts_errors.KTS_INTERNAL_ERROR)
+			},
+			expectedStatus: http.StatusInternalServerError,
+			expectedBody:   `{"errorMessage":"INTERNAL_ERROR"}`,
+		},
+		{
+			name:         "Event seat not found",
+			paramEventId: utils.NewUUID(),
+			paramSeatId:  utils.NewUUID(),
+			setExpectations: func(mockController *mocks.MockEventSeatControllerI, eventId *uuid.UUID, eventSeatId *uuid.UUID, userId *uuid.UUID) {
+				mockController.EXPECT().UnblockEventSeat(gomock.Any(), gomock.Any(), gomock.Any()).Return(nil, kts_errors.KTS_NOT_FOUND)
+			},
+			expectedStatus: http.StatusNotFound,
+			expectedBody:   `{"errorMessage":"NOT_FOUND"}`,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			// GIVEN
+			w := httptest.NewRecorder()
+			req, _ := http.NewRequest("GET", "/events/"+tc.paramEventId.String()+"/seats/"+tc.paramSeatId.String(), nil)
+			gin.SetMode(gin.TestMode)
+			c, _ := gin.CreateTestContext(w)
+			c.Request = req
+			c.Params = []gin.Param{{Key: "eventId", Value: tc.paramEventId.String()}, {Key: "seatId", Value: tc.paramSeatId.String()}}
+
+			userId := utils.NewUUID()
+
+			ctx := context.WithValue(c.Request.Context(), models.ContextKeyUserID, userId)
+			c.Request = c.Request.WithContext(ctx)
+
+			mockCtrl := gomock.NewController(t)
+			defer mockCtrl.Finish()
+			eventSeatController := mocks.NewMockEventSeatControllerI(mockCtrl)
+
+			tc.setExpectations(eventSeatController, tc.paramEventId, tc.paramSeatId, userId)
+
+			// WHEN
+			handlers.UnblockEventSeatHandler(eventSeatController)(c)
 
 			// THEN
 			assert.Equal(t, tc.expectedStatus, w.Code, "wrong HTTP status code")

@@ -16,6 +16,7 @@ import (
 type EventSeatRepoI interface {
 	GetEventSeats(eventId *uuid.UUID) (*[]models.GetEventSeatsDTO, *models.KTSError)
 	BlockEventSeatIfAvailable(eventId *uuid.UUID, seatId *uuid.UUID, userId *uuid.UUID, blockedUntil *time.Time) *models.KTSError
+	UnblockEventSeat(eventId *uuid.UUID, seatId *uuid.UUID, userId *uuid.UUID) *models.KTSError
 	UpdateBlockedUntilTimeForUserEventSeats(eventId *uuid.UUID, userId *uuid.UUID, blockedUntil *time.Time) *models.KTSError
 }
 
@@ -81,6 +82,32 @@ func (esr *EventSeatRepository) UpdateBlockedUntilTimeForUserEventSeats(eventId 
 	stmt := table.EventSeats.UPDATE(table.EventSeats.BlockedUntil).
 		SET(blockedUntil).
 		WHERE(table.EventSeats.EventID.EQ(utils.MysqlUuid(eventId)).AND(table.EventSeats.UserID.EQ(utils.MysqlUuid(userId))))
+
+	result, err := stmt.Exec(esr.DatabaseManager.GetDatabaseConnection())
+
+	if err != nil {
+		return kts_errors.KTS_INTERNAL_ERROR
+	}
+
+	rowsAffected, err := result.RowsAffected()
+
+	if err != nil {
+		return kts_errors.KTS_INTERNAL_ERROR
+	}
+
+	if rowsAffected == 0 {
+		return kts_errors.KTS_NOT_FOUND
+	}
+
+	return nil
+}
+
+
+func (esr *EventSeatRepository) UnblockEventSeat(eventId *uuid.UUID, seatId *uuid.UUID, userId *uuid.UUID) *models.KTSError {
+	stmt := table.EventSeats.UPDATE(table.EventSeats.BlockedUntil, table.EventSeats.UserID).
+		SET(nil, nil).
+		WHERE(table.EventSeats.EventID.EQ(utils.MysqlUuid(eventId)).AND(table.EventSeats.SeatID.EQ(utils.MysqlUuid(seatId))).
+			AND(table.EventSeats.UserID.EQ(utils.MysqlUuid(userId))))
 
 	result, err := stmt.Exec(esr.DatabaseManager.GetDatabaseConnection())
 
