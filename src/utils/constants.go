@@ -10,3 +10,15 @@ const (
 	REGULAR      SeatType = "regular"
 	DOUBLE       SeatType = "double"
 )
+
+type PriceCategories string
+
+func (pc PriceCategories) String() string {
+	return string(pc)
+}
+
+const (
+	CHILDREN PriceCategories = "children"
+	ADULT    PriceCategories = "adult"
+	SENIOR   PriceCategories = "senior"
+)

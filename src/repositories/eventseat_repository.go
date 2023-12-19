@@ -3,6 +3,7 @@ package repositories
 import (
 	"time"
 
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/.gen/KinoTicketSystem/model"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/.gen/KinoTicketSystem/table"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/managers"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
@@ -19,6 +20,7 @@ type EventSeatRepoI interface {
 	UnblockEventSeat(eventId *uuid.UUID, seatId *uuid.UUID, userId *uuid.UUID) *models.KTSError
 	UpdateBlockedUntilTimeForUserEventSeats(eventId *uuid.UUID, userId *uuid.UUID, blockedUntil *time.Time) *models.KTSError
 	GetSelectedSeats(eventId *uuid.UUID, userId *uuid.UUID) (*[]models.GetEventSeatsDTO, *models.KTSError)
+	UpdateEventSeat(eventSeat *model.EventSeats) *models.KTSError
 }
 
 type EventSeatRepository struct {
@@ -144,4 +146,35 @@ func (esr *EventSeatRepository) GetSelectedSeats(eventId *uuid.UUID, userId *uui
 	}
 
 	return &selectedSeats, nil
+}
+
+func (esr *EventSeatRepository) UpdateEventSeat(eventSeat *model.EventSeats) *models.KTSError {
+	stmt := table.EventSeats.UPDATE(table.EventSeats.AllColumns).
+		SET(
+			utils.MysqlUuid(eventSeat.ID),
+			eventSeat.Booked,
+			eventSeat.BlockedUntil,
+			utils.MysqlUuid(eventSeat.UserID),
+			utils.MysqlUuid(eventSeat.SeatID),
+			utils.MysqlUuid(eventSeat.EventID),
+		).
+		WHERE(table.EventSeats.ID.EQ(utils.MysqlUuid(eventSeat.ID)))
+
+	result, err := stmt.Exec(esr.DatabaseManager.GetDatabaseConnection())
+
+	if err != nil {
+		return kts_errors.KTS_INTERNAL_ERROR
+	}
+
+	rowsAffected, err := result.RowsAffected()
+
+	if err != nil {
+		return kts_errors.KTS_INTERNAL_ERROR
+	}
+
+	if rowsAffected == 0 {
+		return kts_errors.KTS_NOT_FOUND
+	}
+
+	return nil
 }
