@@ -25,23 +25,53 @@ func (oc *OrderController) CreateOrder(CreateOrderDTO models.CreateOrderDTO, eve
 		return nil, kts_errors.KTS_BAD_REQUEST
 	}
 
-	// Get EventSeats for User
 	slectedSeats, kts_err := oc.EventSeatRepo.GetSelectedSeats(eventId, userId)
 	if kts_err != nil {
 		return nil, kts_err
 	}
 
 	priceCategories, kts_err := oc.PriceCategoryRepo.GetPriceCategories()
-
-	adultPriceCategory := getPriceCategoryByName(*priceCategories, utils.ADULT)
-
 	if kts_err != nil {
 		return nil, kts_err
 	}
 
+	adultPriceCategory := getPriceCategoryByName(*priceCategories, utils.ADULT)
 	orderId := utils.NewUUID()
 
-	// Create Ticket Objects and calculate total price
+	tickets, totalPrice := createTicketsAndCalculateTotalPrice(slectedSeats, CreateOrderDTO, priceCategories, adultPriceCategory, orderId)
+
+	order := model.Orders{
+		ID:              orderId,
+		UserID:          userId,
+		PaymentMethodID: CreateOrderDTO.PaymentMethodID,
+		IsPaid:          !isReservation,
+		Totalprice:      totalPrice,
+	}
+
+	_, kts_err = oc.OrderRepo.CreateOrder(&order)
+	if kts_err != nil {
+		return nil, kts_err
+	}
+
+	for _, ticket := range tickets {
+		_, err := oc.TicketRepo.CreateTicket(&ticket)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	for _, seat := range *slectedSeats {
+		seat.EventSeat.Booked = true
+		err := oc.EventSeatRepo.UpdateEventSeat(&seat.EventSeat)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return orderId, nil
+}
+
+func createTicketsAndCalculateTotalPrice(slectedSeats *[]models.GetEventSeatsDTO, CreateOrderDTO models.CreateOrderDTO, priceCategories *[]model.PriceCategories, adultPriceCategory *model.PriceCategories, orderId *uuid.UUID) ([]model.Tickets, int32) {
 	tickets := make([]model.Tickets, len(*slectedSeats))
 
 	totalPrice := int32(0)
@@ -74,37 +104,7 @@ func (oc *OrderController) CreateOrder(CreateOrderDTO models.CreateOrderDTO, eve
 			Validated:       false,
 		}
 	}
-
-	// Create Order
-	order := model.Orders{
-		ID:              orderId,
-		UserID:          userId,
-		PaymentMethodID: CreateOrderDTO.PaymentMethodID,
-		IsPaid:          !isReservation,
-		Totalprice:      totalPrice,
-	}
-
-	oc.OrderRepo.CreateOrder(&order)
-
-	// With order ID and EventSeats create Tickets
-
-	for _, ticket := range tickets {
-		_, err := oc.TicketRepo.CreateTicket(&ticket)
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	// Update EventSeats to booked
-	for _, seat := range *slectedSeats {
-		seat.EventSeat.Booked = true
-		err := oc.EventSeatRepo.UpdateEventSeat(&seat.EventSeat)
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	return orderId, nil
+	return tickets, totalPrice
 }
 
 func getPriceCategoryByName(priceCategories []model.PriceCategories, name utils.PriceCategories) *model.PriceCategories {

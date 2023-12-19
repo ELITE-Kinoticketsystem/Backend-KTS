@@ -12,6 +12,7 @@ import (
 	reflect "reflect"
 	time "time"
 
+	model "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/.gen/KinoTicketSystem/model"
 	models "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
 	uuid "github.com/google/uuid"
 	gomock "go.uber.org/mock/gomock"
@@ -110,4 +111,18 @@ func (m *MockEventSeatRepoI) UpdateBlockedUntilTimeForUserEventSeats(eventId, us
 func (mr *MockEventSeatRepoIMockRecorder) UpdateBlockedUntilTimeForUserEventSeats(eventId, userId, blockedUntil any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateBlockedUntilTimeForUserEventSeats", reflect.TypeOf((*MockEventSeatRepoI)(nil).UpdateBlockedUntilTimeForUserEventSeats), eventId, userId, blockedUntil)
+}
+
+// UpdateEventSeat mocks base method.
+func (m *MockEventSeatRepoI) UpdateEventSeat(eventSeat *model.EventSeats) *models.KTSError {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateEventSeat", eventSeat)
+	ret0, _ := ret[0].(*models.KTSError)
+	return ret0
+}
+
+// UpdateEventSeat indicates an expected call of UpdateEventSeat.
+func (mr *MockEventSeatRepoIMockRecorder) UpdateEventSeat(eventSeat any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateEventSeat", reflect.TypeOf((*MockEventSeatRepoI)(nil).UpdateEventSeat), eventSeat)
 }

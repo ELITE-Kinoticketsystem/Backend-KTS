@@ -34,6 +34,9 @@ func CreateOrderHandler(orderController controllers.OrderControllerI, isReservat
 			return
 		}
 
-		c.JSON(200, order)
+		c.JSON(200, gin.H{
+			"orderId": order,
+		})
+
 	}
 }
