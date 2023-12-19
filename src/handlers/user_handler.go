@@ -29,7 +29,8 @@ func RegisterUserHandler(userCtrl controllers.UserControllerI) gin.HandlerFunc {
 			return
 		}
 
-		c.JSON(http.StatusCreated, loginResponse)
+		utils.SetJWTCookies(c, loginResponse.Token, loginResponse.RefreshToken)
+		c.JSON(http.StatusCreated, loginResponse.User)
 	}
 }
 
@@ -50,7 +51,8 @@ func LoginUserHandler(userCtrl controllers.UserControllerI) gin.HandlerFunc {
 			return
 		}
 
-		c.JSON(http.StatusOK, loginResponse)
+		utils.SetJWTCookies(c, loginResponse.Token, loginResponse.RefreshToken)
+		c.JSON(http.StatusOK, loginResponse.User)
 	}
 }
 
