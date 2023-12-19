@@ -93,10 +93,10 @@ func RefreshTokens(refreshToken string) (string, string, error) {
 
 func SetJWTCookies(c *gin.Context, token string, refreshToken string) {
 	// for development
-	c.SetCookie("token", token, 60*15, "/", "localhost", false, true)
-	c.SetCookie("refreshToken", refreshToken, 60*60*24*7, "/", "localhost", false, true)
+	c.SetCookie("token", token, 60*15, "/", "", false, true)
+	c.SetCookie("refreshToken", refreshToken, 60*60*24*7, "/", "", false, true)
 
 	// for production
-	c.SetCookie("token", token, 60*15, "/", "cinemika.tech", false, true)
-	c.SetCookie("refreshToken", refreshToken, 60*60*24*7, "/", "cinemika.tech", false, true)
+	//c.SetCookie("token", token, 60*15, "/", "cinemika.tech", false, true)
+	//c.SetCookie("refreshToken", refreshToken, 60*60*24*7, "/", "cinemika.tech", false, true)
 }
