@@ -107,7 +107,7 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 			EventSeatRepo: eventSeatRepo,
 		},
 		OrderController: &controllers.OrderController{
-			OrderRep:      &orderRepo,
+			OrderRepo:     &orderRepo,
 			EventSeatRepo: eventSeatRepo,
 		},
 		ReviewController: &controllers.ReviewController{
