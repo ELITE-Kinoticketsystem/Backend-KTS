@@ -16,10 +16,6 @@ const refreshTokenLifeSpan = 3 * 24 * 60 * 60 // 3 days
 const leeway = 5 * 60                         // 5 minutes
 const issuer = "KTS"
 
-type keyType string
-
-const UserIdKey keyType = "userId"
-
 func GenerateJWT(userId *uuid.UUID) (string, string, error) {
 	now := time.Now()
 

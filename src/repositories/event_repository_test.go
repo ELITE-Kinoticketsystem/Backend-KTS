@@ -326,6 +326,7 @@ func TestGetEventsForMovie(t *testing.T) {
 						AddRow(expectedEvents[0].ID, expectedEvents[0].Title, expectedEvents[0].Start, expectedEvents[0].End, expectedEvents[0].Description, expectedEvents[0].EventType, expectedEvents[0].CinemaHallID).
 						AddRow(expectedEvents[1].ID, expectedEvents[1].Title, expectedEvents[1].Start, expectedEvents[1].End, expectedEvents[1].Description, expectedEvents[1].EventType, expectedEvents[1].CinemaHallID),
 				)
+				
 			},
 			expectedEvents: expectedEvents,
 			expectedError:  nil,
