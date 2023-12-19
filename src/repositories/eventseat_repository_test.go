@@ -259,7 +259,7 @@ func TestUpdateBlockedUntilTimeForUserEventSeats(t *testing.T) {
 					WithArgs(blockedUntil, sqlmock.AnyArg(), sqlmock.AnyArg()).
 					WillReturnResult(sqlmock.NewResult(0, 0))
 			},
-			expectedError: kts_errors.KTS_NOT_FOUND,
+			expectedError: nil,
 		},
 		{
 			name: "Update blocked until time for user event seats - error",

@@ -84,20 +84,10 @@ func (esr *EventSeatRepository) UpdateBlockedUntilTimeForUserEventSeats(eventId 
 		SET(blockedUntil).
 		WHERE(table.EventSeats.EventID.EQ(utils.MysqlUuid(eventId)).AND(table.EventSeats.UserID.EQ(utils.MysqlUuid(userId))))
 
-	result, err := stmt.Exec(esr.DatabaseManager.GetDatabaseConnection())
+	_, err := stmt.Exec(esr.DatabaseManager.GetDatabaseConnection())
 
 	if err != nil {
 		return kts_errors.KTS_INTERNAL_ERROR
-	}
-
-	rowsAffected, err := result.RowsAffected()
-
-	if err != nil {
-		return kts_errors.KTS_INTERNAL_ERROR
-	}
-
-	if rowsAffected == 0 {
-		return kts_errors.KTS_NOT_FOUND
 	}
 
 	return nil
