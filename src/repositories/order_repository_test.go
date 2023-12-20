@@ -9,7 +9,9 @@ import (
 	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/managers"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/samples"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestCreateOrder(t *testing.T) {
@@ -86,4 +88,76 @@ func TestCreateOrder(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestGetOrderById(t *testing.T) {
+	order := (*samples.GetGetOrderDto())[0]
+
+	query := "SELECT .* FROM `KinoTicketSystem`.orders .*"
+
+	testCases := []struct {
+		name            string
+		setExpectations func(mock sqlmock.Sqlmock)
+		expectOrder     *models.GetOrderDTO
+		expectedError   *models.KTSError
+	}{
+		{
+			name: "Get order",
+			setExpectations: func(mock sqlmock.Sqlmock) {
+				mock.ExpectQuery(query).WithArgs(sqlmock.AnyArg(), sqlmock.AnyArg()).WillReturnRows(sqlmock.NewRows([]string{
+					"orders.id", "orders.totalprice", "orders.is_paid", "orders.payment_method_id", "orders.user_id", "tickets.id", "tickets.validated", "tickets.price", "tickets.price_category_id", "tickets.order_id", "tickets.event_seat_id", "seats.id", "seats.row_nr", "seats.column_nr", "seats.seat_category_id", "seats.cinema_hall_id", "seats.type"}).
+					AddRow(order.Order.ID, order.Order.Totalprice, order.Order.IsPaid, order.Order.PaymentMethodID, order.Order.UserID, order.Tickets[0].Ticket.ID, order.Tickets[0].Ticket.Validated, order.Tickets[0].Ticket.Price, order.Tickets[0].Ticket.PriceCategoryID, order.Tickets[0].Ticket.OrderID, order.Tickets[0].Ticket.EventSeatID, order.Tickets[0].Seat.ID, order.Tickets[0].Seat.RowNr, order.Tickets[0].Seat.ColumnNr, order.Tickets[0].Seat.SeatCategoryID, order.Tickets[0].Seat.CinemaHallID, order.Tickets[0].Seat.Type))
+			},
+			expectOrder:   &order,
+			expectedError: nil,
+		},
+		{
+			name: "Get order - error",
+			setExpectations: func(mock sqlmock.Sqlmock) {
+				mock.ExpectQuery(query).WithArgs(sqlmock.AnyArg(), sqlmock.AnyArg()).WillReturnError(errors.New("error"))
+			},
+			expectOrder:   nil,
+			expectedError: kts_errors.KTS_INTERNAL_ERROR,
+		},
+		{
+			name: "Get order - no rows",
+			setExpectations: func(mock sqlmock.Sqlmock) {
+				mock.ExpectQuery(query).WithArgs(sqlmock.AnyArg(), sqlmock.AnyArg()).WillReturnRows(sqlmock.NewRows([]string{}))
+			},
+			expectOrder:   nil,
+			expectedError: kts_errors.KTS_INTERNAL_ERROR,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			db, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherRegexp))
+			if err != nil {
+				t.Fatalf("Failed to create mock database connection: %v", err)
+			}
+			defer db.Close()
+
+			orderRepo := &OrderRepository{
+				DatabaseManager: &managers.DatabaseManager{
+					Connection: db,
+				},
+			}
+
+			tc.setExpectations(mock)
+
+			order, kts_err := orderRepo.GetOrderById(utils.NewUUID(), utils.NewUUID())
+
+			if kts_err != tc.expectedError {
+				t.Errorf("Unexpected error: %v", kts_err)
+			}
+
+			assert.Equal(t, tc.expectOrder, order)
+
+			if err := mock.ExpectationsWereMet(); err != nil {
+				t.Errorf("There were unfulfilled expectations: %s", err)
+			}
+
+		})
+	}
+
 }

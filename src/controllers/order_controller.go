@@ -11,6 +11,7 @@ import (
 
 type OrderControllerI interface {
 	CreateOrder(CreateOrderDTO models.CreateOrderDTO, eventId *uuid.UUID, userId *uuid.UUID, isReservation bool) (*uuid.UUID, *models.KTSError)
+	GetOrderById(orderId *uuid.UUID, userId *uuid.UUID) (*models.GetOrderDTO, *models.KTSError)
 }
 
 type OrderController struct {
@@ -69,6 +70,10 @@ func (oc *OrderController) CreateOrder(CreateOrderDTO models.CreateOrderDTO, eve
 	}
 
 	return orderId, nil
+}
+
+func (oc *OrderController) GetOrderById(orderId *uuid.UUID, userId *uuid.UUID) (*models.GetOrderDTO, *models.KTSError) {
+	return oc.OrderRepo.GetOrderById(orderId, userId)
 }
 
 func createTicketsAndCalculateTotalPrice(slectedSeats *[]models.GetEventSeatsDTO, CreateOrderDTO models.CreateOrderDTO, priceCategories *[]model.PriceCategories, adultPriceCategory *model.PriceCategories, orderId *uuid.UUID) ([]model.Tickets, int32) {

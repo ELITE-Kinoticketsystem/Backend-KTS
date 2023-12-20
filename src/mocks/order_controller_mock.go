@@ -53,3 +53,18 @@ func (mr *MockOrderControllerIMockRecorder) CreateOrder(CreateOrderDTO, eventId,
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateOrder", reflect.TypeOf((*MockOrderControllerI)(nil).CreateOrder), CreateOrderDTO, eventId, userId, isReservation)
 }
+
+// GetOrderById mocks base method.
+func (m *MockOrderControllerI) GetOrderById(orderId, userId *uuid.UUID) (*models.GetOrderDTO, *models.KTSError) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetOrderById", orderId, userId)
+	ret0, _ := ret[0].(*models.GetOrderDTO)
+	ret1, _ := ret[1].(*models.KTSError)
+	return ret0, ret1
+}
+
+// GetOrderById indicates an expected call of GetOrderById.
+func (mr *MockOrderControllerIMockRecorder) GetOrderById(orderId, userId any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetOrderById", reflect.TypeOf((*MockOrderControllerI)(nil).GetOrderById), orderId, userId)
+}

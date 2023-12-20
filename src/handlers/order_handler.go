@@ -40,3 +40,25 @@ func CreateOrderHandler(orderController controllers.OrderControllerI, isReservat
 
 	}
 }
+
+func GetOrderByIdHandler(orderController controllers.OrderControllerI) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		orderId, err := uuid.Parse(c.Param("orderId"))
+
+		if err != nil {
+			utils.HandleErrorAndAbort(c, kts_errors.KTS_BAD_REQUEST)
+			return
+		}
+
+		userId := c.Request.Context().Value(models.ContextKeyUserID).(*uuid.UUID)
+
+		order, kts_err := orderController.GetOrderById(&orderId, userId)
+
+		if kts_err != nil {
+			utils.HandleErrorAndAbort(c, kts_err)
+			return
+		}
+
+		c.JSON(200, order)
+	}
+}
