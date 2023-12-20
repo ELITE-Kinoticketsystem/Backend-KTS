@@ -170,6 +170,7 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 	router.Handle(http.MethodPost, "/events/:eventId/book", handlers.CreateOrderHandler(controller.OrderController, false))
 
 	router.Handle(http.MethodGet, "/orders/:orderId", handlers.GetOrderByIdHandler(controller.OrderController))
+	router.Handle(http.MethodGet, "/orders", handlers.GetOrdersHandler(controller.OrderController))
 
 	return router
 }

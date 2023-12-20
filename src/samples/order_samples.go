@@ -44,6 +44,7 @@ func GetOrderDTO() *models.CreateOrderDTO {
 
 func GetGetOrderDto() *[]models.GetOrderDTO {
 	orderId := utils.NewUUID()
+	order2Id := utils.NewUUID()
 
 	return &[]models.GetOrderDTO{
 		{
@@ -60,6 +61,27 @@ func GetGetOrderDto() *[]models.GetOrderDTO {
 					Ticket: model.Tickets{
 						ID:      utils.NewUUID(),
 						OrderID: orderId,
+					},
+					Seat: model.Seats{
+						ID: utils.NewUUID(),
+					},
+				},
+			},
+		},
+		{
+			Order: model.Orders{
+				ID:         order2Id,
+				Totalprice: 0,
+				IsPaid:     false,
+			},
+			Tickets: []struct {
+				Ticket model.Tickets
+				Seat   model.Seats
+			}{
+				{
+					Ticket: model.Tickets{
+						ID:      utils.NewUUID(),
+						OrderID: order2Id,
 					},
 					Seat: model.Seats{
 						ID: utils.NewUUID(),

@@ -168,5 +168,69 @@ func TestGetOrderById(t *testing.T) {
 
 		})
 	}
+}
 
+func TestGetOrders(t *testing.T) {
+	orders := samples.GetGetOrderDto()
+	ordersJson, _ := json.Marshal(orders)
+	tests := []struct {
+		name               string
+		setExpectations    func(mockOrderController *mocks.MockOrderControllerI)
+		expectedStatus     int
+		ExpectedBodyString string
+	}{
+		{
+			name: "Success",
+			setExpectations: func(mockOrderController *mocks.MockOrderControllerI) {
+				mockOrderController.EXPECT().GetOrders(gomock.Any()).Return(
+					orders,
+					nil,
+				)
+			},
+			expectedStatus:     http.StatusOK,
+			ExpectedBodyString: string(ordersJson),
+		},
+		{
+			name: "Bad Request",
+			setExpectations: func(mockOrderController *mocks.MockOrderControllerI) {
+				mockOrderController.EXPECT().GetOrders(gomock.Any()).Return(
+					nil,
+					kts_errors.KTS_INTERNAL_ERROR,
+				)
+			},
+			expectedStatus:     http.StatusInternalServerError,
+			ExpectedBodyString: "{\"errorMessage\":\"INTERNAL_ERROR\"}",
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			// GIVEN
+			w := httptest.NewRecorder()
+			req, _ := http.NewRequest("POST", "/orders", nil)
+			gin.SetMode(gin.TestMode)
+
+			c, _ := gin.CreateTestContext(w)
+			c.Request = req
+
+			userId := utils.NewUUID()
+
+			ctx := context.WithValue(c.Request.Context(), models.ContextKeyUserID, userId)
+			c.Request = c.Request.WithContext(ctx)
+
+			mockCtrl := gomock.NewController(t)
+			defer mockCtrl.Finish()
+			orderController := mocks.NewMockOrderControllerI(mockCtrl)
+
+			tc.setExpectations(orderController)
+
+			// WHEN
+			GetOrdersHandler(orderController)(c)
+
+			// THEN
+			assert.Equal(t, tc.expectedStatus, w.Code, "wrong HTTP status code")
+			assert.Equal(t, tc.ExpectedBodyString, w.Body.String(), "wrong HTTP response body")
+
+		})
+	}
 }

@@ -62,3 +62,18 @@ func GetOrderByIdHandler(orderController controllers.OrderControllerI) gin.Handl
 		c.JSON(200, order)
 	}
 }
+
+func GetOrdersHandler(orderController controllers.OrderControllerI) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		userId := c.Request.Context().Value(models.ContextKeyUserID).(*uuid.UUID)
+
+		orders, kts_err := orderController.GetOrders(userId)
+
+		if kts_err != nil {
+			utils.HandleErrorAndAbort(c, kts_err)
+			return
+		}
+
+		c.JSON(200, orders)
+	}
+}
