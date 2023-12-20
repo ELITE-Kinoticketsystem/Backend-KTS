@@ -89,8 +89,8 @@ func RefreshTokens(refreshToken string) (string, string, error) {
 
 func SetJWTCookies(c *gin.Context, token string, refreshToken string) {
 	// for development
-	c.SetCookie("token", token, 60*15, "/", "", false, true)
-	c.SetCookie("refreshToken", refreshToken, 60*60*24*7, "/", "", false, true)
+	c.SetCookie("token", token, 60*15, "/", "https://cinemika.westeurope.cloudapp.azure.com", false, true)
+	c.SetCookie("refreshToken", refreshToken, 60*60*24*7, "/", "https://cinemika.westeurope.cloudapp.azure.com", false, true)
 
 	// for production
 	//c.SetCookie("token", token, 60*15, "/", "cinemika.tech", false, true)
