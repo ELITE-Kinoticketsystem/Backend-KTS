@@ -126,13 +126,13 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 
 	// Actors
 	router.Handle(http.MethodGet, "/actors/:id", handlers.GetActorByIdHandler(controller.ActorController))
-	router.Handle(http.MethodGet, "/actors/", handlers.GetActorsHandler(controller.ActorController))
-	router.Handle(http.MethodPost, "/actors/", handlers.CreateActorHandler(controller.ActorController))
+	router.Handle(http.MethodGet, "/actors", handlers.GetActorsHandler(controller.ActorController))
+	router.Handle(http.MethodPost, "/actors", handlers.CreateActorHandler(controller.ActorController))
 
 	// Price Categories
 	router.Handle(http.MethodGet, "/price-categories/:id", handlers.GetPriceCategoryByIdHandler(controller.PriceCategories))
-	router.Handle(http.MethodGet, "/price-categories/", handlers.GetPriceCategoriesHandler(controller.PriceCategories))
-	router.Handle(http.MethodPost, "/price-categories/", handlers.CreatePriceCategoryHandler(controller.PriceCategories))
+	router.Handle(http.MethodGet, "/price-categories", handlers.GetPriceCategoriesHandler(controller.PriceCategories))
+	router.Handle(http.MethodPost, "/price-categories", handlers.CreatePriceCategoryHandler(controller.PriceCategories))
 	router.Handle(http.MethodPut, "/price-categories/:id", handlers.UpdatePriceCategoryHandler(controller.PriceCategories))
 	router.Handle(http.MethodDelete, "/price-categories/:id", handlers.DeletePriceCategoryHandler(controller.PriceCategories))
 
