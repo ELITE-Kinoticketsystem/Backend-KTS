@@ -144,7 +144,7 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 
 	// events
 	router.Handle(http.MethodPost, "/events", handlers.CreateEventHandler(controller.EventController))
-	router.Handle(http.MethodGet, "/movies/:movieId/events", handlers.GetEventsForMovieHandler(controller.EventController))
+	router.Handle(http.MethodGet, "/movies/:id/events", handlers.GetEventsForMovieHandler(controller.EventController))
 	router.Handle(http.MethodGet, "/events/special", handlers.GetSpecialEventsHandler(controller.EventController))
 
 	return router
