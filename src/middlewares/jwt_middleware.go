@@ -23,7 +23,7 @@ func JwtAuthMiddleware() gin.HandlerFunc {
 				utils.HandleErrorAndAbort(c, kts_errors.KTS_UNAUTHORIZED)
 				return
 			}
-			token, refreshToken, err := utils.RefreshTokens(refreshToken)
+			token, refreshToken, err = utils.RefreshTokens(refreshToken)
 			if err != nil {
 				utils.HandleErrorAndAbort(c, kts_errors.KTS_UNAUTHORIZED)
 				return

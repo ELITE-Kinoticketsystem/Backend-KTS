@@ -105,6 +105,7 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 	publicRoutes.Handle(http.MethodPost, "/auth/login", handlers.LoginUserHandler(controller.UserController))
 	publicRoutes.Handle(http.MethodPost, "/auth/check-email", handlers.CheckEmailHandler(controller.UserController))
 	publicRoutes.Handle(http.MethodPost, "/auth/check-username", handlers.CheckUsernameHandler(controller.UserController))
+	publicRoutes.Handle(http.MethodGet, "/auth/logged-in", handlers.LoggedInHandler)
 
 	securedRoutes.Handle(http.MethodGet, "/test", handlers.TestJwtToken)
 

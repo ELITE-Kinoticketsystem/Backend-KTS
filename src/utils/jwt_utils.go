@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"net/http"
 	"os"
 	"time"
 
@@ -89,10 +90,29 @@ func RefreshTokens(refreshToken string) (string, string, error) {
 
 func SetJWTCookies(c *gin.Context, token string, refreshToken string) {
 	// for development
-	c.SetCookie("token", token, 60*15, "/", "https://cinemika.westeurope.cloudapp.azure.com", false, true)
-	c.SetCookie("refreshToken", refreshToken, 60*60*24*7, "/", "https://cinemika.westeurope.cloudapp.azure.com", false, true)
+	http.SetCookie(c.Writer, &http.Cookie{
+		Name:     "token",
+		Value:    token,
+		Path:     "/",
+		/* Domain */
+		MaxAge:   tokenLifespan,
+		Secure:   true,
+		HttpOnly: true,
+		SameSite: http.SameSiteNoneMode,
+	})
+
+	http.SetCookie(c.Writer, &http.Cookie{
+		Name:     "refreshToken",
+		Value:    refreshToken,
+		Path:     "/",
+		/* Domain */
+		MaxAge:   refreshTokenLifeSpan,
+		Secure:   true,
+		HttpOnly: true,
+		SameSite: http.SameSiteNoneMode,
+	})
 
 	// for production
-	//c.SetCookie("token", token, 60*15, "/", "cinemika.tech", false, true)
-	//c.SetCookie("refreshToken", refreshToken, 60*60*24*7, "/", "cinemika.tech", false, true)
+	c.SetCookie("token", token, tokenLifespan, "/", "cinemika.westeurope.cloudapp.azure.com", true, true)
+	c.SetCookie("refreshToken", refreshToken, refreshTokenLifeSpan, "/", "cinemika.westeurope.cloudapp.azure.com", true, true)
 }
