@@ -108,44 +108,44 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 
 	securedRoutes.Handle(http.MethodGet, "/test", handlers.TestJwtToken)
 
-	router.Handle(http.MethodGet, "/movies", handlers.GetMovies(controller.MovieController))
-	router.Handle(http.MethodGet, "/movies/genres", handlers.GetMoviesWithGenres(controller.MovieController))
-	router.Handle(http.MethodGet, "/movies/:id", handlers.GetMovieById(controller.MovieController))
+	publicRoutes.Handle(http.MethodGet, "/movies", handlers.GetMovies(controller.MovieController))
+	publicRoutes.Handle(http.MethodGet, "/movies/genres", handlers.GetMoviesWithGenres(controller.MovieController))
+	publicRoutes.Handle(http.MethodGet, "/movies/:id", handlers.GetMovieById(controller.MovieController))
 
 	// Will be implemented later
-	router.Handle(http.MethodPost, "/movies", handlers.CreateMovie(controller.MovieController))
+	securedRoutes.Handle(http.MethodPost, "/movies", handlers.CreateMovie(controller.MovieController))
 	// router.Handle(http.MethodPut, "/movies", handlers.UpdateMovie(controller.MovieController))
 	// router.Handle(http.MethodDelete, "/movies/:id", handlers.DeleteMovie(controller.MovieController))
 
-	router.Handle(http.MethodGet, "/genres", handlers.GetGenres(controller.GenreController))
-	router.Handle(http.MethodGet, "/genres/:name", handlers.GetGenreByName(controller.GenreController))
-	router.Handle(http.MethodGet, "/genres/movies", handlers.GetGenresWithMovies(controller.GenreController))
-	router.Handle(http.MethodPost, "/genres", handlers.CreateGenre(controller.GenreController))
-	router.Handle(http.MethodPut, "/genres", handlers.UpdateGenre(controller.GenreController))
-	router.Handle(http.MethodDelete, "/genres/:id", handlers.DeleteGenre(controller.GenreController))
+	publicRoutes.Handle(http.MethodGet, "/genres", handlers.GetGenres(controller.GenreController))
+	publicRoutes.Handle(http.MethodGet, "/genres/:name", handlers.GetGenreByName(controller.GenreController))
+	publicRoutes.Handle(http.MethodGet, "/genres/movies", handlers.GetGenresWithMovies(controller.GenreController))
+	publicRoutes.Handle(http.MethodPost, "/genres", handlers.CreateGenre(controller.GenreController))
+	publicRoutes.Handle(http.MethodPut, "/genres", handlers.UpdateGenre(controller.GenreController))
+	publicRoutes.Handle(http.MethodDelete, "/genres/:id", handlers.DeleteGenre(controller.GenreController))
 
 	// Actors
-	router.Handle(http.MethodGet, "/actors/:id", handlers.GetActorByIdHandler(controller.ActorController))
-	router.Handle(http.MethodGet, "/actors", handlers.GetActorsHandler(controller.ActorController))
-	router.Handle(http.MethodPost, "/actors", handlers.CreateActorHandler(controller.ActorController))
+	publicRoutes.Handle(http.MethodGet, "/actors/:id", handlers.GetActorByIdHandler(controller.ActorController))
+	publicRoutes.Handle(http.MethodGet, "/actors", handlers.GetActorsHandler(controller.ActorController))
+	securedRoutes.Handle(http.MethodPost, "/actors", handlers.CreateActorHandler(controller.ActorController))
 
 	// Price Categories
-	router.Handle(http.MethodGet, "/price-categories/:id", handlers.GetPriceCategoryByIdHandler(controller.PriceCategories))
-	router.Handle(http.MethodGet, "/price-categories", handlers.GetPriceCategoriesHandler(controller.PriceCategories))
-	router.Handle(http.MethodPost, "/price-categories", handlers.CreatePriceCategoryHandler(controller.PriceCategories))
-	router.Handle(http.MethodPut, "/price-categories/:id", handlers.UpdatePriceCategoryHandler(controller.PriceCategories))
-	router.Handle(http.MethodDelete, "/price-categories/:id", handlers.DeletePriceCategoryHandler(controller.PriceCategories))
+	publicRoutes.Handle(http.MethodGet, "/price-categories/:id", handlers.GetPriceCategoryByIdHandler(controller.PriceCategories))
+	publicRoutes.Handle(http.MethodGet, "/price-categories", handlers.GetPriceCategoriesHandler(controller.PriceCategories))
+	securedRoutes.Handle(http.MethodPost, "/price-categories", handlers.CreatePriceCategoryHandler(controller.PriceCategories))
+	securedRoutes.Handle(http.MethodPut, "/price-categories/:id", handlers.UpdatePriceCategoryHandler(controller.PriceCategories))
+	securedRoutes.Handle(http.MethodDelete, "/price-categories/:id", handlers.DeletePriceCategoryHandler(controller.PriceCategories))
 
 	// event seats
-	router.Handle(http.MethodGet, "/events/:eventId/seats", handlers.GetEventSeatsHandler(controller.EventSeatController))
-	router.Handle(http.MethodPatch, "/events/:eventId/seats/:seatId/block", handlers.BlockEventSeatHandler(controller.EventSeatController))
-	router.Handle(http.MethodPatch, "/events/:eventId/seats/:seatId/unblock", handlers.UnblockEventSeatHandler(controller.EventSeatController))
-	router.Handle(http.MethodGet, "/events/:eventId/user-seats", handlers.GetSelectedSeatsHandler(controller.EventSeatController))
+	securedRoutes.Handle(http.MethodGet, "/events/:eventId/seats", handlers.GetEventSeatsHandler(controller.EventSeatController))
+	securedRoutes.Handle(http.MethodPatch, "/events/:eventId/seats/:seatId/block", handlers.BlockEventSeatHandler(controller.EventSeatController))
+	securedRoutes.Handle(http.MethodPatch, "/events/:eventId/seats/:seatId/unblock", handlers.UnblockEventSeatHandler(controller.EventSeatController))
+	securedRoutes.Handle(http.MethodGet, "/events/:eventId/user-seats", handlers.GetSelectedSeatsHandler(controller.EventSeatController))
 
 	// events
-	router.Handle(http.MethodPost, "/events", handlers.CreateEventHandler(controller.EventController))
-	router.Handle(http.MethodGet, "/movies/:id/events", handlers.GetEventsForMovieHandler(controller.EventController))
-	router.Handle(http.MethodGet, "/events/special", handlers.GetSpecialEventsHandler(controller.EventController))
+	securedRoutes.Handle(http.MethodPost, "/events", handlers.CreateEventHandler(controller.EventController))
+	publicRoutes.Handle(http.MethodGet, "/movies/:id/events", handlers.GetEventsForMovieHandler(controller.EventController))
+	publicRoutes.Handle(http.MethodGet, "/events/special", handlers.GetSpecialEventsHandler(controller.EventController))
 
 	return router
 }
