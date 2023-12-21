@@ -19,7 +19,7 @@ type Controllers struct {
 	MovieController     controllers.MovieControllerI
 	EventSeatController controllers.EventSeatControllerI
 	GenreController     controllers.GenreControllerI
-	PriceCategories controllers.PriceCategoryControllerI
+	PriceCategories     controllers.PriceCategoryControllerI
 }
 
 func createRouter(dbConnection *sql.DB) *gin.Engine {
@@ -141,6 +141,11 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 	router.Handle(http.MethodPatch, "/events/:eventId/seats/:seatId/block", handlers.BlockEventSeatHandler(controller.EventSeatController))
 	router.Handle(http.MethodPatch, "/events/:eventId/seats/:seatId/unblock", handlers.UnblockEventSeatHandler(controller.EventSeatController))
 	router.Handle(http.MethodGet, "/events/:eventId/user-seats", handlers.GetSelectedSeatsHandler(controller.EventSeatController))
+
+	// events
+	router.Handle(http.MethodPost, "/events", handlers.CreateEventHandler(controller.EventController))
+	router.Handle(http.MethodGet, "/movies/:movieId/events", handlers.GetEventsForMovieHandler(controller.EventController))
+	router.Handle(http.MethodGet, "/events/special", handlers.GetSpecialEventsHandler(controller.EventController))
 
 	return router
 }
