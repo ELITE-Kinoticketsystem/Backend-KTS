@@ -1,8 +1,6 @@
 package repositories
 
 import (
-	"fmt"
-
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/.gen/KinoTicketSystem/model"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/.gen/KinoTicketSystem/table"
 	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
@@ -40,19 +38,33 @@ func (rr *ReviewRepository) CreateReview(review model.Reviews) *models.KTSError 
 		utils.MysqlUuid(review.MovieID),
 	)
 
-	_, err := stmt.Exec(rr.DatabaseManager.GetDatabaseConnection())
+	result, err := stmt.Exec(rr.DatabaseManager.GetDatabaseConnection())
 	if err != nil {
-		fmt.Println(err)
 		return kts_errors.KTS_INTERNAL_ERROR
+	}
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return kts_errors.KTS_INTERNAL_ERROR
+	}
+	if rowsAffected == 0 {
+		return kts_errors.KTS_NOT_FOUND
 	}
 	return nil
 }
 
 func (rr *ReviewRepository) DeleteReview(id *uuid.UUID) *models.KTSError {
 	stmt := table.Reviews.DELETE().WHERE(table.Reviews.ID.EQ(utils.MysqlUuid(id)))
-	_, err := stmt.Exec(rr.DatabaseManager.GetDatabaseConnection())
+	result, err := stmt.Exec(rr.DatabaseManager.GetDatabaseConnection())
 	if err != nil {
 		return kts_errors.KTS_INTERNAL_ERROR
 	}
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return kts_errors.KTS_INTERNAL_ERROR
+	}
+	if rowsAffected == 0 {
+		return kts_errors.KTS_NOT_FOUND
+	}
+
 	return nil
 }

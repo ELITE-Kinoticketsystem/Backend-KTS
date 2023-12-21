@@ -43,7 +43,7 @@ func TestCreateReview(t *testing.T) {
 			expectedError: nil,
 		},
 		{
-			name:   "Internal error",
+			name:   "Insert internal error",
 			review: getSampleReview(),
 			setExpectations: func(mock sqlmock.Sqlmock, review model.Reviews) {
 				mock.ExpectExec(
@@ -62,6 +62,48 @@ func TestCreateReview(t *testing.T) {
 				)
 			},
 			expectedError: kts_errors.KTS_INTERNAL_ERROR,
+		},
+		{
+			name:   "Affected rows internal error",
+			review: getSampleReview(),
+			setExpectations: func(mock sqlmock.Sqlmock, review model.Reviews) {
+				mock.ExpectExec(
+					"INSERT INTO `KinoTicketSystem`.reviews (id, rating, comment, datetime, is_spoiler, user_id, movie_id)\n"+
+						"VALUES (?, ?, ?, ?, ?, ?, ?);",
+				).WithArgs(
+					utils.EqUUID(review.ID),
+					review.Rating,
+					review.Comment,
+					review.Datetime,
+					review.IsSpoiler,
+					utils.EqUUID(review.UserID),
+					utils.EqUUID(review.MovieID),
+				).WillReturnResult(
+					sqlmock.NewErrorResult(sqlmock.ErrCancelled),
+				)
+			},
+			expectedError: kts_errors.KTS_INTERNAL_ERROR,
+		},
+		{
+			name:   "No affected rows",
+			review: getSampleReview(),
+			setExpectations: func(mock sqlmock.Sqlmock, review model.Reviews) {
+				mock.ExpectExec(
+					"INSERT INTO `KinoTicketSystem`.reviews (id, rating, comment, datetime, is_spoiler, user_id, movie_id)\n"+
+						"VALUES (?, ?, ?, ?, ?, ?, ?);",
+				).WithArgs(
+					utils.EqUUID(review.ID),
+					review.Rating,
+					review.Comment,
+					review.Datetime,
+					review.IsSpoiler,
+					utils.EqUUID(review.UserID),
+					utils.EqUUID(review.MovieID),
+				).WillReturnResult(
+					sqlmock.NewResult(0, 0),
+				)
+			},
+			expectedError: kts_errors.KTS_NOT_FOUND,
 		},
 	}
 
@@ -119,7 +161,7 @@ func TestDeleteReview(t *testing.T) {
 			expectedError: nil,
 		},
 		{
-			name: "Internal error",
+			name: "Delete internal error",
 			id:   uuid.MustParse("123e4567-e89b-12d3-a456-426614174000"),
 			setExpectations: func(mock sqlmock.Sqlmock, id uuid.UUID) {
 				mock.ExpectExec(
@@ -132,6 +174,36 @@ func TestDeleteReview(t *testing.T) {
 				)
 			},
 			expectedError: kts_errors.KTS_INTERNAL_ERROR,
+		},
+		{
+			name: "Rows affected internal error",
+			id:   uuid.MustParse("123e4567-e89b-12d3-a456-426614174000"),
+			setExpectations: func(mock sqlmock.Sqlmock, id uuid.UUID) {
+				mock.ExpectExec(
+					"DELETE FROM `KinoTicketSystem`.reviews\n" +
+						"WHERE reviews.id = ?;",
+				).WithArgs(
+					utils.EqUUID(&id),
+				).WillReturnResult(
+					sqlmock.NewErrorResult(sqlmock.ErrCancelled),
+				)
+			},
+			expectedError: kts_errors.KTS_INTERNAL_ERROR,
+		},
+		{
+			name: "No rows affected",
+			id:   uuid.MustParse("123e4567-e89b-12d3-a456-426614174000"),
+			setExpectations: func(mock sqlmock.Sqlmock, id uuid.UUID) {
+				mock.ExpectExec(
+					"DELETE FROM `KinoTicketSystem`.reviews\n" +
+						"WHERE reviews.id = ?;",
+				).WithArgs(
+					utils.EqUUID(&id),
+				).WillReturnResult(
+					sqlmock.NewResult(0, 0),
+				)
+			},
+			expectedError: kts_errors.KTS_NOT_FOUND,
 		},
 	}
 

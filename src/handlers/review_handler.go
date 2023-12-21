@@ -26,7 +26,7 @@ func CreateReviewHandler(reviewCtrl controllers.ReviewControllerI) gin.HandlerFu
 			return
 		}
 
-		c.JSON(http.StatusOK, reviewId)
+		c.JSON(http.StatusCreated, reviewId)
 	}
 }
 

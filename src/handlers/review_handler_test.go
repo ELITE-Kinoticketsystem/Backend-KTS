@@ -47,7 +47,7 @@ func TestCreateReview(t *testing.T) {
 				id := uuid.New()
 				mockCtrl.EXPECT().CreateReview(reviewData).Return(&id, nil)
 			},
-			expectedStatus: 200,
+			expectedStatus: 201,
 		},
 		{
 			name: "Internal error",
@@ -122,7 +122,7 @@ func TestCreateReview(t *testing.T) {
 			// THEN
 			// check the HTTP status code
 			assert.Equal(t, tc.expectedStatus, w.Code, "wrong HTTP status code")
-			if tc.expectedStatus == 200 {
+			if tc.expectedStatus == 201 {
 				_, err := uuid.Parse(w.Body.String())
 				assert.True(t, err == nil)
 			}
