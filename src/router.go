@@ -20,6 +20,7 @@ type Controllers struct {
 	EventSeatController controllers.EventSeatControllerI
 	GenreController     controllers.GenreControllerI
 	PriceCategories     controllers.PriceCategoryControllerI
+	ReviewController    controllers.ReviewControllerI
 }
 
 func createRouter(dbConnection *sql.DB) *gin.Engine {
@@ -73,6 +74,10 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 		DatabaseManager: databaseManager,
 	}
 
+	reviewsRepo := &repositories.ReviewRepository{
+		DatabaseManager: databaseManager,
+	}
+
 	// Create controllers
 	controller := Controllers{
 		UserController: &controllers.UserController{
@@ -95,6 +100,9 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 		},
 		EventSeatController: &controllers.EventSeatController{
 			EventSeatRepo: eventSeatRepo,
+		},
+		ReviewController: &controllers.ReviewController{
+			ReviewRepo: reviewsRepo,
 		},
 	}
 
@@ -144,6 +152,9 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 	securedRoutes.Handle(http.MethodPost, "/events", handlers.CreateEventHandler(controller.EventController))
 	publicRoutes.Handle(http.MethodGet, "/movies/:id/events", handlers.GetEventsForMovieHandler(controller.EventController))
 	publicRoutes.Handle(http.MethodGet, "/events/special", handlers.GetSpecialEventsHandler(controller.EventController))
+
+	publicRoutes.Handle(http.MethodPost, "/reviews", handlers.CreateReviewHandler(controller.ReviewController))
+	publicRoutes.Handle(http.MethodDelete, "/reviews/:id", handlers.DeleteReviewHandler(controller.ReviewController))
 
 	return router
 }
