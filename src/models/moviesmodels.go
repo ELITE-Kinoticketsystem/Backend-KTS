@@ -1,6 +1,8 @@
 package models
 
 import (
+	"time"
+
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/.gen/KinoTicketSystem/model"
 	"github.com/google/uuid"
 )
@@ -55,4 +57,17 @@ type MovieDTOCreate struct {
 	ProducersID []struct {
 		ID *uuid.UUID
 	}
+}
+
+type CreateReviewRequest struct {
+	Rating    int32
+	Comment   string
+	Datetime  time.Time
+	IsSpoiler bool
+	UserID    string
+	MovieID   string
+}
+
+type DeleteReviewRequest struct {
+	ID string
 }
