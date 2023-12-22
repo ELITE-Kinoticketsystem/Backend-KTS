@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/.gen/KinoTicketSystem/model"
 	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/managers"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
@@ -15,13 +14,7 @@ import (
 )
 
 func TestCreateOrder(t *testing.T) {
-	order := &model.Orders{
-		ID:              utils.NewUUID(),
-		Totalprice:      100,
-		IsPaid:          false,
-		PaymentMethodID: utils.NewUUID(),
-		UserID:          utils.NewUUID(),
-	}
+	order := samples.GetModelOrder()
 
 	query := "INSERT INTO `KinoTicketSystem`.orders .*"
 

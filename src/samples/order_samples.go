@@ -91,3 +91,13 @@ func GetGetOrderDto() *[]models.GetOrderDTO {
 		},
 	}
 }
+
+func GetModelOrder() *model.Orders {
+	return &model.Orders{
+		ID:              utils.NewUUID(),
+		Totalprice:      100,
+		IsPaid:          false,
+		PaymentMethodID: utils.NewUUID(),
+		UserID:          utils.NewUUID(),
+	}
+}
