@@ -123,3 +123,48 @@ func GetSamplePriceCategory() *model.PriceCategories {
 
 	return &priceCategory
 }
+
+func GetSampleTicket() *models.TicketDTO {
+	ticket := models.TicketDTO{}
+
+	id := uuid.New()
+	seatId := uuid.New()
+	eventId := uuid.New()
+	orderId := uuid.New()
+	cinemaHallId := uuid.New()
+	userId := uuid.New()
+	paymentMethodId := uuid.New()
+	seatCategoryId := uuid.New()
+	description := "Test Description"
+
+	ticket = models.TicketDTO{
+		ID:        &id,
+		Validated: false,
+		Price:     1000,
+		Seats: &model.Seats{
+			ID:             &seatId,
+			RowNr:          1,
+			ColumnNr:       1,
+			SeatCategoryID: &seatCategoryId,
+			Type:           "Test Type",
+		},
+		Event: &model.Events{
+			ID:           &eventId,
+			Title:        "Test Event",
+			Start:        time.Now(),
+			End:          time.Now(),
+			Description:  &description,
+			EventType:    "Test EventType",
+			CinemaHallID: &cinemaHallId,
+		},
+		Order: &model.Orders{
+			ID:              &orderId,
+			Totalprice:      1000,
+			IsPaid:          false,
+			PaymentMethodID: &paymentMethodId,
+			UserID:          &userId,
+		},
+	}
+
+	return &ticket
+}
