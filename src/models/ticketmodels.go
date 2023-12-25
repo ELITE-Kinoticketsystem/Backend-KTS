@@ -19,7 +19,7 @@ import (
 // }
 
 type TicketDTO struct {
-	ID        *uuid.UUID
+	ID        *uuid.UUID `sql:"primary_key"`
 	Validated bool
 	Price     int32
 
@@ -27,3 +27,11 @@ type TicketDTO struct {
 	Order *model.Orders
 	Event *model.Events
 }
+
+// type TicketDTO struct {
+// 	model.Tickets
+
+// 	Seats struct{ model.Seats }
+// 	Order struct{ model.Orders }
+// 	Event struct{ model.Events }
+// }

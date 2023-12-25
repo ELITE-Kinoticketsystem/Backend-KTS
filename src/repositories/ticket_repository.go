@@ -31,9 +31,9 @@ func (tr *TicketRepository) GetTicketById(id *uuid.UUID) (*models.TicketDTO, *mo
 
 	// Create the query
 	stmt := mysql.SELECT(
-		table.Tickets.ID,
-		table.Tickets.Validated,
-		table.Tickets.Price,
+		table.Tickets.ID.AS("tickets.id"),
+		table.Tickets.Validated.AS("tickets.validated"),
+		table.Tickets.Price.AS("tickets.price"),
 
 		table.Seats.AllColumns,
 		table.Events.AllColumns,
@@ -80,6 +80,8 @@ func (tr *TicketRepository) CreateTicket(ticket *model.Tickets) (*uuid.UUID, *mo
 		utils.MysqlUuid(ticket.EventSeatID),
 	)
 
+	log.Print(stmt.DebugSql())
+
 	// Execute the query
 	rows, err := stmt.Exec(tr.DatabaseManager.GetDatabaseConnection())
 	if err != nil {
@@ -107,6 +109,8 @@ func (tr *TicketRepository) ValidateTicket(id *uuid.UUID) *models.KTSError {
 	).WHERE(
 		table.Tickets.ID.EQ(utils.MysqlUuid(id)),
 	)
+
+	log.Print(stmt.DebugSql())
 
 	// Execute the query
 	rows, err := stmt.Exec(tr.DatabaseManager.GetDatabaseConnection())

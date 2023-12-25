@@ -644,7 +644,7 @@ func GetSamplePriceCategories() *[]model.PriceCategories {
 func GetSamplePriceCategory() *model.PriceCategories {
 	priceCategory := model.PriceCategories{}
 
-	uuid1 := uuid.MustParse("6ba7b820-9dad-11d1-80b4-00c04fd430c4")
+	uuid1 := uuid.New()
 
 	priceCategory = model.PriceCategories{
 		ID:           &uuid1,
@@ -670,8 +670,8 @@ func GetSampleTicket() *models.TicketDTO {
 
 	ticket = models.TicketDTO{
 		ID:        &id,
-		Validated: false,
-		Price:     1000,
+		Validated: *new(bool),
+		Price:     10,
 		Seats: &model.Seats{
 			ID:             &seatId,
 			RowNr:          1,
@@ -695,6 +695,26 @@ func GetSampleTicket() *models.TicketDTO {
 			PaymentMethodID: &paymentMethodId,
 			UserID:          &userId,
 		},
+	}
+
+	return &ticket
+}
+
+func GetSampleCreateTicket() *model.Tickets {
+	ticket := model.Tickets{}
+
+	id := uuid.New()
+	eventSeatId := uuid.New()
+	priceCategoryID := uuid.New()
+	orderId := uuid.New()
+
+	ticket = model.Tickets{
+		ID:              &id,
+		Validated:       *new(bool),
+		Price:           10,
+		OrderID:         &orderId,
+		PriceCategoryID: &priceCategoryID,
+		EventSeatID:     &eventSeatId,
 	}
 
 	return &ticket
