@@ -19,5 +19,6 @@ type GetSeatsForSeatSelectorDTO struct {
 	Available     bool
 	BookedByOther bool
 	Category      string
+	Type          string
 	Price         int32
 }

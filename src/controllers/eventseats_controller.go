@@ -42,6 +42,7 @@ func (esc *EventSeatController) GetEventSeats(eventId *uuid.UUID, userId *uuid.U
 			Available:     (seat.EventSeat.BlockedUntil == nil || seat.EventSeat.BlockedUntil.Before(time.Now()) || seat.EventSeat.UserID == nil) && !seat.EventSeat.Booked,
 			BookedByOther: (seat.EventSeat.BlockedUntil != nil && (seat.EventSeat.BlockedUntil.After(time.Now()) && (seat.EventSeat.UserID != nil && seat.EventSeat.UserID != userId))) && !seat.EventSeat.Booked,
 			Category:      seat.SeatCategory.CategoryName,
+			Type:          seat.Seat.Type,
 			Price:         seat.EventSeatCategory.Price,
 		}
 
