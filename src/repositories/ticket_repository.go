@@ -1,7 +1,6 @@
 package repositories
 
 import (
-	"encoding/json"
 	"log"
 
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/.gen/KinoTicketSystem/model"
@@ -31,9 +30,9 @@ func (tr *TicketRepository) GetTicketById(id *uuid.UUID) (*models.TicketDTO, *mo
 
 	// Create the query
 	stmt := mysql.SELECT(
-		table.Tickets.ID.AS("tickets.id"),
-		table.Tickets.Validated.AS("tickets.validated"),
-		table.Tickets.Price.AS("tickets.price"),
+		table.Tickets.ID,
+		table.Tickets.Validated,
+		table.Tickets.Price,
 
 		table.Seats.AllColumns,
 		table.Events.AllColumns,
@@ -56,12 +55,6 @@ func (tr *TicketRepository) GetTicketById(id *uuid.UUID) (*models.TicketDTO, *mo
 		}
 		return nil, kts_errors.KTS_INTERNAL_ERROR
 	}
-
-	prettyTicket, err := json.Marshal(ticket)
-	if err != nil {
-		log.Fatal("Failed to generate json", err)
-	}
-	log.Print(string(prettyTicket))
 
 	return &ticket, nil
 }
@@ -109,8 +102,6 @@ func (tr *TicketRepository) ValidateTicket(id *uuid.UUID) *models.KTSError {
 	).WHERE(
 		table.Tickets.ID.EQ(utils.MysqlUuid(id)),
 	)
-
-	log.Print(stmt.DebugSql())
 
 	// Execute the query
 	rows, err := stmt.Exec(tr.DatabaseManager.GetDatabaseConnection())

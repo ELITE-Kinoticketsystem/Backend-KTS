@@ -19,9 +19,9 @@ import (
 // }
 
 type TicketDTO struct {
-	ID        *uuid.UUID `sql:"primary_key"`
-	Validated bool
-	Price     int32
+	ID        *uuid.UUID `sql:"primary_key" alias:"ticket.id"`
+	Validated bool       `alias:"ticket.validated"`
+	Price     int32      `alias:"ticket.price"`
 
 	Seats *model.Seats
 	Order *model.Orders

@@ -41,7 +41,7 @@ func TestGetTicketById(t *testing.T) {
 			setExpectations: func(mock sqlmock.Sqlmock, id *uuid.UUID) {
 				mock.ExpectQuery(query).WithArgs(utils.EqUUID(ticketId)).WillReturnRows(
 					sqlmock.NewRows(
-						[]string{"tickets.id", "tickets.validated", "tickets.price", "seats.id", "seats.row_nr", "seats.column_nr", "seats.seat_category_id", "seats.cinema_hall_id", "seats.type", "events.id", "events.title", "events.start", "events.end", "events.description", "events.event_type", "events.cinema_hall_id", "orders.id", "orders.totalprice", "orders.is_paid", "orders.payment_method_id", "orders.user_id"},
+						[]string{"ticket.id", "ticket.validated", "ticket.price", "seats.id", "seats.row_nr", "seats.column_nr", "seats.seat_category_id", "seats.cinema_hall_id", "seats.type", "events.id", "events.title", "events.start", "events.end", "events.description", "events.event_type", "events.cinema_hall_id", "orders.id", "orders.totalprice", "orders.is_paid", "orders.payment_method_id", "orders.user_id"},
 					).AddRow(
 						&sampleTicket.ID, &sampleTicket.Validated, &sampleTicket.Price, &sampleTicket.Seats.ID, &sampleTicket.Seats.RowNr, &sampleTicket.Seats.ColumnNr, &sampleTicket.Seats.SeatCategoryID, &sampleTicket.Seats.CinemaHallID, &sampleTicket.Seats.Type, &sampleTicket.Event.ID, &sampleTicket.Event.Title, &sampleTicket.Event.Start, &sampleTicket.Event.End, &sampleTicket.Event.Description, &sampleTicket.Event.EventType, &sampleTicket.Event.CinemaHallID, &sampleTicket.Order.ID, &sampleTicket.Order.Totalprice, &sampleTicket.Order.IsPaid, &sampleTicket.Order.PaymentMethodID, &sampleTicket.Order.UserID,
 					),
@@ -50,24 +50,24 @@ func TestGetTicketById(t *testing.T) {
 			expectedTicket: sampleTicket,
 			expectedError:  nil,
 		},
-		// {
-		// 	name: "Ticket not found",
-		// 	setExpectations: func(mock sqlmock.Sqlmock, id *uuid.UUID) {
-		// 		mock.ExpectQuery(query).WithArgs(utils.EqUUID(ticketId)).WillReturnRows(
-		// 			sqlmock.NewRows([]string{"tickets.id, tickets.validated, tickets.price, seats.id, seats.row_nr, seats.column_nr", "seats.seat_category_id, seats.cinema_hall_id, seats.type, events.id, events.title", "events.start, events.end, events.description, events.event_type, events.cinema_hall_id", "orders.id", "orders.totalprice", "orders.is_paid", "orders.payment_method_id", "orders.user_id"}),
-		// 		)
-		// 	},
-		// 	expectedTicket: nil,
-		// 	expectedError:  kts_errors.KTS_NOT_FOUND,
-		// },
-		// {
-		// 	name: "Error while querying Ticket",
-		// 	setExpectations: func(mock sqlmock.Sqlmock, id *uuid.UUID) {
-		// 		mock.ExpectQuery(query).WithArgs(utils.EqUUID(ticketId)).WillReturnError(sqlmock.ErrCancelled)
-		// 	},
-		// 	expectedTicket: nil,
-		// 	expectedError:  kts_errors.KTS_INTERNAL_ERROR,
-		// },
+		{
+			name: "Ticket not found",
+			setExpectations: func(mock sqlmock.Sqlmock, id *uuid.UUID) {
+				mock.ExpectQuery(query).WithArgs(utils.EqUUID(ticketId)).WillReturnRows(
+					sqlmock.NewRows([]string{"ticket.id", "ticket.validated", "ticket.price", "seats.id", "seats.row_nr", "seats.column_nr", "seats.seat_category_id", "seats.cinema_hall_id", "seats.type", "events.id", "events.title", "events.start", "events.end", "events.description", "events.event_type", "events.cinema_hall_id", "orders.id", "orders.totalprice", "orders.is_paid", "orders.payment_method_id", "orders.user_id"}),
+				)
+			},
+			expectedTicket: nil,
+			expectedError:  kts_errors.KTS_NOT_FOUND,
+		},
+		{
+			name: "Error while querying Ticket",
+			setExpectations: func(mock sqlmock.Sqlmock, id *uuid.UUID) {
+				mock.ExpectQuery(query).WithArgs(utils.EqUUID(ticketId)).WillReturnError(sqlmock.ErrCancelled)
+			},
+			expectedTicket: nil,
+			expectedError:  kts_errors.KTS_INTERNAL_ERROR,
+		},
 	}
 
 	for _, tc := range testCases {
@@ -203,33 +203,33 @@ func TestValidateTicket(t *testing.T) {
 		{
 			name: "Validated Ticket successfully",
 			setExpectations: func(mock sqlmock.Sqlmock, id *uuid.UUID) {
-				mock.ExpectExec(query).WithArgs(utils.EqUUID(ticketID)).WillReturnResult(sqlmock.NewResult(1, 1))
+				mock.ExpectExec(query).WithArgs(true, utils.EqUUID(ticketID)).WillReturnResult(sqlmock.NewResult(1, 1))
 			},
 			expectedError: nil,
 		},
-		// {
-		// 	name: "Error while validating ticket",
-		// 	setExpectations: func(mock sqlmock.Sqlmock, id *uuid.UUID) {
-		// 		mock.ExpectExec(query).WithArgs(sqlmock.AnyArg()).WillReturnError(sqlmock.ErrCancelled)
-		// 	},
-		// 	expectedError: kts_errors.KTS_INTERNAL_ERROR,
-		// },
-		// {
-		// 	name: "Error while converting rows affected",
-		// 	setExpectations: func(mock sqlmock.Sqlmock, id *uuid.UUID) {
-		// 		mock.ExpectExec(query).WithArgs(sqlmock.AnyArg()).WillReturnResult(
-		// 			sqlmock.NewErrorResult(errors.New("rows affected conversion did not work")),
-		// 		)
-		// 	},
-		// 	expectedError: kts_errors.KTS_INTERNAL_ERROR,
-		// },
-		// {
-		// 	name: "Ticket not found",
-		// 	setExpectations: func(mock sqlmock.Sqlmock, id *uuid.UUID) {
-		// 		mock.ExpectExec(query).WithArgs(sqlmock.AnyArg()).WillReturnResult(sqlmock.NewResult(1, 0))
-		// 	},
-		// 	expectedError: kts_errors.KTS_NOT_FOUND,
-		// },
+		{
+			name: "Error while validating ticket",
+			setExpectations: func(mock sqlmock.Sqlmock, id *uuid.UUID) {
+				mock.ExpectExec(query).WithArgs(true, sqlmock.AnyArg()).WillReturnError(sqlmock.ErrCancelled)
+			},
+			expectedError: kts_errors.KTS_INTERNAL_ERROR,
+		},
+		{
+			name: "Error while converting rows affected",
+			setExpectations: func(mock sqlmock.Sqlmock, id *uuid.UUID) {
+				mock.ExpectExec(query).WithArgs(true, sqlmock.AnyArg()).WillReturnResult(
+					sqlmock.NewErrorResult(errors.New("rows affected conversion did not work")),
+				)
+			},
+			expectedError: kts_errors.KTS_INTERNAL_ERROR,
+		},
+		{
+			name: "Ticket not found",
+			setExpectations: func(mock sqlmock.Sqlmock, id *uuid.UUID) {
+				mock.ExpectExec(query).WithArgs(true, sqlmock.AnyArg()).WillReturnResult(sqlmock.NewResult(1, 0))
+			},
+			expectedError: kts_errors.KTS_NOT_FOUND,
+		},
 	}
 
 	for _, tc := range testCases {
