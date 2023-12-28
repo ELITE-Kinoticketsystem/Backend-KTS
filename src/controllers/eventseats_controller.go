@@ -226,7 +226,7 @@ func (esc *EventSeatController) GetSelectedSeats(eventId *uuid.UUID, userId *uui
 }
 
 func seatMapToSlice(seatMap map[int32][]models.GetSeatsForSeatSelectorDTO) *[][]models.GetSeatsForSeatSelectorDTO {
-	seatSlice := [][]models.GetSeatsForSeatSelectorDTO{}
+	seatSlice := make([][]models.GetSeatsForSeatSelectorDTO, len(seatMap))
 
 	for _, seatRow := range seatMap {
 		// sort seatrow by columnNr
@@ -234,7 +234,8 @@ func seatMapToSlice(seatMap map[int32][]models.GetSeatsForSeatSelectorDTO) *[][]
 			return (int)(a.ColumnNr - b.ColumnNr)
 		})
 
-		seatSlice = append(seatSlice, seatRow)
+		row := seatRow[0].RowNr
+		seatSlice[row] = seatRow
 	}
 
 	return &seatSlice
