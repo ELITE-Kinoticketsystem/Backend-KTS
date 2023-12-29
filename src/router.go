@@ -19,8 +19,9 @@ type Controllers struct {
 	MovieController     controllers.MovieControllerI
 	EventSeatController controllers.EventSeatControllerI
 	GenreController     controllers.GenreControllerI
-	PriceCategories     controllers.PriceCategoryControllerI
+	PriceCategories         controllers.PriceCategoryControllerI
 	ReviewController    controllers.ReviewControllerI
+	OrderController     controllers.OrderControllerI
 }
 
 func createRouter(dbConnection *sql.DB) *gin.Engine {
@@ -74,6 +75,10 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 		DatabaseManager: databaseManager,
 	}
 
+	orderRepo := repositories.OrderRepository{
+		DatabaseManager: databaseManager,
+	}
+
 	reviewsRepo := &repositories.ReviewRepository{
 		DatabaseManager: databaseManager,
 	}
@@ -99,6 +104,10 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 			PriceCategoryRepository: priceCategoryRepo,
 		},
 		EventSeatController: &controllers.EventSeatController{
+			EventSeatRepo: eventSeatRepo,
+		},
+		OrderController: &controllers.OrderController{
+			OrderRepo:     &orderRepo,
 			EventSeatRepo: eventSeatRepo,
 		},
 		ReviewController: &controllers.ReviewController{
@@ -155,6 +164,13 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 
 	publicRoutes.Handle(http.MethodPost, "/reviews", handlers.CreateReviewHandler(controller.ReviewController))
 	publicRoutes.Handle(http.MethodDelete, "/reviews/:id", handlers.DeleteReviewHandler(controller.ReviewController))
+
+	// order and reservation
+	router.Handle(http.MethodPost, "/events/:eventId/reserve", handlers.CreateOrderHandler(controller.OrderController, true))
+	router.Handle(http.MethodPost, "/events/:eventId/book", handlers.CreateOrderHandler(controller.OrderController, false))
+
+	router.Handle(http.MethodGet, "/orders/:orderId", handlers.GetOrderByIdHandler(controller.OrderController))
+	router.Handle(http.MethodGet, "/orders", handlers.GetOrdersHandler(controller.OrderController))
 
 	return router
 }
