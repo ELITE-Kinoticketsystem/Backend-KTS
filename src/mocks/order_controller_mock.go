@@ -40,18 +40,18 @@ func (m *MockOrderControllerI) EXPECT() *MockOrderControllerIMockRecorder {
 }
 
 // CreateOrder mocks base method.
-func (m *MockOrderControllerI) CreateOrder(CreateOrderDTO models.CreateOrderDTO, eventId, userId *uuid.UUID, isReservation bool) (*uuid.UUID, *models.KTSError) {
+func (m *MockOrderControllerI) CreateOrder(createOrderDTO models.CreateOrderDTO, eventId, userId *uuid.UUID, isReservation bool) (*uuid.UUID, *models.KTSError) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreateOrder", CreateOrderDTO, eventId, userId, isReservation)
+	ret := m.ctrl.Call(m, "CreateOrder", createOrderDTO, eventId, userId, isReservation)
 	ret0, _ := ret[0].(*uuid.UUID)
 	ret1, _ := ret[1].(*models.KTSError)
 	return ret0, ret1
 }
 
 // CreateOrder indicates an expected call of CreateOrder.
-func (mr *MockOrderControllerIMockRecorder) CreateOrder(CreateOrderDTO, eventId, userId, isReservation any) *gomock.Call {
+func (mr *MockOrderControllerIMockRecorder) CreateOrder(createOrderDTO, eventId, userId, isReservation any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateOrder", reflect.TypeOf((*MockOrderControllerI)(nil).CreateOrder), CreateOrderDTO, eventId, userId, isReservation)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateOrder", reflect.TypeOf((*MockOrderControllerI)(nil).CreateOrder), createOrderDTO, eventId, userId, isReservation)
 }
 
 // GetOrderById mocks base method.

@@ -4,6 +4,7 @@
 ~/go/bin/mockgen -source=./src/controllers/theatre_controller.go -destination=./src/mocks/theatre_controller_mock.go -package=mocks
 ~/go/bin/mockgen -source=./src/controllers/review_controller.go -destination=./src/mocks/review_controller_mock.go -package=mocks
 ~/go/bin/mockgen -source=./src/controllers/eventseats_controller.go -destination=./src/mocks/eventseats_controller_mock.go -package=mocks
+~/go/bin/mockgen -source=./src/controllers/event_controller.go -destination=./src/mocks/event_controller_mock.go -package=mocks
 
 # repositories
 ~/go/bin/mockgen -source=./src/repositories/user_repo.go -destination=./src/mocks/user_repo_mock.go -package=mocks
@@ -20,3 +21,4 @@
 ~/go/bin/mockgen -source=./src/repositories/order_repository.go -destination=./src/mocks/order_repository_mock.go -package=mocks
 ~/go/bin/mockgen -source=./src/repositories/ticket_repository.go -destination=./src/mocks/ticket_repository_mock.go -package=mocks
 ~/go/bin/mockgen -source=./src/controllers/order_controller.go -destination=./src/mocks/order_controller_mock.go -package=mocks
+~/go/bin/mockgen -source=./src/repositories/event_repository.go -destination=./src/mocks/event_repository_mock.go -package=mocks

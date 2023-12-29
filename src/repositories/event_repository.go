@@ -1,6 +1,8 @@
 package repositories
 
 import (
+	"log"
+
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/.gen/KinoTicketSystem/model"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/.gen/KinoTicketSystem/table"
 	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
@@ -26,6 +28,7 @@ type EventRepo interface {
 	CreateEventSeat(eventSeat *model.EventSeats) *models.KTSError
 
 	CreateEventSeatCategory(eventSeatCategory *model.EventSeatCategories) *models.KTSError
+	GetEventById(eventId *uuid.UUID) (*models.GetSpecialEventsDTO, *models.KTSError)
 }
 
 type EventRepository struct {
@@ -116,7 +119,7 @@ func (er *EventRepository) GetSpecialEvents() (*[]models.GetSpecialEventsDTO, *m
 }
 
 func (er *EventRepository) GetEventsForMovie(movieId *uuid.UUID) ([]*model.Events, *models.KTSError) {
-	stmt := table.Events.SELECT(table.Events.AllColumns).FROM(table.Events.FULL_JOIN(table.EventMovies, table.EventMovies.EventID.EQ(table.Events.ID))).WHERE(table.EventMovies.MovieID.EQ(utils.MysqlUuid(movieId))).WHERE(table.Events.Start.GT(utils.MysqlTimeNow())).WHERE(table.Events.EventType.EQ(utils.MySqlString(showing)))
+	stmt := table.Events.SELECT(table.Events.AllColumns).FROM(table.Events.LEFT_JOIN(table.EventMovies, table.EventMovies.EventID.EQ(table.Events.ID))).WHERE(table.EventMovies.MovieID.EQ(utils.MysqlUuid(movieId))).WHERE(table.Events.Start.GT(utils.MysqlTimeNow())).WHERE(table.Events.EventType.EQ(utils.MySqlString(showing)))
 
 	var events []*model.Events
 
@@ -127,4 +130,32 @@ func (er *EventRepository) GetEventsForMovie(movieId *uuid.UUID) ([]*model.Event
 	}
 
 	return events, nil
+}
+
+func (er *EventRepository) GetEventById(eventId *uuid.UUID) (*models.GetSpecialEventsDTO, *models.KTSError) {
+	var event models.GetSpecialEventsDTO
+
+	stmt := mysql.SELECT(
+		table.Events.AllColumns,
+		table.Movies.AllColumns,
+	).
+		FROM(
+			table.Events.
+				LEFT_JOIN(table.EventMovies, table.EventMovies.EventID.EQ(table.Events.ID)).
+				LEFT_JOIN(table.Movies, table.Movies.ID.EQ(table.EventMovies.MovieID)),
+		).
+		WHERE(
+			table.Events.ID.EQ(utils.MysqlUuid(eventId)),
+		)
+
+	log.Println(stmt.DebugSql())
+
+	err := stmt.Query(er.DatabaseManager.GetDatabaseConnection(), &event)
+
+	if err != nil {
+		log.Println(err.Error())
+		return nil, kts_errors.KTS_INTERNAL_ERROR
+	}
+
+	return &event, nil
 }

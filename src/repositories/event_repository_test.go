@@ -11,6 +11,7 @@ import (
 	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/managers"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/samples"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
 )
 
@@ -326,7 +327,7 @@ func TestGetEventsForMovie(t *testing.T) {
 						AddRow(expectedEvents[0].ID, expectedEvents[0].Title, expectedEvents[0].Start, expectedEvents[0].End, expectedEvents[0].Description, expectedEvents[0].EventType, expectedEvents[0].CinemaHallID).
 						AddRow(expectedEvents[1].ID, expectedEvents[1].Title, expectedEvents[1].Start, expectedEvents[1].End, expectedEvents[1].Description, expectedEvents[1].EventType, expectedEvents[1].CinemaHallID),
 				)
-				
+
 			},
 			expectedEvents: expectedEvents,
 			expectedError:  nil,
@@ -469,6 +470,83 @@ func TestGetSpecialEvents(t *testing.T) {
 
 			if !reflect.DeepEqual(specialEvents, tc.expectedEvents) {
 				t.Errorf("Expected special events: %v, got: %v", tc.expectedEvents, specialEvents)
+			}
+
+			if err := mock.ExpectationsWereMet(); err != nil {
+				t.Errorf("There were unfulfilled expectations: %s", err)
+			}
+		})
+	}
+}
+
+func TestGetEventById(t *testing.T) {
+	eventID := utils.NewUUID()
+
+	expectedEvent := samples.GetGetSpecialEventsDTO(eventID)
+
+	query := "SELECT .* FROM `KinoTicketSystem`.events .*"
+
+	testCases := []struct {
+		name            string
+		setExpectations func(mock sqlmock.Sqlmock)
+		expectedEvent   *models.GetSpecialEventsDTO
+		expectedError   *models.KTSError
+	}{
+		{
+			name: "Get event by ID",
+			setExpectations: func(mock sqlmock.Sqlmock) {
+				mock.ExpectQuery(query).WithArgs(utils.EqUUID(eventID)).
+					WillReturnRows(sqlmock.NewRows([]string{
+						"events.id", "events.title", "events.start", "events.end", "events.description", "events.event_type", "events.cinema_hall_id",
+						"movies.id", "movies.title", "movies.description", "movies.banner_pic_url", "movies.cover_pic_url",
+						"movies.trailer_url", "movies.rating", "movies.release_date", "movies.time_in_min", "movies.fsk",
+					}).AddRow(
+						expectedEvent.Events.ID, expectedEvent.Events.Title, expectedEvent.Events.Start, expectedEvent.Events.End, expectedEvent.Events.Description, expectedEvent.Events.EventType, expectedEvent.Events.CinemaHallID,
+						expectedEvent.Movies[0].ID, expectedEvent.Movies[0].Title, expectedEvent.Movies[0].Description, expectedEvent.Movies[0].BannerPicURL, expectedEvent.Movies[0].CoverPicURL,
+						expectedEvent.Movies[0].TrailerURL, expectedEvent.Movies[0].Rating, expectedEvent.Movies[0].ReleaseDate, expectedEvent.Movies[0].TimeInMin, expectedEvent.Movies[0].Fsk,
+					).AddRow(
+						expectedEvent.Events.ID, expectedEvent.Events.Title, expectedEvent.Events.Start, expectedEvent.Events.End, expectedEvent.Events.Description, expectedEvent.Events.EventType, expectedEvent.Events.CinemaHallID,
+						expectedEvent.Movies[1].ID, expectedEvent.Movies[1].Title, expectedEvent.Movies[1].Description, expectedEvent.Movies[1].BannerPicURL, expectedEvent.Movies[1].CoverPicURL,
+						expectedEvent.Movies[1].TrailerURL, expectedEvent.Movies[1].Rating, expectedEvent.Movies[1].ReleaseDate, expectedEvent.Movies[1].TimeInMin, expectedEvent.Movies[1].Fsk,
+					))
+			},
+			expectedEvent: expectedEvent,
+			expectedError: nil,
+		},
+		{
+			name: "Get event by ID sql error",
+			setExpectations: func(mock sqlmock.Sqlmock) {
+				mock.ExpectQuery(query).WithArgs(utils.EqUUID(eventID)).WillReturnError(sql.ErrConnDone)
+			},
+			expectedEvent: nil,
+			expectedError: kts_errors.KTS_INTERNAL_ERROR,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			db, mock, err := sqlmock.New()
+			if err != nil {
+				t.Fatalf("Failed to create mock database connection: %v", err)
+			}
+			defer db.Close()
+
+			eventRepo := &EventRepository{
+				DatabaseManager: &managers.DatabaseManager{
+					Connection: db,
+				},
+			}
+
+			tc.setExpectations(mock)
+
+			event, ktsErr := eventRepo.GetEventById(eventID)
+
+			if ktsErr != tc.expectedError {
+				t.Errorf("Unexpected error: %v", ktsErr)
+			}
+
+			if !reflect.DeepEqual(event, tc.expectedEvent) {
+				t.Errorf("Expected event: %v, got: %v", tc.expectedEvent, event)
 			}
 
 			if err := mock.ExpectationsWereMet(); err != nil {

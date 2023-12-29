@@ -83,6 +83,13 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 		DatabaseManager: databaseManager,
 	}
 
+	eventRepo := &repositories.EventRepository{
+		DatabaseManager: databaseManager,
+	}
+	theatreRepo := &repositories.TheatreRepository{
+		DatabaseManager: databaseManager,
+	}
+
 	// Create controllers
 	controller := Controllers{
 		UserController: &controllers.UserController{
@@ -102,6 +109,10 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 		},
 		PriceCategories: &controllers.PriceCategoryController{
 			PriceCategoryRepository: priceCategoryRepo,
+		},
+		EventController: &controllers.EventController{
+			EventRepo:   eventRepo,
+			TheatreRepo: theatreRepo,
 		},
 		EventSeatController: &controllers.EventSeatController{
 			EventSeatRepo: eventSeatRepo,
@@ -158,10 +169,12 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 	securedRoutes.Handle(http.MethodGet, "/events/:eventId/user-seats", handlers.GetSelectedSeatsHandler(controller.EventSeatController))
 
 	// events
-	securedRoutes.Handle(http.MethodPost, "/events", handlers.CreateEventHandler(controller.EventController))
+	publicRoutes.Handle(http.MethodPost, "/events", handlers.CreateEventHandler(controller.EventController))
 	publicRoutes.Handle(http.MethodGet, "/movies/:id/events", handlers.GetEventsForMovieHandler(controller.EventController))
 	publicRoutes.Handle(http.MethodGet, "/events/special", handlers.GetSpecialEventsHandler(controller.EventController))
+	publicRoutes.Handle(http.MethodGet, "/events/:eventId", handlers.GetEventByIdHandler(controller.EventController))
 
+	// reviews
 	publicRoutes.Handle(http.MethodPost, "/reviews", handlers.CreateReviewHandler(controller.ReviewController))
 	publicRoutes.Handle(http.MethodDelete, "/reviews/:id", handlers.DeleteReviewHandler(controller.ReviewController))
 

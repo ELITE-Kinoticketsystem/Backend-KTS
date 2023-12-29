@@ -15,6 +15,7 @@ type EventControllerI interface {
 	CreateEvent(event *models.CreateEvtDTO) (*uuid.UUID, *models.KTSError)
 	GetEventsForMovie(movieId *uuid.UUID) ([]*model.Events, *models.KTSError)
 	GetSpecialEvents() (*[]models.GetSpecialEventsDTO, *models.KTSError)
+	GetEventById(eventId *uuid.UUID) (*models.GetSpecialEventsDTO, *models.KTSError)
 }
 
 type EventController struct {
@@ -117,4 +118,8 @@ func (ec *EventController) createEventSeats(cinemaHallId *uuid.UUID, eventId *uu
 	}
 
 	return nil
+}
+
+func (ec *EventController) GetEventById(eventId *uuid.UUID) (*models.GetSpecialEventsDTO, *models.KTSError) {
+	return ec.EventRepo.GetEventById(eventId)
 }

@@ -53,3 +53,21 @@ func GetSpecialEventsHandler(eventController controllers.EventControllerI) gin.H
 		c.JSON(http.StatusOK, events)
 	}
 }
+
+func GetEventByIdHandler(eventController controllers.EventControllerI) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		id, err := uuid.Parse(c.Param("eventId"))
+		if err != nil {
+			utils.HandleErrorAndAbort(c, kts_errors.KTS_BAD_REQUEST)
+			return
+		}
+
+		event, kts_err := eventController.GetEventById(&id)
+		if kts_err != nil {
+			utils.HandleErrorAndAbort(c, kts_err)
+			return
+		}
+
+		c.JSON(http.StatusOK, event)
+	}
+}
