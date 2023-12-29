@@ -10,7 +10,7 @@ import (
 )
 
 type OrderControllerI interface {
-	CreateOrder(CreateOrderDTO models.CreateOrderDTO, eventId *uuid.UUID, userId *uuid.UUID, isReservation bool) (*uuid.UUID, *models.KTSError)
+	CreateOrder(createOrderDTO models.CreateOrderDTO, eventId *uuid.UUID, userId *uuid.UUID, isReservation bool) (*uuid.UUID, *models.KTSError)
 	GetOrderById(orderId *uuid.UUID, userId *uuid.UUID) (*models.GetOrderDTO, *models.KTSError)
 	GetOrders(userId *uuid.UUID) (*[]models.GetOrderDTO, *models.KTSError)
 }
@@ -22,12 +22,12 @@ type OrderController struct {
 	TicketRepo        repositories.TicketRepoI
 }
 
-func (oc *OrderController) CreateOrder(CreateOrderDTO models.CreateOrderDTO, eventId *uuid.UUID, userId *uuid.UUID, isReservation bool) (*uuid.UUID, *models.KTSError) {
-	if isReservation && CreateOrderDTO.PaymentMethodID != nil {
+func (oc *OrderController) CreateOrder(createOrderDTO models.CreateOrderDTO, eventId *uuid.UUID, userId *uuid.UUID, isReservation bool) (*uuid.UUID, *models.KTSError) {
+	if isReservation && createOrderDTO.PaymentMethodID != nil {
 		return nil, kts_errors.KTS_BAD_REQUEST
 	}
 
-	slectedSeats, kts_err := oc.EventSeatRepo.GetSelectedSeats(eventId, userId)
+	selectedSeats, kts_err := oc.EventSeatRepo.GetSelectedSeats(eventId, userId)
 	if kts_err != nil {
 		return nil, kts_err
 	}
@@ -40,12 +40,12 @@ func (oc *OrderController) CreateOrder(CreateOrderDTO models.CreateOrderDTO, eve
 	adultPriceCategory := getPriceCategoryByName(*priceCategories, utils.ADULT)
 	orderId := utils.NewUUID()
 
-	tickets, totalPrice := createTicketsAndCalculateTotalPrice(slectedSeats, CreateOrderDTO, priceCategories, adultPriceCategory, orderId)
+	tickets, totalPrice := createTicketsAndCalculateTotalPrice(selectedSeats, createOrderDTO, priceCategories, adultPriceCategory, orderId)
 
 	order := model.Orders{
 		ID:              orderId,
 		UserID:          userId,
-		PaymentMethodID: CreateOrderDTO.PaymentMethodID,
+		PaymentMethodID: createOrderDTO.PaymentMethodID,
 		IsPaid:          !isReservation,
 		Totalprice:      totalPrice,
 	}
@@ -62,7 +62,7 @@ func (oc *OrderController) CreateOrder(CreateOrderDTO models.CreateOrderDTO, eve
 		}
 	}
 
-	for _, seat := range *slectedSeats {
+	for _, seat := range *selectedSeats {
 		seat.EventSeat.Booked = true
 		err := oc.EventSeatRepo.UpdateEventSeat(&seat.EventSeat)
 		if err != nil {
@@ -81,7 +81,7 @@ func (oc *OrderController) GetOrders(userId *uuid.UUID) (*[]models.GetOrderDTO, 
 	return oc.OrderRepo.GetOrders(userId)
 }
 
-func createTicketsAndCalculateTotalPrice(slectedSeats *[]models.GetEventSeatsDTO, CreateOrderDTO models.CreateOrderDTO, priceCategories *[]model.PriceCategories, adultPriceCategory *model.PriceCategories, orderId *uuid.UUID) ([]model.Tickets, int32) {
+func createTicketsAndCalculateTotalPrice(slectedSeats *[]models.GetEventSeatsDTO, createOrderDTO models.CreateOrderDTO, priceCategories *[]model.PriceCategories, adultPriceCategory *model.PriceCategories, orderId *uuid.UUID) ([]model.Tickets, int32) {
 	tickets := make([]model.Tickets, len(*slectedSeats))
 
 	totalPrice := int32(0)
@@ -90,7 +90,7 @@ func createTicketsAndCalculateTotalPrice(slectedSeats *[]models.GetEventSeatsDTO
 
 		var priceCategory *model.PriceCategories
 
-		for _, seatPriceCategory := range CreateOrderDTO.EventSeatPriceCategories {
+		for _, seatPriceCategory := range createOrderDTO.EventSeatPriceCategories {
 			if seat.EventSeat.ID == seatPriceCategory.EventSeatId {
 				priceCategory = getPriceCategoryById(*priceCategories, seatPriceCategory.PriceCategoryId)
 				break
