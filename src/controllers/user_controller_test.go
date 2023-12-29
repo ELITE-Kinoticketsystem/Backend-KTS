@@ -7,6 +7,7 @@ import (
 	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/mocks"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/samples"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
@@ -22,7 +23,7 @@ func TestRegisterUser(t *testing.T) {
 	}{
 		{
 			name:             "Email exists",
-			registrationData: utils.GetSampleRegistrationData(),
+			registrationData: samples.GetSampleRegistrationData(),
 			setExpectations: func(mockRepo mocks.MockUserRepositoryI, registrationData models.RegistrationRequest) {
 				mockRepo.EXPECT().CheckIfEmailExists(registrationData.Email).Return(kts_errors.KTS_EMAIL_EXISTS)
 			},
@@ -31,7 +32,7 @@ func TestRegisterUser(t *testing.T) {
 		},
 		{
 			name:             "Email internal error",
-			registrationData: utils.GetSampleRegistrationData(),
+			registrationData: samples.GetSampleRegistrationData(),
 			setExpectations: func(mockRepo mocks.MockUserRepositoryI, registrationData models.RegistrationRequest) {
 				mockRepo.EXPECT().CheckIfEmailExists(registrationData.Email).Return(kts_errors.KTS_INTERNAL_ERROR)
 			},
@@ -40,7 +41,7 @@ func TestRegisterUser(t *testing.T) {
 		},
 		{
 			name:             "CreateUser internal error",
-			registrationData: utils.GetSampleRegistrationData(),
+			registrationData: samples.GetSampleRegistrationData(),
 			setExpectations: func(mockRepo mocks.MockUserRepositoryI, registrationData models.RegistrationRequest) {
 				user := model.Users{
 					/* Id */
@@ -60,7 +61,7 @@ func TestRegisterUser(t *testing.T) {
 		},
 		{
 			name:             "Success",
-			registrationData: utils.GetSampleRegistrationData(),
+			registrationData: samples.GetSampleRegistrationData(),
 			setExpectations: func(mockRepo mocks.MockUserRepositoryI, registrationData models.RegistrationRequest) {
 				user := model.Users{
 					/* Id */
@@ -75,7 +76,7 @@ func TestRegisterUser(t *testing.T) {
 				mockRepo.EXPECT().CreateUser(utils.EqUserMatcher(user, registrationData.Password)).Return(nil)
 			},
 			expectedResponse: &models.LoginResponse{
-				User: utils.GetSampleUser(),
+				User: samples.GetSampleUser(),
 				/* Token */
 				/* RefreshToken */
 			},
@@ -126,7 +127,7 @@ func TestLoginUser(t *testing.T) {
 	}{
 		{
 			name:      "User not found",
-			loginData: utils.GetSampleLoginData(),
+			loginData: samples.GetSampleLoginData(),
 			setExpectations: func(mockRepo mocks.MockUserRepositoryI, loginData models.LoginRequest) {
 				mockRepo.EXPECT().GetUserByUsername(loginData.Username).Return(nil, kts_errors.KTS_USER_NOT_FOUND)
 			},
@@ -135,7 +136,7 @@ func TestLoginUser(t *testing.T) {
 		},
 		{
 			name:      "Internal error",
-			loginData: utils.GetSampleLoginData(),
+			loginData: samples.GetSampleLoginData(),
 			setExpectations: func(mockRepo mocks.MockUserRepositoryI, loginData models.LoginRequest) {
 				mockRepo.EXPECT().GetUserByUsername(loginData.Username).Return(nil, kts_errors.KTS_INTERNAL_ERROR)
 			},
@@ -146,7 +147,7 @@ func TestLoginUser(t *testing.T) {
 			name:      "Incorrect password",
 			loginData: models.LoginRequest{Username: "Collinho el niño", Password: "incorrect"},
 			setExpectations: func(mockRepo mocks.MockUserRepositoryI, loginData models.LoginRequest) {
-				user := utils.GetSampleUser()
+				user := samples.GetSampleUser()
 				mockRepo.EXPECT().GetUserByUsername(loginData.Username).Return(&user, nil)
 			},
 			expectedError:    kts_errors.KTS_CREDENTIALS_INVALID,
@@ -154,14 +155,14 @@ func TestLoginUser(t *testing.T) {
 		},
 		{
 			name:      "success",
-			loginData: utils.GetSampleLoginData(),
+			loginData: samples.GetSampleLoginData(),
 			setExpectations: func(mockRepo mocks.MockUserRepositoryI, loginData models.LoginRequest) {
-				user := utils.GetSampleUser()
+				user := samples.GetSampleUser()
 				mockRepo.EXPECT().GetUserByUsername(loginData.Username).Return(&user, nil)
 			},
 			expectedError: nil,
 			expectedResponse: &models.LoginResponse{
-				User: utils.GetSampleUser(),
+				User: samples.GetSampleUser(),
 				/* Token */
 				/* RefreshToken */
 			},

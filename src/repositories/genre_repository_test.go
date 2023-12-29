@@ -9,13 +9,14 @@ import (
 	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/managers"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/samples"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestGetGenres(t *testing.T) {
-	sampleGenres := utils.GetSampleGenres()
+	sampleGenres := samples.GetSampleGenres()
 
 	query := "\nSELECT genres.id AS \"genres.id\",\n     genres.genre_name AS \"genres.genre_name\"\nFROM `KinoTicketSystem`.genres;\n"
 
@@ -96,7 +97,7 @@ func TestGetGenres(t *testing.T) {
 }
 
 func TestGetGenreByName(t *testing.T) {
-	sampleGenre := utils.GetSampleGenre()
+	sampleGenre := samples.GetSampleGenre()
 
 	genreName := sampleGenre.GenreName
 
@@ -177,7 +178,7 @@ func TestGetGenreByName(t *testing.T) {
 }
 
 func TestCreateGenre(t *testing.T) {
-	sampleGenre := utils.GetSampleGenre()
+	sampleGenre := samples.GetSampleGenre()
 
 	genreName := sampleGenre.GenreName
 
@@ -262,7 +263,7 @@ func TestCreateGenre(t *testing.T) {
 }
 
 func TestUpdateGenre(t *testing.T) {
-	sampleGenre := utils.GetSampleGenre()
+	sampleGenre := samples.GetSampleGenre()
 
 	query := "UPDATE `KinoTicketSystem`.genres SET genre_name = ? WHERE genres.id = ?;"
 
@@ -414,7 +415,7 @@ func TestDeleteGenre(t *testing.T) {
 }
 
 func TestGetGenresWithMovies(t *testing.T) {
-	sampleGenresWithMovies := utils.GetSampleGenresWithMovies()
+	sampleGenresWithMovies := samples.GetSampleGenresWithMovies()
 
 	query := "SELECT movies.id AS \"movies.id\",\n     movies.title AS \"movies.title\",\n     movies.description AS \"movies.description\",\n     movies.banner_pic_url AS \"movies.banner_pic_url\",\n     movies.cover_pic_url AS \"movies.cover_pic_url\",\n     movies.trailer_url AS \"movies.trailer_url\",\n     movies.rating AS \"movies.rating\",\n     movies.release_date AS \"movies.release_date\",\n     movies.time_in_min AS \"movies.time_in_min\",\n     movies.fsk AS \"movies.fsk\",\n     genres.id AS \"genres.id\",\n     genres.genre_name AS \"genres.genre_name\"\nFROM `KinoTicketSystem`.movie_genres\n     INNER JOIN `KinoTicketSystem`.movies ON (movies.id = movie_genres.movie_id)\n     INNER JOIN `KinoTicketSystem`.genres ON (genres.id = movie_genres.genre_id);\n"
 

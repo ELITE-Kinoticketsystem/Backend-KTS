@@ -2,13 +2,13 @@ package repositories
 
 import (
 	"testing"
-	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/.gen/KinoTicketSystem/model"
 	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/managers"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/samples"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
@@ -23,7 +23,7 @@ func TestCreateReview(t *testing.T) {
 	}{
 		{
 			name:   "Success",
-			review: getSampleReview(),
+			review: samples.GetSampleReview(),
 			setExpectations: func(mock sqlmock.Sqlmock, review model.Reviews) {
 				mock.ExpectExec(
 					"INSERT INTO `KinoTicketSystem`.reviews (id, rating, comment, datetime, is_spoiler, user_id, movie_id)\n"+
@@ -44,7 +44,7 @@ func TestCreateReview(t *testing.T) {
 		},
 		{
 			name:   "Insert internal error",
-			review: getSampleReview(),
+			review: samples.GetSampleReview(),
 			setExpectations: func(mock sqlmock.Sqlmock, review model.Reviews) {
 				mock.ExpectExec(
 					"INSERT INTO `KinoTicketSystem`.reviews (id, rating, comment, datetime, is_spoiler, user_id, movie_id)\n"+
@@ -65,7 +65,7 @@ func TestCreateReview(t *testing.T) {
 		},
 		{
 			name:   "Affected rows internal error",
-			review: getSampleReview(),
+			review: samples.GetSampleReview(),
 			setExpectations: func(mock sqlmock.Sqlmock, review model.Reviews) {
 				mock.ExpectExec(
 					"INSERT INTO `KinoTicketSystem`.reviews (id, rating, comment, datetime, is_spoiler, user_id, movie_id)\n"+
@@ -86,7 +86,7 @@ func TestCreateReview(t *testing.T) {
 		},
 		{
 			name:   "No affected rows",
-			review: getSampleReview(),
+			review: samples.GetSampleReview(),
 			setExpectations: func(mock sqlmock.Sqlmock, review model.Reviews) {
 				mock.ExpectExec(
 					"INSERT INTO `KinoTicketSystem`.reviews (id, rating, comment, datetime, is_spoiler, user_id, movie_id)\n"+
@@ -235,20 +235,5 @@ func TestDeleteReview(t *testing.T) {
 				t.Errorf("There were unfulfilled expectations: %s", err)
 			}
 		})
-	}
-}
-
-func getSampleReview() model.Reviews {
-	id := uuid.MustParse("123e4567-e89b-12d3-a456-426614174000")
-	movieId := uuid.MustParse("db30d28d-506a-4637-9e9e-aef1546f9cdc")
-	userId := uuid.MustParse("1264775d-b14a-43d6-a158-1bb5040f4b90")
-	return model.Reviews{
-		ID:        &id,
-		Rating:    5,
-		Comment:   "Comment",
-		Datetime:  time.Now(),
-		IsSpoiler: new(bool),
-		MovieID:   &movieId,
-		UserID:    &userId,
 	}
 }

@@ -9,13 +9,14 @@ import (
 	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/managers"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/samples"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestGetMovies(t *testing.T) {
-	sampleMovies := utils.GetSampleMovies()
+	sampleMovies := samples.GetSampleMovies()
 
 	query := "\nSELECT movies.id AS \"movies.id\",\n     movies.title AS \"movies.title\",\n     movies.description AS \"movies.description\",\n     movies.banner_pic_url AS \"movies.banner_pic_url\",\n     movies.cover_pic_url AS \"movies.cover_pic_url\",\n     movies.trailer_url AS \"movies.trailer_url\",\n     movies.rating AS \"movies.rating\",\n     movies.release_date AS \"movies.release_date\",\n     movies.time_in_min AS \"movies.time_in_min\",\n     movies.fsk AS \"movies.fsk\"\nFROM `KinoTicketSystem`.movies;\n"
 
@@ -96,7 +97,7 @@ func TestGetMovies(t *testing.T) {
 }
 
 func TestGetMovieByName(t *testing.T) {
-	sampleMovie := utils.GetSampleMovieById()
+	sampleMovie := samples.GetSampleMovieById()
 
 	name := sampleMovie.Title
 
@@ -177,7 +178,7 @@ func TestGetMovieByName(t *testing.T) {
 }
 
 func TestCreateMovie(t *testing.T) {
-	sampleMovie := utils.GetSampleMovieById()
+	sampleMovie := samples.GetSampleMovieById()
 
 	query := "INSERT INTO `KinoTicketSystem`.movies (id, title, description, banner_pic_url, cover_pic_url, trailer_url, rating, release_date, time_in_min, fsk) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);"
 
@@ -261,7 +262,7 @@ func TestCreateMovie(t *testing.T) {
 
 // Update Movie
 func TestUpdateMovie(t *testing.T) {
-	sampleMovie := utils.GetSampleMovieById()
+	sampleMovie := samples.GetSampleMovieById()
 
 	query := "\nUPDATE `KinoTicketSystem`.movies\nSET title = ?,\n    description = ?,\n    banner_pic_url = ?,\n    cover_pic_url = ?,\n    trailer_url = ?,\n    rating = ?,\n    release_date = CAST(? AS DATE),\n    time_in_min = ?,\n    fsk = ?\nWHERE movies.id = ?;\n"
 
@@ -413,7 +414,7 @@ func TestDeleteMovie(t *testing.T) {
 
 // GetMoviesWithGenres
 func TestGetMoviesWithGenres(t *testing.T) {
-	sampleMoviesWithGenres := utils.GetSampleMoviesWithGenres()
+	sampleMoviesWithGenres := samples.GetSampleMoviesWithGenres()
 
 	query := "SELECT movies.id AS \"movies.id\",\n     movies.title AS \"movies.title\",\n     movies.description AS \"movies.description\",\n     movies.banner_pic_url AS \"movies.banner_pic_url\",\n     movies.cover_pic_url AS \"movies.cover_pic_url\",\n     movies.trailer_url AS \"movies.trailer_url\",\n     movies.rating AS \"movies.rating\",\n     movies.release_date AS \"movies.release_date\",\n     movies.time_in_min AS \"movies.time_in_min\",\n     movies.fsk AS \"movies.fsk\",\n     genres.id AS \"genres.id\",\n     genres.genre_name AS \"genres.genre_name\"\nFROM `KinoTicketSystem`.movie_genres\n     INNER JOIN `KinoTicketSystem`.movies ON (movies.id = movie_genres.movie_id)\n     INNER JOIN `KinoTicketSystem`.genres ON (genres.id = movie_genres.genre_id);\n"
 
@@ -496,7 +497,7 @@ func TestGetMoviesWithGenres(t *testing.T) {
 }
 
 func TestGetMovieById(t *testing.T) {
-	smplFullMovie := utils.GetSampleMovieByIdWithEverything()
+	smplFullMovie := samples.GetSampleMovieByIdWithEverything()
 
 	id := smplFullMovie.ID
 

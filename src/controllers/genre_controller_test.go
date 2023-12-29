@@ -7,14 +7,14 @@ import (
 	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/mocks"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
-	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/samples"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
 )
 
 func TestGetGenres(t *testing.T) {
-	sampleGenre := utils.GetSampleGenres()
+	sampleGenre := samples.GetSampleGenres()
 
 	testCases := []struct {
 		name            string
@@ -74,7 +74,7 @@ func TestGetGenres(t *testing.T) {
 }
 
 func TestGetGenreByName(t *testing.T) {
-	sampleGenre := utils.GetSampleGenre()
+	sampleGenre := samples.GetSampleGenre()
 
 	genreName := sampleGenre.GenreName
 
@@ -135,7 +135,7 @@ func TestGetGenreByName(t *testing.T) {
 }
 
 func TestGetGenresWithMovies(t *testing.T) {
-	sampleGenre := utils.GetSampleGenresWithMovies()
+	sampleGenre := samples.GetSampleGenresWithMovies()
 
 	testCases := []struct {
 		name            string
@@ -193,7 +193,7 @@ func TestGetGenresWithMovies(t *testing.T) {
 }
 
 func TestCreateGenre(t *testing.T) {
-	sampleGenre := utils.GetSampleGenre()
+	sampleGenre := samples.GetSampleGenre()
 
 	testCases := []struct {
 		name            string
@@ -269,7 +269,7 @@ func TestCreateGenre(t *testing.T) {
 }
 
 func TestUpdateGenre(t *testing.T) {
-	sampleGenre := utils.GetSampleGenre()
+	sampleGenre := samples.GetSampleGenre()
 
 	testCases := []struct {
 		name            string
@@ -322,7 +322,7 @@ func TestUpdateGenre(t *testing.T) {
 }
 
 func TestDeleteGenre(t *testing.T) {
-	sampleGenre := utils.GetSampleGenre()
+	sampleGenre := samples.GetSampleGenre()
 
 	genreID := sampleGenre.ID
 

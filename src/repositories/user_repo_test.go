@@ -9,12 +9,13 @@ import (
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/managers"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/samples"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestGetUserByUsername(t *testing.T) {
-	sampleUser := utils.GetSampleUser()
+	sampleUser := samples.GetSampleUser()
 	testCases := []struct {
 		name            string
 		username        string
@@ -131,7 +132,7 @@ func TestCreateUser(t *testing.T) {
 	}{
 		{
 			name: "Success",
-			data: utils.GetSampleUser(),
+			data: samples.GetSampleUser(),
 			setExpectations: func(mock sqlmock.Sqlmock, user *model.Users) {
 				mock.ExpectExec(
 					"INSERT INTO `KinoTicketSystem`.users (id, username, email, password, firstname, lastname)\n"+
@@ -144,7 +145,7 @@ func TestCreateUser(t *testing.T) {
 		},
 		{
 			name: "Internal error",
-			data: utils.GetSampleUser(),
+			data: samples.GetSampleUser(),
 			setExpectations: func(mock sqlmock.Sqlmock, user *model.Users) {
 				mock.ExpectExec(
 					"INSERT INTO `KinoTicketSystem`.users (id, username, email, password, firstname, lastname)\n"+
