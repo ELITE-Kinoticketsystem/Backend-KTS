@@ -8,6 +8,7 @@ import (
 	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/mocks"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/samples"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
@@ -25,7 +26,7 @@ func TestCreateReview(t *testing.T) {
 	}{
 		{
 			name:       "Internal error",
-			reviewData: getSampleReviewRequest(),
+			reviewData: samples.GetSampleReviewRequest(),
 			setExpectations: func(mockRepo mocks.MockReviewRepositoryI, reviewData models.CreateReviewRequest) {
 				movieId := uuid.MustParse(reviewData.MovieID)
 				userId := uuid.MustParse(reviewData.UserID)
@@ -72,7 +73,7 @@ func TestCreateReview(t *testing.T) {
 		},
 		{
 			name:       "Success",
-			reviewData: getSampleReviewRequest(),
+			reviewData: samples.GetSampleReviewRequest(),
 			setExpectations: func(mockRepo mocks.MockReviewRepositoryI, reviewData models.CreateReviewRequest) {
 				movieId := uuid.MustParse(reviewData.MovieID)
 				userId := uuid.MustParse(reviewData.UserID)
@@ -162,16 +163,5 @@ func TestDeleteReview(t *testing.T) {
 			// check expected error and id
 			assert.Equal(t, err, tc.expectedError, "wrong error")
 		})
-	}
-}
-
-func getSampleReviewRequest() models.CreateReviewRequest {
-	return models.CreateReviewRequest{
-		Rating:    5,
-		Comment:   "Comment",
-		Datetime:  time.Now(),
-		IsSpoiler: false,
-		MovieID:   "7236556f-5e78-4e94-8910-3072c2f5cd5b",
-		UserID:    "fa40ef37-dba9-4b0d-9fc4-0edc7588200e",
 	}
 }
