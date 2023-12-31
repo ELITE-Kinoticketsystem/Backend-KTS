@@ -19,14 +19,14 @@ func TestOrderController_CreateOrder(t *testing.T) {
 
 	tests := []struct {
 		name          string
-		expectedFuncs func(mockOrderRepo *mocks.MockOrderRepoI, mockEventSeatRepo *mocks.MockEventSeatRepoI, mockPriceCategoryRepo *mocks.MockPriceCategoryRepositoryI, mockTicketRepo *mocks.MockTicketRepoI)
+		expectedFuncs func(mockOrderRepo *mocks.MockOrderRepoI, mockEventSeatRepo *mocks.MockEventSeatRepoI, mockPriceCategoryRepo *mocks.MockPriceCategoryRepositoryI, mockTicketRepo *mocks.MockTicketRepositoryI)
 		expectedErr   *models.KTSError
 		expectOrderId bool
 		orderRequest  models.CreateOrderDTO
 	}{
 		{
 			name: "Create Order",
-			expectedFuncs: func(mockOrderRepo *mocks.MockOrderRepoI, mockEventSeatRepo *mocks.MockEventSeatRepoI, mockPriceCategoryRepo *mocks.MockPriceCategoryRepositoryI, mockTicketRepo *mocks.MockTicketRepoI) {
+			expectedFuncs: func(mockOrderRepo *mocks.MockOrderRepoI, mockEventSeatRepo *mocks.MockEventSeatRepoI, mockPriceCategoryRepo *mocks.MockPriceCategoryRepositoryI, mockTicketRepo *mocks.MockTicketRepositoryI) {
 				mockEventSeatRepo.EXPECT().GetSelectedSeats(gomock.Any(), gomock.Any()).Return(eventSeats, nil)
 				mockPriceCategoryRepo.EXPECT().GetPriceCategories().Return(priceCategories, nil)
 				mockOrderRepo.EXPECT().CreateOrder(gomock.Any()).Return(utils.NewUUID(), nil)
@@ -39,7 +39,7 @@ func TestOrderController_CreateOrder(t *testing.T) {
 		},
 		{
 			name: "Create Order - GetSelectedSeats Error",
-			expectedFuncs: func(mockOrderRepo *mocks.MockOrderRepoI, mockEventSeatRepo *mocks.MockEventSeatRepoI, mockPriceCategoryRepo *mocks.MockPriceCategoryRepositoryI, mockTicketRepo *mocks.MockTicketRepoI) {
+			expectedFuncs: func(mockOrderRepo *mocks.MockOrderRepoI, mockEventSeatRepo *mocks.MockEventSeatRepoI, mockPriceCategoryRepo *mocks.MockPriceCategoryRepositoryI, mockTicketRepo *mocks.MockTicketRepositoryI) {
 				mockEventSeatRepo.EXPECT().GetSelectedSeats(gomock.Any(), gomock.Any()).Return(nil, kts_errors.KTS_NOT_FOUND)
 			},
 			expectedErr:   kts_errors.KTS_NOT_FOUND,
@@ -48,7 +48,7 @@ func TestOrderController_CreateOrder(t *testing.T) {
 		},
 		{
 			name: "Create Order - GetPriceCategories Error",
-			expectedFuncs: func(mockOrderRepo *mocks.MockOrderRepoI, mockEventSeatRepo *mocks.MockEventSeatRepoI, mockPriceCategoryRepo *mocks.MockPriceCategoryRepositoryI, mockTicketRepo *mocks.MockTicketRepoI) {
+			expectedFuncs: func(mockOrderRepo *mocks.MockOrderRepoI, mockEventSeatRepo *mocks.MockEventSeatRepoI, mockPriceCategoryRepo *mocks.MockPriceCategoryRepositoryI, mockTicketRepo *mocks.MockTicketRepositoryI) {
 				mockEventSeatRepo.EXPECT().GetSelectedSeats(gomock.Any(), gomock.Any()).Return(eventSeats, nil)
 				mockPriceCategoryRepo.EXPECT().GetPriceCategories().Return(nil, kts_errors.KTS_NOT_FOUND)
 			},
@@ -58,7 +58,7 @@ func TestOrderController_CreateOrder(t *testing.T) {
 		},
 		{
 			name: "Create Order - CreateOrder Error",
-			expectedFuncs: func(mockOrderRepo *mocks.MockOrderRepoI, mockEventSeatRepo *mocks.MockEventSeatRepoI, mockPriceCategoryRepo *mocks.MockPriceCategoryRepositoryI, mockTicketRepo *mocks.MockTicketRepoI) {
+			expectedFuncs: func(mockOrderRepo *mocks.MockOrderRepoI, mockEventSeatRepo *mocks.MockEventSeatRepoI, mockPriceCategoryRepo *mocks.MockPriceCategoryRepositoryI, mockTicketRepo *mocks.MockTicketRepositoryI) {
 				mockEventSeatRepo.EXPECT().GetSelectedSeats(gomock.Any(), gomock.Any()).Return(eventSeats, nil)
 				mockPriceCategoryRepo.EXPECT().GetPriceCategories().Return(priceCategories, nil)
 				mockOrderRepo.EXPECT().CreateOrder(gomock.Any()).Return(nil, kts_errors.KTS_NOT_FOUND)
@@ -69,7 +69,7 @@ func TestOrderController_CreateOrder(t *testing.T) {
 		},
 		{
 			name: "Create Order - CreateTicket Error",
-			expectedFuncs: func(mockOrderRepo *mocks.MockOrderRepoI, mockEventSeatRepo *mocks.MockEventSeatRepoI, mockPriceCategoryRepo *mocks.MockPriceCategoryRepositoryI, mockTicketRepo *mocks.MockTicketRepoI) {
+			expectedFuncs: func(mockOrderRepo *mocks.MockOrderRepoI, mockEventSeatRepo *mocks.MockEventSeatRepoI, mockPriceCategoryRepo *mocks.MockPriceCategoryRepositoryI, mockTicketRepo *mocks.MockTicketRepositoryI) {
 				mockEventSeatRepo.EXPECT().GetSelectedSeats(gomock.Any(), gomock.Any()).Return(eventSeats, nil)
 				mockPriceCategoryRepo.EXPECT().GetPriceCategories().Return(priceCategories, nil)
 				mockOrderRepo.EXPECT().CreateOrder(gomock.Any()).Return(utils.NewUUID(), nil)
@@ -81,7 +81,7 @@ func TestOrderController_CreateOrder(t *testing.T) {
 		},
 		{
 			name: "Create Order - UpdateEventSeat Error",
-			expectedFuncs: func(mockOrderRepo *mocks.MockOrderRepoI, mockEventSeatRepo *mocks.MockEventSeatRepoI, mockPriceCategoryRepo *mocks.MockPriceCategoryRepositoryI, mockTicketRepo *mocks.MockTicketRepoI) {
+			expectedFuncs: func(mockOrderRepo *mocks.MockOrderRepoI, mockEventSeatRepo *mocks.MockEventSeatRepoI, mockPriceCategoryRepo *mocks.MockPriceCategoryRepositoryI, mockTicketRepo *mocks.MockTicketRepositoryI) {
 				mockEventSeatRepo.EXPECT().GetSelectedSeats(gomock.Any(), gomock.Any()).Return(eventSeats, nil)
 				mockPriceCategoryRepo.EXPECT().GetPriceCategories().Return(priceCategories, nil)
 				mockOrderRepo.EXPECT().CreateOrder(gomock.Any()).Return(utils.NewUUID(), nil)
@@ -94,7 +94,7 @@ func TestOrderController_CreateOrder(t *testing.T) {
 		},
 		{
 			name: "Create Order - Empty OrderRequest",
-			expectedFuncs: func(mockOrderRepo *mocks.MockOrderRepoI, mockEventSeatRepo *mocks.MockEventSeatRepoI, mockPriceCategoryRepo *mocks.MockPriceCategoryRepositoryI, mockTicketRepo *mocks.MockTicketRepoI) {
+			expectedFuncs: func(mockOrderRepo *mocks.MockOrderRepoI, mockEventSeatRepo *mocks.MockEventSeatRepoI, mockPriceCategoryRepo *mocks.MockPriceCategoryRepositoryI, mockTicketRepo *mocks.MockTicketRepositoryI) {
 				mockEventSeatRepo.EXPECT().GetSelectedSeats(gomock.Any(), gomock.Any()).Return(eventSeats, nil)
 				mockPriceCategoryRepo.EXPECT().GetPriceCategories().Return(priceCategories, nil)
 				mockOrderRepo.EXPECT().CreateOrder(gomock.Any()).Return(utils.NewUUID(), nil)
@@ -114,7 +114,7 @@ func TestOrderController_CreateOrder(t *testing.T) {
 			mockOrderRepo := mocks.NewMockOrderRepoI(mockCtrl)
 			mockEventSeatRepo := mocks.NewMockEventSeatRepoI(mockCtrl)
 			mockPriceCategoryRepo := mocks.NewMockPriceCategoryRepositoryI(mockCtrl)
-			mockTicketRepo := mocks.NewMockTicketRepoI(mockCtrl)
+			mockTicketRepo := mocks.NewMockTicketRepositoryI(mockCtrl)
 
 			tc.expectedFuncs(mockOrderRepo, mockEventSeatRepo, mockPriceCategoryRepo, mockTicketRepo)
 

@@ -4,8 +4,10 @@ import (
 	"database/sql/driver"
 	"fmt"
 	"reflect"
+	"time"
 
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/.gen/KinoTicketSystem/model"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/google/uuid"

@@ -13,14 +13,14 @@ import (
 )
 
 type Controllers struct {
-	UserController      controllers.UserControllerI
-	EventController     controllers.EventControllerI
-	ActorController     controllers.ActorControllerI
-	MovieController     controllers.MovieControllerI
-	EventSeatController controllers.EventSeatControllerI
-	GenreController     controllers.GenreControllerI
-	ReviewController    controllers.ReviewControllerI
-	OrderController     controllers.OrderControllerI
+	UserController            controllers.UserControllerI
+	EventController           controllers.EventControllerI
+	ActorController           controllers.ActorControllerI
+	MovieController           controllers.MovieControllerI
+	EventSeatController       controllers.EventSeatControllerI
+	GenreController           controllers.GenreControllerI
+	ReviewController          controllers.ReviewControllerI
+	OrderController           controllers.OrderControllerI
 	PriceCategoriesController controllers.PriceCategoryControllerI
 	TicketController          controllers.TicketControllerI
 }
@@ -170,7 +170,6 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 	securedRoutes.Handle(http.MethodPut, "/price-categories/:id", handlers.UpdatePriceCategoryHandler(controller.PriceCategoriesController))
 	securedRoutes.Handle(http.MethodDelete, "/price-categories/:id", handlers.DeletePriceCategoryHandler(controller.PriceCategoriesController))
 
-
 	// event seats
 	securedRoutes.Handle(http.MethodGet, "/events/:eventId/seats", handlers.GetEventSeatsHandler(controller.EventSeatController))
 	securedRoutes.Handle(http.MethodPatch, "/events/:eventId/seats/:seatId/block", handlers.BlockEventSeatHandler(controller.EventSeatController))
@@ -194,11 +193,9 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 	router.Handle(http.MethodGet, "/orders/:orderId", handlers.GetOrderByIdHandler(controller.OrderController))
 	router.Handle(http.MethodGet, "/orders", handlers.GetOrdersHandler(controller.OrderController))
 
-
-
-	
 	// Ticket
 	router.Handle(http.MethodGet, "/ticket/:ticketId", handlers.GetTicketByIdHandler(controller.TicketController))
 	router.Handle(http.MethodPut, "/ticket/:ticketId", handlers.ValidateTicketHandler(controller.TicketController))
+
 	return router
 }
