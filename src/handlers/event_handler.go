@@ -29,10 +29,9 @@ func CreateEventHandler(eventController controllers.EventControllerI) gin.Handle
 	}
 }
 
-
 func GetEventsForMovieHandler(eventController controllers.EventControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		movieId := uuid.MustParse(c.Param("movieId"))
+		movieId := uuid.MustParse(c.Param("id"))
 		events, err := eventController.GetEventsForMovie(&movieId)
 		if err != nil {
 			utils.HandleErrorAndAbort(c, err)
@@ -43,7 +42,6 @@ func GetEventsForMovieHandler(eventController controllers.EventControllerI) gin.
 	}
 }
 
-
 func GetSpecialEventsHandler(eventController controllers.EventControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		events, err := eventController.GetSpecialEvents()
@@ -53,5 +51,23 @@ func GetSpecialEventsHandler(eventController controllers.EventControllerI) gin.H
 		}
 
 		c.JSON(http.StatusOK, events)
+	}
+}
+
+func GetEventByIdHandler(eventController controllers.EventControllerI) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		id, err := uuid.Parse(c.Param("eventId"))
+		if err != nil {
+			utils.HandleErrorAndAbort(c, kts_errors.KTS_BAD_REQUEST)
+			return
+		}
+
+		event, kts_err := eventController.GetEventById(&id)
+		if kts_err != nil {
+			utils.HandleErrorAndAbort(c, kts_err)
+			return
+		}
+
+		c.JSON(http.StatusOK, event)
 	}
 }

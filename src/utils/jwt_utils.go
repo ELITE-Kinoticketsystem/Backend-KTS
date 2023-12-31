@@ -1,9 +1,11 @@
 package utils
 
 import (
+	"net/http"
 	"os"
 	"time"
 
+	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 )
@@ -14,10 +16,6 @@ const tokenLifespan = 15 * 60                 // 15 minutes
 const refreshTokenLifeSpan = 3 * 24 * 60 * 60 // 3 days
 const leeway = 5 * 60                         // 5 minutes
 const issuer = "KTS"
-
-type keyType string
-
-const UserIdKey keyType = "userId"
 
 func GenerateJWT(userId *uuid.UUID) (string, string, error) {
 	now := time.Now()
@@ -81,11 +79,40 @@ func ValidateToken(tokenString string) (*uuid.UUID, error) {
 	return &userId, nil
 }
 
-func ExtractToken(authHeader string) (string, error) {
-	if len(authHeader) < 7 {
-		return "", jwt.ErrInvalidKey
+func RefreshTokens(refreshToken string) (string, string, error) {
+	userId, err := ValidateToken(refreshToken)
+	if err != nil {
+		return "", "", nil
 	}
 
-	// Return token without "Bearer " prefix
-	return authHeader[7:], nil
+	return GenerateJWT(userId)
+}
+
+func SetJWTCookies(c *gin.Context, token string, refreshToken string) {
+	// for development
+	http.SetCookie(c.Writer, &http.Cookie{
+		Name:     "token",
+		Value:    token,
+		Path:     "/",
+		/* Domain */
+		MaxAge:   tokenLifespan,
+		Secure:   true,
+		HttpOnly: true,
+		SameSite: http.SameSiteNoneMode,
+	})
+
+	http.SetCookie(c.Writer, &http.Cookie{
+		Name:     "refreshToken",
+		Value:    refreshToken,
+		Path:     "/",
+		/* Domain */
+		MaxAge:   refreshTokenLifeSpan,
+		Secure:   true,
+		HttpOnly: true,
+		SameSite: http.SameSiteNoneMode,
+	})
+
+	// for production
+	c.SetCookie("token", token, tokenLifespan, "/", "cinemika.westeurope.cloudapp.azure.com", true, true)
+	c.SetCookie("refreshToken", refreshToken, refreshTokenLifeSpan, "/", "cinemika.westeurope.cloudapp.azure.com", true, true)
 }

@@ -1,3 +1,4 @@
+# controllers
 ~/go/bin/mockgen -source=./src/controllers/user_controller.go -destination=./src/mocks/user_controller_mock.go -package=mocks
 ~/go/bin/mockgen -source=./src/controllers/genre_controller.go -destination=./src/mocks/genre_controller_mock.go -package=mocks
 ~/go/bin/mockgen -source=./src/repositories/user_repo.go -destination=./src/mocks/user_repo_mock.go -package=mocks
@@ -5,10 +6,8 @@
 ~/go/bin/mockgen -source=./src/repositories/genre_repository.go -destination=./src/mocks/genre_repository_mock.go -package=mocks
 ~/go/bin/mockgen -source=./src/repositories/actor_repository.go -destination=./src/mocks/actor_repository_mock.go -package=mocks
 ~/go/bin/mockgen -source=./src/repositories/movie_genres_repository.go -destination=./src/mocks/movie_genres_repository_mock.go -package=mocks
-~/go/bin/mockgen -source=./src/repositories/ticket_repository.go -destination=./src/mocks/ticket_repository_mock.go -package=mocks
-~/go/bin/mockgen -source=./src/controllers/ticket_controller.go -destination=./src/mocks/ticket_controller_mock.go -package=mocks
 ~/go/bin/mockgen -source=./src/repositories/movie_producer_repository.go -destination=./src/mocks/movie_producer_repository_mock.go -package=mocks
 ~/go/bin/mockgen -source=./src/repositories/movie_actor_repository.go -destination=./src/mocks/movie_actor_repository_mock.go -package=mocks
 ~/go/bin/mockgen -source=./src/controllers/theatre_controller.go -destination=./src/mocks/theatre_controller_mock.go -package=mocks
 ~/go/bin/mockgen -source=./src/repositories/theatre_repository.go -destination=./src/mocks/theatre_repository_mock.go -package=mocks
-~/go/bin/mockgen -source=./src/repositories/price_category_repository.go -destination=./src/mocks/price_category_repository_mock.go -package=mocks
+~/go/bin/mockgen -source=./src/controllers/theatre_controller.go -destination=./src/mocks/theatre_controller_mock.go -package=mocks

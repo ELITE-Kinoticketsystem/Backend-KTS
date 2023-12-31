@@ -10,3 +10,4 @@ type CreateTheatreRequest struct {
 		Country  string
 	}
 }
+

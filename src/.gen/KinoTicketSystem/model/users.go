@@ -15,7 +15,7 @@ type Users struct {
 	ID        *uuid.UUID `sql:"primary_key"`
 	Username  *string
 	Email     string
-	Password  string
+	Password  string `json:"-"`
 	Firstname *string
 	Lastname  *string
 }

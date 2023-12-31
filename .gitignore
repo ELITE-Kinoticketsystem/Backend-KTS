@@ -28,6 +28,7 @@ go.sum
 
 # editor/IDE directories
 .vscode
+__debug_bin*
 .idea
 
 # git patch files

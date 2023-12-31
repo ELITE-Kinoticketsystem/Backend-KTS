@@ -50,7 +50,7 @@ func (tr *TheatreRepository) GetSeatsForCinemaHall(cinemaHallId *uuid.UUID) ([]m
 		table.Seats.CinemaHallID.EQ(utils.MysqlUuid(cinemaHallId)),
 	)
 	err := stmt.Query(tr.DatabaseManager.GetDatabaseConnection(), &seats)
-	
+
 	if err != nil {
 		if err.Error() == "jet: sql: no rows in result set" {
 			return nil, kts_errors.KTS_NOT_FOUND

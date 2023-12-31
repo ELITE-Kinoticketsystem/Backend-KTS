@@ -7,14 +7,14 @@ import (
 	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/mocks"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
-	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/samples"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
 )
 
 func TestGetMovies(t *testing.T) {
-	sampleMovies := utils.GetSampleMovies()
+	sampleMovies := samples.GetSampleMovies()
 
 	testCases := []struct {
 		name            string
@@ -75,7 +75,7 @@ func TestGetMovies(t *testing.T) {
 }
 
 func TestGetMovieByName(t *testing.T) {
-	sampleMovie := utils.GetSampleMovieById()
+	sampleMovie := samples.GetSampleMovieById()
 
 	name := sampleMovie.Title
 
@@ -139,7 +139,7 @@ func TestGetMovieByName(t *testing.T) {
 }
 
 func TestGetMoviesWithGenres(t *testing.T) {
-	sampleMovies := utils.GetSampleMoviesWithGenres()
+	sampleMovies := samples.GetSampleMoviesWithGenres()
 
 	testCases := []struct {
 		name            string
@@ -200,7 +200,7 @@ func TestGetMoviesWithGenres(t *testing.T) {
 }
 
 func TestGetMovieById(t *testing.T) {
-	sampleMovie := utils.GetSampleMovieByIdWithEverything()
+	sampleMovie := samples.GetSampleMovieByIdWithEverything()
 
 	id := sampleMovie.ID
 
@@ -264,7 +264,7 @@ func TestGetMovieById(t *testing.T) {
 }
 
 func TestCreateMovie(t *testing.T) {
-	sampleMovie := utils.GetSampleMovieDTOCreate()
+	sampleMovie := samples.GetSampleMovieDTOCreate()
 
 	testCases := []struct {
 		name             string

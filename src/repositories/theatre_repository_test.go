@@ -10,6 +10,7 @@ import (
 	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/managers"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/samples"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
 	"github.com/stretchr/testify/assert"
 )
@@ -23,7 +24,7 @@ func TestCreateTheatre(t *testing.T) {
 	}{
 		{
 			name: "Success",
-			data: getSampleTheatre(),
+			data: samples.GetSampleTheatre(),
 			setExpectations: func(mock sqlmock.Sqlmock, theatre *model.Theatres) {
 				mock.ExpectExec("INSERT INTO `KinoTicketSystem`.theatres").WithArgs(
 					theatre.ID, theatre.Name, theatre.AddressID,
@@ -33,7 +34,7 @@ func TestCreateTheatre(t *testing.T) {
 		},
 		{
 			name: "Internal error",
-			data: getSampleTheatre(),
+			data: samples.GetSampleTheatre(),
 			setExpectations: func(mock sqlmock.Sqlmock, theatre *model.Theatres) {
 				mock.ExpectExec("INSERT INTO `KinoTicketSystem`.theatres").WithArgs(
 					theatre.ID, theatre.Name, theatre.AddressID,
@@ -160,13 +161,5 @@ func TestGetSeatsForCinemaHall(t *testing.T) {
 				t.Errorf("There were unfulfilled expectations: %s", err)
 			}
 		})
-	}
-}
-
-func getSampleTheatre() model.Theatres {
-	return model.Theatres{
-		/* ID */
-		Name: "Theatre",
-		/* AddressID */
 	}
 }

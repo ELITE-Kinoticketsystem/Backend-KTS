@@ -15,6 +15,7 @@ type DatabaseManagerI interface {
 	ExecuteQueryRow(query string, args ...any) *sql.Row
 	CheckIfExists(query string, args ...any) (bool, error)
 	GetDatabaseConnection() *sql.DB
+	GetDatabaseTransaction() (*sql.Tx, error)
 }
 
 type DatabaseManager struct {
@@ -74,4 +75,8 @@ func InitializeDB() (*sql.DB, error) {
 	}
 
 	return db, nil
+}
+
+func (dm *DatabaseManager) GetDatabaseTransaction() (*sql.Tx, error) {
+	return dm.Connection.Begin()
 }

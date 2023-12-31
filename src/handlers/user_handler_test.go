@@ -14,7 +14,7 @@ import (
 	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/mocks"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
-	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/samples"
 )
 
 func TestRegisterUser(t *testing.T) {
@@ -27,25 +27,21 @@ func TestRegisterUser(t *testing.T) {
 	}{
 		{
 			name: "Success",
-			body: utils.GetSampleRegistrationData(),
+			body: samples.GetSampleRegistrationData(),
 			setExpectations: func(mockController *mocks.MockUserControllerI, registrationData interface{}) {
 				mockController.EXPECT().RegisterUser(registrationData).Return(
 					&models.LoginResponse{
-						User: utils.GetSampleUser(),
+						User: samples.GetSampleUser(),
 						/* Token */
 						/* RefreshToken */
 					}, nil)
 			},
-			expectedResponseBody: models.LoginResponse{
-				User: utils.GetSampleUser(),
-				/* Token */
-				/* RefreshToken */
-			},
-			expectedStatus: http.StatusCreated,
+			expectedResponseBody: samples.GetSampleUser(),
+			expectedStatus:       http.StatusCreated,
 		},
 		{
 			name: "Internal Error",
-			body: utils.GetSampleRegistrationData(),
+			body: samples.GetSampleRegistrationData(),
 			setExpectations: func(mockController *mocks.MockUserControllerI, registrationData interface{}) {
 				mockController.EXPECT().RegisterUser(registrationData).Return(nil, kts_errors.KTS_INTERNAL_ERROR)
 			},
@@ -56,7 +52,7 @@ func TestRegisterUser(t *testing.T) {
 		},
 		{
 			name: "Email exists",
-			body: utils.GetSampleRegistrationData(),
+			body: samples.GetSampleRegistrationData(),
 			setExpectations: func(mockController *mocks.MockUserControllerI, registrationData interface{}) {
 				mockController.EXPECT().RegisterUser(registrationData).Return(nil, kts_errors.KTS_EMAIL_EXISTS)
 			},
@@ -67,7 +63,7 @@ func TestRegisterUser(t *testing.T) {
 		},
 		{
 			name: "Upstream Error",
-			body: utils.GetSampleRegistrationData(),
+			body: samples.GetSampleRegistrationData(),
 			setExpectations: func(mockController *mocks.MockUserControllerI, registrationData interface{}) {
 				mockController.EXPECT().RegisterUser(registrationData).Return(nil, kts_errors.KTS_UPSTREAM_ERROR)
 			},
@@ -165,7 +161,7 @@ func TestLoginUser(t *testing.T) {
 		},
 		{
 			name: "User not found",
-			body: utils.GetSampleLoginData(),
+			body: samples.GetSampleLoginData(),
 			setExpectations: func(mockController *mocks.MockUserControllerI, loginData models.LoginRequest) {
 				mockController.EXPECT().LoginUser(loginData).Return(nil, kts_errors.KTS_USER_NOT_FOUND)
 			},
@@ -176,7 +172,7 @@ func TestLoginUser(t *testing.T) {
 		},
 		{
 			name: "Internal error",
-			body: utils.GetSampleLoginData(),
+			body: samples.GetSampleLoginData(),
 			setExpectations: func(mockController *mocks.MockUserControllerI, loginData models.LoginRequest) {
 				mockController.EXPECT().LoginUser(loginData).Return(nil, kts_errors.KTS_INTERNAL_ERROR)
 			},
@@ -187,7 +183,7 @@ func TestLoginUser(t *testing.T) {
 		},
 		{
 			name: "Incorrect password",
-			body: utils.GetSampleLoginData(),
+			body: samples.GetSampleLoginData(),
 			setExpectations: func(mockController *mocks.MockUserControllerI, loginData models.LoginRequest) {
 				mockController.EXPECT().LoginUser(loginData).Return(nil, kts_errors.KTS_CREDENTIALS_INVALID)
 			},
@@ -198,9 +194,9 @@ func TestLoginUser(t *testing.T) {
 		},
 		{
 			name: "Success",
-			body: utils.GetSampleLoginData(),
+			body: samples.GetSampleLoginData(),
 			setExpectations: func(mockController *mocks.MockUserControllerI, loginData models.LoginRequest) {
-				user := utils.GetSampleUser()
+				user := samples.GetSampleUser()
 				mockController.EXPECT().LoginUser(loginData).Return(
 					&models.LoginResponse{
 						User: user,
@@ -208,12 +204,8 @@ func TestLoginUser(t *testing.T) {
 						/* RefreshToken */
 					}, nil)
 			},
-			expectedResponseBody: models.LoginResponse{
-				User: utils.GetSampleUser(),
-				/* Token */
-				/* RefreshToken */
-			},
-			expectedStatus: http.StatusOK,
+			expectedResponseBody: samples.GetSampleUser(),
+			expectedStatus:       http.StatusOK,
 		},
 	}
 

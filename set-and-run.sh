@@ -5,6 +5,7 @@ export DB_PORT=$DB_PORT
 export DB_USER=$DB_USER
 export DB_PASSWORD=$DB_PASSWORD
 export DB_NAME=$DB_NAME
+export JWT_SECRET=$JWT_SECRET
 
 
 go run ./src

@@ -3,10 +3,10 @@ package controllers
 import (
 	"testing"
 
-	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/.gen/KinoTicketSystem/model"
 	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/mocks"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/samples"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
@@ -40,7 +40,7 @@ func TestCreateTheatre(t *testing.T) {
 			name:        "CreateAddress internal error",
 			theatreData: sampleTheatreData,
 			setExpectations: func(mockRepo mocks.MockTheaterRepoI, theatreData models.CreateTheatreRequest) {
-				mockRepo.EXPECT().CreateAddress(utils.EqExceptId(getSampleAddress())).Return(kts_errors.KTS_INTERNAL_ERROR)
+				mockRepo.EXPECT().CreateAddress(utils.EqExceptId(samples.GetSampleAddress())).Return(kts_errors.KTS_INTERNAL_ERROR)
 			},
 			expectedError: kts_errors.KTS_INTERNAL_ERROR,
 		},
@@ -48,8 +48,8 @@ func TestCreateTheatre(t *testing.T) {
 			name:        "CreateTheatre internal error",
 			theatreData: sampleTheatreData,
 			setExpectations: func(mockRepo mocks.MockTheaterRepoI, theatreData models.CreateTheatreRequest) {
-				mockRepo.EXPECT().CreateAddress(utils.EqExceptId(getSampleAddress())).Return(nil)
-				mockRepo.EXPECT().CreateTheatre(utils.EqExceptId((getSampleTheatre()))).Return(kts_errors.KTS_INTERNAL_ERROR)
+				mockRepo.EXPECT().CreateAddress(utils.EqExceptId(samples.GetSampleAddress())).Return(nil)
+				mockRepo.EXPECT().CreateTheatre(utils.EqExceptId((samples.GetSampleTheatre()))).Return(kts_errors.KTS_INTERNAL_ERROR)
 			},
 			expectedError: kts_errors.KTS_INTERNAL_ERROR,
 		},
@@ -57,8 +57,8 @@ func TestCreateTheatre(t *testing.T) {
 			name:        "Success",
 			theatreData: sampleTheatreData,
 			setExpectations: func(mockRepo mocks.MockTheaterRepoI, theatreData models.CreateTheatreRequest) {
-				mockRepo.EXPECT().CreateAddress(utils.EqExceptId(getSampleAddress())).Return(nil)
-				mockRepo.EXPECT().CreateTheatre(utils.EqExceptId((getSampleTheatre()))).Return(nil)
+				mockRepo.EXPECT().CreateAddress(utils.EqExceptId(samples.GetSampleAddress())).Return(nil)
+				mockRepo.EXPECT().CreateTheatre(utils.EqExceptId((samples.GetSampleTheatre()))).Return(nil)
 			},
 			expectedError: nil,
 		},
@@ -91,23 +91,4 @@ func TestCreateTheatre(t *testing.T) {
 		})
 	}
 
-}
-
-func getSampleAddress() model.Addresses {
-	return model.Addresses{
-		/* Id */
-		Street:   "Street",
-		StreetNr: "StreetNr",
-		Zipcode:  "Zipcode",
-		City:     "City",
-		Country:  "Country",
-	}
-}
-
-func getSampleTheatre() model.Theatres {
-	return model.Theatres{
-		/* ID */
-		Name: "Theatre",
-		/* AddressID */
-	}
 }

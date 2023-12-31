@@ -29,7 +29,8 @@ func RegisterUserHandler(userCtrl controllers.UserControllerI) gin.HandlerFunc {
 			return
 		}
 
-		c.JSON(http.StatusCreated, loginResponse)
+		utils.SetJWTCookies(c, loginResponse.Token, loginResponse.RefreshToken)
+		c.JSON(http.StatusCreated, loginResponse.User)
 	}
 }
 
@@ -50,7 +51,8 @@ func LoginUserHandler(userCtrl controllers.UserControllerI) gin.HandlerFunc {
 			return
 		}
 
-		c.JSON(http.StatusOK, loginResponse)
+		utils.SetJWTCookies(c, loginResponse.Token, loginResponse.RefreshToken)
+		c.JSON(http.StatusOK, loginResponse.User)
 	}
 }
 
@@ -100,4 +102,34 @@ func CheckUsernameHandler(userCtrl controllers.UserControllerI) gin.HandlerFunc 
 
 func TestJwtToken(c *gin.Context) {
 	c.Status(http.StatusOK)
+}
+
+func LoggedInHandler(c *gin.Context) {
+	var token string
+
+	// check if token is set
+	token, err := c.Cookie("token")
+	if err != nil {
+		// token is not set, check if refresh token is set
+		token, err = c.Cookie("refreshToken")
+		if err != nil {
+			c.JSON(http.StatusOK, gin.H{
+				"loggedIn": false,
+			})
+			return
+		}
+	}
+
+	id, err := utils.ValidateToken(token)
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"loggedIn": false,
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"loggedIn": true,
+		"id":       id,
+	})
 }

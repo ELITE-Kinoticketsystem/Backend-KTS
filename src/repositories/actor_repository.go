@@ -1,8 +1,6 @@
 package repositories
 
 import (
-	"log"
-
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/.gen/KinoTicketSystem/model"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/.gen/KinoTicketSystem/table"
 	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
@@ -119,8 +117,6 @@ func (ar *ActorRepository) CreateActorPicture(actorPicture *model.ActorPictures)
 	)
 
 	rows, err := insertStmt.Exec(ar.DatabaseManager.GetDatabaseConnection())
-
-	log.Println(err)
 
 	if err != nil {
 		return nil, kts_errors.KTS_INTERNAL_ERROR

@@ -9,12 +9,13 @@ import (
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/managers"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/samples"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestGetUserByUsername(t *testing.T) {
-	sampleUser := utils.GetSampleUser()
+	sampleUser := samples.GetSampleUser()
 	testCases := []struct {
 		name            string
 		username        string
@@ -131,26 +132,26 @@ func TestCreateUser(t *testing.T) {
 	}{
 		{
 			name: "Success",
-			data: utils.GetSampleUser(),
+			data: samples.GetSampleUser(),
 			setExpectations: func(mock sqlmock.Sqlmock, user *model.Users) {
 				mock.ExpectExec(
 					"INSERT INTO `KinoTicketSystem`.users (id, username, email, password, firstname, lastname)\n"+
 						"VALUES (?, ?, ?, ?, ?, ?);",
 				).WithArgs(
-					user.ID, user.Username, user.Email, user.Password, user.Firstname, user.Lastname,
+					utils.EqUUID(user.ID), user.Username, user.Email, user.Password, user.Firstname, user.Lastname,
 				).WillReturnResult(sqlmock.NewResult(1, 1))
 			},
 			expectedError: nil,
 		},
 		{
 			name: "Internal error",
-			data: utils.GetSampleUser(),
+			data: samples.GetSampleUser(),
 			setExpectations: func(mock sqlmock.Sqlmock, user *model.Users) {
 				mock.ExpectExec(
 					"INSERT INTO `KinoTicketSystem`.users (id, username, email, password, firstname, lastname)\n"+
 						"VALUES (?, ?, ?, ?, ?, ?);",
 				).WithArgs(
-					user.ID, user.Username, user.Email, user.Password, user.Firstname, user.Lastname,
+					utils.EqUUID(user.ID), user.Username, user.Email, user.Password, user.Firstname, user.Lastname,
 				).WillReturnError(sqlmock.ErrCancelled)
 			},
 			expectedError: kts_errors.KTS_INTERNAL_ERROR,
