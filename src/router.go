@@ -13,11 +13,12 @@ import (
 )
 
 type Controllers struct {
-	UserController  controllers.UserControllerI
-	MovieController controllers.MovieControllerI
-	GenreController controllers.GenreControllerI
-	ActorController controllers.ActorControllerI
-	PriceCategories controllers.PriceCategoryControllerI
+	UserController            controllers.UserControllerI
+	MovieController           controllers.MovieControllerI
+	GenreController           controllers.GenreControllerI
+	ActorController           controllers.ActorControllerI
+	PriceCategoriesController controllers.PriceCategoryControllerI
+	TicketController          controllers.TicketControllerI
 }
 
 func createRouter(dbConnection *sql.DB) *gin.Engine {
@@ -67,6 +68,10 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 		DatabaseManager: databaseManager,
 	}
 
+	ticketRepo := &repositories.TicketRepository{
+		DatabaseManager: databaseManager,
+	}
+
 	// Create controllers
 	controller := Controllers{
 		UserController: &controllers.UserController{
@@ -84,8 +89,11 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 		ActorController: &controllers.ActorController{
 			ActorRepo: actorRepo,
 		},
-		PriceCategories: &controllers.PriceCategoryController{
+		PriceCategoriesController: &controllers.PriceCategoryController{
 			PriceCategoryRepository: priceCategoryRepo,
+		},
+		TicketController: &controllers.TicketController{
+			TicketRepo: ticketRepo,
 		},
 	}
 
@@ -121,11 +129,15 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 	router.Handle(http.MethodPost, "/actors/", handlers.CreateActorHandler(controller.ActorController))
 
 	// Price Categories
-	router.Handle(http.MethodGet, "/price-categories/:id", handlers.GetPriceCategoryByIdHandler(controller.PriceCategories))
-	router.Handle(http.MethodGet, "/price-categories/", handlers.GetPriceCategoriesHandler(controller.PriceCategories))
-	router.Handle(http.MethodPost, "/price-categories/", handlers.CreatePriceCategoryHandler(controller.PriceCategories))
-	router.Handle(http.MethodPut, "/price-categories/:id", handlers.UpdatePriceCategoryHandler(controller.PriceCategories))
-	router.Handle(http.MethodDelete, "/price-categories/:id", handlers.DeletePriceCategoryHandler(controller.PriceCategories))
+	router.Handle(http.MethodGet, "/price-categories/:id", handlers.GetPriceCategoryByIdHandler(controller.PriceCategoriesController))
+	router.Handle(http.MethodGet, "/price-categories/", handlers.GetPriceCategoriesHandler(controller.PriceCategoriesController))
+	router.Handle(http.MethodPost, "/price-categories/", handlers.CreatePriceCategoryHandler(controller.PriceCategoriesController))
+	router.Handle(http.MethodPut, "/price-categories/:id", handlers.UpdatePriceCategoryHandler(controller.PriceCategoriesController))
+	router.Handle(http.MethodDelete, "/price-categories/:id", handlers.DeletePriceCategoryHandler(controller.PriceCategoriesController))
+
+	// Ticket
+	router.Handle(http.MethodGet, "/ticket/:ticketId", handlers.GetTicketByIdHandler(controller.TicketController))
+	router.Handle(http.MethodPut, "/ticket/:ticketId", handlers.ValidateTicketHandler(controller.TicketController))
 
 	return router
 }
