@@ -53,6 +53,20 @@ func (mr *MockMovieProducerRepositoryIMockRecorder) AddMovieProducer(movieId, pr
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddMovieProducer", reflect.TypeOf((*MockMovieProducerRepositoryI)(nil).AddMovieProducer), movieId, producerId)
 }
 
+// RemoveAllProducerCombinationWithMovie mocks base method.
+func (m *MockMovieProducerRepositoryI) RemoveAllProducerCombinationWithMovie(movieId *uuid.UUID) *models.KTSError {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "RemoveAllProducerCombinationWithMovie", movieId)
+	ret0, _ := ret[0].(*models.KTSError)
+	return ret0
+}
+
+// RemoveAllProducerCombinationWithMovie indicates an expected call of RemoveAllProducerCombinationWithMovie.
+func (mr *MockMovieProducerRepositoryIMockRecorder) RemoveAllProducerCombinationWithMovie(movieId any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RemoveAllProducerCombinationWithMovie", reflect.TypeOf((*MockMovieProducerRepositoryI)(nil).RemoveAllProducerCombinationWithMovie), movieId)
+}
+
 // RemoveMovieProducer mocks base method.
 func (m *MockMovieProducerRepositoryI) RemoveMovieProducer(movieId, producerId *uuid.UUID) *models.KTSError {
 	m.ctrl.T.Helper()

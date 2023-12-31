@@ -53,6 +53,20 @@ func (mr *MockMovieGenreRepositoryIMockRecorder) AddMovieGenre(movieId, genreId 
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddMovieGenre", reflect.TypeOf((*MockMovieGenreRepositoryI)(nil).AddMovieGenre), movieId, genreId)
 }
 
+// RemoveAllGenreCombinationWithMovie mocks base method.
+func (m *MockMovieGenreRepositoryI) RemoveAllGenreCombinationWithMovie(movieId *uuid.UUID) *models.KTSError {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "RemoveAllGenreCombinationWithMovie", movieId)
+	ret0, _ := ret[0].(*models.KTSError)
+	return ret0
+}
+
+// RemoveAllGenreCombinationWithMovie indicates an expected call of RemoveAllGenreCombinationWithMovie.
+func (mr *MockMovieGenreRepositoryIMockRecorder) RemoveAllGenreCombinationWithMovie(movieId any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RemoveAllGenreCombinationWithMovie", reflect.TypeOf((*MockMovieGenreRepositoryI)(nil).RemoveAllGenreCombinationWithMovie), movieId)
+}
+
 // RemoveMovieGenre mocks base method.
 func (m *MockMovieGenreRepositoryI) RemoveMovieGenre(movieId, genreId *uuid.UUID) *models.KTSError {
 	m.ctrl.T.Helper()

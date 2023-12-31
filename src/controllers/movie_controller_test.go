@@ -395,3 +395,147 @@ func TestCreateMovie(t *testing.T) {
 		})
 	}
 }
+
+func TestUpdateMovie(t *testing.T) {
+	sampleMovie := samples.GetSampleMovieById()
+
+	testCases := []struct {
+		name            string
+		setExpectations func(mockMovieRepo mocks.MockMovieRepositoryI, movie *model.Movies)
+		expectedError   *models.KTSError
+	}{
+		{
+			name: "Update movie",
+			setExpectations: func(mockMovieRepo mocks.MockMovieRepositoryI, movie *model.Movies) {
+				mockMovieRepo.EXPECT().UpdateMovie(movie).Return(nil)
+			},
+			expectedError: nil,
+		},
+		{
+			name: "Error while updating movie",
+			setExpectations: func(mockMovieRepo mocks.MockMovieRepositoryI, movie *model.Movies) {
+				mockMovieRepo.EXPECT().UpdateMovie(movie).Return(kts_errors.KTS_INTERNAL_ERROR)
+			},
+			expectedError: kts_errors.KTS_INTERNAL_ERROR,
+		},
+		{
+			name: "Error while converting rows affected",
+			setExpectations: func(mockMovieRepo mocks.MockMovieRepositoryI, movie *model.Movies) {
+				mockMovieRepo.EXPECT().UpdateMovie(movie).Return(kts_errors.KTS_INTERNAL_ERROR)
+			},
+			expectedError: kts_errors.KTS_INTERNAL_ERROR,
+		},
+		{
+			name: "Movie not found",
+			setExpectations: func(mockMovieRepo mocks.MockMovieRepositoryI, movie *model.Movies) {
+				mockMovieRepo.EXPECT().UpdateMovie(movie).Return(kts_errors.KTS_NOT_FOUND)
+			},
+			expectedError: kts_errors.KTS_NOT_FOUND,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			mockCtrl := gomock.NewController(t)
+			defer mockCtrl.Finish()
+			movieRepoMock := mocks.NewMockMovieRepositoryI(mockCtrl)
+
+			movieController := MovieController{
+				MovieRepo: movieRepoMock,
+			}
+
+			// define expectations
+			tc.setExpectations(*movieRepoMock, sampleMovie)
+
+			// WHEN
+			// Call the method under test
+			kts_err := movieController.UpdateMovie(sampleMovie)
+
+			// Verify
+			assert.Equal(t, tc.expectedError, kts_err)
+		})
+	}
+}
+
+func TestDeleteMovie(t *testing.T) {
+	sampleMovie := samples.GetSampleMovieById()
+
+	testCases := []struct {
+		name            string
+		setExpectations func(mockMovieRepo mocks.MockMovieRepositoryI, mockMovieGenreRepo mocks.MockMovieGenreRepositoryI, mockMovieActorRepo mocks.MockMovieActorRepositoryI, mockMovieProducerRepo mocks.MockMovieProducerRepositoryI, movieId *uuid.UUID)
+		expectedError   *models.KTSError
+	}{
+		{
+			name: "Delete movie",
+			setExpectations: func(mockMovieRepo mocks.MockMovieRepositoryI, mockMovieGenreRepo mocks.MockMovieGenreRepositoryI, mockMovieActorRepo mocks.MockMovieActorRepositoryI, mockMovieProducerRepo mocks.MockMovieProducerRepositoryI, movieId *uuid.UUID) {
+				mockMovieGenreRepo.EXPECT().RemoveAllGenreCombinationWithMovie(movieId).Return(nil)
+				mockMovieActorRepo.EXPECT().RemoveAllActorCombinationWithMovie(movieId).Return(nil)
+				mockMovieProducerRepo.EXPECT().RemoveAllProducerCombinationWithMovie(movieId).Return(nil)
+				mockMovieRepo.EXPECT().DeleteMovie(movieId).Return(nil)
+			},
+			expectedError: nil,
+		},
+		{
+			name: "Error while deleting MovieProducer",
+			setExpectations: func(mockMovieRepo mocks.MockMovieRepositoryI, mockMovieGenreRepo mocks.MockMovieGenreRepositoryI, mockMovieActorRepo mocks.MockMovieActorRepositoryI, mockMovieProducerRepo mocks.MockMovieProducerRepositoryI, movieId *uuid.UUID) {
+				mockMovieGenreRepo.EXPECT().RemoveAllGenreCombinationWithMovie(movieId).Return(nil)
+				mockMovieActorRepo.EXPECT().RemoveAllActorCombinationWithMovie(movieId).Return(nil)
+				mockMovieProducerRepo.EXPECT().RemoveAllProducerCombinationWithMovie(movieId).Return(kts_errors.KTS_INTERNAL_ERROR)
+			},
+			expectedError: kts_errors.KTS_INTERNAL_ERROR,
+		},
+		{
+			name: "Error while deleting MovieActor",
+			setExpectations: func(mockMovieRepo mocks.MockMovieRepositoryI, mockMovieGenreRepo mocks.MockMovieGenreRepositoryI, mockMovieActorRepo mocks.MockMovieActorRepositoryI, mockMovieProducerRepo mocks.MockMovieProducerRepositoryI, movieId *uuid.UUID) {
+				mockMovieGenreRepo.EXPECT().RemoveAllGenreCombinationWithMovie(movieId).Return(nil)
+				mockMovieActorRepo.EXPECT().RemoveAllActorCombinationWithMovie(movieId).Return(kts_errors.KTS_INTERNAL_ERROR)
+			},
+			expectedError: kts_errors.KTS_INTERNAL_ERROR,
+		},
+		{
+			name: "Error while deleting MovieGenre",
+			setExpectations: func(mockMovieRepo mocks.MockMovieRepositoryI, mockMovieGenreRepo mocks.MockMovieGenreRepositoryI, mockMovieActorRepo mocks.MockMovieActorRepositoryI, mockMovieProducerRepo mocks.MockMovieProducerRepositoryI, movieId *uuid.UUID) {
+				mockMovieGenreRepo.EXPECT().RemoveAllGenreCombinationWithMovie(movieId).Return(kts_errors.KTS_INTERNAL_ERROR)
+			},
+			expectedError: kts_errors.KTS_INTERNAL_ERROR,
+		},
+		{
+			name: "Movie not found",
+			setExpectations: func(mockMovieRepo mocks.MockMovieRepositoryI, mockMovieGenreRepo mocks.MockMovieGenreRepositoryI, mockMovieActorRepo mocks.MockMovieActorRepositoryI, mockMovieProducerRepo mocks.MockMovieProducerRepositoryI, movieId *uuid.UUID) {
+				mockMovieGenreRepo.EXPECT().RemoveAllGenreCombinationWithMovie(movieId).Return(nil)
+				mockMovieActorRepo.EXPECT().RemoveAllActorCombinationWithMovie(movieId).Return(nil)
+				mockMovieProducerRepo.EXPECT().RemoveAllProducerCombinationWithMovie(movieId).Return(nil)
+				mockMovieRepo.EXPECT().DeleteMovie(movieId).Return(kts_errors.KTS_NOT_FOUND)
+			},
+			expectedError: kts_errors.KTS_NOT_FOUND,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			mockCtrl := gomock.NewController(t)
+			defer mockCtrl.Finish()
+			movieRepoMock := mocks.NewMockMovieRepositoryI(mockCtrl)
+			genreRepoMock := mocks.NewMockMovieGenreRepositoryI(mockCtrl)
+			actorRepoMock := mocks.NewMockMovieActorRepositoryI(mockCtrl)
+			producerRepoMock := mocks.NewMockMovieProducerRepositoryI(mockCtrl)
+
+			movieController := MovieController{
+				MovieRepo:         movieRepoMock,
+				MovieGenreRepo:    genreRepoMock,
+				MovieActorRepo:    actorRepoMock,
+				MovieProducerRepo: producerRepoMock,
+			}
+
+			// define expectations
+			tc.setExpectations(*movieRepoMock, *genreRepoMock, *actorRepoMock, *producerRepoMock, sampleMovie.ID)
+
+			// WHEN
+			// Call the method under test
+			kts_err := movieController.DeleteMovie(sampleMovie.ID)
+
+			// Verify
+			assert.Equal(t, tc.expectedError, kts_err)
+		})
+	}
+}
