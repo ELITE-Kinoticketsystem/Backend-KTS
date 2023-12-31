@@ -11,13 +11,14 @@ import (
 	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/managers"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/samples"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestGetTicketById(t *testing.T) {
-	sampleTicket := utils.GetSampleTicket()
+	sampleTicket := samples.GetSampleTicket()
 
 	prettyTicket, err := json.Marshal(sampleTicket)
 	if err != nil {
@@ -108,7 +109,7 @@ func TestGetTicketById(t *testing.T) {
 }
 
 func TestCreateTicket(t *testing.T) {
-	sampleTicket := utils.GetSampleCreateTicket()
+	sampleTicket := samples.GetSampleCreateTicket()
 
 	query := "INSERT INTO `KinoTicketSystem`.tickets (id, validated, price, price_category_id, order_id, event_seat_id) VALUES (?, ?, ?, ?, ?, ?);"
 

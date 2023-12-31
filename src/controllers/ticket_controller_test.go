@@ -6,6 +6,7 @@ import (
 	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/mocks"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/samples"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
@@ -13,7 +14,7 @@ import (
 )
 
 func TestGetTicketById(t *testing.T) {
-	sampleTicket := utils.GetSampleTicket()
+	sampleTicket := samples.GetSampleTicket()
 
 	testCases := []struct {
 		name            string
