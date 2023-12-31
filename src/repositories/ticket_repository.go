@@ -16,7 +16,7 @@ import (
 )
 
 type TicketRepositoryI interface {
-	GetTicketById(id *uuid.UUID) (*model.Tickets, *models.KTSError)
+	GetTicketById(id *uuid.UUID) (*models.TicketDTO, *models.KTSError)
 	CreateTicket(ticket *model.Tickets) (*uuid.UUID, *models.KTSError)
 	ValidateTicket(id *uuid.UUID) *models.KTSError
 }
