@@ -60,3 +60,4 @@ func GetSamplePriceCategory() *model.PriceCategories {
 
 	return &priceCategory
 }
+
