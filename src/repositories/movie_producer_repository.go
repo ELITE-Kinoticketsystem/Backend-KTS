@@ -13,6 +13,7 @@ type MovieProducerRepositoryI interface {
 	// Combine Movie and Actor
 	AddMovieProducer(movieId *uuid.UUID, producerId *uuid.UUID) *models.KTSError
 	RemoveMovieProducer(movieId *uuid.UUID, producerId *uuid.UUID) *models.KTSError
+	RemoveAllProducerCombinationWithMovie(movieId *uuid.UUID) *models.KTSError
 }
 
 type MovieProducerRepository struct {
@@ -66,6 +67,22 @@ func (pr *MovieProducerRepository) RemoveMovieProducer(movieId *uuid.UUID, produ
 	if rowsAff == 0 {
 		return kts_errors.KTS_NOT_FOUND
 	}
+
+	return nil
+}
+
+func (pr *MovieProducerRepository) RemoveAllProducerCombinationWithMovie(movieId *uuid.UUID) *models.KTSError {
+	deleteQuery := table.MovieProducers.DELETE().WHERE(
+		table.MovieProducers.MovieID.EQ(utils.MysqlUuid(movieId)),
+	)
+
+	// Execute the query
+	_, err := deleteQuery.Exec(pr.DatabaseManager.GetDatabaseConnection())
+	if err != nil {
+		return kts_errors.KTS_INTERNAL_ERROR
+	}
+
+
 
 	return nil
 }
