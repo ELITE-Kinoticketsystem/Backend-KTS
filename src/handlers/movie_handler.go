@@ -129,7 +129,13 @@ func UpdateMovie(movieCtrl controllers.MovieControllerI) gin.HandlerFunc {
 
 func DeleteMovie(movieCtrl controllers.MovieControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		movieId := uuid.MustParse(c.Param("movieId"))
+		movieId, err := uuid.Parse(c.Param("movieId"))
+
+		if err != nil {
+			utils.HandleErrorAndAbort(c, kts_errors.KTS_BAD_REQUEST)
+			return
+		}
+
 		kts_err := movieCtrl.DeleteMovie(&movieId)
 		if kts_err != nil {
 			utils.HandleErrorAndAbort(c, kts_err)
