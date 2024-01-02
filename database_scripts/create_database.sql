@@ -232,6 +232,7 @@ CREATE TABLE events
      description    TEXT, 
      event_type     VARCHAR(40) NOT NULL,
      cinema_hall_id BINARY(16) NOT NULL,
+     is3d            BOOLEAN NOT NULL DEFAULT FALSE,
      PRIMARY KEY (id),
      FOREIGN KEY (cinema_hall_id) REFERENCES cinema_halls(id)
   );
