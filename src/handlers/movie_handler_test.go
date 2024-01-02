@@ -15,7 +15,6 @@ import (
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/samples"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
 )
@@ -104,36 +103,38 @@ func TestDeleteMovieHandler(t *testing.T) {
 
 	testCases := []struct {
 		name            string
-		setExpectations func(mockController *mocks.MockMovieControllerI, movieId *uuid.UUID)
+		movieId         string
+		setExpectations func(mockController *mocks.MockMovieControllerI, movieId string)
 		expectedStatus  int
 		expectedBody    string
 	}{
 		{
-			name: "Success",
-			setExpectations: func(mockController *mocks.MockMovieControllerI, movieId *uuid.UUID) {
+			name:    "Success",
+			movieId: sampleUpdateMovieId.String(),
+			setExpectations: func(mockController *mocks.MockMovieControllerI, movieId string) {
 				mockController.EXPECT().DeleteMovie(gomock.Any()).Return(nil)
 			},
 			expectedStatus: http.StatusOK,
 			expectedBody:   `{"message":"Movie deleted"}`,
 		},
-		// {
-		// 	name:          "Internal error",
-		// 	paramTicketId: utils.NewUUID(),
-		// 	setExpectations: func(mockController *mocks.MockTicketControllerI, ticketId *uuid.UUID) {
-		// 		mockController.EXPECT().ValidateTicket(gomock.Any()).Return(kts_errors.KTS_INTERNAL_ERROR)
-		// 	},
-		// 	expectedStatus: http.StatusInternalServerError,
-		// 	expectedBody:   `{"errorMessage":"INTERNAL_ERROR"}`,
-		// },
-		// {
-		// 	name:          "Ticket not found",
-		// 	paramTicketId: utils.NewUUID(),
-		// 	setExpectations: func(mockController *mocks.MockTicketControllerI, ticketId *uuid.UUID) {
-		// 		mockController.EXPECT().ValidateTicket(gomock.Any()).Return(kts_errors.KTS_NOT_FOUND)
-		// 	},
-		// 	expectedStatus: http.StatusNotFound,
-		// 	expectedBody:   `{"errorMessage":"NOT_FOUND"}`,
-		// },
+		{
+			name:    "Internal error",
+			movieId: sampleUpdateMovieId.String(),
+			setExpectations: func(mockController *mocks.MockMovieControllerI, movieId string) {
+				mockController.EXPECT().DeleteMovie(gomock.Any()).Return(kts_errors.KTS_INTERNAL_ERROR)
+			},
+			expectedStatus: http.StatusInternalServerError,
+			expectedBody:   `{"errorMessage":"INTERNAL_ERROR"}`,
+		},
+		{
+			name:    "Ticket not found",
+			movieId: "",
+			setExpectations: func(mockController *mocks.MockMovieControllerI, movieId string) {
+
+			},
+			expectedStatus: http.StatusBadRequest,
+			expectedBody:   `{"errorMessage":"BAD_REQUEST"}`,
+		},
 	}
 
 	for _, tc := range testCases {
@@ -149,9 +150,9 @@ func TestDeleteMovieHandler(t *testing.T) {
 
 			req, _ := http.NewRequest("Delete", "/movies/"+sampleUpdateMovieId.String(), nil)
 			c.Request = req
-			c.Params = []gin.Param{{Key: "movieId", Value: sampleUpdateMovieId.String()}}
+			c.Params = []gin.Param{{Key: "movieId", Value: tc.movieId}}
 
-			tc.setExpectations(movieController, sampleUpdateMovieId)
+			tc.setExpectations(movieController, tc.movieId)
 
 			// WHEN
 			handlers.DeleteMovie(movieController)(c)
