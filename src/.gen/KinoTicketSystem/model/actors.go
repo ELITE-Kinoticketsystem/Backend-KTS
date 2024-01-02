@@ -17,5 +17,4 @@ type Actors struct {
 	Name        string
 	Birthdate   time.Time
 	Description string
-	PicURL      *string
 }

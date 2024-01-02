@@ -17,5 +17,4 @@ type Producers struct {
 	Name        string
 	Birthdate   time.Time
 	Description string
-	PicURL      *string
 }

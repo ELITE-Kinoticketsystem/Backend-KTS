@@ -85,7 +85,6 @@ func (ar *ActorRepository) CreateActor(actor *model.Actors) (*uuid.UUID, *models
 		actor.Name,
 		actor.Birthdate,
 		actor.Description,
-		actor.PicURL,
 	)
 
 	rows, err := insertStmt.Exec(ar.DatabaseManager.GetDatabaseConnection())

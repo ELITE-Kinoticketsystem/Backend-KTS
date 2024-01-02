@@ -20,4 +20,5 @@ type Events struct {
 	Description  *string
 	EventType    string
 	CinemaHallID *uuid.UUID
+	Is3d         bool
 }
