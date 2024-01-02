@@ -12,7 +12,7 @@ import (
 
 var key = os.Getenv("JWT_SECRET")
 
-const tokenLifespan = 15 * 60                 // 15 minutes
+const tokenLifespan = 45 * 60                 // 45 minutes
 const refreshTokenLifeSpan = 3 * 24 * 60 * 60 // 3 days
 const leeway = 5 * 60                         // 5 minutes
 const issuer = "KTS"
