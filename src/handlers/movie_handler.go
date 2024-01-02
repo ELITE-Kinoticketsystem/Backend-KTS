@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/.gen/KinoTicketSystem/model"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/controllers"
 	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
@@ -89,45 +90,35 @@ func CreateMovie(movieCtrl controllers.MovieControllerI) gin.HandlerFunc {
 }
 
 func UpdateMovie(movieCtrl controllers.MovieControllerI) gin.HandlerFunc {
-	// return func(c *gin.Context) {
-	// 	var movie *model.Movies
-	// 	err := c.ShouldBindJSON(&movie)
-	// 	if err != nil ||
-	// 		utils.ContainsEmptyString(
-	// 			movie.Title, movie.Description, *movie.BannerPicURL, *movie.CoverPicURL, *movie.TrailerURL,
-	// 		) {
-	// 		utils.HandleErrorAndAbort(c, kts_errors.KTS_BAD_REQUEST)
-	// 		return
-	// 	}
-
-	// 	kts_err := movieCtrl.UpdateMovie(movie)
-	// 	if kts_err != nil {
-	// 		utils.HandleErrorAndAbort(c, kts_err)
-	// 		return
-	// 	}
-	// 	c.JSON(http.StatusOK, movie)
-	// }
-
-	// TODO: implement
 	return func(c *gin.Context) {
-		c.JSON(http.StatusNotImplemented, gin.H{"message": "Not implemented"})
+		var movie *model.Movies
+		err := c.ShouldBindJSON(&movie)
+		if err != nil ||
+			utils.ContainsEmptyString(
+				movie.Title,
+			) {
+			utils.HandleErrorAndAbort(c, kts_errors.KTS_BAD_REQUEST)
+			return
+		}
+
+		kts_err := movieCtrl.UpdateMovie(movie)
+		if kts_err != nil {
+			utils.HandleErrorAndAbort(c, kts_err)
+			return
+		}
+		c.JSON(http.StatusOK, movie)
 	}
 }
 
 func DeleteMovie(movieCtrl controllers.MovieControllerI) gin.HandlerFunc {
-	// return func(c *gin.Context) {
-	// 	movieId := uuid.MustParse(c.Param("movieId"))
-	// 	kts_err := movieCtrl.DeleteMovie(&movieId)
-	// 	if kts_err != nil {
-	// 		utils.HandleErrorAndAbort(c, kts_err)
-	// 		return
-	// 	}
-	// 	c.Status(http.StatusNoContent)
-	// }
-
-	// TODO: implement
 	return func(c *gin.Context) {
-		c.JSON(http.StatusNotImplemented, gin.H{"message": "Not implemented"})
+		movieId := uuid.MustParse(c.Param("movieId"))
+		kts_err := movieCtrl.DeleteMovie(&movieId)
+		if kts_err != nil {
+			utils.HandleErrorAndAbort(c, kts_err)
+			return
+		}
+		c.JSON(http.StatusOK, gin.H{"message": "Movie deleted"})
 	}
 }
 

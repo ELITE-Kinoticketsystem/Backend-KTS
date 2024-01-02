@@ -5,6 +5,7 @@
 ~/go/bin/mockgen -source=./src/controllers/review_controller.go -destination=./src/mocks/review_controller_mock.go -package=mocks
 ~/go/bin/mockgen -source=./src/controllers/eventseats_controller.go -destination=./src/mocks/eventseats_controller_mock.go -package=mocks
 ~/go/bin/mockgen -source=./src/controllers/event_controller.go -destination=./src/mocks/event_controller_mock.go -package=mocks
+~/go/bin/mockgen -source=./src/controllers/movie_controller.go -destination=./src/mocks/movie_controller_mock.go -package=mocks
 
 # repositories
 ~/go/bin/mockgen -source=./src/repositories/user_repo.go -destination=./src/mocks/user_repo_mock.go -package=mocks
