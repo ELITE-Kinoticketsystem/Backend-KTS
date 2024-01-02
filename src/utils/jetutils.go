@@ -2,6 +2,7 @@ package utils
 
 import (
 	"database/sql"
+	"time"
 
 	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
 
@@ -13,6 +14,10 @@ import (
 func MysqlUuid(uuid *uuid.UUID) mysql.StringExpression {
 	binary_id, _ := uuid.MarshalBinary()
 	return mysql.String(string(binary_id))
+}
+
+func MysqlTime(time *time.Time) mysql.TimeExpression {
+	return mysql.TimeT(*time)
 }
 
 func MySqlString(str string) mysql.StringExpression {

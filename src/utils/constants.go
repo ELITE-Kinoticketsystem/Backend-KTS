@@ -1,6 +1,8 @@
 package utils
 
-const BLOCKED_TICKET_TIME = 15 * 60 // 15 minutes
+import "time"
+
+const BLOCKED_TICKET_TIME time.Duration = 9e+11 // 15 minutes
 
 type SeatType string
 

@@ -40,18 +40,17 @@ func (esc *EventSeatController) GetEventSeats(eventId *uuid.UUID, userId *uuid.U
 			RowNr:         seat.Seat.RowNr,
 			ColumnNr:      seat.Seat.ColumnNr,
 			Available:     (seat.EventSeat.BlockedUntil == nil || seat.EventSeat.BlockedUntil.Before(time.Now()) || seat.EventSeat.UserID == nil) && !seat.EventSeat.Booked,
-			BookedByOther: (seat.EventSeat.BlockedUntil != nil && (seat.EventSeat.BlockedUntil.After(time.Now()) && (seat.EventSeat.UserID != nil && seat.EventSeat.UserID != userId))) && !seat.EventSeat.Booked,
+			BookedByOther: (seat.EventSeat.BlockedUntil != nil && (seat.EventSeat.BlockedUntil.After(time.Now()) && (seat.EventSeat.UserID != nil && *seat.EventSeat.UserID != *userId))) && !seat.EventSeat.Booked,
 			Category:      seat.SeatCategory.CategoryName,
 			Type:          seat.Seat.Type,
 			Price:         seat.EventSeatCategory.Price,
 		}
 
-		if seat.EventSeat.UserID == userId && !seat.EventSeat.Booked {
+		if seat.EventSeat.UserID != nil && *seat.EventSeat.UserID == *userId && !seat.EventSeat.Booked {
 			currentUserSeats = append(currentUserSeats, currentSeat)
-		}
-
-		if len(currentUserSeats) > 0 {
-			blockedUntil = seat.EventSeat.BlockedUntil
+			if len(currentUserSeats) == 1 {
+				blockedUntil = seat.EventSeat.BlockedUntil
+			}
 		}
 
 		seatRow := seatRows[currentSeat.RowNr]
@@ -123,7 +122,7 @@ func (esc *EventSeatController) AreUserSeatsNextToEachOtherWithoutSeat(eventId *
 	var emtpySeatArray []models.GetEventSeatsDTO
 
 	for _, seat := range *seats {
-		if (seat.EventSeat.UserID == userId && !seat.EventSeat.Booked) && seat.EventSeat.ID != eventSeatId {
+		if ((seat.EventSeat.UserID != nil && *seat.EventSeat.UserID == *userId) && !seat.EventSeat.Booked) && *seat.EventSeat.ID != *eventSeatId {
 			if rowNr == -1 {
 				rowNr = seat.Seat.RowNr
 			} else if rowNr != seat.Seat.RowNr {
@@ -178,7 +177,7 @@ func (esc *EventSeatController) AreUserSeatsNextToEachOther(eventId *uuid.UUID, 
 	var emtpySeatArray []models.GetEventSeatsDTO
 
 	for _, seat := range *seats {
-		if (seat.EventSeat.UserID == userId && !seat.EventSeat.Booked) || seat.EventSeat.ID == eventSeatId {
+		if ((seat.EventSeat.UserID != nil && *seat.EventSeat.UserID == *userId) && !seat.EventSeat.Booked) || *seat.EventSeat.ID == *eventSeatId {
 			if rowNr == -1 {
 				rowNr = seat.Seat.RowNr
 			} else if rowNr != seat.Seat.RowNr {
