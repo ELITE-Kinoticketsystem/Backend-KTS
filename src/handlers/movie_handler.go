@@ -17,22 +17,38 @@ func GetMovies(movieCtrl controllers.MovieControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		movies, kts_err := movieCtrl.GetMovies()
 		if kts_err != nil {
-			c.JSON(kts_err.Status, kts_err)
+			utils.HandleErrorAndAbort(c, kts_err)
 			return
 		}
 		c.JSON(http.StatusOK, movies)
 	}
 }
 
-func GetMovieByName(movieCtrl controllers.MovieControllerI) gin.HandlerFunc {
+func GetMovieById(movieCtrl controllers.MovieControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		name := c.Param("name")
-		movie, kts_err := movieCtrl.GetMovieByName(&name)
+		movieId, err := uuid.Parse(c.Param("id"))
+		if err != nil {
+			utils.HandleErrorAndAbort(c, kts_errors.KTS_BAD_REQUEST)
+			return
+		}
+
+		movie, kts_err := movieCtrl.GetMovieById(&movieId)
 		if kts_err != nil {
-			c.JSON(kts_err.Status, kts_err)
+			utils.HandleErrorAndAbort(c, kts_err)
 			return
 		}
 		c.JSON(http.StatusOK, movie)
+	}
+}
+
+func GetMoviesWithGenres(movieCtrl controllers.MovieControllerI) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		movies, kts_err := movieCtrl.GetMoviesWithGenres()
+		if kts_err != nil {
+			utils.HandleErrorAndAbort(c, kts_err)
+			return
+		}
+		c.JSON(http.StatusOK, movies)
 	}
 }
 
@@ -42,15 +58,11 @@ func CreateMovie(movieCtrl controllers.MovieControllerI) gin.HandlerFunc {
 		err := c.ShouldBindJSON(&movie)
 		if err != nil ||
 			utils.ContainsEmptyString(
-				movie.ReleaseDate.String(),
+				movie.Title,
 			) {
-			log.Print("Failed to bind JSON")
-			log.Print(err)
 			utils.HandleErrorAndAbort(c, kts_errors.KTS_BAD_REQUEST)
 			return
 		}
-
-		log.Print(movie)
 
 		for _, genre := range movie.GenresID {
 			if utils.ContainsEmptyString(genre.ID.String()) {
@@ -125,29 +137,5 @@ func DeleteMovie(movieCtrl controllers.MovieControllerI) gin.HandlerFunc {
 			return
 		}
 		c.JSON(http.StatusOK, gin.H{"message": "Movie deleted"})
-	}
-}
-
-func GetMoviesWithGenres(movieCtrl controllers.MovieControllerI) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		movies, kts_err := movieCtrl.GetMoviesWithGenres()
-		if kts_err != nil {
-			utils.HandleErrorAndAbort(c, kts_err)
-			return
-		}
-		c.JSON(http.StatusOK, movies)
-	}
-}
-
-func GetMovieById(movieCtrl controllers.MovieControllerI) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		movieId := uuid.MustParse(c.Param("id"))
-
-		movie, kts_err := movieCtrl.GetMovieById(&movieId)
-		if kts_err != nil {
-			utils.HandleErrorAndAbort(c, kts_err)
-			return
-		}
-		c.JSON(http.StatusOK, movie)
 	}
 }
