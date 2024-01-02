@@ -51,7 +51,7 @@ CREATE TABLE genres
 CREATE TABLE movies
   (
      id             BINARY(16) DEFAULT (Uuid_to_bin(Uuid(), 1)),
-     title          VARCHAR(80) NOT NULL,
+     title          VARCHAR(80) NOT NULL UNIQUE,
      description    TEXT NOT NULL,
      banner_pic_url TEXT,
      cover_pic_url  TEXT,
@@ -78,7 +78,6 @@ CREATE TABLE producers
      name        VARCHAR(50) NOT NULL,
      birthdate   DATE NOT NULL,
      description TEXT NOT NULL,
-     pic_url     TEXT,
      PRIMARY KEY (id)
   );
 
@@ -88,7 +87,6 @@ CREATE TABLE actors
      name        VARCHAR(50) NOT NULL,
      birthdate   DATE NOT NULL,
      description TEXT NOT NULL,
-     pic_url     TEXT,
      PRIMARY KEY (id)
   );
 
