@@ -151,6 +151,8 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 	publicRoutes.Handle(http.MethodGet, "/movies/genres", handlers.GetMoviesWithGenres(controller.MovieController))
 	publicRoutes.Handle(http.MethodGet, "/movies/:id", handlers.GetMovieById(controller.MovieController))
 	securedRoutes.Handle(http.MethodPost, "/movies", handlers.CreateMovie(controller.MovieController))
+	securedRoutes.Handle(http.MethodPut, "/movies", handlers.UpdateMovie(controller.MovieController))
+	securedRoutes.Handle(http.MethodDelete, "/movies", handlers.DeleteMovie(controller.MovieController))
 
 	// genres
 	publicRoutes.Handle(http.MethodGet, "/genres", handlers.GetGenres(controller.GenreController))
