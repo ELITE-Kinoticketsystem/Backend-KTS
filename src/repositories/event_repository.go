@@ -1,8 +1,6 @@
 package repositories
 
 import (
-	"log"
-
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/.gen/KinoTicketSystem/model"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/.gen/KinoTicketSystem/table"
 	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
@@ -100,10 +98,8 @@ func (er *EventRepository) GetSpecialEvents() (*[]models.GetSpecialEventsDTO, *m
 				LEFT_JOIN(table.Movies, table.Movies.ID.EQ(table.EventMovies.MovieID)),
 		).
 		WHERE(
-			table.Events.EventType.EQ(utils.MySqlString(special)),
-		).WHERE(
-		table.Events.Start.GT(utils.MysqlTimeNow()),
-	)
+			table.Events.EventType.EQ(utils.MySqlString(special)).AND(table.Events.Start.GT(utils.MysqlTimeNow())),
+		)
 
 	err := stmt.Query(er.DatabaseManager.GetDatabaseConnection(), &specialEvents)
 
@@ -148,12 +144,9 @@ func (er *EventRepository) GetEventById(eventId *uuid.UUID) (*models.GetSpecialE
 			table.Events.ID.EQ(utils.MysqlUuid(eventId)),
 		)
 
-	log.Println(stmt.DebugSql())
-
 	err := stmt.Query(er.DatabaseManager.GetDatabaseConnection(), &event)
 
 	if err != nil {
-		log.Println(err.Error())
 		return nil, kts_errors.KTS_INTERNAL_ERROR
 	}
 

@@ -417,7 +417,7 @@ func TestGetSpecialEvents(t *testing.T) {
 		{
 			name: "Get special events",
 			setExpectations: func(mock sqlmock.Sqlmock) {
-				mock.ExpectQuery("SELECT .* FROM `KinoTicketSystem`.events .*").WillReturnRows(
+				mock.ExpectQuery("SELECT .* FROM `KinoTicketSystem`.events .*").WithArgs(special).WillReturnRows(
 					sqlmock.NewRows([]string{"events.id", "events.title", "events.start", "events.end", "events.description", "movies.id", "movies.title"}).
 						AddRow(expectedSpecialEvents[0].ID, expectedSpecialEvents[0].Title, expectedSpecialEvents[0].Start, expectedSpecialEvents[0].End, expectedSpecialEvents[0].Description, expectedSpecialEvents[0].Movies[0].ID, expectedSpecialEvents[0].Movies[0].Title).
 						AddRow(expectedSpecialEvents[1].ID, expectedSpecialEvents[1].Title, expectedSpecialEvents[1].Start, expectedSpecialEvents[1].End, expectedSpecialEvents[1].Description, expectedSpecialEvents[1].Movies[0].ID, expectedSpecialEvents[1].Movies[0].Title),
@@ -429,7 +429,7 @@ func TestGetSpecialEvents(t *testing.T) {
 		{
 			name: "Get special events sql error",
 			setExpectations: func(mock sqlmock.Sqlmock) {
-				mock.ExpectQuery("SELECT .* FROM `KinoTicketSystem`.events .*").WillReturnError(sql.ErrConnDone)
+				mock.ExpectQuery("SELECT .* FROM `KinoTicketSystem`.events .*").WithArgs(special).WillReturnError(sql.ErrConnDone)
 			},
 			expectedEvents: nil,
 			expectedError:  kts_errors.KTS_INTERNAL_ERROR,
@@ -437,7 +437,7 @@ func TestGetSpecialEvents(t *testing.T) {
 		{
 			name: "Get special events no rows affected",
 			setExpectations: func(mock sqlmock.Sqlmock) {
-				mock.ExpectQuery("SELECT .* FROM `KinoTicketSystem`.events .*").WillReturnRows(
+				mock.ExpectQuery("SELECT .* FROM `KinoTicketSystem`.events .*").WithArgs(special).WillReturnRows(
 					sqlmock.NewRows([]string{"events.id", "events.title", "events.start", "events.end", "events.description", "movies.id", "movies.title"}),
 				)
 			},
