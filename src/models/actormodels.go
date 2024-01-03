@@ -1,7 +1,7 @@
 package models
 
 import (
-	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/.gen/KinoTicketSystem/model"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/gen/KinoTicketSystem/model"
 )
 
 type ActorDTO struct {

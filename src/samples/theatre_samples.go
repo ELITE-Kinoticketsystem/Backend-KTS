@@ -1,7 +1,7 @@
 package samples
 
 import (
-	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/.gen/KinoTicketSystem/model"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/gen/KinoTicketSystem/model"
 )
 
 func GetSampleAddress() model.Addresses {

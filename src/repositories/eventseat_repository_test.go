@@ -4,8 +4,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/.gen/KinoTicketSystem/model"
 	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/gen/KinoTicketSystem/model"
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/managers"

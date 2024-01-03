@@ -1,9 +1,9 @@
 package controllers
 
 import (
-	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
+	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/gen/KinoTicketSystem/model"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
-	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/.gen/KinoTicketSystem/model"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/repositories"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
 	"github.com/google/uuid"
@@ -53,8 +53,8 @@ func (uc *UserController) RegisterUser(registrationData models.RegistrationReque
 	}
 
 	return &models.LoginResponse{
-		User: user,
-		Token: token,
+		User:         user,
+		Token:        token,
 		RefreshToken: refreshToken,
 	}, nil
 }

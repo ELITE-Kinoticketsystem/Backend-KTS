@@ -10,6 +10,7 @@ import (
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/managers"
 )
 
+
 func main() {
 	log.Println("Initializing database connection...")
 	dbConnection, err := managers.InitializeDB()

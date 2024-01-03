@@ -36,7 +36,7 @@ func main() {
 }
 
 func GenerateJetMySQL(dbMySQLConnection mysql2.DBConnection) {
-	const gen_path = "./src/.gen"
+	const gen_path = "./src/gen"
 
 	err := mysql2.Generate(
 		gen_path,

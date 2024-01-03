@@ -1,6 +1,10 @@
 package models
 
+type KTSErrorMessage struct {
+	ErrorMessage string `json:"errorMessage"`
+}
+
 type KTSError struct {
-	ErrorMessage string
-	Status       int
+	KTSErrorMessage
+	Status int
 }

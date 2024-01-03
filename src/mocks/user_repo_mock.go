@@ -11,7 +11,7 @@ package mocks
 import (
 	reflect "reflect"
 
-	model "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/.gen/KinoTicketSystem/model"
+	model "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/gen/KinoTicketSystem/model"
 	models "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
 	gomock "go.uber.org/mock/gomock"
 )
