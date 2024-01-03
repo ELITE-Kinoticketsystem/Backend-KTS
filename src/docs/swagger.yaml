@@ -1,0 +1,174 @@
+definitions:
+  model.ActorPictures:
+    properties:
+      actorID:
+        type: string
+      id:
+        type: string
+      picURL:
+        type: string
+    type: object
+  model.Movies:
+    properties:
+      bannerPicURL:
+        type: string
+      coverPicURL:
+        type: string
+      description:
+        type: string
+      fsk:
+        type: integer
+      id:
+        type: string
+      rating:
+        type: number
+      releaseDate:
+        type: string
+      timeInMin:
+        type: integer
+      title:
+        type: string
+      trailerURL:
+        type: string
+    type: object
+  models.ActorDTO:
+    properties:
+      birthdate:
+        type: string
+      description:
+        type: string
+      id:
+        type: string
+      movies:
+        items:
+          $ref: '#/definitions/model.Movies'
+        type: array
+      name:
+        type: string
+      pictures:
+        items:
+          $ref: '#/definitions/model.ActorPictures'
+        type: array
+    type: object
+  models.CreateActorDTO:
+    properties:
+      birthdate:
+        type: string
+      description:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      picturesUrls:
+        items:
+          type: string
+        type: array
+    type: object
+  models.GetActorsDTO:
+    properties:
+      birthdate:
+        type: string
+      description:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      pictures:
+        items:
+          $ref: '#/definitions/model.ActorPictures'
+        type: array
+    type: object
+  models.KTSErrorMessage:
+    properties:
+      errorMessage:
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /actors:
+    get:
+      consumes:
+      - application/json
+      description: Get actors
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.GetActorsDTO'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.KTSErrorMessage'
+      summary: Get actors
+      tags:
+      - Actors
+    post:
+      consumes:
+      - application/json
+      description: Create actor
+      parameters:
+      - description: Actor
+        in: body
+        name: actor
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreateActorDTO'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.KTSErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.KTSErrorMessage'
+      summary: Create actor
+      tags:
+      - Actors
+  /actors/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get actor by id
+      parameters:
+      - description: Actor ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ActorDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.KTSErrorMessage'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.KTSErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.KTSErrorMessage'
+      summary: Get actor by id
+      tags:
+      - Actors
+swagger: "2.0"

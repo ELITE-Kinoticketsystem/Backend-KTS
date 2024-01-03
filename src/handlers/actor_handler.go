@@ -11,6 +11,17 @@ import (
 	"github.com/google/uuid"
 )
 
+// @Summary Get actor by id
+// @Description Get actor by id
+// @Tags Actors
+// @Accept  json
+// @Produce  json
+// @Param id path string true "Actor ID"
+// @Success 200 {object} models.ActorDTO
+// @Failure 400 {object} models.KTSErrorMessage
+// @Failure 404 {object} models.KTSErrorMessage
+// @Failure 500 {object} models.KTSErrorMessage
+// @Router /actors/{id} [get]
 func GetActorByIdHandler(actorController controllers.ActorControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		actorId, err := uuid.Parse(c.Param("id"))
@@ -28,6 +39,14 @@ func GetActorByIdHandler(actorController controllers.ActorControllerI) gin.Handl
 	}
 }
 
+// @Summary Get actors
+// @Description Get actors
+// @Tags Actors
+// @Accept  json
+// @Produce  json
+// @Success 200 {array} models.GetActorsDTO
+// @Failure 500 {object} models.KTSErrorMessage
+// @Router /actors [get]
 func GetActorsHandler(actorController controllers.ActorControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		actors, err := actorController.GetActors()
@@ -40,6 +59,16 @@ func GetActorsHandler(actorController controllers.ActorControllerI) gin.HandlerF
 	}
 }
 
+// @Summary Create actor
+// @Description Create actor
+// @Tags Actors
+// @Accept  json
+// @Produce  json
+// @Param actor body models.CreateActorDTO true "Actor"
+// @Success 201 {object} uuid.UUID
+// @Failure 400 {object} models.KTSErrorMessage
+// @Failure 500 {object} models.KTSErrorMessage
+// @Router /actors [post]
 func CreateActorHandler(actorController controllers.ActorControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var actorDto models.CreateActorDTO

@@ -10,10 +10,14 @@ WORKDIR /app
 COPY src/ ./src
 
 RUN echo "module github.com/ELITE-Kinoticketsystem/Backend-KTS" > go.mod
+RUN go install github.com/swaggo/swag/cmd/swag@latest
 RUN go mod tidy
 
 # Download the Go module dependencies
 RUN go mod download
+
+# Build the swagger docs
+RUN cd src && ~/go/bin/swag init
 
 # Build the executable binary named "api" in the src directory
 RUN go build -o api ./src
