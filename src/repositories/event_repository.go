@@ -100,10 +100,8 @@ func (er *EventRepository) GetSpecialEvents() (*[]models.GetSpecialEventsDTO, *m
 				LEFT_JOIN(table.Movies, table.Movies.ID.EQ(table.EventMovies.MovieID)),
 		).
 		WHERE(
-			table.Events.EventType.EQ(utils.MySqlString(special)),
-		).WHERE(
-		table.Events.Start.GT(utils.MysqlTimeNow()),
-	)
+			table.Events.EventType.EQ(utils.MySqlString(special)).AND(table.Events.Start.GT(utils.MysqlTimeNow())),
+		)
 
 	err := stmt.Query(er.DatabaseManager.GetDatabaseConnection(), &specialEvents)
 
