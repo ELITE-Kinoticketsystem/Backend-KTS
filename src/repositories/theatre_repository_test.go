@@ -27,7 +27,10 @@ func TestCreateTheatre(t *testing.T) {
 			data: samples.GetSampleTheatre(),
 			setExpectations: func(mock sqlmock.Sqlmock, theatre *model.Theatres) {
 				mock.ExpectExec("INSERT INTO `KinoTicketSystem`.theatres").WithArgs(
-					theatre.ID, theatre.Name, theatre.AddressID,
+					utils.EqUUID(theatre.ID),
+					theatre.Name,
+					*theatre.LogoURL,
+					utils.EqUUID(theatre.AddressID),
 				).WillReturnResult(sqlmock.NewResult(1, 1))
 			},
 			expectedError: nil,
@@ -37,7 +40,10 @@ func TestCreateTheatre(t *testing.T) {
 			data: samples.GetSampleTheatre(),
 			setExpectations: func(mock sqlmock.Sqlmock, theatre *model.Theatres) {
 				mock.ExpectExec("INSERT INTO `KinoTicketSystem`.theatres").WithArgs(
-					theatre.ID, theatre.Name, theatre.AddressID,
+					utils.EqUUID(theatre.ID),
+					theatre.Name,
+					*theatre.LogoURL,
+					utils.EqUUID(theatre.AddressID),
 				).WillReturnError(sql.ErrConnDone)
 			},
 			expectedError: kts_errors.KTS_INTERNAL_ERROR,
@@ -62,7 +68,7 @@ func TestCreateTheatre(t *testing.T) {
 			tc.setExpectations(mock, &tc.data)
 
 			// WHEN
-			// call CreateTheatre with user data
+			// call CreateTheatre with theatre data
 			kts_err := theatreRepo.CreateTheatre(tc.data)
 
 			// THEN

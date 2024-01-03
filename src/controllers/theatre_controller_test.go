@@ -14,7 +14,8 @@ import (
 
 func TestCreateTheatre(t *testing.T) {
 	sampleTheatreData := models.CreateTheatreRequest{
-		Name: "Theatre",
+		Name:    "Theatre",
+		LogoUrl: "LogoURL",
 		Address: struct {
 			Street   string
 			StreetNr string
@@ -72,7 +73,7 @@ func TestCreateTheatre(t *testing.T) {
 			defer mockCtrl.Finish()
 			theatreRepoMock := mocks.NewMockTheaterRepoI(mockCtrl)
 			theatreController := TheatreController{
-				theatreRepo: theatreRepoMock,
+				TheatreRepo: theatreRepoMock,
 			}
 
 			// create mock data

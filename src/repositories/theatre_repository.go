@@ -25,8 +25,15 @@ func (tr *TheatreRepository) CreateTheatre(theatre model.Theatres) *models.KTSEr
 	stmt := table.Theatres.INSERT(
 		table.Theatres.ID,
 		table.Theatres.Name,
+		table.Theatres.LogoURL,
 		table.Theatres.AddressID,
-	).MODEL(theatre)
+	).VALUES(
+		utils.MysqlUuid(theatre.ID),
+		theatre.Name,
+		utils.MySqlStringPtr(theatre.LogoURL),
+		utils.MysqlUuid(theatre.AddressID),
+	)
+
 	_, err := stmt.Exec(tr.DatabaseManager.GetDatabaseConnection())
 	if err != nil {
 		return kts_errors.KTS_INTERNAL_ERROR
@@ -69,7 +76,14 @@ func (tr *TheatreRepository) CreateAddress(address model.Addresses) *models.KTSE
 		table.Addresses.Zipcode,
 		table.Addresses.City,
 		table.Addresses.Country,
-	).MODEL(address)
+	).VALUES(
+		utils.MysqlUuid(address.ID),
+		address.Street,
+		address.StreetNr,
+		address.Zipcode,
+		address.City,
+		address.Country,
+	)
 	_, err := insertStmt.Exec(tr.DatabaseManager.GetDatabaseConnection())
 	if err != nil {
 		return kts_errors.KTS_INTERNAL_ERROR

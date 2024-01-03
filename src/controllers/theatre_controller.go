@@ -13,7 +13,7 @@ type TheatreControllerI interface {
 }
 
 type TheatreController struct {
-	theatreRepo repositories.TheaterRepoI
+	TheatreRepo repositories.TheaterRepoI
 }
 
 func (tc *TheatreController) CreateTheatre(theatreData *models.CreateTheatreRequest) *models.KTSError {
@@ -27,7 +27,7 @@ func (tc *TheatreController) CreateTheatre(theatreData *models.CreateTheatreRequ
 		Country:  theatreData.Address.Country,
 	}
 
-	err := tc.theatreRepo.CreateAddress(address)
+	err := tc.TheatreRepo.CreateAddress(address)
 	if err != nil {
 		return kts_errors.KTS_INTERNAL_ERROR
 	}
@@ -36,9 +36,10 @@ func (tc *TheatreController) CreateTheatre(theatreData *models.CreateTheatreRequ
 	theatre := model.Theatres{
 		ID:        &theatreId,
 		Name:      theatreData.Name,
+		LogoURL:   &theatreData.LogoUrl,
 		AddressID: &addressId,
 	}
-	err = tc.theatreRepo.CreateTheatre(theatre)
+	err = tc.TheatreRepo.CreateTheatre(theatre)
 	if err != nil {
 		return kts_errors.KTS_INTERNAL_ERROR
 	}

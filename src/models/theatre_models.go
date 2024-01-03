@@ -2,6 +2,7 @@ package models
 
 type CreateTheatreRequest struct {
 	Name    string
+	LogoUrl string
 	Address struct {
 		Street   string
 		StreetNr string
@@ -10,4 +11,3 @@ type CreateTheatreRequest struct {
 		Country  string
 	}
 }
-

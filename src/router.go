@@ -10,11 +10,6 @@ import (
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/middlewares"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/repositories"
 	"github.com/gin-gonic/gin"
-
-	swaggerFiles "github.com/swaggo/files"
-	ginSwagger "github.com/swaggo/gin-swagger"
-
-	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/docs"
 )
 
 type Controllers struct {
@@ -27,6 +22,7 @@ type Controllers struct {
 	PriceCategories     controllers.PriceCategoryControllerI
 	ReviewController    controllers.ReviewControllerI
 	OrderController     controllers.OrderControllerI
+	TheatreController   controllers.TheatreControllerI
 }
 
 func createRouter(dbConnection *sql.DB) *gin.Engine {
@@ -129,6 +125,9 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 		ReviewController: &controllers.ReviewController{
 			ReviewRepo: reviewsRepo,
 		},
+		TheatreController: &controllers.TheatreController{
+			TheatreRepo: theatreRepo,
+		},
 	}
 
 	// Set routes
@@ -142,12 +141,13 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 
 	securedRoutes.Handle(http.MethodGet, "/test", handlers.TestJwtToken)
 
+	// movies
 	publicRoutes.Handle(http.MethodGet, "/movies", handlers.GetMovies(controller.MovieController))
 	publicRoutes.Handle(http.MethodGet, "/movies/genres", handlers.GetMoviesWithGenres(controller.MovieController))
 	publicRoutes.Handle(http.MethodGet, "/movies/:id", handlers.GetMovieById(controller.MovieController))
-
 	securedRoutes.Handle(http.MethodPost, "/movies", handlers.CreateMovie(controller.MovieController))
 
+	// genres
 	publicRoutes.Handle(http.MethodGet, "/genres", handlers.GetGenres(controller.GenreController))
 	publicRoutes.Handle(http.MethodGet, "/genres/:name", handlers.GetGenreByName(controller.GenreController))
 	publicRoutes.Handle(http.MethodGet, "/genres/movies", handlers.GetGenresWithMovies(controller.GenreController))
@@ -187,16 +187,11 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 	router.Handle(http.MethodPost, "/events/:eventId/reserve", handlers.CreateOrderHandler(controller.OrderController, true))
 	router.Handle(http.MethodPost, "/events/:eventId/book", handlers.CreateOrderHandler(controller.OrderController, false))
 
+	// theatres
+	securedRoutes.Handle(http.MethodPost, "/theatres", handlers.CreateTheatre(controller.TheatreController))
+
 	router.Handle(http.MethodGet, "/orders/:orderId", handlers.GetOrderByIdHandler(controller.OrderController))
 	router.Handle(http.MethodGet, "/orders", handlers.GetOrdersHandler(controller.OrderController))
-
-	// swagger
-	docs.SwaggerInfo.Title = "Kino-Ticket-System API"
-	docs.SwaggerInfo.Description = "This is the API for the Kino-Ticket-System"
-	docs.SwaggerInfo.Version = "1.0"
-	docs.SwaggerInfo.Schemes = []string{"http", "https"}
-
-	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	return router
 }

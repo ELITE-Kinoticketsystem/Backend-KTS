@@ -24,6 +24,13 @@ func MySqlString(str string) mysql.StringExpression {
 	return mysql.String(str)
 }
 
+func MySqlStringPtr(str *string) mysql.StringExpression {
+	if str == nil || *str == "" {
+		return nil
+	}
+	return mysql.String(*str)
+}
+
 func MysqlTimeNow() mysql.TimestampExpression {
 	return mysql.NOW()
 }
