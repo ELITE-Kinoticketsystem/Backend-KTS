@@ -11,6 +11,14 @@ import (
 	"github.com/google/uuid"
 )
 
+// @Summary Get genres
+// @Description Get genres
+// @Tags Genres
+// @Accept  json
+// @Produce  json
+// @Success 200 {array} model.Genres
+// @Failure 500 {object} models.KTSErrorMessage
+// @Router /genres [get]
 func GetGenres(genreCtrl controllers.GenreControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		genres, kts_err := genreCtrl.GetGenres()
@@ -22,6 +30,17 @@ func GetGenres(genreCtrl controllers.GenreControllerI) gin.HandlerFunc {
 	}
 }
 
+// @Summary Get genre by name
+// @Description Get genre by name
+// @Tags Genres
+// @Accept  json
+// @Produce  json
+// @Param name path string true "Genre name"
+// @Success 200 {object} model.Genres
+// @Failure 400 {object} models.KTSErrorMessage
+// @Failure 404 {object} models.KTSErrorMessage
+// @Failure 500 {object} models.KTSErrorMessage
+// @Router /genres/{name} [get]
 func GetGenreByName(genreCtrl controllers.GenreControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		name := c.Param("name")
@@ -34,6 +53,17 @@ func GetGenreByName(genreCtrl controllers.GenreControllerI) gin.HandlerFunc {
 	}
 }
 
+
+// @Summary Create genre
+// @Description Create genre
+// @Tags Genres
+// @Accept  json
+// @Produce  json
+// @Param genre body model.Genres true "Genres model"
+// @Success 201 {object} model.Genres
+// @Failure 400 {object} models.KTSErrorMessage
+// @Failure 500 {object} models.KTSErrorMessage
+// @Router /genres [post]
 func CreateGenre(genreCtrl controllers.GenreControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var genre model.Genres
@@ -54,6 +84,16 @@ func CreateGenre(genreCtrl controllers.GenreControllerI) gin.HandlerFunc {
 	}
 }
 
+// @Summary Update genre
+// @Description Update genre
+// @Tags Genres
+// @Accept  json
+// @Produce  json
+// @Param genre body model.Genres true "Genres model"
+// @Success 200 {object} model.Genres
+// @Failure 400 {object} models.KTSErrorMessage
+// @Failure 500 {object} models.KTSErrorMessage
+// @Router /genres [put]
 func UpdateGenre(genreCtrl controllers.GenreControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var genre model.Genres
@@ -72,6 +112,16 @@ func UpdateGenre(genreCtrl controllers.GenreControllerI) gin.HandlerFunc {
 	}
 }
 
+// @Summary Delete genre
+// @Description Delete genre
+// @Tags Genres
+// @Accept  json
+// @Produce  json
+// @Param id path string true "Genre ID"
+// @Success 200
+// @Failure 400 {object} models.KTSErrorMessage
+// @Failure 500 {object} models.KTSErrorMessage
+// @Router /genres/{id} [delete]
 func DeleteGenre(genreCtrl controllers.GenreControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		id := c.Param("id")
@@ -86,6 +136,14 @@ func DeleteGenre(genreCtrl controllers.GenreControllerI) gin.HandlerFunc {
 	}
 }
 
+// @Summary Get genres with movies
+// @Description Get genres with movies
+// @Tags Genres
+// @Accept  json
+// @Produce  json
+// @Success 200 {array} models.GenreWithMovies
+// @Failure 500 {object} models.KTSErrorMessage
+// @Router /genres/movies [get]
 func GetGenresWithMovies(genreCtrl controllers.GenreControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		genres, kts_err := genreCtrl.GetGenresWithMovies()

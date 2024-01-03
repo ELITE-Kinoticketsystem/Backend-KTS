@@ -10,6 +10,15 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// @Summary Create theatre
+// @Description Create theatre
+// @Tags Theatres
+// @Accept  json
+// @Produce  json
+// @Param theatre body models.CreateTheatreRequest true "Theatre data"
+// @Success 201
+// @Failure 400 {object} models.KTSErrorMessage
+// @Router /theatres [post]
 func CreateTheatre(theatreCtrl controllers.TheatreControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var theatreData models.CreateTheatreRequest

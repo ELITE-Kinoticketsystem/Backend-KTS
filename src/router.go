@@ -10,6 +10,11 @@ import (
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/middlewares"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/repositories"
 	"github.com/gin-gonic/gin"
+
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
+
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/docs"
 )
 
 type Controllers struct {
@@ -192,6 +197,14 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 
 	router.Handle(http.MethodGet, "/orders/:orderId", handlers.GetOrderByIdHandler(controller.OrderController))
 	router.Handle(http.MethodGet, "/orders", handlers.GetOrdersHandler(controller.OrderController))
+
+	// swagger
+	docs.SwaggerInfo.Title = "Kino-Ticket-System API"
+	docs.SwaggerInfo.Description = "This is the API for the Kino-Ticket-System"
+	docs.SwaggerInfo.Version = "1.0"
+	docs.SwaggerInfo.Schemes = []string{"http", "https"}
+
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	return router
 }

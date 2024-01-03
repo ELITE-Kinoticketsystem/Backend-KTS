@@ -11,6 +11,17 @@ import (
 	"github.com/google/uuid"
 )
 
+// @Summary Get event seats
+// @Description Get event seats
+// @Tags EventSeats
+// @Accept  json
+// @Produce  json
+// @Param eventId path string true "Event ID"
+// @Success 200 {object} models.GetEventSeatsResponse
+// @Failure 400 {object} models.KTSErrorMessage
+// @Failure 404 {object} models.KTSErrorMessage
+// @Failure 500 {object} models.KTSErrorMessage
+// @Router /events/{eventId}/seats [get]
 func GetEventSeatsHandler(eventSeatController controllers.EventSeatControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		eventSeatId, err := uuid.Parse(c.Param("eventId"))
@@ -28,14 +39,25 @@ func GetEventSeatsHandler(eventSeatController controllers.EventSeatControllerI) 
 			return
 		}
 
-		c.JSON(http.StatusOK, gin.H{
-			"seat_rows":        seatMap,
-			"currentUserSeats": currentUserSeats,
-			"blockedUntil":     blockedUntil,
-		})
+		c.JSON(http.StatusOK, models.GetEventSeatsResponse{
+			SeatRows:        seatMap,
+			CurrentUserSeat: currentUserSeats,
+			BlockedUntil:    blockedUntil})
 	}
 }
 
+// @Summary Block event seat
+// @Description Block event seat
+// @Tags EventSeats
+// @Accept  json
+// @Produce  json
+// @Param eventId path string true "Event ID"
+// @Param seatId path string true "Seat ID"
+// @Success 200 {object} models.PatchEventSeatResponse
+// @Failure 400 {object} models.KTSErrorMessage
+// @Failure 404 {object} models.KTSErrorMessage
+// @Failure 500 {object} models.KTSErrorMessage
+// @Router /events/{eventId}/seats/{seatId}/block [patch]
 func BlockEventSeatHandler(eventSeatController controllers.EventSeatControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		eventId, err := uuid.Parse(c.Param("eventId"))
@@ -60,12 +82,24 @@ func BlockEventSeatHandler(eventSeatController controllers.EventSeatControllerI)
 			return
 		}
 
-		c.JSON(http.StatusOK, gin.H{
-			"blockedUntil": blockedUntil,
+		c.JSON(http.StatusOK, models.PatchEventSeatResponse{
+			BlockedUntil: blockedUntil,
 		})
 	}
 }
 
+// @Summary Unblock event seat
+// @Description Unblock event seat
+// @Tags EventSeats
+// @Accept  json
+// @Produce  json
+// @Param eventId path string true "Event ID"
+// @Param seatId path string true "Seat ID"
+// @Success 200 {object} models.PatchEventSeatResponse
+// @Failure 400 {object} models.KTSErrorMessage
+// @Failure 404 {object} models.KTSErrorMessage
+// @Failure 500 {object} models.KTSErrorMessage
+// @Router /events/{eventId}/seats/{seatId}/unblock [patch]
 func UnblockEventSeatHandler(eventSeatController controllers.EventSeatControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		eventId, err := uuid.Parse(c.Param("eventId"))
@@ -90,12 +124,23 @@ func UnblockEventSeatHandler(eventSeatController controllers.EventSeatController
 			return
 		}
 
-		c.JSON(http.StatusOK, gin.H{
-			"blockedUntil": blockedUntil,
+		c.JSON(http.StatusOK, models.PatchEventSeatResponse{
+			BlockedUntil: blockedUntil,
 		})
 	}
 }
 
+// @Summary Get selected seats
+// @Description Get selected seats
+// @Tags EventSeats
+// @Accept  json
+// @Produce  json
+// @Param eventId path string true "Event ID"
+// @Success 200 {object} models.GetSelectedSeatsResponse
+// @Failure 400 {object} models.KTSErrorMessage
+// @Failure 404 {object} models.KTSErrorMessage
+// @Failure 500 {object} models.KTSErrorMessage
+// @Router /events/{eventId}/user-seats [get]
 func GetSelectedSeatsHandler(eventSeatController controllers.EventSeatControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		eventId, err := uuid.Parse(c.Param("eventId"))
@@ -113,8 +158,8 @@ func GetSelectedSeatsHandler(eventSeatController controllers.EventSeatController
 			return
 		}
 
-		c.JSON(http.StatusOK, gin.H{
-			"selectedSeats": selectedSeats,
+		c.JSON(http.StatusOK, models.GetSelectedSeatsResponse{
+			Seats: selectedSeats,
 		})
 	}
 }

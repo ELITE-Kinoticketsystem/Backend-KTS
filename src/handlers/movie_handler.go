@@ -12,6 +12,14 @@ import (
 	"github.com/google/uuid"
 )
 
+// @Summary Get movies
+// @Description Get movies
+// @Tags Movies
+// @Accept  json
+// @Produce  json
+// @Success 200 {array} model.Movies
+// @Failure 500 {object} models.KTSErrorMessage
+// @Router /movies [get]
 func GetMovies(movieCtrl controllers.MovieControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		movies, kts_err := movieCtrl.GetMovies()
@@ -35,6 +43,15 @@ func GetMovieByName(movieCtrl controllers.MovieControllerI) gin.HandlerFunc {
 	}
 }
 
+// @Summary Create movie
+// @Description Create movie
+// @Tags Movies
+// @Accept  json
+// @Produce  json
+// @Param movie body models.MovieDTOCreate true "Movie data"
+// @Success 200 {object} uuid.UUID
+// @Failure 500 {object} models.KTSErrorMessage
+// @Router /movies [post]
 func CreateMovie(movieCtrl controllers.MovieControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var movie models.MovieDTOCreate
@@ -131,6 +148,14 @@ func DeleteMovie(movieCtrl controllers.MovieControllerI) gin.HandlerFunc {
 	}
 }
 
+// @Summary Get movies with genres
+// @Description Get movies with genres
+// @Tags Movies
+// @Accept  json
+// @Produce  json
+// @Success 200 {array} models.MovieWithGenres
+// @Failure 500 {object} models.KTSErrorMessage
+// @Router /movies/genres [get]
 func GetMoviesWithGenres(movieCtrl controllers.MovieControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		movies, kts_err := movieCtrl.GetMoviesWithGenres()
@@ -142,6 +167,15 @@ func GetMoviesWithGenres(movieCtrl controllers.MovieControllerI) gin.HandlerFunc
 	}
 }
 
+// @Summary Get Movie By Id
+// @Description Get Movie By Id
+// @Tags Movies
+// @Accept  json
+// @Produce  json
+// @Param id path string true "Movie ID"
+// @Success 200 {object} models.MovieWithEverything
+// @Failure 500 {object} models.KTSErrorMessage
+// @Router /movies/{id} [get]
 func GetMovieById(movieCtrl controllers.MovieControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		movieId := uuid.MustParse(c.Param("id"))

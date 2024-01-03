@@ -8,6 +8,56 @@ definitions:
       picURL:
         type: string
     type: object
+  model.EventSeatCategories:
+    properties:
+      eventID:
+        type: string
+      price:
+        type: integer
+      seatCategoryID:
+        type: string
+    type: object
+  model.EventSeats:
+    properties:
+      blockedUntil:
+        type: string
+      booked:
+        type: boolean
+      eventID:
+        type: string
+      id:
+        type: string
+      seatID:
+        type: string
+      userID:
+        type: string
+    type: object
+  model.Events:
+    properties:
+      cinemaHallID:
+        type: string
+      description:
+        type: string
+      end:
+        type: string
+      eventType:
+        type: string
+      id:
+        type: string
+      is3d:
+        type: boolean
+      start:
+        type: string
+      title:
+        type: string
+    type: object
+  model.Genres:
+    properties:
+      genreName:
+        type: string
+      id:
+        type: string
+    type: object
   model.Movies:
     properties:
       bannerPicURL:
@@ -31,6 +81,78 @@ definitions:
       trailerURL:
         type: string
     type: object
+  model.Orders:
+    properties:
+      id:
+        type: string
+      isPaid:
+        type: boolean
+      paymentMethodID:
+        type: string
+      totalprice:
+        type: integer
+      userID:
+        type: string
+    type: object
+  model.PriceCategories:
+    properties:
+      categoryName:
+        type: string
+      id:
+        type: string
+      price:
+        type: integer
+    type: object
+  model.SeatCategories:
+    properties:
+      categoryName:
+        type: string
+      id:
+        type: string
+    type: object
+  model.Seats:
+    properties:
+      cinemaHallID:
+        type: string
+      columnNr:
+        type: integer
+      id:
+        type: string
+      rowNr:
+        type: integer
+      seatCategoryID:
+        type: string
+      type:
+        type: string
+    type: object
+  model.Tickets:
+    properties:
+      eventSeatID:
+        type: string
+      id:
+        type: string
+      orderID:
+        type: string
+      price:
+        type: integer
+      priceCategoryID:
+        type: string
+      validated:
+        type: boolean
+    type: object
+  model.Users:
+    properties:
+      email:
+        type: string
+      firstname:
+        type: string
+      id:
+        type: string
+      lastname:
+        type: string
+      username:
+        type: string
+    type: object
   models.ActorDTO:
     properties:
       birthdate:
@@ -50,6 +172,16 @@ definitions:
           $ref: '#/definitions/model.ActorPictures'
         type: array
     type: object
+  models.CheckEmailRequest:
+    properties:
+      email:
+        type: string
+    type: object
+  models.CheckUsernameRequest:
+    properties:
+      username:
+        type: string
+    type: object
   models.CreateActorDTO:
     properties:
       birthdate:
@@ -63,6 +195,114 @@ definitions:
       picturesUrls:
         items:
           type: string
+        type: array
+    type: object
+  models.CreateEvtDTO:
+    properties:
+      cinemaHallID:
+        type: string
+      description:
+        type: string
+      end:
+        type: string
+      eventSeatCategories:
+        items:
+          $ref: '#/definitions/model.EventSeatCategories'
+        type: array
+      eventType:
+        type: string
+      id:
+        type: string
+      is3d:
+        type: boolean
+      movies:
+        items:
+          type: string
+        type: array
+      start:
+        type: string
+      title:
+        type: string
+    type: object
+  models.CreateOrderDTO:
+    properties:
+      eventSeatPriceCategories:
+        items:
+          properties:
+            eventSeatId:
+              type: string
+            priceCategoryId:
+              type: string
+          type: object
+        type: array
+      paymentMethodID:
+        type: string
+    type: object
+  models.CreateReviewRequest:
+    properties:
+      comment:
+        type: string
+      datetime:
+        type: string
+      isSpoiler:
+        type: boolean
+      movieID:
+        type: string
+      rating:
+        type: integer
+      userID:
+        type: string
+    type: object
+  models.CreateTheatreRequest:
+    properties:
+      address:
+        properties:
+          city:
+            type: string
+          country:
+            type: string
+          street:
+            type: string
+          streetNr:
+            type: string
+          zipcode:
+            type: string
+        type: object
+      logoUrl:
+        type: string
+      name:
+        type: string
+    type: object
+  models.GenreWithMovies:
+    properties:
+      genreName:
+        type: string
+      id:
+        type: string
+      movies:
+        items:
+          properties:
+            bannerPicURL:
+              type: string
+            coverPicURL:
+              type: string
+            description:
+              type: string
+            fsk:
+              type: integer
+            id:
+              type: string
+            rating:
+              type: number
+            releaseDate:
+              type: string
+            timeInMin:
+              type: integer
+            title:
+              type: string
+            trailerURL:
+              type: string
+          type: object
         type: array
     type: object
   models.GetActorsDTO:
@@ -80,9 +320,288 @@ definitions:
           $ref: '#/definitions/model.ActorPictures'
         type: array
     type: object
+  models.GetEventSeatsDTO:
+    properties:
+      eventSeat:
+        $ref: '#/definitions/model.EventSeats'
+      eventSeatCategory:
+        $ref: '#/definitions/model.EventSeatCategories'
+      seat:
+        $ref: '#/definitions/model.Seats'
+      seatCategory:
+        $ref: '#/definitions/model.SeatCategories'
+    type: object
+  models.GetEventSeatsResponse:
+    properties:
+      blockedUntil:
+        type: string
+      currentUserSeats:
+        items:
+          $ref: '#/definitions/models.GetSeatsForSeatSelectorDTO'
+        type: array
+      seat_rows:
+        items:
+          items:
+            $ref: '#/definitions/models.GetSeatsForSeatSelectorDTO'
+          type: array
+        type: array
+    type: object
+  models.GetOrderDTO:
+    properties:
+      order:
+        $ref: '#/definitions/model.Orders'
+      tickets:
+        items:
+          properties:
+            seat:
+              $ref: '#/definitions/model.Seats'
+            ticket:
+              $ref: '#/definitions/model.Tickets'
+          type: object
+        type: array
+    type: object
+  models.GetSeatsForSeatSelectorDTO:
+    properties:
+      available:
+        type: boolean
+      bookedByOther:
+        type: boolean
+      category:
+        type: string
+      columnNr:
+        type: integer
+      id:
+        type: string
+      price:
+        type: integer
+      rowNr:
+        type: integer
+      type:
+        type: string
+    type: object
+  models.GetSelectedSeatsResponse:
+    properties:
+      selectedSeats:
+        items:
+          $ref: '#/definitions/models.GetEventSeatsDTO'
+        type: array
+    type: object
+  models.GetSpecialEventsDTO:
+    properties:
+      cinemaHallID:
+        type: string
+      description:
+        type: string
+      end:
+        type: string
+      eventType:
+        type: string
+      id:
+        type: string
+      is3d:
+        type: boolean
+      movies:
+        items:
+          $ref: '#/definitions/model.Movies'
+        type: array
+      start:
+        type: string
+      title:
+        type: string
+    type: object
+  models.IdResponse:
+    properties:
+      id:
+        type: string
+    type: object
   models.KTSErrorMessage:
     properties:
       errorMessage:
+        type: string
+    type: object
+  models.LoggedInResponse:
+    properties:
+      id:
+        type: string
+      loggedIn:
+        type: boolean
+    type: object
+  models.LoginRequest:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    type: object
+  models.MovieDTOCreate:
+    properties:
+      actorsID:
+        items:
+          properties:
+            id:
+              type: string
+          type: object
+        type: array
+      bannerPicURL:
+        type: string
+      coverPicURL:
+        type: string
+      description:
+        type: string
+      fsk:
+        type: integer
+      genresID:
+        items:
+          properties:
+            id:
+              type: string
+          type: object
+        type: array
+      id:
+        type: string
+      producersID:
+        items:
+          properties:
+            id:
+              type: string
+          type: object
+        type: array
+      rating:
+        type: number
+      releaseDate:
+        type: string
+      timeInMin:
+        type: integer
+      title:
+        type: string
+      trailerURL:
+        type: string
+    type: object
+  models.MovieWithEverything:
+    properties:
+      actors:
+        items:
+          properties:
+            birthdate:
+              type: string
+            description:
+              type: string
+            id:
+              type: string
+            name:
+              type: string
+          type: object
+        type: array
+      bannerPicURL:
+        type: string
+      coverPicURL:
+        type: string
+      description:
+        type: string
+      fsk:
+        type: integer
+      genres:
+        items:
+          properties:
+            genreName:
+              type: string
+            id:
+              type: string
+          type: object
+        type: array
+      id:
+        type: string
+      producers:
+        items:
+          properties:
+            birthdate:
+              type: string
+            description:
+              type: string
+            id:
+              type: string
+            name:
+              type: string
+          type: object
+        type: array
+      rating:
+        type: number
+      releaseDate:
+        type: string
+      reviews:
+        items:
+          properties:
+            comment:
+              type: string
+            datetime:
+              type: string
+            id:
+              type: string
+            isSpoiler:
+              type: boolean
+            movieID:
+              type: string
+            rating:
+              type: integer
+            userID:
+              type: string
+          type: object
+        type: array
+      timeInMin:
+        type: integer
+      title:
+        type: string
+      trailerURL:
+        type: string
+    type: object
+  models.MovieWithGenres:
+    properties:
+      bannerPicURL:
+        type: string
+      coverPicURL:
+        type: string
+      description:
+        type: string
+      fsk:
+        type: integer
+      genres:
+        items:
+          properties:
+            genreName:
+              type: string
+            id:
+              type: string
+          type: object
+        type: array
+      id:
+        type: string
+      rating:
+        type: number
+      releaseDate:
+        type: string
+      timeInMin:
+        type: integer
+      title:
+        type: string
+      trailerURL:
+        type: string
+    type: object
+  models.PatchEventSeatResponse:
+    properties:
+      blockedUntil:
+        type: string
+    type: object
+  models.RegistrationRequest:
+    properties:
+      email:
+        type: string
+      firstname:
+        type: string
+      lastname:
+        type: string
+      password:
+        type: string
+      username:
         type: string
     type: object
 info:
@@ -171,4 +690,939 @@ paths:
       summary: Get actor by id
       tags:
       - Actors
+  /auth/check-email:
+    post:
+      consumes:
+      - application/json
+      description: Check email
+      parameters:
+      - description: Email data
+        in: body
+        name: checkEmailRequest
+        required: true
+        schema:
+          $ref: '#/definitions/models.CheckEmailRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.KTSErrorMessage'
+      summary: Check email
+      tags:
+      - Users
+  /auth/check-username:
+    post:
+      consumes:
+      - application/json
+      description: Check username
+      parameters:
+      - description: Username data
+        in: body
+        name: checkUsernameRequest
+        required: true
+        schema:
+          $ref: '#/definitions/models.CheckUsernameRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.KTSErrorMessage'
+      summary: Check username
+      tags:
+      - Users
+  /auth/logged-in:
+    get:
+      consumes:
+      - application/json
+      description: Check if user is logged in
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.LoggedInResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.KTSErrorMessage'
+      summary: Logged in
+      tags:
+      - Users
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Login user
+      parameters:
+      - description: User data
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/models.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Users'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.KTSErrorMessage'
+      summary: Login user
+      tags:
+      - Users
+  /auth/register:
+    post:
+      consumes:
+      - application/json
+      description: Register user
+      parameters:
+      - description: User data
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/models.RegistrationRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/model.Users'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.KTSErrorMessage'
+      summary: Register user
+      tags:
+      - Users
+  /events:
+    post:
+      consumes:
+      - application/json
+      description: Create event
+      parameters:
+      - description: Event data
+        in: body
+        name: event
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreateEvtDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              type: string
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.KTSErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Create event
+      tags:
+      - Events
+  /events/{eventId}:
+    get:
+      consumes:
+      - application/json
+      description: Get event by id
+      parameters:
+      - description: Event ID
+        in: path
+        name: eventId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.GetSpecialEventsDTO'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.KTSErrorMessage'
+      summary: Get event by id
+      tags:
+      - Events
+  /events/{eventId}/book:
+    post:
+      consumes:
+      - application/json
+      description: Create order
+      parameters:
+      - description: Event ID
+        in: path
+        name: eventId
+        required: true
+        type: string
+      - description: Order data
+        in: body
+        name: order
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreateOrderDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.IdResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.KTSErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.KTSErrorMessage'
+      summary: Create order
+      tags:
+      - Orders
+  /events/{eventId}/reserve:
+    post:
+      consumes:
+      - application/json
+      description: Create order
+      parameters:
+      - description: Event ID
+        in: path
+        name: eventId
+        required: true
+        type: string
+      - description: Order data
+        in: body
+        name: order
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreateOrderDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.IdResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.KTSErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.KTSErrorMessage'
+      summary: Create order
+      tags:
+      - Orders
+  /events/{eventId}/seats:
+    get:
+      consumes:
+      - application/json
+      description: Get event seats
+      parameters:
+      - description: Event ID
+        in: path
+        name: eventId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.GetEventSeatsResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.KTSErrorMessage'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.KTSErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.KTSErrorMessage'
+      summary: Get event seats
+      tags:
+      - EventSeats
+  /events/{eventId}/seats/{seatId}/block:
+    patch:
+      consumes:
+      - application/json
+      description: Block event seat
+      parameters:
+      - description: Event ID
+        in: path
+        name: eventId
+        required: true
+        type: string
+      - description: Seat ID
+        in: path
+        name: seatId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.PatchEventSeatResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.KTSErrorMessage'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.KTSErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.KTSErrorMessage'
+      summary: Block event seat
+      tags:
+      - EventSeats
+  /events/{eventId}/seats/{seatId}/unblock:
+    patch:
+      consumes:
+      - application/json
+      description: Unblock event seat
+      parameters:
+      - description: Event ID
+        in: path
+        name: eventId
+        required: true
+        type: string
+      - description: Seat ID
+        in: path
+        name: seatId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.PatchEventSeatResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.KTSErrorMessage'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.KTSErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.KTSErrorMessage'
+      summary: Unblock event seat
+      tags:
+      - EventSeats
+  /events/{eventId}/user-seats:
+    get:
+      consumes:
+      - application/json
+      description: Get selected seats
+      parameters:
+      - description: Event ID
+        in: path
+        name: eventId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.GetSelectedSeatsResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.KTSErrorMessage'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.KTSErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.KTSErrorMessage'
+      summary: Get selected seats
+      tags:
+      - EventSeats
+  /events/special:
+    get:
+      consumes:
+      - application/json
+      description: Get special events
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.GetSpecialEventsDTO'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.KTSErrorMessage'
+      summary: Get special events
+      tags:
+      - Events
+  /genres:
+    get:
+      consumes:
+      - application/json
+      description: Get genres
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.Genres'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.KTSErrorMessage'
+      summary: Get genres
+      tags:
+      - Genres
+    post:
+      consumes:
+      - application/json
+      description: Create genre
+      parameters:
+      - description: Genres model
+        in: body
+        name: genre
+        required: true
+        schema:
+          $ref: '#/definitions/model.Genres'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/model.Genres'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.KTSErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.KTSErrorMessage'
+      summary: Create genre
+      tags:
+      - Genres
+    put:
+      consumes:
+      - application/json
+      description: Update genre
+      parameters:
+      - description: Genres model
+        in: body
+        name: genre
+        required: true
+        schema:
+          $ref: '#/definitions/model.Genres'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Genres'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.KTSErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.KTSErrorMessage'
+      summary: Update genre
+      tags:
+      - Genres
+  /genres/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete genre
+      parameters:
+      - description: Genre ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.KTSErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.KTSErrorMessage'
+      summary: Delete genre
+      tags:
+      - Genres
+  /genres/{name}:
+    get:
+      consumes:
+      - application/json
+      description: Get genre by name
+      parameters:
+      - description: Genre name
+        in: path
+        name: name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Genres'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.KTSErrorMessage'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.KTSErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.KTSErrorMessage'
+      summary: Get genre by name
+      tags:
+      - Genres
+  /genres/movies:
+    get:
+      consumes:
+      - application/json
+      description: Get genres with movies
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.GenreWithMovies'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.KTSErrorMessage'
+      summary: Get genres with movies
+      tags:
+      - Genres
+  /movies:
+    get:
+      consumes:
+      - application/json
+      description: Get movies
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.Movies'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.KTSErrorMessage'
+      summary: Get movies
+      tags:
+      - Movies
+    post:
+      consumes:
+      - application/json
+      description: Create movie
+      parameters:
+      - description: Movie data
+        in: body
+        name: movie
+        required: true
+        schema:
+          $ref: '#/definitions/models.MovieDTOCreate'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.KTSErrorMessage'
+      summary: Create movie
+      tags:
+      - Movies
+  /movies/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get Movie By Id
+      parameters:
+      - description: Movie ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.MovieWithEverything'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.KTSErrorMessage'
+      summary: Get Movie By Id
+      tags:
+      - Movies
+  /movies/{id}/events:
+    get:
+      consumes:
+      - application/json
+      description: Get events for movie
+      parameters:
+      - description: Movie ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.Events'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.KTSErrorMessage'
+      summary: Get events for movie
+      tags:
+      - Events
+  /movies/genres:
+    get:
+      consumes:
+      - application/json
+      description: Get movies with genres
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.MovieWithGenres'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.KTSErrorMessage'
+      summary: Get movies with genres
+      tags:
+      - Movies
+  /orders:
+    get:
+      consumes:
+      - application/json
+      description: Get orders for user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.GetOrderDTO'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.KTSErrorMessage'
+      summary: Get orders
+      tags:
+      - Orders
+  /orders/{orderId}:
+    get:
+      consumes:
+      - application/json
+      description: Get order by id
+      parameters:
+      - description: Order ID
+        in: path
+        name: orderId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.GetOrderDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.KTSErrorMessage'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.KTSErrorMessage'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.KTSErrorMessage'
+      summary: Get order by id
+      tags:
+      - Orders
+  /price-categories:
+    get:
+      consumes:
+      - application/json
+      description: Get price categories
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.PriceCategories'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.KTSErrorMessage'
+      summary: Get price categories
+      tags:
+      - PriceCategories
+    post:
+      consumes:
+      - application/json
+      description: Create price category
+      parameters:
+      - description: Price category data
+        in: body
+        name: priceCategory
+        required: true
+        schema:
+          $ref: '#/definitions/model.PriceCategories'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.KTSErrorMessage'
+      summary: Create price category
+      tags:
+      - PriceCategories
+    put:
+      consumes:
+      - application/json
+      description: Update price category
+      parameters:
+      - description: Price category data
+        in: body
+        name: priceCategory
+        required: true
+        schema:
+          $ref: '#/definitions/model.PriceCategories'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.KTSErrorMessage'
+      summary: Update price category
+      tags:
+      - PriceCategories
+  /price-categories/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete price category
+      parameters:
+      - description: Price category ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Deleted
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.KTSErrorMessage'
+      summary: Delete price category
+      tags:
+      - PriceCategories
+    get:
+      consumes:
+      - application/json
+      description: Get price category by id
+      parameters:
+      - description: Price category ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.PriceCategories'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.KTSErrorMessage'
+      summary: Get price category by id
+      tags:
+      - PriceCategories
+  /reviews:
+    post:
+      consumes:
+      - application/json
+      description: Create review
+      parameters:
+      - description: Review data
+        in: body
+        name: review
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreateReviewRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.KTSErrorMessage'
+      summary: Create review
+      tags:
+      - Reviews
+  /reviews/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete review
+      parameters:
+      - description: Review ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.KTSErrorMessage'
+      summary: Delete review
+      tags:
+      - Reviews
+  /theatres:
+    post:
+      consumes:
+      - application/json
+      description: Create theatre
+      parameters:
+      - description: Theatre data
+        in: body
+        name: theatre
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreateTheatreRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.KTSErrorMessage'
+      summary: Create theatre
+      tags:
+      - Theatres
 swagger: "2.0"

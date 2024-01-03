@@ -1,6 +1,8 @@
 package models
 
 import (
+	"time"
+
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/gen/KinoTicketSystem/model"
 	"github.com/google/uuid"
 )
@@ -21,4 +23,18 @@ type GetSeatsForSeatSelectorDTO struct {
 	Category      string
 	Type          string
 	Price         int32
+}
+
+type GetEventSeatsResponse struct {
+	BlockedUntil    *time.Time                      `json:"blockedUntil"`
+	CurrentUserSeat *[]GetSeatsForSeatSelectorDTO   `json:"currentUserSeats"`
+	SeatRows        *[][]GetSeatsForSeatSelectorDTO `json:"seat_rows"`
+}
+
+type PatchEventSeatResponse struct {
+	BlockedUntil *time.Time `json:"blockedUntil"`
+}
+
+type GetSelectedSeatsResponse struct {
+	Seats *[]GetEventSeatsDTO `json:"selectedSeats"`
 }
