@@ -13,7 +13,7 @@ import (
 
 type EventControllerI interface {
 	CreateEvent(event *models.CreateEvtDTO) (*uuid.UUID, *models.KTSError)
-	GetEventsForMovie(movieId *uuid.UUID) ([]*model.Events, *models.KTSError)
+	GetEventsForMovie(movieId *uuid.UUID, theatreId *uuid.UUID) ([]*model.Events, *models.KTSError)
 	GetSpecialEvents() (*[]models.GetSpecialEventsDTO, *models.KTSError)
 	GetEventById(eventId *uuid.UUID) (*models.GetSpecialEventsDTO, *models.KTSError)
 }
@@ -77,8 +77,8 @@ func (ec *EventController) CreateEvent(eventDto *models.CreateEvtDTO) (*uuid.UUI
 	return eventId, nil
 }
 
-func (ec *EventController) GetEventsForMovie(movieId *uuid.UUID) ([]*model.Events, *models.KTSError) {
-	events, err := ec.EventRepo.GetEventsForMovie(movieId)
+func (ec *EventController) GetEventsForMovie(movieId *uuid.UUID, theatreId *uuid.UUID) ([]*model.Events, *models.KTSError) {
+	events, err := ec.EventRepo.GetEventsForMovie(movieId, theatreId)
 	if err != nil {
 		log.Printf("Error getting events for movie: %v", err)
 		return nil, kts_errors.KTS_INTERNAL_ERROR

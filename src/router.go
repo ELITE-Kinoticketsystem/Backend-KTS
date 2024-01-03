@@ -175,7 +175,7 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 
 	// events
 	publicRoutes.Handle(http.MethodPost, "/events", handlers.CreateEventHandler(controller.EventController))
-	publicRoutes.Handle(http.MethodGet, "/movies/:id/events", handlers.GetEventsForMovieHandler(controller.EventController))
+	publicRoutes.Handle(http.MethodGet, "/movies/:id/events/:theatreId", handlers.GetEventsForMovieHandler(controller.EventController))
 	publicRoutes.Handle(http.MethodGet, "/events/special", handlers.GetSpecialEventsHandler(controller.EventController))
 	publicRoutes.Handle(http.MethodGet, "/events/:eventId", handlers.GetEventByIdHandler(controller.EventController))
 

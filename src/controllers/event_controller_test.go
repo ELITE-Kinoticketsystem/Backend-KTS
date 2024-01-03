@@ -9,6 +9,7 @@ import (
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/gen/KinoTicketSystem/model"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/mocks"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/samples"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
 	"github.com/google/uuid"
 	"go.uber.org/mock/gomock"
@@ -194,26 +195,9 @@ func TestEventController_CreateEvent(t *testing.T) {
 
 func TestEventController_GetEventsForMovie(t *testing.T) {
 	movieId := utils.NewUUID()
+	theatreId := utils.NewUUID()
 
-	expectedEvents := []*model.Events{{
-		ID:           utils.NewUUID(),
-		Title:        "Test Event 1",
-		Start:        time.Now(),
-		End:          time.Now().Add(time.Hour),
-		Description:  nil,
-		EventType:    "Test event type 1",
-		CinemaHallID: utils.NewUUID(),
-	},
-		{
-			ID:           utils.NewUUID(),
-			Title:        "Test Event 2",
-			Start:        time.Now(),
-			End:          time.Now().Add(time.Hour),
-			Description:  nil,
-			EventType:    "Test event type 2",
-			CinemaHallID: utils.NewUUID(),
-		},
-	}
+	expectedEvents := samples.GetModelEvents()
 
 	tests := []struct {
 		name           string
@@ -224,7 +208,7 @@ func TestEventController_GetEventsForMovie(t *testing.T) {
 		{
 			name: "Get Events for Movie",
 			expectFuncs: func(mockEventRepo *mocks.MockEventRepo, t *testing.T) {
-				mockEventRepo.EXPECT().GetEventsForMovie(movieId).Return(expectedEvents, nil)
+				mockEventRepo.EXPECT().GetEventsForMovie(movieId, theatreId).Return(expectedEvents, nil)
 			},
 			expectedError:  nil,
 			expectedEvents: expectedEvents,
@@ -232,7 +216,7 @@ func TestEventController_GetEventsForMovie(t *testing.T) {
 		{
 			name: "Get Events for Movie returns error",
 			expectFuncs: func(mockEventRepo *mocks.MockEventRepo, t *testing.T) {
-				mockEventRepo.EXPECT().GetEventsForMovie(movieId).Return(nil, kts_errors.KTS_INTERNAL_ERROR)
+				mockEventRepo.EXPECT().GetEventsForMovie(movieId, theatreId).Return(nil, kts_errors.KTS_INTERNAL_ERROR)
 			},
 			expectedError:  kts_errors.KTS_INTERNAL_ERROR,
 			expectedEvents: nil,
@@ -254,7 +238,7 @@ func TestEventController_GetEventsForMovie(t *testing.T) {
 			}
 
 			// when
-			events, ktsErr := eventController.GetEventsForMovie(movieId)
+			events, ktsErr := eventController.GetEventsForMovie(movieId, theatreId)
 
 			// then
 			if ktsErr != tt.expectedError {

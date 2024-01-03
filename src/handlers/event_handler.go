@@ -31,10 +31,20 @@ func CreateEventHandler(eventController controllers.EventControllerI) gin.Handle
 
 func GetEventsForMovieHandler(eventController controllers.EventControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		movieId := uuid.MustParse(c.Param("id"))
-		events, err := eventController.GetEventsForMovie(&movieId)
+		movieId, err := uuid.Parse(c.Param("id"))
 		if err != nil {
-			utils.HandleErrorAndAbort(c, err)
+			utils.HandleErrorAndAbort(c, kts_errors.KTS_BAD_REQUEST)
+			return
+		}
+		theatreId, err := uuid.Parse(c.Param("theatreId"))
+		if err != nil {
+			utils.HandleErrorAndAbort(c, kts_errors.KTS_BAD_REQUEST)
+			return
+		}
+
+		events, kts_err := eventController.GetEventsForMovie(&movieId, &theatreId)
+		if kts_err != nil {
+			utils.HandleErrorAndAbort(c, kts_err)
 			return
 		}
 

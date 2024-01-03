@@ -71,18 +71,18 @@ func (mr *MockEventControllerIMockRecorder) GetEventById(eventId any) *gomock.Ca
 }
 
 // GetEventsForMovie mocks base method.
-func (m *MockEventControllerI) GetEventsForMovie(movieId *uuid.UUID) ([]*model.Events, *models.KTSError) {
+func (m *MockEventControllerI) GetEventsForMovie(movieId, theatreId *uuid.UUID) ([]*model.Events, *models.KTSError) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetEventsForMovie", movieId)
+	ret := m.ctrl.Call(m, "GetEventsForMovie", movieId, theatreId)
 	ret0, _ := ret[0].([]*model.Events)
 	ret1, _ := ret[1].(*models.KTSError)
 	return ret0, ret1
 }
 
 // GetEventsForMovie indicates an expected call of GetEventsForMovie.
-func (mr *MockEventControllerIMockRecorder) GetEventsForMovie(movieId any) *gomock.Call {
+func (mr *MockEventControllerIMockRecorder) GetEventsForMovie(movieId, theatreId any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetEventsForMovie", reflect.TypeOf((*MockEventControllerI)(nil).GetEventsForMovie), movieId)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetEventsForMovie", reflect.TypeOf((*MockEventControllerI)(nil).GetEventsForMovie), movieId, theatreId)
 }
 
 // GetSpecialEvents mocks base method.
