@@ -49,3 +49,25 @@ func GetGetSpecialEventsDTO(eventId *uuid.UUID) *models.GetSpecialEventsDTO {
 		},
 	}
 }
+
+func GetModelEvents() []*model.Events {
+	return []*model.Events{{
+		ID:           utils.NewUUID(),
+		Title:        "Test Event 1",
+		Start:        time.Now(),
+		End:          time.Now().Add(time.Hour),
+		Description:  nil,
+		EventType:    "Test event type 1",
+		CinemaHallID: utils.NewUUID(),
+	},
+		{
+			ID:           utils.NewUUID(),
+			Title:        "Test Event 2",
+			Start:        time.Now(),
+			End:          time.Now().Add(time.Hour),
+			Description:  nil,
+			EventType:    "Test event type 2",
+			CinemaHallID: utils.NewUUID(),
+		},
+	}
+}

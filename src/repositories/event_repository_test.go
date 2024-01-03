@@ -291,6 +291,7 @@ func TestCreateEventSeat(t *testing.T) {
 }
 func TestGetEventsForMovie(t *testing.T) {
 	movieID := utils.NewUUID()
+	theatreId := utils.NewUUID()
 
 	expectedEvents := []*model.Events{
 		{
@@ -322,7 +323,7 @@ func TestGetEventsForMovie(t *testing.T) {
 		{
 			name: "Get events for movie",
 			setExpectations: func(mock sqlmock.Sqlmock) {
-				mock.ExpectQuery("SELECT .* FROM `KinoTicketSystem`.events .*").WithArgs(sqlmock.AnyArg()).WillReturnRows(
+				mock.ExpectQuery("SELECT .* FROM `KinoTicketSystem`.events .*").WithArgs(sqlmock.AnyArg(), showing, sqlmock.AnyArg()).WillReturnRows(
 					sqlmock.NewRows([]string{"events.id", "events.title", "events.start", "events.end", "events.description", "events.event_type", "events.cinema_hall_id"}).
 						AddRow(expectedEvents[0].ID, expectedEvents[0].Title, expectedEvents[0].Start, expectedEvents[0].End, expectedEvents[0].Description, expectedEvents[0].EventType, expectedEvents[0].CinemaHallID).
 						AddRow(expectedEvents[1].ID, expectedEvents[1].Title, expectedEvents[1].Start, expectedEvents[1].End, expectedEvents[1].Description, expectedEvents[1].EventType, expectedEvents[1].CinemaHallID),
@@ -335,7 +336,7 @@ func TestGetEventsForMovie(t *testing.T) {
 		{
 			name: "Get events for movie sql error",
 			setExpectations: func(mock sqlmock.Sqlmock) {
-				mock.ExpectQuery("SELECT .* FROM `KinoTicketSystem`.events .*").WithArgs(sqlmock.AnyArg()).WillReturnError(sql.ErrConnDone)
+				mock.ExpectQuery("SELECT .* FROM `KinoTicketSystem`.events .*").WithArgs(sqlmock.AnyArg(), showing, sqlmock.AnyArg()).WillReturnError(sql.ErrConnDone)
 			},
 			expectedEvents: nil,
 			expectedError:  kts_errors.KTS_INTERNAL_ERROR,
@@ -344,7 +345,7 @@ func TestGetEventsForMovie(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			db, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherRegexp))
+			db, mock, err := sqlmock.New()
 			if err != nil {
 				t.Fatalf("Failed to create mock database connection: %v", err)
 			}
@@ -358,7 +359,7 @@ func TestGetEventsForMovie(t *testing.T) {
 
 			tc.setExpectations(mock)
 
-			events, ktsErr := eventRepo.GetEventsForMovie(movieID)
+			events, ktsErr := eventRepo.GetEventsForMovie(movieID, theatreId)
 
 			if ktsErr != tc.expectedError {
 				t.Errorf("Unexpected error: %v", ktsErr)

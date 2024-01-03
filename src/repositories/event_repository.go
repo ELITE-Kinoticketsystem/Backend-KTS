@@ -20,7 +20,7 @@ const (
 
 type EventRepo interface {
 	CreateEvent(event *model.Events) (*uuid.UUID, *models.KTSError)
-	GetEventsForMovie(movieId *uuid.UUID) ([]*model.Events, *models.KTSError)
+	GetEventsForMovie(movieId *uuid.UUID, theatreId *uuid.UUID) ([]*model.Events, *models.KTSError)
 
 	AddEventMovie(eventId *uuid.UUID, movieId *uuid.UUID) *models.KTSError
 
@@ -118,8 +118,16 @@ func (er *EventRepository) GetSpecialEvents() (*[]models.GetSpecialEventsDTO, *m
 	return &specialEvents, nil
 }
 
-func (er *EventRepository) GetEventsForMovie(movieId *uuid.UUID) ([]*model.Events, *models.KTSError) {
-	stmt := table.Events.SELECT(table.Events.AllColumns).FROM(table.Events.LEFT_JOIN(table.EventMovies, table.EventMovies.EventID.EQ(table.Events.ID))).WHERE(table.EventMovies.MovieID.EQ(utils.MysqlUuid(movieId))).WHERE(table.Events.Start.GT(utils.MysqlTimeNow())).WHERE(table.Events.EventType.EQ(utils.MySqlString(showing)))
+func (er *EventRepository) GetEventsForMovie(movieId *uuid.UUID, theatreId *uuid.UUID) ([]*model.Events, *models.KTSError) {
+	stmt := table.Events.SELECT(table.Events.AllColumns).
+		FROM(table.Events.
+			LEFT_JOIN(table.EventMovies, table.EventMovies.EventID.EQ(table.Events.ID)).
+			LEFT_JOIN(table.CinemaHalls, table.CinemaHalls.ID.EQ(table.Events.CinemaHallID))).
+		WHERE(table.EventMovies.MovieID.EQ(utils.MysqlUuid(movieId)).
+			AND(table.Events.Start.GT(utils.MysqlTimeNow())).
+			AND(table.Events.EventType.EQ(utils.MySqlString(showing))).
+			AND(table.CinemaHalls.TheatreID.EQ(utils.MysqlUuid(theatreId)))).
+		ORDER_BY(table.Events.Start.ASC())
 
 	var events []*model.Events
 
