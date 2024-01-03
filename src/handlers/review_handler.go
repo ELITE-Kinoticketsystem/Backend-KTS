@@ -11,6 +11,15 @@ import (
 	"github.com/google/uuid"
 )
 
+// @Summary Create review
+// @Description Create review
+// @Tags Reviews
+// @Accept  json
+// @Produce  json
+// @Param review body models.CreateReviewRequest true "Review data"
+// @Success 201 {object} uuid.UUID
+// @Failure 400 {object} models.KTSErrorMessage
+// @Router /reviews [post]
 func CreateReviewHandler(reviewCtrl controllers.ReviewControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var reviewData models.CreateReviewRequest
@@ -30,6 +39,15 @@ func CreateReviewHandler(reviewCtrl controllers.ReviewControllerI) gin.HandlerFu
 	}
 }
 
+// @Summary Delete review
+// @Description Delete review
+// @Tags Reviews
+// @Accept  json
+// @Produce  json
+// @Param id path string true "Review ID"
+// @Success 200
+// @Failure 400 {object} models.KTSErrorMessage
+// @Router /reviews/{id} [delete]
 func DeleteReviewHandler(reviewCtrl controllers.ReviewControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		id, err := uuid.Parse(c.Param("id"))

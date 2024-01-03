@@ -11,6 +11,15 @@ import (
 	"github.com/google/uuid"
 )
 
+// @Summary Get price category by id
+// @Description Get price category by id
+// @Tags PriceCategories
+// @Accept  json
+// @Produce  json
+// @Param id path string true "Price category ID"
+// @Success 200 {object} model.PriceCategories
+// @Failure 500 {object} models.KTSErrorMessage
+// @Router /price-categories/{id} [get]
 func GetPriceCategoryByIdHandler(priceCategoriesController controllers.PriceCategoryControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		priceCategoryId, err := uuid.Parse(c.Param("id"))
@@ -28,6 +37,14 @@ func GetPriceCategoryByIdHandler(priceCategoriesController controllers.PriceCate
 	}
 }
 
+// @Summary Get price categories
+// @Description Get price categories
+// @Tags PriceCategories
+// @Accept  json
+// @Produce  json
+// @Success 200 {array} model.PriceCategories
+// @Failure 500 {object} models.KTSErrorMessage
+// @Router /price-categories [get]
 func GetPriceCategoriesHandler(priceCategoriesController controllers.PriceCategoryControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		priceCategories, err := priceCategoriesController.GetPriceCategories()
@@ -40,6 +57,15 @@ func GetPriceCategoriesHandler(priceCategoriesController controllers.PriceCatego
 	}
 }
 
+// @Summary Create price category
+// @Description Create price category
+// @Tags PriceCategories
+// @Accept  json
+// @Produce  json
+// @Param priceCategory body model.PriceCategories true "Price category data"
+// @Success 200 {object} uuid.UUID
+// @Failure 500 {object} models.KTSErrorMessage
+// @Router /price-categories [post]
 func CreatePriceCategoryHandler(priceCategoriesController controllers.PriceCategoryControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var priceCategory model.PriceCategories
@@ -58,6 +84,15 @@ func CreatePriceCategoryHandler(priceCategoriesController controllers.PriceCateg
 	}
 }
 
+// @Summary Update price category
+// @Description Update price category
+// @Tags PriceCategories
+// @Accept  json
+// @Produce  json
+// @Param priceCategory body model.PriceCategories true "Price category data"
+// @Success 200 {object} uuid.UUID
+// @Failure 500 {object} models.KTSErrorMessage
+// @Router /price-categories [put]
 func UpdatePriceCategoryHandler(priceCategoriesController controllers.PriceCategoryControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var priceCategory model.PriceCategories
@@ -76,6 +111,15 @@ func UpdatePriceCategoryHandler(priceCategoriesController controllers.PriceCateg
 	}
 }
 
+// @Summary Delete price category
+// @Description Delete price category
+// @Tags PriceCategories
+// @Accept  json
+// @Produce  json
+// @Param id path string true "Price category ID"
+// @Success 200 {string} string "Deleted"
+// @Failure 500 {object} models.KTSErrorMessage
+// @Router /price-categories/{id} [delete]
 func DeletePriceCategoryHandler(priceCategoriesController controllers.PriceCategoryControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		priceCategoryId, err := uuid.Parse(c.Param("id"))

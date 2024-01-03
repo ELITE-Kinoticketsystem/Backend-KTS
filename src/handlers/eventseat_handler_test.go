@@ -40,9 +40,9 @@ func TestGetEventSeatsHandler(t *testing.T) {
 					nil)
 			},
 			expectedResponseBody: gin.H{
+				"blockedUntil":     nil,
 				"seat_rows":        []models.GetEventSeatsDTO{},
 				"currentUserSeats": []models.GetEventSeatsDTO{},
-				"blockedUntil":     nil,
 			},
 			expectedStatus: http.StatusOK,
 		},

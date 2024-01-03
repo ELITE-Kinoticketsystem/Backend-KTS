@@ -41,7 +41,7 @@ func TestCreateOrderHandler(t *testing.T) {
 				)
 			},
 			expectedResponseBody: gin.H{
-				"orderId": orderId,
+				"id": orderId,
 			},
 			expectedStatus: http.StatusOK,
 			createOrderDTO: samples.GetOrderDTO(),

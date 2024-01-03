@@ -10,6 +10,15 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// @Summary Register user
+// @Description Register user
+// @Tags Users
+// @Accept  json
+// @Produce  json
+// @Param user body models.RegistrationRequest true "User data"
+// @Success 201 {object} model.Users
+// @Failure 400 {object} models.KTSErrorMessage
+// @Router /auth/register [post]
 func RegisterUserHandler(userCtrl controllers.UserControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var registrationData models.RegistrationRequest
@@ -34,6 +43,15 @@ func RegisterUserHandler(userCtrl controllers.UserControllerI) gin.HandlerFunc {
 	}
 }
 
+// @Summary Login user
+// @Description Login user
+// @Tags Users
+// @Accept  json
+// @Produce  json
+// @Param user body models.LoginRequest true "User data"
+// @Success 200 {object} model.Users
+// @Failure 400 {object} models.KTSErrorMessage
+// @Router /auth/login [post]
 func LoginUserHandler(userCtrl controllers.UserControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var loginData models.LoginRequest
@@ -56,6 +74,15 @@ func LoginUserHandler(userCtrl controllers.UserControllerI) gin.HandlerFunc {
 	}
 }
 
+// @Summary Check email
+// @Description Check email
+// @Tags Users
+// @Accept  json
+// @Produce  json
+// @Param checkEmailRequest body models.CheckEmailRequest true "Email data"
+// @Success 200
+// @Failure 400 {object} models.KTSErrorMessage
+// @Router /auth/check-email [post]
 func CheckEmailHandler(userCtrl controllers.UserControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var requestData models.CheckEmailRequest
@@ -78,6 +105,15 @@ func CheckEmailHandler(userCtrl controllers.UserControllerI) gin.HandlerFunc {
 	}
 }
 
+// @Summary Check username
+// @Description Check username
+// @Tags Users
+// @Accept  json
+// @Produce  json
+// @Param checkUsernameRequest body models.CheckUsernameRequest true "Username data"
+// @Success 200
+// @Failure 400 {object} models.KTSErrorMessage
+// @Router /auth/check-username [post]
 func CheckUsernameHandler(userCtrl controllers.UserControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var requestData models.CheckUsernameRequest
@@ -104,6 +140,14 @@ func TestJwtToken(c *gin.Context) {
 	c.Status(http.StatusOK)
 }
 
+// @Summary Logged in
+// @Description Check if user is logged in
+// @Tags Users
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} models.LoggedInResponse
+// @Failure 400 {object} models.KTSErrorMessage
+// @Router /auth/logged-in [get]
 func LoggedInHandler(c *gin.Context) {
 	var token string
 
@@ -113,8 +157,8 @@ func LoggedInHandler(c *gin.Context) {
 		// token is not set, check if refresh token is set
 		token, err = c.Cookie("refreshToken")
 		if err != nil {
-			c.JSON(http.StatusOK, gin.H{
-				"loggedIn": false,
+			c.JSON(http.StatusOK, models.LoggedInResponse{
+				LoggedIn: false,
 			})
 			return
 		}
@@ -122,14 +166,14 @@ func LoggedInHandler(c *gin.Context) {
 
 	id, err := utils.ValidateToken(token)
 	if err != nil {
-		c.JSON(http.StatusOK, gin.H{
-			"loggedIn": false,
+		c.JSON(http.StatusOK, models.LoggedInResponse{
+			LoggedIn: false,
 		})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"loggedIn": true,
-		"id":       id,
+	c.JSON(http.StatusOK, models.LoggedInResponse{
+		LoggedIn: true,
+		Id:       id,
 	})
 }
