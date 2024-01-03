@@ -44,6 +44,7 @@ func (er *EventRepository) CreateEvent(event *model.Events) (*uuid.UUID, *models
 		event.Description,
 		event.EventType,
 		utils.MysqlUuid(event.CinemaHallID),
+		event.Is3d,
 	)
 
 	kts_err := utils.ExcecuteInsertStatement(stmt, er.DatabaseManager.GetDatabaseConnection())

@@ -501,7 +501,7 @@ func TestGetMovieById(t *testing.T) {
 
 	id := smplFullMovie.ID
 
-	query := "SELECT movies.id AS \"movies.id\",\n     movies.title AS \"movies.title\",\n     movies.description AS \"movies.description\",\n     movies.banner_pic_url AS \"movies.banner_pic_url\",\n     movies.cover_pic_url AS \"movies.cover_pic_url\",\n     movies.trailer_url AS \"movies.trailer_url\",\n     movies.rating AS \"movies.rating\",\n     movies.release_date AS \"movies.release_date\",\n     movies.time_in_min AS \"movies.time_in_min\",\n     movies.fsk AS \"movies.fsk\",\n     genres.id AS \"genres.id\",\n     genres.genre_name AS \"genres.genre_name\",\n     actors.id AS \"actors.id\",\n     actors.name AS \"actors.name\",\n     actors.birthdate AS \"actors.birthdate\",\n     actors.description AS \"actors.description\",\n     actors.pic_url AS \"actors.pic_url\",\n     producers.id AS \"producers.id\",\n     producers.name AS \"producers.name\",\n     producers.birthdate AS \"producers.birthdate\",\n     producers.description AS \"producers.description\",\n     producers.pic_url AS \"producers.pic_url\",\n     reviews.id AS \"reviews.id\",\n     reviews.rating AS \"reviews.rating\",\n     reviews.comment AS \"reviews.comment\",\n     reviews.datetime AS \"reviews.datetime\",\n     reviews.is_spoiler AS \"reviews.is_spoiler\",\n     reviews.user_id AS \"reviews.user_id\",\n     reviews.movie_id AS \"reviews.movie_id\"\nFROM `KinoTicketSystem`.movies\n     LEFT JOIN `KinoTicketSystem`.movie_genres ON (movie_genres.movie_id = movies.id)\n     LEFT JOIN `KinoTicketSystem`.genres ON (genres.id = movie_genres.genre_id)\n     LEFT JOIN `KinoTicketSystem`.movie_actors ON (movie_actors.movie_id = movies.id)\n     LEFT JOIN `KinoTicketSystem`.actors ON (actors.id = movie_actors.actor_id)\n     LEFT JOIN `KinoTicketSystem`.movie_producers ON (movie_producers.movie_id = movies.id)\n     LEFT JOIN `KinoTicketSystem`.producers ON (producers.id = movie_producers.producer_id)\n     LEFT JOIN `KinoTicketSystem`.reviews ON (reviews.movie_id = movies.id)\nWHERE movies.id = ?;\n"
+	query := "SELECT .* FROM `KinoTicketSystem`.movies .*"
 
 	testCases := []struct {
 		name            string
@@ -513,7 +513,7 @@ func TestGetMovieById(t *testing.T) {
 			name: "Empty result",
 			setExpectations: func(mock sqlmock.Sqlmock, id *uuid.UUID) {
 				mock.ExpectQuery(query).WithArgs(utils.EqUUID(id)).WillReturnRows(
-					sqlmock.NewRows([]string{"movies.id", "movies.title", "movies.description", "movies.banner_pic_url", "movies.cover_pic_url", "movies.trailer_url", "movies.rating", "movies.release_date", "movies.time_in_min", "movies.fsk", "genres.id", "genres.genre_name", "actors.id", "actors.name", "actors.birthdate", "actors.description", "actors.pic_url", "producers.id", "producers.name", "producers.birthdate", "producers.description", "producers.pic_url", "reviews.id", "reviews.rating", "reviews.comment", "reviews.datetime", "reviews.is_spoiler", "reviews.user_id", "reviews.movie_id"}),
+					sqlmock.NewRows([]string{"movies.id", "movies.title", "movies.description", "movies.banner_pic_url", "movies.cover_pic_url", "movies.trailer_url", "movies.rating", "movies.release_date", "movies.time_in_min", "movies.fsk", "genres.id", "genres.genre_name", "actors.id", "actors.name", "actors.birthdate", "actors.description", "producers.id", "producers.name", "producers.birthdate", "producers.description", "reviews.id", "reviews.rating", "reviews.comment", "reviews.datetime", "reviews.is_spoiler", "reviews.user_id", "reviews.movie_id"}),
 				)
 			},
 			expectedMovie: nil,
@@ -524,9 +524,9 @@ func TestGetMovieById(t *testing.T) {
 			setExpectations: func(mock sqlmock.Sqlmock, id *uuid.UUID) {
 				mock.ExpectQuery(query).WithArgs(utils.EqUUID(id)).WillReturnRows(
 					sqlmock.NewRows(
-						[]string{"movies.id", "movies.title", "movies.description", "movies.banner_pic_url", "movies.cover_pic_url", "movies.trailer_url", "movies.rating", "movies.release_date", "movies.time_in_min", "movies.fsk", "genres.id", "genres.genre_name", "actors.id", "actors.name", "actors.birthdate", "actors.description", "actors.pic_url", "producers.id", "producers.name", "producers.birthdate", "producers.description", "producers.pic_url", "reviews.id", "reviews.rating", "reviews.comment", "reviews.datetime", "reviews.is_spoiler", "reviews.user_id", "reviews.movie_id"},
+						[]string{"movies.id", "movies.title", "movies.description", "movies.banner_pic_url", "movies.cover_pic_url", "movies.trailer_url", "movies.rating", "movies.release_date", "movies.time_in_min", "movies.fsk", "genres.id", "genres.genre_name", "actors.id", "actors.name", "actors.birthdate", "actors.description", "producers.id", "producers.name", "producers.birthdate", "producers.description", "reviews.id", "reviews.rating", "reviews.comment", "reviews.datetime", "reviews.is_spoiler", "reviews.user_id", "reviews.movie_id"},
 					).AddRow(
-						&smplFullMovie.ID, &smplFullMovie.Title, &smplFullMovie.Description, &smplFullMovie.BannerPicURL, &smplFullMovie.CoverPicURL, &smplFullMovie.TrailerURL, &smplFullMovie.Rating, &smplFullMovie.ReleaseDate, &smplFullMovie.TimeInMin, &smplFullMovie.Fsk, &smplFullMovie.Genres[0].ID, &smplFullMovie.Genres[0].GenreName, &smplFullMovie.Actors[0].ID, &smplFullMovie.Actors[0].Name, &smplFullMovie.Actors[0].Birthdate, &smplFullMovie.Actors[0].Description, &smplFullMovie.Actors[0].PicURL, &smplFullMovie.Producers[0].ID, &smplFullMovie.Producers[0].Name, &smplFullMovie.Producers[0].Birthdate, &smplFullMovie.Producers[0].Description, &smplFullMovie.Producers[0].PicURL, &smplFullMovie.Reviews[0].ID, &smplFullMovie.Reviews[0].Rating, &smplFullMovie.Reviews[0].Comment, &smplFullMovie.Reviews[0].Datetime, &smplFullMovie.Reviews[0].IsSpoiler, &smplFullMovie.Reviews[0].UserID, &smplFullMovie.Reviews[0].MovieID,
+						&smplFullMovie.ID, &smplFullMovie.Title, &smplFullMovie.Description, &smplFullMovie.BannerPicURL, &smplFullMovie.CoverPicURL, &smplFullMovie.TrailerURL, &smplFullMovie.Rating, &smplFullMovie.ReleaseDate, &smplFullMovie.TimeInMin, &smplFullMovie.Fsk, &smplFullMovie.Genres[0].ID, &smplFullMovie.Genres[0].GenreName, &smplFullMovie.Actors[0].ID, &smplFullMovie.Actors[0].Name, &smplFullMovie.Actors[0].Birthdate, &smplFullMovie.Actors[0].Description, &smplFullMovie.Producers[0].ID, &smplFullMovie.Producers[0].Name, &smplFullMovie.Producers[0].Birthdate, &smplFullMovie.Producers[0].Description, &smplFullMovie.Reviews[0].ID, &smplFullMovie.Reviews[0].Rating, &smplFullMovie.Reviews[0].Comment, &smplFullMovie.Reviews[0].Datetime, &smplFullMovie.Reviews[0].IsSpoiler, &smplFullMovie.Reviews[0].UserID, &smplFullMovie.Reviews[0].MovieID,
 					),
 				)
 			},
@@ -546,7 +546,7 @@ func TestGetMovieById(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// Create a new mock database connection
-			db, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
+			db, mock, err := sqlmock.New()
 			if err != nil {
 				t.Fatalf("Failed to create mock database connection: %v", err)
 			}

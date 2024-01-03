@@ -37,7 +37,7 @@ func TestCreateEvent(t *testing.T) {
 		{
 			name: "Create event",
 			setExpectations: func(mock sqlmock.Sqlmock) {
-				mock.ExpectExec("INSERT INTO `KinoTicketSystem`.events .*").WithArgs(sqlmock.AnyArg(), event.Title, sqlmock.AnyArg(), sqlmock.AnyArg(), event.Description, event.EventType, sqlmock.AnyArg()).WillReturnResult(sqlmock.NewResult(1, 1))
+				mock.ExpectExec("INSERT INTO `KinoTicketSystem`.events .*").WithArgs(sqlmock.AnyArg(), event.Title, sqlmock.AnyArg(), sqlmock.AnyArg(), event.Description, event.EventType, sqlmock.AnyArg(), false).WillReturnResult(sqlmock.NewResult(1, 1))
 			},
 			expectEventID: true,
 			expectedError: nil,
@@ -45,7 +45,7 @@ func TestCreateEvent(t *testing.T) {
 		{
 			name: "Create event sql error",
 			setExpectations: func(mock sqlmock.Sqlmock) {
-				mock.ExpectExec("INSERT INTO `KinoTicketSystem`.events .*").WithArgs(sqlmock.AnyArg(), event.Title, sqlmock.AnyArg(), sqlmock.AnyArg(), event.Description, event.EventType, sqlmock.AnyArg()).WillReturnError(sql.ErrConnDone)
+				mock.ExpectExec("INSERT INTO `KinoTicketSystem`.events .*").WithArgs(sqlmock.AnyArg(), event.Title, sqlmock.AnyArg(), sqlmock.AnyArg(), event.Description, event.EventType, sqlmock.AnyArg(), false).WillReturnError(sql.ErrConnDone)
 			},
 			expectEventID: false,
 			expectedError: kts_errors.KTS_INTERNAL_ERROR,
@@ -53,7 +53,7 @@ func TestCreateEvent(t *testing.T) {
 		{
 			name: "Create event no rows affected",
 			setExpectations: func(mock sqlmock.Sqlmock) {
-				mock.ExpectExec("INSERT INTO `KinoTicketSystem`.events .*").WithArgs(sqlmock.AnyArg(), event.Title, sqlmock.AnyArg(), sqlmock.AnyArg(), event.Description, event.EventType, sqlmock.AnyArg()).WillReturnResult(sqlmock.NewResult(1, 0))
+				mock.ExpectExec("INSERT INTO `KinoTicketSystem`.events .*").WithArgs(sqlmock.AnyArg(), event.Title, sqlmock.AnyArg(), sqlmock.AnyArg(), event.Description, event.EventType, sqlmock.AnyArg(), false).WillReturnResult(sqlmock.NewResult(1, 0))
 			},
 			expectEventID: false,
 			expectedError: kts_errors.KTS_INTERNAL_ERROR,

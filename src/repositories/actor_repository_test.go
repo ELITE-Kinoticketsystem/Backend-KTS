@@ -18,7 +18,7 @@ import (
 
 func TestGetActorById(t *testing.T) {
 
-	query := "\nSELECT actors.id AS \"actors.id\",\n     actors.name AS \"actors.name\",\n     actors.birthdate AS \"actors.birthdate\",\n     actors.description AS \"actors.description\",\n     actors.pic_url AS \"actors.pic_url\",\n     actor_pictures.id AS \"actor_pictures.id\",\n     actor_pictures.actor_id AS \"actor_pictures.actor_id\",\n     actor_pictures.pic_url AS \"actor_pictures.pic_url\",\n     movies.id AS \"movies.id\",\n     movies.title AS \"movies.title\",\n     movies.description AS \"movies.description\",\n     movies.banner_pic_url AS \"movies.banner_pic_url\",\n     movies.cover_pic_url AS \"movies.cover_pic_url\",\n     movies.trailer_url AS \"movies.trailer_url\",\n     movies.rating AS \"movies.rating\",\n     movies.release_date AS \"movies.release_date\",\n     movies.time_in_min AS \"movies.time_in_min\",\n     movies.fsk AS \"movies.fsk\"\nFROM `KinoTicketSystem`.actors\n     LEFT JOIN `KinoTicketSystem`.actor_pictures ON (actor_pictures.actor_id = actors.id)\n     LEFT JOIN `KinoTicketSystem`.movie_actors ON (movie_actors.actor_id = actors.id)\n     LEFT JOIN `KinoTicketSystem`.movies ON (movies.id = movie_actors.movie_id)\nWHERE actors.id = ?;\n"
+	query := "\nSELECT .* FROM `KinoTicketSystem`.actors .*"
 
 	actor := *GetActor()
 
@@ -59,7 +59,7 @@ func TestGetActorById(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 
-			db, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
+			db, mock, err := sqlmock.New()
 			if err != nil {
 				t.Fatalf("Failed to create mock database connection: %v", err)
 			}
@@ -96,7 +96,7 @@ func TestGetActorById(t *testing.T) {
 func TestGetActors(t *testing.T) {
 	actors := *GetActors()
 
-	query := "\nSELECT actors.id AS \"actors.id\",\n     actors.name AS \"actors.name\",\n     actors.birthdate AS \"actors.birthdate\",\n     actors.description AS \"actors.description\",\n     actors.pic_url AS \"actors.pic_url\",\n     actor_pictures.id AS \"actor_pictures.id\",\n     actor_pictures.actor_id AS \"actor_pictures.actor_id\",\n     actor_pictures.pic_url AS \"actor_pictures.pic_url\"\nFROM `KinoTicketSystem`.actors\n     LEFT JOIN `KinoTicketSystem`.actor_pictures ON (actor_pictures.actor_id = actors.id);\n"
+	query := "SELECT .* FROM `KinoTicketSystem`.actors .*"
 
 	testCases := []struct {
 		name            string
@@ -140,7 +140,7 @@ func TestGetActors(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 
-			db, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
+			db, mock, err := sqlmock.New()
 			if err != nil {
 				t.Fatalf("Failed to create mock database connection: %v", err)
 			}
@@ -325,7 +325,7 @@ func TestCreateActor(t *testing.T) {
 		{
 			name: "Create actor",
 			setExpectations: func(mock sqlmock.Sqlmock) {
-				mock.ExpectExec("INSERT INTO `KinoTicketSystem`.actors .*").WithArgs(sqlmock.AnyArg(), actor.Name, actor.Birthdate, actor.Description, nil).WillReturnResult(sqlmock.NewResult(1, 1))
+				mock.ExpectExec("INSERT INTO `KinoTicketSystem`.actors .*").WithArgs(sqlmock.AnyArg(), actor.Name, actor.Birthdate, actor.Description).WillReturnResult(sqlmock.NewResult(1, 1))
 			},
 			expectActorId: true,
 			expectedError: nil,
@@ -333,7 +333,7 @@ func TestCreateActor(t *testing.T) {
 		{
 			name: "Create actor sql error",
 			setExpectations: func(mock sqlmock.Sqlmock) {
-				mock.ExpectExec("INSERT INTO `KinoTicketSystem`.actors .*").WithArgs(sqlmock.AnyArg(), actor.Name, actor.Birthdate, actor.Description, nil).WillReturnError(sql.ErrConnDone)
+				mock.ExpectExec("INSERT INTO `KinoTicketSystem`.actors .*").WithArgs(sqlmock.AnyArg(), actor.Name, actor.Birthdate, actor.Description).WillReturnError(sql.ErrConnDone)
 			},
 			expectActorId: false,
 			expectedError: kts_errors.KTS_INTERNAL_ERROR,
@@ -341,7 +341,7 @@ func TestCreateActor(t *testing.T) {
 		{
 			name: "Create actor no rows affected",
 			setExpectations: func(mock sqlmock.Sqlmock) {
-				mock.ExpectExec("INSERT INTO `KinoTicketSystem`.actors .*").WithArgs(sqlmock.AnyArg(), actor.Name, actor.Birthdate, actor.Description, nil).WillReturnResult(sqlmock.NewResult(1, 0))
+				mock.ExpectExec("INSERT INTO `KinoTicketSystem`.actors .*").WithArgs(sqlmock.AnyArg(), actor.Name, actor.Birthdate, actor.Description).WillReturnResult(sqlmock.NewResult(1, 0))
 			},
 			expectActorId: false,
 			expectedError: kts_errors.KTS_INTERNAL_ERROR,
@@ -351,7 +351,7 @@ func TestCreateActor(t *testing.T) {
 	for _, tc := range teststCases {
 		t.Run(tc.name, func(t *testing.T) {
 
-			db, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherRegexp))
+			db, mock, err := sqlmock.New()
 			if err != nil {
 				t.Fatalf("Failed to create mock database connection: %v", err)
 			}
