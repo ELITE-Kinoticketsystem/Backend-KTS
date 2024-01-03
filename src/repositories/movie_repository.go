@@ -192,9 +192,9 @@ func (mr *MovieRepository) GetMoviesWithGenres() (*[]models.MovieWithGenres, *mo
 		table.Movies.AllColumns,
 		table.Genres.AllColumns,
 	).FROM(
-		table.MovieGenres.
-			INNER_JOIN(table.Movies, table.Movies.ID.EQ(table.MovieGenres.MovieID)).
-			INNER_JOIN(table.Genres, table.Genres.ID.EQ(table.MovieGenres.GenreID)),
+		table.Movies.
+			LEFT_JOIN(table.MovieGenres, table.Movies.ID.EQ(table.MovieGenres.MovieID)).
+			LEFT_JOIN(table.Genres, table.Genres.ID.EQ(table.MovieGenres.GenreID)),
 	)
 
 	// Execute the query
