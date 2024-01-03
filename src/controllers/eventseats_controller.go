@@ -234,7 +234,7 @@ func seatMapToSlice(seatMap map[int32][]models.GetSeatsForSeatSelectorDTO) *[][]
 		})
 
 		row := seatRow[0].RowNr
-		seatSlice[row] = seatRow
+		seatSlice[row-1] = seatRow
 	}
 
 	return &seatSlice
