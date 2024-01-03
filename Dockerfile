@@ -17,7 +17,7 @@ RUN go mod tidy
 RUN go mod download
 
 # Build the swagger docs
-RUN cd src && ~/go/bin/swag init
+RUN cd src && swag init
 
 # Build the executable binary named "api" in the src directory
 RUN go build -o api ./src
