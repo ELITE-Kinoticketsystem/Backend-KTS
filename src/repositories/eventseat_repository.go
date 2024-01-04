@@ -18,7 +18,7 @@ type EventSeatRepoI interface {
 	GetEventSeats(eventId *uuid.UUID) (*[]models.GetEventSeatsDTO, *models.KTSError)
 	BlockEventSeatIfAvailable(eventId *uuid.UUID, seatId *uuid.UUID, userId *uuid.UUID, blockedUntil *time.Time) *models.KTSError
 	UnblockEventSeat(eventId *uuid.UUID, seatId *uuid.UUID, userId *uuid.UUID) *models.KTSError
-	UpdateBlockedUntilTimeForUserEventSeats(eventId *uuid.UUID, userId *uuid.UUID, blockedUntil *time.Time) *models.KTSError
+	UpdateBlockedUntilTimeForUserEventSeats(eventId *uuid.UUID, userId *uuid.UUID, blockedUntil *time.Time) (int64, *models.KTSError)
 	GetSelectedSeats(eventId *uuid.UUID, userId *uuid.UUID) (*[]models.GetEventSeatsDTO, *models.KTSError)
 	UpdateEventSeat(eventSeat *model.EventSeats) *models.KTSError
 }
@@ -81,18 +81,24 @@ func (esr *EventSeatRepository) BlockEventSeatIfAvailable(eventId *uuid.UUID, se
 	return nil
 }
 
-func (esr *EventSeatRepository) UpdateBlockedUntilTimeForUserEventSeats(eventId *uuid.UUID, userId *uuid.UUID, blockedUntil *time.Time) *models.KTSError {
+func (esr *EventSeatRepository) UpdateBlockedUntilTimeForUserEventSeats(eventId *uuid.UUID, userId *uuid.UUID, blockedUntil *time.Time) (int64, *models.KTSError) {
 	stmt := table.EventSeats.UPDATE(table.EventSeats.BlockedUntil).
 		SET(blockedUntil).
 		WHERE(table.EventSeats.EventID.EQ(utils.MysqlUuid(eventId)).AND(table.EventSeats.UserID.EQ(utils.MysqlUuid(userId))).AND(table.EventSeats.BlockedUntil.GT(utils.MysqlTimeNow())).AND(table.EventSeats.Booked.IS_FALSE()))
 
-	_, err := stmt.Exec(esr.DatabaseManager.GetDatabaseConnection())
+	result, err := stmt.Exec(esr.DatabaseManager.GetDatabaseConnection())
 
 	if err != nil {
-		return kts_errors.KTS_INTERNAL_ERROR
+		return 0, kts_errors.KTS_INTERNAL_ERROR
 	}
 
-	return nil
+	rowsAffected, err := result.RowsAffected()
+
+	if err != nil {
+		return 0, kts_errors.KTS_INTERNAL_ERROR
+	}
+
+	return rowsAffected, nil
 }
 
 func (esr *EventSeatRepository) UnblockEventSeat(eventId *uuid.UUID, seatId *uuid.UUID, userId *uuid.UUID) *models.KTSError {

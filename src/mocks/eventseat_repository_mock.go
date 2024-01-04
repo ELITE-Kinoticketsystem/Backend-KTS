@@ -100,11 +100,12 @@ func (mr *MockEventSeatRepoIMockRecorder) UnblockEventSeat(eventId, seatId, user
 }
 
 // UpdateBlockedUntilTimeForUserEventSeats mocks base method.
-func (m *MockEventSeatRepoI) UpdateBlockedUntilTimeForUserEventSeats(eventId, userId *uuid.UUID, blockedUntil *time.Time) *models.KTSError {
+func (m *MockEventSeatRepoI) UpdateBlockedUntilTimeForUserEventSeats(eventId, userId *uuid.UUID, blockedUntil *time.Time) (int64, *models.KTSError) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UpdateBlockedUntilTimeForUserEventSeats", eventId, userId, blockedUntil)
-	ret0, _ := ret[0].(*models.KTSError)
-	return ret0
+	ret0, _ := ret[0].(int64)
+	ret1, _ := ret[1].(*models.KTSError)
+	return ret0, ret1
 }
 
 // UpdateBlockedUntilTimeForUserEventSeats indicates an expected call of UpdateBlockedUntilTimeForUserEventSeats.

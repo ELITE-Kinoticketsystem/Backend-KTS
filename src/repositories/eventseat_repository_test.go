@@ -239,9 +239,10 @@ func TestUpdateBlockedUntilTimeForUserEventSeats(t *testing.T) {
 	query := "UPDATE `KinoTicketSystem`.event_seats SET .* WHERE .*"
 
 	testCases := []struct {
-		name            string
-		setExpectations func(mock sqlmock.Sqlmock)
-		expectedError   *models.KTSError
+		name                 string
+		setExpectations      func(mock sqlmock.Sqlmock)
+		expectedError        *models.KTSError
+		expectedAffectedRows int64
 	}{
 		{
 			name: "Update blocked until time for user event seats",
@@ -250,7 +251,8 @@ func TestUpdateBlockedUntilTimeForUserEventSeats(t *testing.T) {
 					WithArgs(blockedUntil, sqlmock.AnyArg(), sqlmock.AnyArg()).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 			},
-			expectedError: nil,
+			expectedError:        nil,
+			expectedAffectedRows: 1,
 		},
 		{
 			name: "Update blocked until time for user event seats - no rows affected",
@@ -259,7 +261,8 @@ func TestUpdateBlockedUntilTimeForUserEventSeats(t *testing.T) {
 					WithArgs(blockedUntil, sqlmock.AnyArg(), sqlmock.AnyArg()).
 					WillReturnResult(sqlmock.NewResult(0, 0))
 			},
-			expectedError: nil,
+			expectedError:        nil,
+			expectedAffectedRows: 0,
 		},
 		{
 			name: "Update blocked until time for user event seats - error",
@@ -268,7 +271,8 @@ func TestUpdateBlockedUntilTimeForUserEventSeats(t *testing.T) {
 					WithArgs(blockedUntil, sqlmock.AnyArg(), sqlmock.AnyArg()).
 					WillReturnError(sqlmock.ErrCancelled)
 			},
-			expectedError: kts_errors.KTS_INTERNAL_ERROR,
+			expectedError:        kts_errors.KTS_INTERNAL_ERROR,
+			expectedAffectedRows: 0,
 		},
 	}
 
@@ -290,12 +294,14 @@ func TestUpdateBlockedUntilTimeForUserEventSeats(t *testing.T) {
 			tc.setExpectations(mock)
 
 			// When
-			ktsErr := esr.UpdateBlockedUntilTimeForUserEventSeats(eventId, userId, &blockedUntil)
+			rows_affected, ktsErr := esr.UpdateBlockedUntilTimeForUserEventSeats(eventId, userId, &blockedUntil)
 
 			// Then
 			if err := mock.ExpectationsWereMet(); err != nil {
 				t.Errorf("There were unfulfilled expectations: %s", err)
 			}
+
+			assert.Equal(t, tc.expectedAffectedRows, rows_affected)
 
 			assert.Equal(t, tc.expectedError, ktsErr)
 		})

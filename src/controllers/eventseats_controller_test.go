@@ -227,7 +227,7 @@ func TestEventSeatController_BlockEventSeat(t *testing.T) {
 			name: "Block event seat",
 			expectFuncs: func(mockEventSeatRepo *mocks.MockEventSeatRepoI, t *testing.T) {
 				mockEventSeatRepo.EXPECT().BlockEventSeatIfAvailable(eventId, eventSeatId, userId, gomock.Any()).Return(nil)
-				mockEventSeatRepo.EXPECT().UpdateBlockedUntilTimeForUserEventSeats(eventId, userId, gomock.Any()).Return(nil)
+				mockEventSeatRepo.EXPECT().UpdateBlockedUntilTimeForUserEventSeats(eventId, userId, gomock.Any()).Return(int64(1), nil)
 				eventSeats := GetEventSeatsDTO(eventId, userId, eventSeatId)
 
 				mockEventSeatRepo.EXPECT().GetEventSeats(eventId).Return(&eventSeats, nil)
@@ -817,7 +817,7 @@ func TestEventSeatController_UnblockEventSeat(t *testing.T) {
 					},
 				}, nil)
 				mockEventSeatRepo.EXPECT().UnblockEventSeat(eventId, eventSeatId, userId).Return(nil)
-				mockEventSeatRepo.EXPECT().UpdateBlockedUntilTimeForUserEventSeats(eventId, userId, gomock.Any()).Return(nil)
+				mockEventSeatRepo.EXPECT().UpdateBlockedUntilTimeForUserEventSeats(eventId, userId, gomock.Any()).Return(int64(1), nil)
 			},
 			expectedError: nil,
 			expectTime:    true,

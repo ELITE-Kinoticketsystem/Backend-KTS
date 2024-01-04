@@ -76,7 +76,7 @@ func (esc *EventSeatController) BlockEventSeat(eventId *uuid.UUID, eventSeatId *
 		return nil, err
 	}
 
-	err = esc.EventSeatRepo.UpdateBlockedUntilTimeForUserEventSeats(eventId, userId, &blockedUntil)
+	_, err = esc.EventSeatRepo.UpdateBlockedUntilTimeForUserEventSeats(eventId, userId, &blockedUntil)
 
 	if err != nil {
 		return nil, err
@@ -101,10 +101,13 @@ func (esc *EventSeatController) UnblockEventSeat(eventId *uuid.UUID, eventSeatId
 		return nil, err
 	}
 
-	err = esc.EventSeatRepo.UpdateBlockedUntilTimeForUserEventSeats(eventId, userId, &blockedUntil)
+	affectedRows, err := esc.EventSeatRepo.UpdateBlockedUntilTimeForUserEventSeats(eventId, userId, &blockedUntil)
 
 	if err != nil {
 		return nil, err
+	}
+	if affectedRows == 0 {
+		return nil, nil
 	}
 
 	return &blockedUntil, nil
