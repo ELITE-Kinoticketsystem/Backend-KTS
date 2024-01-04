@@ -253,7 +253,7 @@ func TestCreatePriceCategory(t *testing.T) {
 			// THEN
 			assert.Equal(t, tc.expectedError, kts_err)
 			if tc.expectedPriceCategoryID && priceCategoryID == nil {
-				t.Error("Expected actor ID, got nil")
+				t.Error("Expected priceCategory ID, got nil")
 			}
 
 			// Verify that all expectations were met
