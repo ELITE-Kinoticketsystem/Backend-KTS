@@ -1,6 +1,7 @@
 package samples
 
 import (
+	"log"
 	"time"
 
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/gen/KinoTicketSystem/model"
@@ -48,7 +49,10 @@ func GetSampleMovies() *[]model.Movies {
 
 func GetSampleMovieById() *model.Movies {
 	modelMovies := model.Movies{}
-	uuid1 := uuid.MustParse("6ba7b826-9dad-11d1-80b4-00c04fd430c0")
+	uuid1, err := uuid.Parse("6ba7b826-9dad-11d1-80b4-00c04fd430c0")
+	if err != nil {
+		log.Print("GetSampleMovieById: Parsing UUID does not work")
+	}
 	banner := ""
 	cover := ""
 	trailer := ""
@@ -369,7 +373,8 @@ func GetSampleMoviesWithGenres() *[]models.MovieWithGenres {
 func GetSampleMovieByIdWithEverything() *models.MovieWithEverything {
 	movieWithEverything := models.MovieWithEverything{}
 
-	uuid1 := uuid.MustParse("6ba7b820-9dad-11d1-80b4-00c04fd430c4")
+	// uuid1 := uuid.MustParse("6ba7b820-9dad-11d1-80b4-00c04fd430c4")
+	uuid1 := uuid.New()
 	uuid2 := uuid.MustParse("6ba7b827-9dad-11d1-80b4-00c04fd430c1")
 	uuid5 := uuid.MustParse("6ba7b829-9dad-11d1-80b4-00c04fd430c3")
 	uuid7 := uuid.MustParse("6ba7b82b-9dad-11d1-80b4-00c04fd430c5")

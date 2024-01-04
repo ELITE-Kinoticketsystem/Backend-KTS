@@ -18,7 +18,7 @@ import (
 func TestGetMovies(t *testing.T) {
 	sampleMovies := samples.GetSampleMovies()
 
-	query := "\nSELECT movies.id AS \"movies.id\",\n     movies.title AS \"movies.title\",\n     movies.description AS \"movies.description\",\n     movies.banner_pic_url AS \"movies.banner_pic_url\",\n     movies.cover_pic_url AS \"movies.cover_pic_url\",\n     movies.trailer_url AS \"movies.trailer_url\",\n     movies.rating AS \"movies.rating\",\n     movies.release_date AS \"movies.release_date\",\n     movies.time_in_min AS \"movies.time_in_min\",\n     movies.fsk AS \"movies.fsk\"\nFROM `KinoTicketSystem`.movies;\n"
+	query := "SELECT movies.id AS \"movies.id\", movies.title AS \"movies.title\", movies.description AS \"movies.description\", movies.banner_pic_url AS \"movies.banner_pic_url\", movies.cover_pic_url AS \"movies.cover_pic_url\", movies.trailer_url AS \"movies.trailer_url\", movies.rating AS \"movies.rating\", movies.release_date AS \"movies.release_date\", movies.time_in_min AS \"movies.time_in_min\", movies.fsk AS \"movies.fsk\" FROM `KinoTicketSystem`.movies;"
 
 	testCases := []struct {
 		name            string
@@ -101,7 +101,7 @@ func TestGetMovieByName(t *testing.T) {
 
 	name := sampleMovie.Title
 
-	query := "SELECT movies.id AS \"movies.id\",\n     movies.title AS \"movies.title\",\n     movies.description AS \"movies.description\",\n     movies.banner_pic_url AS \"movies.banner_pic_url\",\n     movies.cover_pic_url AS \"movies.cover_pic_url\",\n     movies.trailer_url AS \"movies.trailer_url\",\n     movies.rating AS \"movies.rating\",\n     movies.release_date AS \"movies.release_date\",\n     movies.time_in_min AS \"movies.time_in_min\",\n     movies.fsk AS \"movies.fsk\"\nFROM `KinoTicketSystem`.movies\nWHERE movies.title = ?;\n"
+	query := "SELECT movies.id AS \"movies.id\", movies.title AS \"movies.title\", movies.description AS \"movies.description\", movies.banner_pic_url AS \"movies.banner_pic_url\", movies.cover_pic_url AS \"movies.cover_pic_url\", movies.trailer_url AS \"movies.trailer_url\", movies.rating AS \"movies.rating\", movies.release_date AS \"movies.release_date\", movies.time_in_min AS \"movies.time_in_min\", movies.fsk AS \"movies.fsk\" FROM `KinoTicketSystem`.movies WHERE movies.title = ?;"
 
 	testCases := []struct {
 		name            string
@@ -264,7 +264,7 @@ func TestCreateMovie(t *testing.T) {
 func TestUpdateMovie(t *testing.T) {
 	sampleMovie := samples.GetSampleMovieById()
 
-	query := "\nUPDATE `KinoTicketSystem`.movies\nSET title = ?,\n    description = ?,\n    banner_pic_url = ?,\n    cover_pic_url = ?,\n    trailer_url = ?,\n    rating = ?,\n    release_date = CAST(? AS DATE),\n    time_in_min = ?,\n    fsk = ?\nWHERE movies.id = ?;\n"
+	query := "UPDATE `KinoTicketSystem`.movies SET title = ?, description = ?, banner_pic_url = ?, cover_pic_url = ?, trailer_url = ?, rating = ?, release_date = CAST(? AS DATE), time_in_min = ?, fsk = ? WHERE movies.id = ?;"
 
 	testCases := []struct {
 		name            string
@@ -340,7 +340,7 @@ func TestUpdateMovie(t *testing.T) {
 func TestDeleteMovie(t *testing.T) {
 	movieId := uuid.New()
 
-	query := "DELETE FROM `KinoTicketSystem`.movies WHERE movies.id = ?;\n"
+	query := "DELETE FROM `KinoTicketSystem`.movies WHERE movies.id = ?;"
 
 	testCases := []struct {
 		name            string

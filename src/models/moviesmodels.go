@@ -70,3 +70,7 @@ type CreateReviewRequest struct {
 type DeleteReviewRequest struct {
 	ID string
 }
+
+type DeleteResponse struct {
+	Message string `json:"message"`
+}

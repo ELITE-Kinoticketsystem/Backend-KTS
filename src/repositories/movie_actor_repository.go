@@ -12,6 +12,7 @@ import (
 type MovieActorRepositoryI interface {
 	AddMovieActor(movieId *uuid.UUID, actorId *uuid.UUID) *models.KTSError
 	RemoveMovieActor(movieId *uuid.UUID, actorId *uuid.UUID) *models.KTSError
+	RemoveAllActorCombinationWithMovie(movieId *uuid.UUID) *models.KTSError
 }
 
 type MovieActorRepository struct {
@@ -66,6 +67,20 @@ func (mar *MovieActorRepository) RemoveMovieActor(movieId *uuid.UUID, actorId *u
 
 	if rowsAff == 0 {
 		return kts_errors.KTS_NOT_FOUND
+	}
+
+	return nil
+}
+
+func (mar *MovieActorRepository) RemoveAllActorCombinationWithMovie(movieId *uuid.UUID) *models.KTSError {
+	deleteQuery := table.MovieActors.DELETE().WHERE(
+		table.MovieActors.MovieID.EQ(utils.MysqlUuid(movieId)),
+	)
+
+	// Execute the query
+	_, err := deleteQuery.Exec(mar.DatabaseManager.GetDatabaseConnection())
+	if err != nil {
+		return kts_errors.KTS_INTERNAL_ERROR
 	}
 
 	return nil
