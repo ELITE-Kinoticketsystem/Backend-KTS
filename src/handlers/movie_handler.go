@@ -7,7 +7,6 @@ import (
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/controllers"
 	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/gen/KinoTicketSystem/model"
-	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/gen/KinoTicketSystem/model"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
 	"github.com/gin-gonic/gin"
@@ -149,7 +148,7 @@ func GetMoviesWithGenres(movieCtrl controllers.MovieControllerI) gin.HandlerFunc
 			utils.HandleErrorAndAbort(c, kts_err)
 			return
 		}
-		c.JSON(http.StatusOK, movie)
+		c.JSON(http.StatusOK, movies)
 	}
 }
 
