@@ -67,3 +67,18 @@ func (mr *MockReviewRepositoryIMockRecorder) DeleteReview(id any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteReview", reflect.TypeOf((*MockReviewRepositoryI)(nil).DeleteReview), id)
 }
+
+// GetReviewById mocks base method.
+func (m *MockReviewRepositoryI) GetReviewById(id *uuid.UUID) (*model.Reviews, *models.KTSError) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetReviewById", id)
+	ret0, _ := ret[0].(*model.Reviews)
+	ret1, _ := ret[1].(*models.KTSError)
+	return ret0, ret1
+}
+
+// GetReviewById indicates an expected call of GetReviewById.
+func (mr *MockReviewRepositoryIMockRecorder) GetReviewById(id any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetReviewById", reflect.TypeOf((*MockReviewRepositoryI)(nil).GetReviewById), id)
+}
