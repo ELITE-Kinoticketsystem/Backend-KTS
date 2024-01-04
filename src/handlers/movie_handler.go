@@ -7,6 +7,7 @@ import (
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/controllers"
 	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/gen/KinoTicketSystem/model"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/gen/KinoTicketSystem/model"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
 	"github.com/gin-gonic/gin"
@@ -25,6 +26,7 @@ func GetMovies(movieCtrl controllers.MovieControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		movies, kts_err := movieCtrl.GetMovies()
 		if kts_err != nil {
+			utils.HandleErrorAndAbort(c, kts_err)
 			utils.HandleErrorAndAbort(c, kts_err)
 			return
 		}
@@ -46,8 +48,10 @@ func CreateMovie(movieCtrl controllers.MovieControllerI) gin.HandlerFunc {
 		var movie models.MovieDTOCreate
 		err := c.ShouldBindJSON(&movie)
 		log.Println(movie.GenresID)
+		log.Println(movie.GenresID)
 		if err != nil ||
 			utils.ContainsEmptyString(
+				movie.Title,
 				movie.Title,
 			) {
 			utils.HandleErrorAndAbort(c, kts_errors.KTS_BAD_REQUEST)
@@ -145,7 +149,7 @@ func GetMoviesWithGenres(movieCtrl controllers.MovieControllerI) gin.HandlerFunc
 			utils.HandleErrorAndAbort(c, kts_err)
 			return
 		}
-		c.JSON(http.StatusOK, movies)
+		c.JSON(http.StatusOK, movie)
 	}
 }
 
@@ -166,11 +170,16 @@ func GetMovieById(movieCtrl controllers.MovieControllerI) gin.HandlerFunc {
 			return
 		}
 
-		movie, kts_err := movieCtrl.GetMovieById(&movieId)
+		if err != nil {
+			utils.HandleErrorAndAbort(c, kts_errors.KTS_BAD_REQUEST)
+			return
+		}
+
+		kts_err := movieCtrl.DeleteMovie(&movieId)
 		if kts_err != nil {
 			utils.HandleErrorAndAbort(c, kts_err)
 			return
 		}
-		c.JSON(http.StatusOK, movie)
+		c.JSON(http.StatusOK, gin.H{"message": "Movie deleted"})
 	}
 }
