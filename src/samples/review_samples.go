@@ -15,7 +15,6 @@ func GetSampleReviewRequest() models.CreateReviewRequest {
 		Datetime:  time.Now(),
 		IsSpoiler: false,
 		MovieID:   "7236556f-5e78-4e94-8910-3072c2f5cd5b",
-		UserID:    "fa40ef37-dba9-4b0d-9fc4-0edc7588200e",
 	}
 }
 

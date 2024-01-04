@@ -129,6 +129,7 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 		},
 		ReviewController: &controllers.ReviewController{
 			ReviewRepo: reviewsRepo,
+			UserRepo:   userRepo,
 		},
 		TheatreController: &controllers.TheatreController{
 			TheatreRepo: theatreRepo,
@@ -185,8 +186,8 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 	publicRoutes.Handle(http.MethodGet, "/events/:eventId", handlers.GetEventByIdHandler(controller.EventController))
 
 	// reviews
-	publicRoutes.Handle(http.MethodPost, "/reviews", handlers.CreateReviewHandler(controller.ReviewController))
-	publicRoutes.Handle(http.MethodDelete, "/reviews/:id", handlers.DeleteReviewHandler(controller.ReviewController))
+	securedRoutes.Handle(http.MethodPost, "/reviews", handlers.CreateReviewHandler(controller.ReviewController))
+	securedRoutes.Handle(http.MethodDelete, "/reviews/:id", handlers.DeleteReviewHandler(controller.ReviewController))
 
 	// order and reservation
 	router.Handle(http.MethodPost, "/events/:eventId/reserve", handlers.CreateOrderHandler(controller.OrderController, true))

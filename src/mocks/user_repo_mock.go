@@ -13,6 +13,7 @@ import (
 
 	model "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/gen/KinoTicketSystem/model"
 	models "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
+	uuid "github.com/google/uuid"
 	gomock "go.uber.org/mock/gomock"
 )
 
@@ -79,6 +80,21 @@ func (m *MockUserRepositoryI) CreateUser(user model.Users) *models.KTSError {
 func (mr *MockUserRepositoryIMockRecorder) CreateUser(user any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateUser", reflect.TypeOf((*MockUserRepositoryI)(nil).CreateUser), user)
+}
+
+// GetUserById mocks base method.
+func (m *MockUserRepositoryI) GetUserById(id *uuid.UUID) (*model.Users, *models.KTSError) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetUserById", id)
+	ret0, _ := ret[0].(*model.Users)
+	ret1, _ := ret[1].(*models.KTSError)
+	return ret0, ret1
+}
+
+// GetUserById indicates an expected call of GetUserById.
+func (mr *MockUserRepositoryIMockRecorder) GetUserById(id any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserById", reflect.TypeOf((*MockUserRepositoryI)(nil).GetUserById), id)
 }
 
 // GetUserByUsername mocks base method.

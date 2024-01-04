@@ -40,30 +40,30 @@ func (m *MockReviewControllerI) EXPECT() *MockReviewControllerIMockRecorder {
 }
 
 // CreateReview mocks base method.
-func (m *MockReviewControllerI) CreateReview(reviewData models.CreateReviewRequest) (*uuid.UUID, *models.KTSError) {
+func (m *MockReviewControllerI) CreateReview(reviewData models.CreateReviewRequest, userId *uuid.UUID) (string, *models.KTSError) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreateReview", reviewData)
-	ret0, _ := ret[0].(*uuid.UUID)
+	ret := m.ctrl.Call(m, "CreateReview", reviewData, userId)
+	ret0, _ := ret[0].(string)
 	ret1, _ := ret[1].(*models.KTSError)
 	return ret0, ret1
 }
 
 // CreateReview indicates an expected call of CreateReview.
-func (mr *MockReviewControllerIMockRecorder) CreateReview(reviewData any) *gomock.Call {
+func (mr *MockReviewControllerIMockRecorder) CreateReview(reviewData, userId any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateReview", reflect.TypeOf((*MockReviewControllerI)(nil).CreateReview), reviewData)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateReview", reflect.TypeOf((*MockReviewControllerI)(nil).CreateReview), reviewData, userId)
 }
 
 // DeleteReview mocks base method.
-func (m *MockReviewControllerI) DeleteReview(id *uuid.UUID) *models.KTSError {
+func (m *MockReviewControllerI) DeleteReview(id, userId *uuid.UUID) *models.KTSError {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "DeleteReview", id)
+	ret := m.ctrl.Call(m, "DeleteReview", id, userId)
 	ret0, _ := ret[0].(*models.KTSError)
 	return ret0
 }
 
 // DeleteReview indicates an expected call of DeleteReview.
-func (mr *MockReviewControllerIMockRecorder) DeleteReview(id any) *gomock.Call {
+func (mr *MockReviewControllerIMockRecorder) DeleteReview(id, userId any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteReview", reflect.TypeOf((*MockReviewControllerI)(nil).DeleteReview), id)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteReview", reflect.TypeOf((*MockReviewControllerI)(nil).DeleteReview), id, userId)
 }

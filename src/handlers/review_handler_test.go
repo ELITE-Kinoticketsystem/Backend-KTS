@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"net/http/httptest"
 	"testing"
@@ -18,10 +19,13 @@ import (
 )
 
 func TestCreateReview(t *testing.T) {
+	userId := uuid.New()
+	username := "Collinho el niño"
 	testCases := []struct {
 		name            string
 		requestBody     gin.H
 		setExpectations func(mockCtrl *mocks.MockReviewControllerI, body gin.H)
+		expectedBody    gin.H
 		expectedStatus  int
 	}{
 		{
@@ -31,7 +35,6 @@ func TestCreateReview(t *testing.T) {
 				"comment":   "Comment",
 				"datetime":  "2006-01-02T15:04:05Z",
 				"isSpoiler": false,
-				"userId":    "d2781ace-4d6e-4cc7-9285-bd310c5c6d25",
 				"movieId":   "f3c4e8f8-1769-4029-a6b4-fd36b91918a9",
 			},
 			setExpectations: func(mockCtrl *mocks.MockReviewControllerI, body gin.H) {
@@ -41,12 +44,11 @@ func TestCreateReview(t *testing.T) {
 					Comment:   body["comment"].(string),
 					Datetime:  datetime,
 					IsSpoiler: body["isSpoiler"].(bool),
-					UserID:    body["userId"].(string),
 					MovieID:   body["movieId"].(string),
 				}
-				id := uuid.New()
-				mockCtrl.EXPECT().CreateReview(reviewData).Return(&id, nil)
+				mockCtrl.EXPECT().CreateReview(reviewData, &userId).Return(username, nil)
 			},
+			expectedBody:   gin.H{"username": username},
 			expectedStatus: 201,
 		},
 		{
@@ -56,7 +58,6 @@ func TestCreateReview(t *testing.T) {
 				"comment":   "Comment",
 				"datetime":  "2006-01-02T15:04:05Z",
 				"isSpoiler": false,
-				"userId":    "d2781ace-4d6e-4cc7-9285-bd310c5c6d25",
 				"movieId":   "f3c4e8f8-1769-4029-a6b4-fd36b91918a9",
 			},
 			setExpectations: func(mockCtrl *mocks.MockReviewControllerI, body gin.H) {
@@ -66,17 +67,18 @@ func TestCreateReview(t *testing.T) {
 					Comment:   body["comment"].(string),
 					Datetime:  datetime,
 					IsSpoiler: body["isSpoiler"].(bool),
-					UserID:    body["userId"].(string),
 					MovieID:   body["movieId"].(string),
 				}
-				mockCtrl.EXPECT().CreateReview(reviewData).Return(nil, kts_errors.KTS_INTERNAL_ERROR)
+				mockCtrl.EXPECT().CreateReview(reviewData, &userId).Return("", kts_errors.KTS_INTERNAL_ERROR)
 			},
+			expectedBody:   gin.H{"errorMessage": "INTERNAL_ERROR"},
 			expectedStatus: 500,
 		},
 		{
 			name:            "Invalid json",
 			requestBody:     nil,
 			setExpectations: func(mockCtrl *mocks.MockReviewControllerI, body gin.H) {},
+			expectedBody:    gin.H{"errorMessage": "BAD_REQUEST"},
 			expectedStatus:  400,
 		},
 		{
@@ -90,6 +92,7 @@ func TestCreateReview(t *testing.T) {
 				"movieId":   "f3c4e8f8-1769-4029-a6b4-fd36b91918a9",
 			},
 			setExpectations: func(mockCtrl *mocks.MockReviewControllerI, body gin.H) {},
+			expectedBody:    gin.H{"errorMessage": "BAD_REQUEST"},
 			expectedStatus:  400,
 		},
 	}
@@ -110,7 +113,8 @@ func TestCreateReview(t *testing.T) {
 			jsonData, _ := json.Marshal(tc.requestBody)
 			req := httptest.NewRequest("POST", "/reviews", bytes.NewBuffer(jsonData))
 			req.Header.Set("Content-Type", "application/json")
-			c.Request = req
+			ctx := context.WithValue(req.Context(), models.ContextKeyUserID, &userId)
+			c.Request = req.WithContext(ctx)
 
 			// define expectations
 			tc.setExpectations(reviewController, tc.requestBody)
@@ -122,10 +126,8 @@ func TestCreateReview(t *testing.T) {
 			// THEN
 			// check the HTTP status code
 			assert.Equal(t, tc.expectedStatus, w.Code, "wrong HTTP status code")
-			if tc.expectedStatus == 201 {
-				_, err := uuid.Parse(w.Body.String())
-				assert.True(t, err == nil)
-			}
+			expectedResponseBody, _ := json.Marshal(tc.expectedBody)
+			assert.Equal(t, bytes.NewBuffer(expectedResponseBody).String(), w.Body.String(), "wrong response body")
 		})
 	}
 
@@ -135,24 +137,42 @@ func TestDeleteReview(t *testing.T) {
 	testCases := []struct {
 		name                 string
 		id                   string
-		setExpectations      func(mockCtrl *mocks.MockReviewControllerI, id uuid.UUID)
+		userId               string
+		setExpectations      func(mockCtrl *mocks.MockReviewControllerI, id uuid.UUID, userId uuid.UUID)
 		expectedStatus       int
 		expectedResponseBody string
 	}{
 		{
-			name: "Success",
-			id:   uuid.NewString(),
-			setExpectations: func(mockCtrl *mocks.MockReviewControllerI, id uuid.UUID) {
-				mockCtrl.EXPECT().DeleteReview(&id).Return(nil)
+			name:   "Success",
+			id:     uuid.NewString(),
+			userId: uuid.NewString(),
+			setExpectations: func(mockCtrl *mocks.MockReviewControllerI, id uuid.UUID, userId uuid.UUID) {
+				mockCtrl.EXPECT().DeleteReview(&id, &userId).Return(nil)
 			},
 			expectedStatus:       200,
 			expectedResponseBody: "",
 		},
 		{
-			name: "Internal error",
-			id:   uuid.NewString(),
-			setExpectations: func(mockCtrl *mocks.MockReviewControllerI, id uuid.UUID) {
-				mockCtrl.EXPECT().DeleteReview(&id).Return(kts_errors.KTS_INTERNAL_ERROR)
+			name:   "Unauthorized",
+			id:     uuid.NewString(),
+			userId: uuid.NewString(),
+			setExpectations: func(mockCtrl *mocks.MockReviewControllerI, id uuid.UUID, userId uuid.UUID) {
+				mockCtrl.EXPECT().DeleteReview(&id, &userId).Return(kts_errors.KTS_FORBIDDEN)
+			},
+			expectedStatus: 403,
+			expectedResponseBody: func() string {
+				expectedResponseBody, _ := json.Marshal(gin.H{
+					"errorMessage": "FORBIDDEN",
+				})
+				return bytes.NewBuffer(expectedResponseBody).String()
+			}(),
+		},
+		{
+			name:   "Internal error",
+			id:     uuid.NewString(),
+			userId: uuid.NewString(),
+			setExpectations: func(mockCtrl *mocks.MockReviewControllerI, id uuid.UUID, userId uuid.UUID) {
+				mockCtrl.EXPECT().DeleteReview(&id, &userId).Return(kts_errors.KTS_INTERNAL_ERROR)
 			},
 			expectedStatus: 500,
 			expectedResponseBody: func() string {
@@ -165,7 +185,7 @@ func TestDeleteReview(t *testing.T) {
 		{
 			name:            "Invalid id",
 			id:              "invalid id",
-			setExpectations: func(mockCtrl *mocks.MockReviewControllerI, id uuid.UUID) {},
+			setExpectations: func(mockCtrl *mocks.MockReviewControllerI, id uuid.UUID, userId uuid.UUID) {},
 			expectedStatus:  400,
 			expectedResponseBody: func() string {
 				expectedResponseBody, _ := json.Marshal(gin.H{
@@ -190,13 +210,16 @@ func TestDeleteReview(t *testing.T) {
 			reviewController := mocks.NewMockReviewControllerI(mockCtrl)
 
 			// create mock request
+			id, _ := uuid.Parse(tc.id)
+			userId, _ := uuid.Parse(tc.userId)
+
 			req := httptest.NewRequest("DELETE", "/reviews/:id", nil)
-			c.Request = req
+			ctx := context.WithValue(req.Context(), models.ContextKeyUserID, &userId)
+			c.Request = req.WithContext(ctx)
 			c.AddParam("id", tc.id)
 
 			// define expectations
-			id, _ := uuid.Parse(tc.id)
-			tc.setExpectations(reviewController, id)
+			tc.setExpectations(reviewController, id, userId)
 
 			// WHEN
 			// call DeleteReviewHandler with mock context

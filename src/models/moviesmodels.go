@@ -64,7 +64,6 @@ type CreateReviewRequest struct {
 	Comment   string
 	Datetime  time.Time
 	IsSpoiler bool
-	UserID    string
 	MovieID   string
 }
 

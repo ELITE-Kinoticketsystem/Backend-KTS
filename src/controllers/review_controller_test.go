@@ -17,31 +17,42 @@ import (
 )
 
 func TestCreateReview(t *testing.T) {
+	user := samples.GetSampleUser()
+	userId := user.ID
 	testCases := []struct {
-		name            string
-		reviewData      models.CreateReviewRequest
-		setExpectations func(mockRepo mocks.MockReviewRepositoryI, reviewData models.CreateReviewRequest)
-		expectedError   *models.KTSError
-		returnsId       bool
+		name             string
+		reviewData       models.CreateReviewRequest
+		setExpectations  func(userRepo mocks.MockUserRepositoryI, mockRepo mocks.MockReviewRepositoryI, reviewData models.CreateReviewRequest)
+		expectedUsername string
+		expectedError    *models.KTSError
 	}{
 		{
-			name:       "Internal error",
+			name:       "User Internal error",
 			reviewData: samples.GetSampleReviewRequest(),
-			setExpectations: func(mockRepo mocks.MockReviewRepositoryI, reviewData models.CreateReviewRequest) {
+			setExpectations: func(userRepo mocks.MockUserRepositoryI, mockRepo mocks.MockReviewRepositoryI, reviewData models.CreateReviewRequest) {
+				userRepo.EXPECT().GetUserById(userId).Return(nil, kts_errors.KTS_INTERNAL_ERROR)
+			},
+			expectedUsername: "",
+			expectedError:    kts_errors.KTS_INTERNAL_ERROR,
+		},
+		{
+			name:       "Create Internal error",
+			reviewData: samples.GetSampleReviewRequest(),
+			setExpectations: func(userRepo mocks.MockUserRepositoryI, mockRepo mocks.MockReviewRepositoryI, reviewData models.CreateReviewRequest) {
 				movieId := uuid.MustParse(reviewData.MovieID)
-				userId := uuid.MustParse(reviewData.UserID)
 				review := model.Reviews{
 					Rating:    reviewData.Rating,
 					Comment:   reviewData.Comment,
 					Datetime:  reviewData.Datetime,
 					IsSpoiler: &reviewData.IsSpoiler,
 					MovieID:   &movieId,
-					UserID:    &userId,
+					/* UserID */
 				}
+				userRepo.EXPECT().GetUserById(userId).Return(&user, nil)
 				mockRepo.EXPECT().CreateReview(utils.EqExceptId(review)).Return(kts_errors.KTS_INTERNAL_ERROR)
 			},
-			expectedError: kts_errors.KTS_INTERNAL_ERROR,
-			returnsId:     false,
+			expectedUsername: "",
+			expectedError:    kts_errors.KTS_INTERNAL_ERROR,
 		},
 		{
 			name: "Invalid movie id",
@@ -51,44 +62,32 @@ func TestCreateReview(t *testing.T) {
 				Datetime:  time.Now(),
 				IsSpoiler: false,
 				MovieID:   "invalid id",
-				UserID:    "fa40ef37-dba9-4b0d-9fc4-0edc7588200e",
+				/* UserID */
 			},
-			setExpectations: func(mockRepo mocks.MockReviewRepositoryI, reviewData models.CreateReviewRequest) {},
-			expectedError:   kts_errors.KTS_BAD_REQUEST,
-			returnsId:       false,
-		},
-		{
-			name: "Invalid user id",
-			reviewData: models.CreateReviewRequest{
-				Rating:    5,
-				Comment:   "Comment",
-				Datetime:  time.Now(),
-				IsSpoiler: false,
-				MovieID:   "7236556f-5e78-4e94-8910-3072c2f5cd5b",
-				UserID:    "invalid id",
+			setExpectations: func(userRepo mocks.MockUserRepositoryI, mockRepo mocks.MockReviewRepositoryI, reviewData models.CreateReviewRequest) {
+				userRepo.EXPECT().GetUserById(userId).Return(&user, nil)
 			},
-			setExpectations: func(mockRepo mocks.MockReviewRepositoryI, reviewData models.CreateReviewRequest) {},
-			expectedError:   kts_errors.KTS_BAD_REQUEST,
-			returnsId:       false,
+			expectedUsername: "",
+			expectedError:    kts_errors.KTS_BAD_REQUEST,
 		},
 		{
 			name:       "Success",
 			reviewData: samples.GetSampleReviewRequest(),
-			setExpectations: func(mockRepo mocks.MockReviewRepositoryI, reviewData models.CreateReviewRequest) {
+			setExpectations: func(userRepo mocks.MockUserRepositoryI, mockRepo mocks.MockReviewRepositoryI, reviewData models.CreateReviewRequest) {
 				movieId := uuid.MustParse(reviewData.MovieID)
-				userId := uuid.MustParse(reviewData.UserID)
 				review := model.Reviews{
 					Rating:    reviewData.Rating,
 					Comment:   reviewData.Comment,
 					Datetime:  reviewData.Datetime,
 					IsSpoiler: &reviewData.IsSpoiler,
 					MovieID:   &movieId,
-					UserID:    &userId,
+					/* UserID */
 				}
+				userRepo.EXPECT().GetUserById(userId).Return(&user, nil)
 				mockRepo.EXPECT().CreateReview(utils.EqExceptId(review)).Return(nil)
 			},
-			expectedError: nil,
-			returnsId:     true,
+			expectedUsername: *user.Username,
+			expectedError:    nil,
 		},
 	}
 	for _, tc := range testCases {
@@ -98,26 +97,29 @@ func TestCreateReview(t *testing.T) {
 			mockCtrl := gomock.NewController(t)
 			defer mockCtrl.Finish()
 			reviewRepoMock := mocks.NewMockReviewRepositoryI(mockCtrl)
+			userRepoMock := mocks.NewMockUserRepositoryI(mockCtrl)
 			reviewController := ReviewController{
 				ReviewRepo: reviewRepoMock,
+				UserRepo:   userRepoMock,
 			}
 
 			// define expectations
-			tc.setExpectations(*reviewRepoMock, tc.reviewData)
+			tc.setExpectations(*userRepoMock, *reviewRepoMock, tc.reviewData)
 
 			// WHEN
 			// call CreateReview with review data
-			id, err := reviewController.CreateReview(tc.reviewData)
+			username, err := reviewController.CreateReview(tc.reviewData, userId)
 
 			// THEN
-			// check expected error and id
+			// check expected error and username
+			assert.Equal(t, username, tc.expectedUsername, "wrong username")
 			assert.Equal(t, err, tc.expectedError, "wrong error")
-			assert.False(t, tc.returnsId && id == nil, "should not return id")
 		})
 	}
 }
 
 func TestDeleteReview(t *testing.T) {
+	userId := uuid.New()
 	testCases := []struct {
 		name            string
 		id              uuid.UUID
@@ -128,14 +130,38 @@ func TestDeleteReview(t *testing.T) {
 			name: "Success",
 			id:   uuid.New(),
 			setExpectations: func(mockRepo mocks.MockReviewRepositoryI, id uuid.UUID) {
+				mockRepo.EXPECT().GetReviewById(&id).Return(&model.Reviews{
+					UserID: &userId,
+				}, nil)
 				mockRepo.EXPECT().DeleteReview(&id).Return(nil)
 			},
 			expectedError: nil,
 		},
 		{
-			name: "Internal error",
+			name: "Forbidden",
 			id:   uuid.New(),
 			setExpectations: func(mockRepo mocks.MockReviewRepositoryI, id uuid.UUID) {
+				mockRepo.EXPECT().GetReviewById(&id).Return(&model.Reviews{
+					UserID: utils.NewUUID(),
+				}, nil)
+			},
+			expectedError: kts_errors.KTS_FORBIDDEN,
+		},
+		{
+			name: "Review internal error",
+			id:   uuid.New(),
+			setExpectations: func(mockRepo mocks.MockReviewRepositoryI, id uuid.UUID) {
+				mockRepo.EXPECT().GetReviewById(&id).Return(nil, kts_errors.KTS_INTERNAL_ERROR)
+			},
+			expectedError: kts_errors.KTS_INTERNAL_ERROR,
+		},
+		{
+			name: "Delete internal error",
+			id:   uuid.New(),
+			setExpectations: func(mockRepo mocks.MockReviewRepositoryI, id uuid.UUID) {
+				mockRepo.EXPECT().GetReviewById(&id).Return(&model.Reviews{
+					UserID: &userId,
+				}, nil)
 				mockRepo.EXPECT().DeleteReview(&id).Return(kts_errors.KTS_INTERNAL_ERROR)
 			},
 			expectedError: kts_errors.KTS_INTERNAL_ERROR,
@@ -157,7 +183,7 @@ func TestDeleteReview(t *testing.T) {
 
 			// WHEN
 			// call DeleteReview with review data
-			err := reviewController.DeleteReview(&tc.id)
+			err := reviewController.DeleteReview(&tc.id, &userId)
 
 			// THEN
 			// check expected error and id
