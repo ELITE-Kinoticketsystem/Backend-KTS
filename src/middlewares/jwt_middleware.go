@@ -2,6 +2,7 @@ package middlewares
 
 import (
 	"context"
+	"log"
 
 	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
@@ -16,14 +17,21 @@ func JwtAuthMiddleware() gin.HandlerFunc {
 
 		// check if token is set
 		token, err := c.Cookie("token")
+		log.Println("token err: ", err)
+		log.Println("token: ", token)
 		if err != nil {
 			// token is not set, check if refresh token is set
 			refreshToken, err := c.Cookie("refreshToken")
+			log.Println("refreshToken err: ", err)
+			log.Println("refreshToken: ", refreshToken)
 			if err != nil {
 				utils.HandleErrorAndAbort(c, kts_errors.KTS_UNAUTHORIZED)
 				return
 			}
 			token, refreshToken, err = utils.RefreshTokens(refreshToken)
+			log.Println("refreshed err: ", err)
+			log.Println("token: ", token)
+			log.Println("refreshToken: ", refreshToken)
 			if err != nil {
 				utils.HandleErrorAndAbort(c, kts_errors.KTS_UNAUTHORIZED)
 				return
@@ -32,6 +40,8 @@ func JwtAuthMiddleware() gin.HandlerFunc {
 		}
 
 		userId, err := utils.ValidateToken(token)
+		log.Println("userId err: ", err)
+		log.Println("userId: ", userId)
 		if err != nil {
 			utils.HandleErrorAndAbort(c, kts_errors.KTS_UNAUTHORIZED)
 			return
