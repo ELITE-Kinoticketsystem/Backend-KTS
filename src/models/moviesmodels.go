@@ -39,7 +39,8 @@ type MovieWithEverything struct {
 	}
 
 	Reviews []struct {
-		model.Reviews
+		Review   model.Reviews
+		Username string `alias:"users.username"`
 	}
 }
 
