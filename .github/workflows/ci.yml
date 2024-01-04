@@ -34,7 +34,6 @@ jobs:
         run: go test -v ./...
 
       - name: Update coverage report
-        permissions: write-all
         uses: ncruces/go-coverage-report@v0
         with:
           report: true
