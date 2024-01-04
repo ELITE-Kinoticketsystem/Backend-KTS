@@ -11,6 +11,7 @@ package mocks
 import (
 	reflect "reflect"
 
+	model "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/gen/KinoTicketSystem/model"
 	models "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
 	uuid "github.com/google/uuid"
 	gomock "go.uber.org/mock/gomock"
@@ -40,12 +41,13 @@ func (m *MockReviewControllerI) EXPECT() *MockReviewControllerIMockRecorder {
 }
 
 // CreateReview mocks base method.
-func (m *MockReviewControllerI) CreateReview(reviewData models.CreateReviewRequest, userId *uuid.UUID) (string, *models.KTSError) {
+func (m *MockReviewControllerI) CreateReview(reviewData models.CreateReviewRequest, userId *uuid.UUID) (*model.Reviews, string, *models.KTSError) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateReview", reviewData, userId)
-	ret0, _ := ret[0].(string)
-	ret1, _ := ret[1].(*models.KTSError)
-	return ret0, ret1
+	ret0, _ := ret[0].(*model.Reviews)
+	ret1, _ := ret[1].(string)
+	ret2, _ := ret[2].(*models.KTSError)
+	return ret0, ret1, ret2
 }
 
 // CreateReview indicates an expected call of CreateReview.

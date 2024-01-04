@@ -24,7 +24,7 @@ func GetSampleLoginData() models.LoginRequest {
 }
 
 func GetSampleUser() model.Users {
-	id, _ := uuid.Parse("47CF752501DF45B7A3A9D3CB25AE939F")
+	id := uuid.MustParse("47cf7525-01df-45b7-a3a9-d3cb25ae939f")
 	username := "Collinho el niño"
 	firstname := "Collin"
 	lastname := "Forslund"

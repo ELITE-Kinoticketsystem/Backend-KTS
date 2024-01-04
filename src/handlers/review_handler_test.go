@@ -11,6 +11,7 @@ import (
 	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/mocks"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/samples"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -19,8 +20,8 @@ import (
 )
 
 func TestCreateReview(t *testing.T) {
-	userId := uuid.New()
-	username := "Collinho el niño"
+	user := samples.GetSampleUser()
+	review := samples.GetSampleReview()
 	testCases := []struct {
 		name            string
 		requestBody     gin.H
@@ -46,9 +47,9 @@ func TestCreateReview(t *testing.T) {
 					IsSpoiler: body["isSpoiler"].(bool),
 					MovieID:   body["movieId"].(string),
 				}
-				mockCtrl.EXPECT().CreateReview(reviewData, &userId).Return(username, nil)
+				mockCtrl.EXPECT().CreateReview(reviewData, user.ID).Return(&review, *user.Username, nil)
 			},
-			expectedBody:   gin.H{"username": username},
+			expectedBody:   gin.H{"review": review, "username": user.Username},
 			expectedStatus: 201,
 		},
 		{
@@ -69,7 +70,7 @@ func TestCreateReview(t *testing.T) {
 					IsSpoiler: body["isSpoiler"].(bool),
 					MovieID:   body["movieId"].(string),
 				}
-				mockCtrl.EXPECT().CreateReview(reviewData, &userId).Return("", kts_errors.KTS_INTERNAL_ERROR)
+				mockCtrl.EXPECT().CreateReview(reviewData, user.ID).Return(nil, "", kts_errors.KTS_INTERNAL_ERROR)
 			},
 			expectedBody:   gin.H{"errorMessage": "INTERNAL_ERROR"},
 			expectedStatus: 500,
@@ -113,7 +114,7 @@ func TestCreateReview(t *testing.T) {
 			jsonData, _ := json.Marshal(tc.requestBody)
 			req := httptest.NewRequest("POST", "/reviews", bytes.NewBuffer(jsonData))
 			req.Header.Set("Content-Type", "application/json")
-			ctx := context.WithValue(req.Context(), models.ContextKeyUserID, &userId)
+			ctx := context.WithValue(req.Context(), models.ContextKeyUserID, user.ID)
 			c.Request = req.WithContext(ctx)
 
 			// define expectations

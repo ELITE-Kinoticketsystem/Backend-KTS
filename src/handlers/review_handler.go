@@ -35,13 +35,13 @@ func CreateReviewHandler(reviewCtrl controllers.ReviewControllerI) gin.HandlerFu
 			return
 		}
 
-		username, kts_err := reviewCtrl.CreateReview(reviewData, userId)
+		review, username, kts_err := reviewCtrl.CreateReview(reviewData, userId)
 		if kts_err != nil {
 			utils.HandleErrorAndAbort(c, kts_err)
 			return
 		}
 
-		c.JSON(http.StatusCreated, gin.H{"username": username})
+		c.JSON(http.StatusCreated, gin.H{"review": review, "username": username})
 	}
 }
 

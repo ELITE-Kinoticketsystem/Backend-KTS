@@ -45,22 +45,27 @@ func EqUserMatcher(u model.Users, password string) UserMatcher {
 	return UserMatcher{user: u, password: password}
 }
 
+// Evaluates whether two structs are equal except for their ids.
+func EqualsExceptId(value1 interface{}, value2 interface{}) bool {
+	return cmp.Equal(value1, value2, cmpopts.IgnoreFields(value1, "ID"))
+}
+
 // for matching a struct except for uuid fields
-type IdMatcher struct {
+type ExceptUuidMatcher struct {
 	value interface{}
 }
 
-func (m IdMatcher) Matches(otherValue interface{}) bool {
+func (m ExceptUuidMatcher) Matches(otherValue interface{}) bool {
 	return cmp.Equal(m.value, otherValue, cmpopts.IgnoreTypes(&uuid.UUID{}))
 }
 
-func (m IdMatcher) String() string {
+func (m ExceptUuidMatcher) String() string {
 	return fmt.Sprintf("matches %v", m.value)
 }
 
-// Returns a matcher that matches the struct except for the uuid fields.
-func EqExceptId(value interface{}) IdMatcher {
-	return IdMatcher{value: value}
+// Returns a matcher that matches the struct except for its uuid fields.
+func EqExceptUUIDs(value interface{}) ExceptUuidMatcher {
+	return ExceptUuidMatcher{value: value}
 }
 
 // for matching a uuid with its binary representation

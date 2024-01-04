@@ -41,7 +41,7 @@ func TestCreateTheatre(t *testing.T) {
 			name:        "CreateAddress internal error",
 			theatreData: sampleTheatreData,
 			setExpectations: func(mockRepo mocks.MockTheaterRepoI, theatreData models.CreateTheatreRequest) {
-				mockRepo.EXPECT().CreateAddress(utils.EqExceptId(samples.GetSampleAddress())).Return(kts_errors.KTS_INTERNAL_ERROR)
+				mockRepo.EXPECT().CreateAddress(utils.EqExceptUUIDs(samples.GetSampleAddress())).Return(kts_errors.KTS_INTERNAL_ERROR)
 			},
 			expectedError: kts_errors.KTS_INTERNAL_ERROR,
 		},
@@ -49,8 +49,8 @@ func TestCreateTheatre(t *testing.T) {
 			name:        "CreateTheatre internal error",
 			theatreData: sampleTheatreData,
 			setExpectations: func(mockRepo mocks.MockTheaterRepoI, theatreData models.CreateTheatreRequest) {
-				mockRepo.EXPECT().CreateAddress(utils.EqExceptId(samples.GetSampleAddress())).Return(nil)
-				mockRepo.EXPECT().CreateTheatre(utils.EqExceptId((samples.GetSampleTheatre()))).Return(kts_errors.KTS_INTERNAL_ERROR)
+				mockRepo.EXPECT().CreateAddress(utils.EqExceptUUIDs(samples.GetSampleAddress())).Return(nil)
+				mockRepo.EXPECT().CreateTheatre(utils.EqExceptUUIDs((samples.GetSampleTheatre()))).Return(kts_errors.KTS_INTERNAL_ERROR)
 			},
 			expectedError: kts_errors.KTS_INTERNAL_ERROR,
 		},
@@ -58,8 +58,8 @@ func TestCreateTheatre(t *testing.T) {
 			name:        "Success",
 			theatreData: sampleTheatreData,
 			setExpectations: func(mockRepo mocks.MockTheaterRepoI, theatreData models.CreateTheatreRequest) {
-				mockRepo.EXPECT().CreateAddress(utils.EqExceptId(samples.GetSampleAddress())).Return(nil)
-				mockRepo.EXPECT().CreateTheatre(utils.EqExceptId((samples.GetSampleTheatre()))).Return(nil)
+				mockRepo.EXPECT().CreateAddress(utils.EqExceptUUIDs(samples.GetSampleAddress())).Return(nil)
+				mockRepo.EXPECT().CreateTheatre(utils.EqExceptUUIDs((samples.GetSampleTheatre()))).Return(nil)
 			},
 			expectedError: nil,
 		},

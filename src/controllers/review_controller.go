@@ -9,7 +9,7 @@ import (
 )
 
 type ReviewControllerI interface {
-	CreateReview(reviewData models.CreateReviewRequest, userId *uuid.UUID) (string, *models.KTSError)
+	CreateReview(reviewData models.CreateReviewRequest, userId *uuid.UUID) (*model.Reviews, string, *models.KTSError)
 	DeleteReview(id *uuid.UUID, userId *uuid.UUID) *models.KTSError
 }
 
@@ -18,16 +18,16 @@ type ReviewController struct {
 	UserRepo   repositories.UserRepositoryI
 }
 
-func (rc ReviewController) CreateReview(reviewData models.CreateReviewRequest, userId *uuid.UUID) (string, *models.KTSError) {
+func (rc ReviewController) CreateReview(reviewData models.CreateReviewRequest, userId *uuid.UUID) (*model.Reviews, string, *models.KTSError) {
 	user, kts_err := rc.UserRepo.GetUserById(userId)
 	if kts_err != nil {
-		return "", kts_err
+		return nil, "", kts_err
 	}
 
 	id := uuid.New()
 	movieId, err := uuid.Parse(reviewData.MovieID)
 	if err != nil {
-		return "", kts_errors.KTS_BAD_REQUEST
+		return nil, "", kts_errors.KTS_BAD_REQUEST
 	}
 
 	review := model.Reviews{
@@ -42,10 +42,10 @@ func (rc ReviewController) CreateReview(reviewData models.CreateReviewRequest, u
 
 	kts_error := rc.ReviewRepo.CreateReview(review)
 	if kts_error != nil {
-		return "", kts_error
+		return nil, "", kts_error
 	}
 
-	return *user.Username, nil
+	return &review, *user.Username, nil
 }
 
 func (rc ReviewController) DeleteReview(id *uuid.UUID, userId *uuid.UUID) *models.KTSError {
