@@ -15,14 +15,14 @@ type GetEventSeatsDTO struct {
 }
 
 type GetSeatsForSeatSelectorDTO struct {
-	ID            *uuid.UUID
-	RowNr         int32
-	ColumnNr      int32
-	Available     bool
-	BookedByOther bool
-	Category      string
-	Type          string
-	Price         int32
+	ID             *uuid.UUID
+	RowNr          int32
+	ColumnNr       int32
+	Available      bool
+	BlockedByOther bool
+	Category       string
+	Type           string
+	Price          int32
 }
 
 type GetEventSeatsResponse struct {

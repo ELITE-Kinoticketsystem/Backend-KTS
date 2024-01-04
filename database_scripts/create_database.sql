@@ -267,7 +267,7 @@ CREATE TABLE event_seats
      id            BINARY(16) DEFAULT (Uuid_to_bin(Uuid(), 1)),
      booked        BOOLEAN NOT NULL,
      blocked_until TIMESTAMP,
-     user_id       BINARY(16) NOT NULL,
+     user_id       BINARY(16),
      seat_id       BINARY(16) NOT NULL,
      event_id      BINARY(16) NOT NULL,
      PRIMARY KEY (id),

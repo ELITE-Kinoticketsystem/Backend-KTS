@@ -36,17 +36,17 @@ func (esc *EventSeatController) GetEventSeats(eventId *uuid.UUID, userId *uuid.U
 
 	for _, seat := range *seats {
 		currentSeat := models.GetSeatsForSeatSelectorDTO{
-			ID:            seat.EventSeat.ID,
-			RowNr:         seat.Seat.RowNr,
-			ColumnNr:      seat.Seat.ColumnNr,
-			Available:     (seat.EventSeat.BlockedUntil == nil || seat.EventSeat.BlockedUntil.Before(time.Now()) || seat.EventSeat.UserID == nil) && !seat.EventSeat.Booked,
-			BookedByOther: (seat.EventSeat.BlockedUntil != nil && (seat.EventSeat.BlockedUntil.After(time.Now()) && (seat.EventSeat.UserID != nil && *seat.EventSeat.UserID != *userId))) && !seat.EventSeat.Booked,
-			Category:      seat.SeatCategory.CategoryName,
-			Type:          seat.Seat.Type,
-			Price:         seat.EventSeatCategory.Price,
+			ID:             seat.EventSeat.ID,
+			RowNr:          seat.Seat.RowNr,
+			ColumnNr:       seat.Seat.ColumnNr,
+			Available:      (seat.EventSeat.BlockedUntil == nil || seat.EventSeat.BlockedUntil.Before(time.Now()) || seat.EventSeat.UserID == nil) && !seat.EventSeat.Booked,
+			BlockedByOther: (seat.EventSeat.BlockedUntil != nil && (seat.EventSeat.BlockedUntil.After(time.Now()) && (seat.EventSeat.UserID != nil && *seat.EventSeat.UserID != *userId))) || seat.EventSeat.Booked,
+			Category:       seat.SeatCategory.CategoryName,
+			Type:           seat.Seat.Type,
+			Price:          seat.EventSeatCategory.Price,
 		}
 
-		if seat.EventSeat.UserID != nil && *seat.EventSeat.UserID == *userId && !seat.EventSeat.Booked &&  seat.EventSeat.BlockedUntil != nil && seat.EventSeat.BlockedUntil.After(time.Now()) {
+		if seat.EventSeat.UserID != nil && *seat.EventSeat.UserID == *userId && !seat.EventSeat.Booked && seat.EventSeat.BlockedUntil != nil && seat.EventSeat.BlockedUntil.After(time.Now()) {
 			currentUserSeats = append(currentUserSeats, currentSeat)
 			if len(currentUserSeats) == 1 {
 				blockedUntil = seat.EventSeat.BlockedUntil
@@ -122,7 +122,7 @@ func (esc *EventSeatController) AreUserSeatsNextToEachOtherWithoutSeat(eventId *
 	var emtpySeatArray []models.GetEventSeatsDTO
 
 	for _, seat := range *seats {
-		if ((seat.EventSeat.UserID != nil && *seat.EventSeat.UserID == *userId) && !seat.EventSeat.Booked) && *seat.EventSeat.ID != *eventSeatId {
+		if ((seat.EventSeat.UserID != nil && *seat.EventSeat.UserID == *userId) && (seat.EventSeat.BlockedUntil != nil && seat.EventSeat.BlockedUntil.After(time.Now())) && !seat.EventSeat.Booked) && *seat.EventSeat.ID != *eventSeatId {
 			if rowNr == -1 {
 				rowNr = seat.Seat.RowNr
 			} else if rowNr != seat.Seat.RowNr {
@@ -177,7 +177,7 @@ func (esc *EventSeatController) AreUserSeatsNextToEachOther(eventId *uuid.UUID, 
 	var emtpySeatArray []models.GetEventSeatsDTO
 
 	for _, seat := range *seats {
-		if ((seat.EventSeat.UserID != nil && *seat.EventSeat.UserID == *userId) && !seat.EventSeat.Booked) || *seat.EventSeat.ID == *eventSeatId {
+		if (((seat.EventSeat.UserID != nil && *seat.EventSeat.UserID == *userId) && (seat.EventSeat.BlockedUntil != nil && seat.EventSeat.BlockedUntil.After(time.Now()))) && !seat.EventSeat.Booked) || *seat.EventSeat.ID == *eventSeatId {
 			if rowNr == -1 {
 				rowNr = seat.Seat.RowNr
 			} else if rowNr != seat.Seat.RowNr {
