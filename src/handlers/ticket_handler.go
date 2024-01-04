@@ -13,7 +13,6 @@ import (
 func GetTicketByIdHandler(ticketController controllers.TicketControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		ticketId, err := uuid.Parse(c.Param("ticketId"))
-
 		if err != nil {
 			utils.HandleErrorAndAbort(c, kts_errors.KTS_BAD_REQUEST)
 			return
