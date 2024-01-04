@@ -3,14 +3,13 @@ package handlers_test
 import (
 	"bytes"
 	"encoding/json"
-	"log"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 	"time"
 
-	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/.gen/KinoTicketSystem/model"
 	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/gen/KinoTicketSystem/model"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/handlers"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/mocks"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
@@ -403,8 +402,6 @@ func TestCreateMovieHandler(t *testing.T) {
 			w := httptest.NewRecorder()
 			gin.SetMode(gin.TestMode)
 			c, _ := gin.CreateTestContext(w)
-
-			log.Print("Body: \t", tc.body)
 
 			mockCtrl := gomock.NewController(t)
 			defer mockCtrl.Finish()

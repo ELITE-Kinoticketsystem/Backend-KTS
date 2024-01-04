@@ -4,9 +4,9 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/.gen/KinoTicketSystem/model"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/controllers"
 	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/gen/KinoTicketSystem/model"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
 	"github.com/gin-gonic/gin"
@@ -56,6 +56,7 @@ func CreateMovie(movieCtrl controllers.MovieControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var movie models.MovieDTOCreate
 		err := c.ShouldBindJSON(&movie)
+		log.Println(movie.GenresID)
 		if err != nil ||
 			utils.ContainsEmptyString(
 				movie.Title,
