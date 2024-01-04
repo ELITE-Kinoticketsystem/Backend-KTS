@@ -1,4 +1,4 @@
-[![Go Coverage](https://github.com/ELITE-Kinoticketsystem/Backend-KTS/wiki/coverage.svg)](https://raw.githack.com/wiki/ELITE-Kinoticketsystem/Backend-KTS/coverage.html)
+[![Go Coverage](https://github.com/ELITE-Kinoticketsystem/Backend-KTS/wiki/coverage.svg)]([https://raw.githack.com/wiki/ELITE-Kinoticketsystem/Backend-KTS/coverage.html](https://github.com/ELITE-Kinoticketsystem/Backend-KTS/wiki/Coverage-Report))
 # Backend-KTS
 
 To get it working you need to have a .env file at the root of the repository with the following variables defined:
