@@ -100,31 +100,31 @@ func TestEventSeatController_GetEventSeats(t *testing.T) {
 
 	seatsSlice := []models.GetSeatsForSeatSelectorDTO{
 		{
-			ID:            eventSeats[0].EventSeat.ID,
-			RowNr:         eventSeats[0].Seat.RowNr,
-			ColumnNr:      eventSeats[0].Seat.ColumnNr,
-			Available:     true,
-			BookedByOther: false,
-			Category:      eventSeats[0].SeatCategory.CategoryName,
-			Price:         eventSeats[0].EventSeatCategory.Price,
+			ID:             eventSeats[0].EventSeat.ID,
+			RowNr:          eventSeats[0].Seat.RowNr,
+			ColumnNr:       eventSeats[0].Seat.ColumnNr,
+			Available:      true,
+			BlockedByOther: false,
+			Category:       eventSeats[0].SeatCategory.CategoryName,
+			Price:          eventSeats[0].EventSeatCategory.Price,
 		},
 		{
-			ID:            eventSeats[1].EventSeat.ID,
-			RowNr:         eventSeats[1].Seat.RowNr,
-			ColumnNr:      eventSeats[1].Seat.ColumnNr,
-			Available:     true,
-			BookedByOther: false,
-			Category:      eventSeats[1].SeatCategory.CategoryName,
-			Price:         eventSeats[1].EventSeatCategory.Price,
+			ID:             eventSeats[1].EventSeat.ID,
+			RowNr:          eventSeats[1].Seat.RowNr,
+			ColumnNr:       eventSeats[1].Seat.ColumnNr,
+			Available:      true,
+			BlockedByOther: false,
+			Category:       eventSeats[1].SeatCategory.CategoryName,
+			Price:          eventSeats[1].EventSeatCategory.Price,
 		},
 		{
-			ID:            eventSeats[2].EventSeat.ID,
-			RowNr:         eventSeats[2].Seat.RowNr,
-			ColumnNr:      eventSeats[2].Seat.ColumnNr,
-			Available:     false,
-			BookedByOther: false,
-			Category:      eventSeats[2].SeatCategory.CategoryName,
-			Price:         eventSeats[2].EventSeatCategory.Price,
+			ID:             eventSeats[2].EventSeat.ID,
+			RowNr:          eventSeats[2].Seat.RowNr,
+			ColumnNr:       eventSeats[2].Seat.ColumnNr,
+			Available:      false,
+			BlockedByOther: false,
+			Category:       eventSeats[2].SeatCategory.CategoryName,
+			Price:          eventSeats[2].EventSeatCategory.Price,
 		},
 	}
 
@@ -383,6 +383,7 @@ func TestEventSeatController_AreUserSeatsNextToEachOther(t *testing.T) {
 }
 
 func GetEventSeatsDTO(eventId *uuid.UUID, userId *uuid.UUID, eventSeatId *uuid.UUID) []models.GetEventSeatsDTO {
+	blockedUntil := time.Now().Add(time.Minute * 5)
 	return []models.GetEventSeatsDTO{
 		{
 			EventSeat: model.EventSeats{
@@ -438,7 +439,7 @@ func GetEventSeatsDTO(eventId *uuid.UUID, userId *uuid.UUID, eventSeatId *uuid.U
 			EventSeat: model.EventSeats{
 				ID:           utils.NewUUID(),
 				Booked:       false,
-				BlockedUntil: nil,
+				BlockedUntil: &blockedUntil,
 				UserID:       userId,
 				EventID:      eventId,
 				SeatID:       utils.NewUUID(),
@@ -463,7 +464,7 @@ func GetEventSeatsDTO(eventId *uuid.UUID, userId *uuid.UUID, eventSeatId *uuid.U
 			EventSeat: model.EventSeats{
 				ID:           utils.NewUUID(),
 				Booked:       false,
-				BlockedUntil: nil,
+				BlockedUntil: &blockedUntil,
 				UserID:       userId,
 				EventID:      eventId,
 				SeatID:       utils.NewUUID(),
@@ -488,7 +489,7 @@ func GetEventSeatsDTO(eventId *uuid.UUID, userId *uuid.UUID, eventSeatId *uuid.U
 			EventSeat: model.EventSeats{
 				ID:           utils.NewUUID(),
 				Booked:       false,
-				BlockedUntil: nil,
+				BlockedUntil: &blockedUntil,
 				UserID:       userId,
 				EventID:      eventId,
 				SeatID:       utils.NewUUID(),
@@ -516,6 +517,8 @@ func TestEventSeatController_AreUserSeatsNextToEachOtherWithoutSeat(t *testing.T
 	userId := utils.NewUUID()
 	eventSeatId := utils.NewUUID()
 
+	blockedUntil := time.Now().Add(time.Minute * 5)
+
 	tests := []struct {
 		name           string
 		expectFuncs    func(mockEventSeatRepo *mocks.MockEventSeatRepoI, t *testing.T)
@@ -525,12 +528,14 @@ func TestEventSeatController_AreUserSeatsNextToEachOtherWithoutSeat(t *testing.T
 		{
 			name: "Are user seats next to each other",
 			expectFuncs: func(mockEventSeatRepo *mocks.MockEventSeatRepoI, t *testing.T) {
+
 				eventSeats := []models.GetEventSeatsDTO{
 					{
 						EventSeat: model.EventSeats{
-							ID:     eventSeatId,
-							UserID: userId,
-							Booked: false,
+							ID:           eventSeatId,
+							UserID:       userId,
+							Booked:       false,
+							BlockedUntil: &blockedUntil,
 						},
 						Seat: model.Seats{
 							RowNr:    1,
@@ -539,9 +544,10 @@ func TestEventSeatController_AreUserSeatsNextToEachOtherWithoutSeat(t *testing.T
 					},
 					{
 						EventSeat: model.EventSeats{
-							ID:     utils.NewUUID(),
-							UserID: userId,
-							Booked: false,
+							ID:           utils.NewUUID(),
+							UserID:       userId,
+							Booked:       false,
+							BlockedUntil: &blockedUntil,
 						},
 						Seat: model.Seats{
 							RowNr:    1,
@@ -550,9 +556,10 @@ func TestEventSeatController_AreUserSeatsNextToEachOtherWithoutSeat(t *testing.T
 					},
 					{
 						EventSeat: model.EventSeats{
-							ID:     utils.NewUUID(),
-							UserID: userId,
-							Booked: false,
+							ID:           utils.NewUUID(),
+							UserID:       userId,
+							Booked:       false,
+							BlockedUntil: &blockedUntil,
 						},
 						Seat: model.Seats{
 							RowNr:    1,
@@ -572,9 +579,10 @@ func TestEventSeatController_AreUserSeatsNextToEachOtherWithoutSeat(t *testing.T
 				eventSeats := []models.GetEventSeatsDTO{
 					{
 						EventSeat: model.EventSeats{
-							ID:     utils.NewUUID(),
-							UserID: userId,
-							Booked: false,
+							ID:           utils.NewUUID(),
+							UserID:       userId,
+							Booked:       false,
+							BlockedUntil: &blockedUntil,
 						},
 						Seat: model.Seats{
 							RowNr:    1,
@@ -583,9 +591,10 @@ func TestEventSeatController_AreUserSeatsNextToEachOtherWithoutSeat(t *testing.T
 					},
 					{
 						EventSeat: model.EventSeats{
-							ID:     eventSeatId,
-							UserID: userId,
-							Booked: false,
+							ID:           eventSeatId,
+							UserID:       userId,
+							Booked:       false,
+							BlockedUntil: &blockedUntil,
 						},
 						Seat: model.Seats{
 							RowNr:    1,
@@ -594,9 +603,10 @@ func TestEventSeatController_AreUserSeatsNextToEachOtherWithoutSeat(t *testing.T
 					},
 					{
 						EventSeat: model.EventSeats{
-							ID:     utils.NewUUID(),
-							UserID: userId,
-							Booked: false,
+							ID:           utils.NewUUID(),
+							UserID:       userId,
+							Booked:       false,
+							BlockedUntil: &blockedUntil,
 						},
 						Seat: model.Seats{
 							RowNr:    1,
@@ -633,9 +643,10 @@ func TestEventSeatController_AreUserSeatsNextToEachOtherWithoutSeat(t *testing.T
 				eventSeats := []models.GetEventSeatsDTO{
 					{
 						EventSeat: model.EventSeats{
-							ID:     utils.NewUUID(),
-							UserID: userId,
-							Booked: false,
+							ID:           utils.NewUUID(),
+							UserID:       userId,
+							Booked:       false,
+							BlockedUntil: &blockedUntil,
 						},
 						Seat: model.Seats{
 							RowNr:    1,
@@ -644,9 +655,10 @@ func TestEventSeatController_AreUserSeatsNextToEachOtherWithoutSeat(t *testing.T
 					},
 					{
 						EventSeat: model.EventSeats{
-							ID:     eventSeatId,
-							UserID: userId,
-							Booked: false,
+							ID:           eventSeatId,
+							UserID:       userId,
+							Booked:       false,
+							BlockedUntil: &blockedUntil,
 						},
 						Seat: model.Seats{
 							RowNr:    1,
@@ -655,9 +667,10 @@ func TestEventSeatController_AreUserSeatsNextToEachOtherWithoutSeat(t *testing.T
 					},
 					{
 						EventSeat: model.EventSeats{
-							ID:     utils.NewUUID(),
-							UserID: userId,
-							Booked: false,
+							ID:           utils.NewUUID(),
+							UserID:       userId,
+							Booked:       false,
+							BlockedUntil: &blockedUntil,
 						},
 						Seat: model.Seats{
 							RowNr:    2,
@@ -677,9 +690,10 @@ func TestEventSeatController_AreUserSeatsNextToEachOtherWithoutSeat(t *testing.T
 				eventSeats := []models.GetEventSeatsDTO{
 					{
 						EventSeat: model.EventSeats{
-							ID:     utils.NewUUID(),
-							UserID: userId,
-							Booked: false,
+							ID:           utils.NewUUID(),
+							UserID:       userId,
+							Booked:       false,
+							BlockedUntil: &blockedUntil,
 						},
 						Seat: model.Seats{
 							RowNr:    1,
@@ -688,9 +702,10 @@ func TestEventSeatController_AreUserSeatsNextToEachOtherWithoutSeat(t *testing.T
 					},
 					{
 						EventSeat: model.EventSeats{
-							ID:     eventSeatId,
-							UserID: userId,
-							Booked: false,
+							ID:           eventSeatId,
+							UserID:       userId,
+							Booked:       false,
+							BlockedUntil: &blockedUntil,
 						},
 						Seat: model.Seats{
 							RowNr:    1,
@@ -700,9 +715,10 @@ func TestEventSeatController_AreUserSeatsNextToEachOtherWithoutSeat(t *testing.T
 					},
 					{
 						EventSeat: model.EventSeats{
-							ID:     utils.NewUUID(),
-							UserID: userId,
-							Booked: false,
+							ID:           utils.NewUUID(),
+							UserID:       userId,
+							Booked:       false,
+							BlockedUntil: &blockedUntil,
 						},
 						Seat: model.Seats{
 							RowNr:    1,
@@ -722,9 +738,10 @@ func TestEventSeatController_AreUserSeatsNextToEachOtherWithoutSeat(t *testing.T
 				eventSeats := []models.GetEventSeatsDTO{
 					{
 						EventSeat: model.EventSeats{
-							ID:     eventSeatId,
-							UserID: userId,
-							Booked: false,
+							ID:           eventSeatId,
+							UserID:       userId,
+							Booked:       false,
+							BlockedUntil: &blockedUntil,
 						},
 						Seat: model.Seats{
 							RowNr:    1,
