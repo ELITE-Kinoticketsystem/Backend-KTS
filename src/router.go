@@ -18,17 +18,17 @@ import (
 )
 
 type Controllers struct {
-	UserController      controllers.UserControllerI
-	EventController     controllers.EventControllerI
-	ActorController     controllers.ActorControllerI
-	MovieController     controllers.MovieControllerI
-	EventSeatController controllers.EventSeatControllerI
-	GenreController     controllers.GenreControllerI
-	PriceCategories     controllers.PriceCategoryControllerI
-	ReviewController    controllers.ReviewControllerI
-	OrderController     controllers.OrderControllerI
-	TheatreController   controllers.TheatreControllerI
-	TicketController    controllers.TicketControllerI
+	UserController            controllers.UserControllerI
+	EventController           controllers.EventControllerI
+	ActorController           controllers.ActorControllerI
+	MovieController           controllers.MovieControllerI
+	EventSeatController       controllers.EventSeatControllerI
+	GenreController           controllers.GenreControllerI
+	PriceCategoriesController controllers.PriceCategoryControllerI
+	ReviewController          controllers.ReviewControllerI
+	OrderController           controllers.OrderControllerI
+	TheatreController         controllers.TheatreControllerI
+	TicketController          controllers.TicketControllerI
 }
 
 func createRouter(dbConnection *sql.DB) *gin.Engine {
@@ -118,7 +118,7 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 		ActorController: &controllers.ActorController{
 			ActorRepo: actorRepo,
 		},
-		PriceCategories: &controllers.PriceCategoryController{
+		PriceCategoriesController: &controllers.PriceCategoryController{
 			PriceCategoryRepository: priceCategoryRepo,
 		},
 		EventController: &controllers.EventController{
@@ -174,11 +174,11 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 	securedRoutes.Handle(http.MethodPost, "/actors", handlers.CreateActorHandler(controller.ActorController))
 
 	// Price Categories
-	publicRoutes.Handle(http.MethodGet, "/price-categories/:id", handlers.GetPriceCategoryByIdHandler(controller.PriceCategories))
-	publicRoutes.Handle(http.MethodGet, "/price-categories", handlers.GetPriceCategoriesHandler(controller.PriceCategories))
-	securedRoutes.Handle(http.MethodPost, "/price-categories", handlers.CreatePriceCategoryHandler(controller.PriceCategories))
-	securedRoutes.Handle(http.MethodPut, "/price-categories/:id", handlers.UpdatePriceCategoryHandler(controller.PriceCategories))
-	securedRoutes.Handle(http.MethodDelete, "/price-categories/:id", handlers.DeletePriceCategoryHandler(controller.PriceCategories))
+	publicRoutes.Handle(http.MethodGet, "/price-categories/:id", handlers.GetPriceCategoryByIdHandler(controller.PriceCategoriesController))
+	publicRoutes.Handle(http.MethodGet, "/price-categories", handlers.GetPriceCategoriesHandler(controller.PriceCategoriesController))
+	securedRoutes.Handle(http.MethodPost, "/price-categories", handlers.CreatePriceCategoryHandler(controller.PriceCategoriesController))
+	securedRoutes.Handle(http.MethodPut, "/price-categories/:id", handlers.UpdatePriceCategoryHandler(controller.PriceCategoriesController))
+	securedRoutes.Handle(http.MethodDelete, "/price-categories/:id", handlers.DeletePriceCategoryHandler(controller.PriceCategoriesController))
 
 	// event seats
 	securedRoutes.Handle(http.MethodGet, "/events/:eventId/seats", handlers.GetEventSeatsHandler(controller.EventSeatController))
