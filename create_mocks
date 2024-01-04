@@ -5,6 +5,7 @@
 ~/go/bin/mockgen -source=./src/controllers/review_controller.go -destination=./src/mocks/review_controller_mock.go -package=mocks
 ~/go/bin/mockgen -source=./src/controllers/eventseats_controller.go -destination=./src/mocks/eventseats_controller_mock.go -package=mocks
 ~/go/bin/mockgen -source=./src/controllers/event_controller.go -destination=./src/mocks/event_controller_mock.go -package=mocks
+~/go/bin/mockgen -source=./src/controllers/ticket_controller.go -destination=./src/mocks/ticket_controller_mock.go -package=mocks
 
 # repositories
 ~/go/bin/mockgen -source=./src/repositories/user_repo.go -destination=./src/mocks/user_repo_mock.go -package=mocks
@@ -14,11 +15,7 @@
 ~/go/bin/mockgen -source=./src/repositories/movie_genres_repository.go -destination=./src/mocks/movie_genres_repository_mock.go -package=mocks
 ~/go/bin/mockgen -source=./src/repositories/movie_producer_repository.go -destination=./src/mocks/movie_producer_repository_mock.go -package=mocks
 ~/go/bin/mockgen -source=./src/repositories/movie_actor_repository.go -destination=./src/mocks/movie_actor_repository_mock.go -package=mocks
+~/go/bin/mockgen -source=./src/controllers/theatre_controller.go -destination=./src/mocks/theatre_controller_mock.go -package=mocks
 ~/go/bin/mockgen -source=./src/repositories/theatre_repository.go -destination=./src/mocks/theatre_repository_mock.go -package=mocks
 ~/go/bin/mockgen -source=./src/repositories/price_category_repository.go -destination=./src/mocks/price_category_repository_mock.go -package=mocks
-~/go/bin/mockgen -source=./src/repositories/eventseat_repository.go -destination=./src/mocks/eventseat_repository_mock.go -package=mocks
-~/go/bin/mockgen -source=./src/repositories/review_repository.go -destination=./src/mocks/review_repository_mock.go -package=mocks
-~/go/bin/mockgen -source=./src/repositories/order_repository.go -destination=./src/mocks/order_repository_mock.go -package=mocks
 ~/go/bin/mockgen -source=./src/repositories/ticket_repository.go -destination=./src/mocks/ticket_repository_mock.go -package=mocks
-~/go/bin/mockgen -source=./src/controllers/order_controller.go -destination=./src/mocks/order_controller_mock.go -package=mocks
-~/go/bin/mockgen -source=./src/repositories/event_repository.go -destination=./src/mocks/event_repository_mock.go -package=mocks

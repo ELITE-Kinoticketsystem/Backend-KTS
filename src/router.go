@@ -28,6 +28,7 @@ type Controllers struct {
 	ReviewController    controllers.ReviewControllerI
 	OrderController     controllers.OrderControllerI
 	TheatreController   controllers.TheatreControllerI
+	TicketController    controllers.TicketControllerI
 }
 
 func createRouter(dbConnection *sql.DB) *gin.Engine {
@@ -96,6 +97,10 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 		DatabaseManager: databaseManager,
 	}
 
+	ticketRepo := &repositories.TicketRepository{
+		DatabaseManager: databaseManager,
+	}
+
 	// Create controllers
 	controller := Controllers{
 		UserController: &controllers.UserController{
@@ -132,6 +137,9 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 		},
 		TheatreController: &controllers.TheatreController{
 			TheatreRepo: theatreRepo,
+		},
+		TicketController: &controllers.TicketController{
+			TicketRepo: ticketRepo,
 		},
 	}
 
@@ -191,6 +199,10 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 	// order and reservation
 	router.Handle(http.MethodPost, "/events/:eventId/reserve", handlers.CreateOrderHandler(controller.OrderController, true))
 	router.Handle(http.MethodPost, "/events/:eventId/book", handlers.CreateOrderHandler(controller.OrderController, false))
+
+	// tickets
+	publicRoutes.Handle(http.MethodGet, "/tickets/:ticketId", handlers.GetTicketByIdHandler(controller.TicketController))
+	publicRoutes.Handle(http.MethodPatch, "/tickets/:ticketId", handlers.ValidateTicketHandler(controller.TicketController))
 
 	// theatres
 	securedRoutes.Handle(http.MethodPost, "/theatres", handlers.CreateTheatre(controller.TheatreController))

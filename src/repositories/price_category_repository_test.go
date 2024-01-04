@@ -5,8 +5,8 @@ import (
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/.gen/KinoTicketSystem/model"
 	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/gen/KinoTicketSystem/model"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/managers"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
@@ -287,7 +287,7 @@ func TestUpdatePriceCategory(t *testing.T) {
 		{
 			name: "Error while updating PriceCategory",
 			setExpectations: func(mock sqlmock.Sqlmock, priceCategory *model.PriceCategories) {
-				mock.ExpectExec(query).WithArgs(sqlmock.AnyArg(),  priceCategory.CategoryName, priceCategory.Price, utils.EqUUID(priceCategory.ID)).WillReturnError(sqlmock.ErrCancelled)
+				mock.ExpectExec(query).WithArgs(sqlmock.AnyArg(), priceCategory.CategoryName, priceCategory.Price, utils.EqUUID(priceCategory.ID)).WillReturnError(sqlmock.ErrCancelled)
 			},
 			expectedPriceCategoryID: false,
 			expectedError:           kts_errors.KTS_INTERNAL_ERROR,
@@ -295,7 +295,7 @@ func TestUpdatePriceCategory(t *testing.T) {
 		{
 			name: "Error while converting rows affected",
 			setExpectations: func(mock sqlmock.Sqlmock, priceCategory *model.PriceCategories) {
-				mock.ExpectExec(query).WithArgs(sqlmock.AnyArg(),  priceCategory.CategoryName, priceCategory.Price, utils.EqUUID(priceCategory.ID)).WillReturnResult(
+				mock.ExpectExec(query).WithArgs(sqlmock.AnyArg(), priceCategory.CategoryName, priceCategory.Price, utils.EqUUID(priceCategory.ID)).WillReturnResult(
 					sqlmock.NewErrorResult(errors.New("rows affected conversion did not work")),
 				)
 			},
@@ -305,7 +305,7 @@ func TestUpdatePriceCategory(t *testing.T) {
 		{
 			name: "PriceCategory not found",
 			setExpectations: func(mock sqlmock.Sqlmock, priceCategory *model.PriceCategories) {
-				mock.ExpectExec(query).WithArgs(sqlmock.AnyArg(),  priceCategory.CategoryName, priceCategory.Price, utils.EqUUID(priceCategory.ID)).WillReturnResult(sqlmock.NewResult(1, 0))
+				mock.ExpectExec(query).WithArgs(sqlmock.AnyArg(), priceCategory.CategoryName, priceCategory.Price, utils.EqUUID(priceCategory.ID)).WillReturnResult(sqlmock.NewResult(1, 0))
 			},
 			expectedPriceCategoryID: false,
 			expectedError:           kts_errors.KTS_NOT_FOUND,
