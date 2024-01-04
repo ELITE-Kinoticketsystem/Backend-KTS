@@ -10,11 +10,6 @@ import (
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/middlewares"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/repositories"
 	"github.com/gin-gonic/gin"
-
-	swaggerFiles "github.com/swaggo/files"
-	ginSwagger "github.com/swaggo/gin-swagger"
-
-	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/docs"
 )
 
 type Controllers struct {
@@ -28,6 +23,7 @@ type Controllers struct {
 	OrderController           controllers.OrderControllerI
 	PriceCategoriesController controllers.PriceCategoryControllerI
 	TicketController          controllers.TicketControllerI
+	TheatreController         controllers.TheatreControllerI
 }
 
 func createRouter(dbConnection *sql.DB) *gin.Engine {
