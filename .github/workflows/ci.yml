@@ -2,35 +2,47 @@ name: Continuous Integration
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
+permissions: read-all
 jobs:
-
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-    - name: Set up Go
-      uses: actions/setup-go@v4
-      with:
-        go-version: 1.21.5
-      
-    - name: Create go.mod
-      run: echo "module github.com/ELITE-Kinoticketsystem/Backend-KTS" > go.mod && go mod tidy && go get -v ./...
-    
-    
-    
-    - name: Install Staticcheck
-      run: go install honnef.co/go/tools/cmd/staticcheck@latest
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: 1.21.5
 
-    - name: Build project and verify dependencies
-      run: go build -v ./... && go mod verify
+      - name: Create go.mod
+        run: echo "module github.com/ELITE-Kinoticketsystem/Backend-KTS" > go.mod && go mod tidy && go get -v ./...
 
-    - name: Test
-      run: go test -v ./...
+      - name: Install Staticcheck
+        run: go install honnef.co/go/tools/cmd/staticcheck@latest
 
-    - name: Verify Code Quality
-      run: go vet ./... && staticcheck ./...
+      - name: Build project and verify dependencies
+        run: go build -v ./... && go mod verify
+
+      - name: Test
+        run: go test -v ./...
+
+      - name: Verify Code Quality
+        run: go vet ./... && staticcheck ./...
+
+      - name: Test
+        run: go test -v ./...
+
+      - name: Update coverage report
+        uses: ncruces/go-coverage-report@v0
+        with:
+          report: true
+          chart: true
+          amend: true
+        if: |
+          matrix.os == 'ubuntu-latest' &&
+          github.event_name == 'push'
+        continue-on-error: true
