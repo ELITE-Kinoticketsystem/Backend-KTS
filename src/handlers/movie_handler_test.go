@@ -3,7 +3,6 @@ package handlers_test
 import (
 	"bytes"
 	"encoding/json"
-	"log"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -403,8 +402,6 @@ func TestCreateMovieHandler(t *testing.T) {
 			w := httptest.NewRecorder()
 			gin.SetMode(gin.TestMode)
 			c, _ := gin.CreateTestContext(w)
-
-			log.Print("Body: \t", tc.body)
 
 			mockCtrl := gomock.NewController(t)
 			defer mockCtrl.Finish()

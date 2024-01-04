@@ -45,6 +45,7 @@ func CreateMovie(movieCtrl controllers.MovieControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var movie models.MovieDTOCreate
 		err := c.ShouldBindJSON(&movie)
+		log.Println(movie.GenresID)
 		if err != nil ||
 			utils.ContainsEmptyString(
 				movie.Title,
