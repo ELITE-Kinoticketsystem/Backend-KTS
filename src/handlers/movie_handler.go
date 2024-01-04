@@ -93,6 +93,15 @@ func CreateMovie(movieCtrl controllers.MovieControllerI) gin.HandlerFunc {
 	}
 }
 
+// @Summary Update Movie
+// @Description Update Movie
+// @Tags Movies
+// @Accept  json
+// @Produce  json
+// @Param id path string true "Movie ID"
+// @Success 200 {object} model.Movies
+// @Failure 500 {object} models.KTSErrorMessage
+// @Router /movies/{id} [put]
 func UpdateMovie(movieCtrl controllers.MovieControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var movie *model.Movies
@@ -114,6 +123,15 @@ func UpdateMovie(movieCtrl controllers.MovieControllerI) gin.HandlerFunc {
 	}
 }
 
+// @Summary Delete Movie
+// @Description Delete Movie
+// @Tags Movies
+// @Accept  json
+// @Produce  json
+// @Param id path string true "Movie ID"
+// @Success 200 {object} models.DeleteResponse
+// @Failure 500 {object} models.KTSErrorMessage
+// @Router /movies/{id} [delete]
 func DeleteMovie(movieCtrl controllers.MovieControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		movieId, err := uuid.Parse(c.Param("movieId"))
@@ -128,7 +146,9 @@ func DeleteMovie(movieCtrl controllers.MovieControllerI) gin.HandlerFunc {
 			utils.HandleErrorAndAbort(c, kts_err)
 			return
 		}
-		c.JSON(http.StatusOK, gin.H{"message": "Movie deleted"})
+		c.JSON(http.StatusOK, models.DeleteResponse{
+			Message: "Movie deleted",
+		})
 	}
 }
 
@@ -163,11 +183,6 @@ func GetMoviesWithGenres(movieCtrl controllers.MovieControllerI) gin.HandlerFunc
 func GetMovieById(movieCtrl controllers.MovieControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		movieId, err := uuid.Parse(c.Param("id"))
-		if err != nil {
-			utils.HandleErrorAndAbort(c, kts_errors.KTS_BAD_REQUEST)
-			return
-		}
-
 		if err != nil {
 			utils.HandleErrorAndAbort(c, kts_errors.KTS_BAD_REQUEST)
 			return
