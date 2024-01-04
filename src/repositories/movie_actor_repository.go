@@ -73,7 +73,7 @@ func (mar *MovieActorRepository) RemoveMovieActor(movieId *uuid.UUID, actorId *u
 }
 
 func (mar *MovieActorRepository) RemoveAllActorCombinationWithMovie(movieId *uuid.UUID) *models.KTSError {
-	deleteQuery := table.MovieGenres.DELETE().WHERE(
+	deleteQuery := table.MovieActors.DELETE().WHERE(
 		table.MovieActors.MovieID.EQ(utils.MysqlUuid(movieId)),
 	)
 

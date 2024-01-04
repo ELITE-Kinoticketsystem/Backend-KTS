@@ -26,7 +26,6 @@ func GetMovies(movieCtrl controllers.MovieControllerI) gin.HandlerFunc {
 		movies, kts_err := movieCtrl.GetMovies()
 		if kts_err != nil {
 			utils.HandleErrorAndAbort(c, kts_err)
-			utils.HandleErrorAndAbort(c, kts_err)
 			return
 		}
 		c.JSON(http.StatusOK, movies)
@@ -174,11 +173,11 @@ func GetMovieById(movieCtrl controllers.MovieControllerI) gin.HandlerFunc {
 			return
 		}
 
-		kts_err := movieCtrl.DeleteMovie(&movieId)
+		movie, kts_err := movieCtrl.GetMovieById(&movieId)
 		if kts_err != nil {
 			utils.HandleErrorAndAbort(c, kts_err)
 			return
 		}
-		c.JSON(http.StatusOK, gin.H{"message": "Movie deleted"})
+		c.JSON(http.StatusOK, movie)
 	}
 }
