@@ -10,24 +10,20 @@ import (
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/middlewares"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/repositories"
 	"github.com/gin-gonic/gin"
-
-	swaggerFiles "github.com/swaggo/files"
-	ginSwagger "github.com/swaggo/gin-swagger"
-
-	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/docs"
 )
 
 type Controllers struct {
-	UserController      controllers.UserControllerI
-	EventController     controllers.EventControllerI
-	ActorController     controllers.ActorControllerI
-	MovieController     controllers.MovieControllerI
-	EventSeatController controllers.EventSeatControllerI
-	GenreController     controllers.GenreControllerI
-	PriceCategories     controllers.PriceCategoryControllerI
-	ReviewController    controllers.ReviewControllerI
-	OrderController     controllers.OrderControllerI
-	TheatreController   controllers.TheatreControllerI
+	UserController            controllers.UserControllerI
+	EventController           controllers.EventControllerI
+	ActorController           controllers.ActorControllerI
+	MovieController           controllers.MovieControllerI
+	EventSeatController       controllers.EventSeatControllerI
+	GenreController           controllers.GenreControllerI
+	ReviewController          controllers.ReviewControllerI
+	OrderController           controllers.OrderControllerI
+	PriceCategoriesController controllers.PriceCategoryControllerI
+	TicketController          controllers.TicketControllerI
+	TheatreController         controllers.TheatreControllerI
 }
 
 func createRouter(dbConnection *sql.DB) *gin.Engine {
@@ -96,6 +92,10 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 		DatabaseManager: databaseManager,
 	}
 
+	ticketRepo := &repositories.TicketRepository{
+		DatabaseManager: databaseManager,
+	}
+
 	// Create controllers
 	controller := Controllers{
 		UserController: &controllers.UserController{
@@ -113,7 +113,7 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 		ActorController: &controllers.ActorController{
 			ActorRepo: actorRepo,
 		},
-		PriceCategories: &controllers.PriceCategoryController{
+		PriceCategoriesController: &controllers.PriceCategoryController{
 			PriceCategoryRepository: priceCategoryRepo,
 		},
 		EventController: &controllers.EventController{
@@ -129,9 +129,13 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 		},
 		ReviewController: &controllers.ReviewController{
 			ReviewRepo: reviewsRepo,
+			UserRepo:   userRepo,
 		},
 		TheatreController: &controllers.TheatreController{
 			TheatreRepo: theatreRepo,
+		},
+		TicketController: &controllers.TicketController{
+			TicketRepo: ticketRepo,
 		},
 	}
 
@@ -170,11 +174,11 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 	securedRoutes.Handle(http.MethodPost, "/actors", handlers.CreateActorHandler(controller.ActorController))
 
 	// Price Categories
-	publicRoutes.Handle(http.MethodGet, "/price-categories/:id", handlers.GetPriceCategoryByIdHandler(controller.PriceCategories))
-	publicRoutes.Handle(http.MethodGet, "/price-categories", handlers.GetPriceCategoriesHandler(controller.PriceCategories))
-	securedRoutes.Handle(http.MethodPost, "/price-categories", handlers.CreatePriceCategoryHandler(controller.PriceCategories))
-	securedRoutes.Handle(http.MethodPut, "/price-categories/:id", handlers.UpdatePriceCategoryHandler(controller.PriceCategories))
-	securedRoutes.Handle(http.MethodDelete, "/price-categories/:id", handlers.DeletePriceCategoryHandler(controller.PriceCategories))
+	publicRoutes.Handle(http.MethodGet, "/price-categories/:id", handlers.GetPriceCategoryByIdHandler(controller.PriceCategoriesController))
+	publicRoutes.Handle(http.MethodGet, "/price-categories", handlers.GetPriceCategoriesHandler(controller.PriceCategoriesController))
+	securedRoutes.Handle(http.MethodPost, "/price-categories", handlers.CreatePriceCategoryHandler(controller.PriceCategoriesController))
+	securedRoutes.Handle(http.MethodPut, "/price-categories/:id", handlers.UpdatePriceCategoryHandler(controller.PriceCategoriesController))
+	securedRoutes.Handle(http.MethodDelete, "/price-categories/:id", handlers.DeletePriceCategoryHandler(controller.PriceCategoriesController))
 
 	// event seats
 	securedRoutes.Handle(http.MethodGet, "/events/:eventId/seats", handlers.GetEventSeatsHandler(controller.EventSeatController))
@@ -189,12 +193,16 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 	publicRoutes.Handle(http.MethodGet, "/events/:eventId", handlers.GetEventByIdHandler(controller.EventController))
 
 	// reviews
-	publicRoutes.Handle(http.MethodPost, "/reviews", handlers.CreateReviewHandler(controller.ReviewController))
-	publicRoutes.Handle(http.MethodDelete, "/reviews/:id", handlers.DeleteReviewHandler(controller.ReviewController))
+	securedRoutes.Handle(http.MethodPost, "/reviews", handlers.CreateReviewHandler(controller.ReviewController))
+	securedRoutes.Handle(http.MethodDelete, "/reviews/:id", handlers.DeleteReviewHandler(controller.ReviewController))
 
 	// order and reservation
 	router.Handle(http.MethodPost, "/events/:eventId/reserve", handlers.CreateOrderHandler(controller.OrderController, true))
 	router.Handle(http.MethodPost, "/events/:eventId/book", handlers.CreateOrderHandler(controller.OrderController, false))
+
+	// tickets
+	publicRoutes.Handle(http.MethodGet, "/tickets/:ticketId", handlers.GetTicketByIdHandler(controller.TicketController))
+	publicRoutes.Handle(http.MethodPatch, "/tickets/:ticketId", handlers.ValidateTicketHandler(controller.TicketController))
 
 	// theatres
 	securedRoutes.Handle(http.MethodPost, "/theatres", handlers.CreateTheatre(controller.TheatreController))
@@ -202,13 +210,9 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 	router.Handle(http.MethodGet, "/orders/:orderId", handlers.GetOrderByIdHandler(controller.OrderController))
 	router.Handle(http.MethodGet, "/orders", handlers.GetOrdersHandler(controller.OrderController))
 
-	// swagger
-	docs.SwaggerInfo.Title = "Kino-Ticket-System API"
-	docs.SwaggerInfo.Description = "This is the API for the Kino-Ticket-System"
-	docs.SwaggerInfo.Version = "1.0"
-	docs.SwaggerInfo.Schemes = []string{"http", "https"}
-
-	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	// Ticket
+	router.Handle(http.MethodGet, "/ticket/:ticketId", handlers.GetTicketByIdHandler(controller.TicketController))
+	router.Handle(http.MethodPut, "/ticket/:ticketId", handlers.ValidateTicketHandler(controller.TicketController))
 
 	return router
 }

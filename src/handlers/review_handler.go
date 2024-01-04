@@ -24,18 +24,24 @@ func CreateReviewHandler(reviewCtrl controllers.ReviewControllerI) gin.HandlerFu
 	return func(c *gin.Context) {
 		var reviewData models.CreateReviewRequest
 		err := c.ShouldBindJSON(&reviewData)
-		if err != nil || utils.ContainsEmptyString(reviewData.Comment, reviewData.UserID, reviewData.MovieID) {
+		if err != nil || utils.ContainsEmptyString(reviewData.Comment, reviewData.MovieID) {
 			utils.HandleErrorAndAbort(c, kts_errors.KTS_BAD_REQUEST)
 			return
 		}
 
-		reviewId, kts_err := reviewCtrl.CreateReview(reviewData)
+		userId, ok := c.Request.Context().Value(models.ContextKeyUserID).(*uuid.UUID)
+		if !ok {
+			utils.HandleErrorAndAbort(c, kts_errors.KTS_UNAUTHORIZED)
+			return
+		}
+
+		username, kts_err := reviewCtrl.CreateReview(reviewData, userId)
 		if kts_err != nil {
 			utils.HandleErrorAndAbort(c, kts_err)
 			return
 		}
 
-		c.JSON(http.StatusCreated, reviewId)
+		c.JSON(http.StatusCreated, gin.H{"username": username})
 	}
 }
 
@@ -56,7 +62,13 @@ func DeleteReviewHandler(reviewCtrl controllers.ReviewControllerI) gin.HandlerFu
 			return
 		}
 
-		kts_err := reviewCtrl.DeleteReview(&id)
+		userId, ok := c.Request.Context().Value(models.ContextKeyUserID).(*uuid.UUID)
+		if !ok {
+			utils.HandleErrorAndAbort(c, kts_errors.KTS_UNAUTHORIZED)
+			return
+		}
+
+		kts_err := reviewCtrl.DeleteReview(&id, userId)
 		if kts_err != nil {
 			utils.HandleErrorAndAbort(c, kts_err)
 			return

@@ -11,9 +11,11 @@ import (
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
 	"github.com/go-jet/jet/v2/mysql"
+	"github.com/google/uuid"
 )
 
 type UserRepositoryI interface {
+	GetUserById(id *uuid.UUID) (*model.Users, *models.KTSError)
 	GetUserByUsername(username string) (*model.Users, *models.KTSError)
 	CreateUser(user model.Users) *models.KTSError
 	CheckIfUsernameExists(username string) *models.KTSError
@@ -22,6 +24,31 @@ type UserRepositoryI interface {
 
 type UserRepository struct {
 	DatabaseManager managers.DatabaseManagerI
+}
+
+func (ur *UserRepository) GetUserById(id *uuid.UUID) (*model.Users, *models.KTSError) {
+	var user model.Users
+	stmt := mysql.SELECT(
+		table.Users.ID,
+		table.Users.Username,
+		table.Users.Email,
+		table.Users.Password,
+		table.Users.Firstname,
+		table.Users.Lastname,
+	).FROM(
+		table.Users,
+	).WHERE(
+		table.Users.ID.EQ(utils.MysqlUuid(id)),
+	)
+	err := stmt.Query(ur.DatabaseManager.GetDatabaseConnection(), &user)
+	if err != nil {
+		if err.Error() == "jet: sql: no rows in result set" {
+			return nil, kts_errors.KTS_USER_NOT_FOUND
+		}
+		return nil, kts_errors.KTS_INTERNAL_ERROR
+	}
+
+	return &user, nil
 }
 
 func (ur *UserRepository) GetUserByUsername(username string) (*model.Users, *models.KTSError) {

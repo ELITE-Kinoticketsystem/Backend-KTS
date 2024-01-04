@@ -19,7 +19,7 @@ type OrderController struct {
 	OrderRepo         repositories.OrderRepoI
 	EventSeatRepo     repositories.EventSeatRepoI
 	PriceCategoryRepo repositories.PriceCategoryRepositoryI
-	TicketRepo        repositories.TicketRepoI
+	TicketRepo        repositories.TicketRepositoryI
 }
 
 func (oc *OrderController) CreateOrder(createOrderDTO models.CreateOrderDTO, eventId *uuid.UUID, userId *uuid.UUID, isReservation bool) (*uuid.UUID, *models.KTSError) {

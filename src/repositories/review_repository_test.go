@@ -1,6 +1,7 @@
 package repositories
 
 import (
+	"database/sql"
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
@@ -136,6 +137,113 @@ func TestCreateReview(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestGetReview(t *testing.T) {
+	review := samples.GetSampleReview()
+	query := "SELECT reviews.id AS \"reviews.id\",\n" +
+		"reviews.rating AS \"reviews.rating\",\n" +
+		"reviews.comment AS \"reviews.comment\",\n" +
+		"reviews.datetime AS \"reviews.datetime\",\n" +
+		"reviews.is_spoiler AS \"reviews.is_spoiler\",\n" +
+		"reviews.user_id AS \"reviews.user_id\",\n" +
+		"reviews.movie_id AS \"reviews.movie_id\"\n" +
+		"FROM `KinoTicketSystem`.reviews\n" +
+		"WHERE reviews.id = ?;"
+	testCases := []struct {
+		name            string
+		id              uuid.UUID
+		setExpectations func(mock sqlmock.Sqlmock, id uuid.UUID)
+		expectedReview  *model.Reviews
+		expectedError   *models.KTSError
+	}{
+		{
+			name: "Success",
+			id:   uuid.New(),
+			setExpectations: func(mock sqlmock.Sqlmock, id uuid.UUID) {
+				mock.ExpectQuery(
+					query,
+				).WithArgs(
+					utils.EqUUID(&id),
+				).WillReturnRows(
+					sqlmock.NewRows([]string{"reviews.id", "reviews.rating", "reviews.comment", "reviews.datetime", "reviews.is_spoiler", "reviews.user_id", "reviews.movie_id"}).
+						AddRow(
+							review.ID,
+							review.Rating,
+							review.Comment,
+							review.Datetime,
+							review.IsSpoiler,
+							review.UserID,
+							review.MovieID,
+						),
+				)
+			},
+			expectedReview: &review,
+			expectedError:  nil,
+		},
+		{
+			name: "Internal error",
+			id:   uuid.New(),
+			setExpectations: func(mock sqlmock.Sqlmock, id uuid.UUID) {
+				mock.ExpectQuery(
+					query,
+				).WithArgs(
+					utils.EqUUID(&id),
+				).WillReturnError(
+					sqlmock.ErrCancelled,
+				)
+			},
+			expectedReview: nil,
+			expectedError:  kts_errors.KTS_INTERNAL_ERROR,
+		},
+		{
+			name: "Not found",
+			id:   uuid.New(),
+			setExpectations: func(mock sqlmock.Sqlmock, id uuid.UUID) {
+				mock.ExpectQuery(
+					query,
+				).WithArgs(
+					utils.EqUUID(&id),
+				).WillReturnError(
+					sql.ErrNoRows,
+				)
+			},
+			expectedReview: nil,
+			expectedError:  kts_errors.KTS_NOT_FOUND,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			// GIVEN
+			// create mock db manager
+			db, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
+			if err != nil {
+				t.Fatalf("error while setting up mock database: %s", err)
+			}
+			reviewRepo := ReviewRepository{
+				DatabaseManager: &managers.DatabaseManager{
+					Connection: db,
+				},
+			}
+
+			// define expectations
+			tc.setExpectations(mock, tc.id)
+
+			// WHEN
+			// call GetReviewById with id
+			review, kts_err := reviewRepo.GetReviewById(&tc.id)
+
+			// THEN
+			// check expected error and expectations
+			assert.Equal(t, tc.expectedError, kts_err)
+			assert.Equal(t, tc.expectedReview, review)
+			if err = mock.ExpectationsWereMet(); err != nil {
+				t.Errorf("There were unfulfilled expectations: %s", err)
+			}
+		})
+	}
+
 }
 
 func TestDeleteReview(t *testing.T) {
