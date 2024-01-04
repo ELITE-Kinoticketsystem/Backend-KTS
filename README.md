@@ -1,3 +1,4 @@
+[![Go Coverage](https://github.com/USER/REPO/wiki/coverage.svg)](https://raw.githack.com/wiki/USER/REPO/coverage.html)
 # Backend-KTS
 
 To get it working you need to have a .env file at the root of the repository with the following variables defined:
