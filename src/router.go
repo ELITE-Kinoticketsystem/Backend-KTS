@@ -146,15 +146,17 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 
 	securedRoutes.Handle(http.MethodGet, "/test", handlers.TestJwtToken)
 
-	// movies
+	// Moive
 	publicRoutes.Handle(http.MethodGet, "/movies", handlers.GetMovies(controller.MovieController))
 	publicRoutes.Handle(http.MethodGet, "/movies/genres", handlers.GetMoviesWithGenres(controller.MovieController))
 	publicRoutes.Handle(http.MethodGet, "/movies/:id", handlers.GetMovieById(controller.MovieController))
-	securedRoutes.Handle(http.MethodPost, "/movies", handlers.CreateMovie(controller.MovieController))
+
+	// securedRoutes.Handle(http.MethodPost, "/movies", handlers.CreateMovie(controller.MovieController))
+	publicRoutes.Handle(http.MethodPost, "/movies", handlers.CreateMovie(controller.MovieController))
 	securedRoutes.Handle(http.MethodPut, "/movies", handlers.UpdateMovie(controller.MovieController))
 	securedRoutes.Handle(http.MethodDelete, "/movies", handlers.DeleteMovie(controller.MovieController))
 
-	// genres
+	// Genre
 	publicRoutes.Handle(http.MethodGet, "/genres", handlers.GetGenres(controller.GenreController))
 	publicRoutes.Handle(http.MethodGet, "/genres/:name", handlers.GetGenreByName(controller.GenreController))
 	publicRoutes.Handle(http.MethodGet, "/genres/movies", handlers.GetGenresWithMovies(controller.GenreController))

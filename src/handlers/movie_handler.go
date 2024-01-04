@@ -4,9 +4,9 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/.gen/KinoTicketSystem/model"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/controllers"
 	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/gen/KinoTicketSystem/model"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
 	"github.com/gin-gonic/gin"
@@ -25,22 +25,10 @@ func GetMovies(movieCtrl controllers.MovieControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		movies, kts_err := movieCtrl.GetMovies()
 		if kts_err != nil {
-			c.JSON(kts_err.Status, kts_err)
+			utils.HandleErrorAndAbort(c, kts_err)
 			return
 		}
 		c.JSON(http.StatusOK, movies)
-	}
-}
-
-func GetMovieByName(movieCtrl controllers.MovieControllerI) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		name := c.Param("name")
-		movie, kts_err := movieCtrl.GetMovieByName(&name)
-		if kts_err != nil {
-			c.JSON(kts_err.Status, kts_err)
-			return
-		}
-		c.JSON(http.StatusOK, movie)
 	}
 }
 
@@ -59,15 +47,11 @@ func CreateMovie(movieCtrl controllers.MovieControllerI) gin.HandlerFunc {
 		err := c.ShouldBindJSON(&movie)
 		if err != nil ||
 			utils.ContainsEmptyString(
-				movie.ReleaseDate.String(),
+				movie.Title,
 			) {
-			log.Print("Failed to bind JSON")
-			log.Print(err)
 			utils.HandleErrorAndAbort(c, kts_errors.KTS_BAD_REQUEST)
 			return
 		}
-
-		log.Print(movie)
 
 		for _, genre := range movie.GenresID {
 			if utils.ContainsEmptyString(genre.ID.String()) {
@@ -175,7 +159,11 @@ func GetMoviesWithGenres(movieCtrl controllers.MovieControllerI) gin.HandlerFunc
 // @Router /movies/{id} [get]
 func GetMovieById(movieCtrl controllers.MovieControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		movieId := uuid.MustParse(c.Param("id"))
+		movieId, err := uuid.Parse(c.Param("id"))
+		if err != nil {
+			utils.HandleErrorAndAbort(c, kts_errors.KTS_BAD_REQUEST)
+			return
+		}
 
 		movie, kts_err := movieCtrl.GetMovieById(&movieId)
 		if kts_err != nil {
