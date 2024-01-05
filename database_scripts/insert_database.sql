@@ -45,10 +45,10 @@ VALUES
 -- Insert statement for PriceCategory table
 INSERT INTO price_categories (id, category_name, price)
 VALUES
-    (UUID_TO_BIN('6ba7b81c-9dad-11d1-80b4-00c04fd430c0'), 'StudentDiscount', 7.00), 
-    (UUID_TO_BIN('6ba7b81d-9dad-11d1-80b4-00c04fd430c1'), 'ChildDiscount', 10.00),
-    (UUID_TO_BIN('6ba7b81e-9dad-11d1-80b4-00c04fd430c2'), 'ElderlyDiscount', 5.00), 
-    (UUID_TO_BIN('6ba7b81f-9dad-11d1-80b4-00c04fd430c3'), 'regular_price', 20.00); 
+    (UUID_TO_BIN('6ba7b81c-9dad-11d1-80b4-00c04fd430c0'), 'student', 7.00), 
+    (UUID_TO_BIN('6ba7b81d-9dad-11d1-80b4-00c04fd430c1'), 'children', 10.00),
+    (UUID_TO_BIN('6ba7b81e-9dad-11d1-80b4-00c04fd430c2'), 'pensioner', 5.00), 
+    (UUID_TO_BIN('6ba7b81f-9dad-11d1-80b4-00c04fd430c3'), 'adult', 0.00); 
 
 -- Insert statement for Genre table
 INSERT INTO genres (id, genre_name)

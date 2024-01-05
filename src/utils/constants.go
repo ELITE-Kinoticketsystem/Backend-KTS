@@ -22,6 +22,6 @@ func (pc PriceCategories) String() string {
 const (
 	CHILDREN PriceCategories = "children"
 	ADULT    PriceCategories = "adult"
-	SENIOR   PriceCategories = "senior"
+	SENIOR   PriceCategories = "pensioner"
 	STUDENT  PriceCategories = "student"
 )
