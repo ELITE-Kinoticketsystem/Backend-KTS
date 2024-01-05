@@ -34,6 +34,6 @@ func CreateTheatre(theatreCtrl controllers.TheatreControllerI) gin.HandlerFunc {
 			return
 		}
 
-		c.Status(http.StatusCreated)
+		c.JSON(http.StatusCreated, nil)
 	}
 }

@@ -28,7 +28,7 @@ func GetPriceCategoryByIdHandler(priceCategoriesController controllers.PriceCate
 			return
 		}
 		priceCategory, kts_err := priceCategoriesController.GetPriceCategoryById(&priceCategoryId)
-		if err != nil {
+		if kts_err != nil {
 			utils.HandleErrorAndAbort(c, kts_err)
 			return
 		}
@@ -69,7 +69,8 @@ func GetPriceCategoriesHandler(priceCategoriesController controllers.PriceCatego
 func CreatePriceCategoryHandler(priceCategoriesController controllers.PriceCategoryControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var priceCategory model.PriceCategories
-		if err := c.ShouldBindJSON(&priceCategory); err != nil {
+		err := c.ShouldBindJSON(&priceCategory)
+		if err != nil || utils.ContainsEmptyString(priceCategory.CategoryName) {
 			utils.HandleErrorAndAbort(c, kts_errors.KTS_BAD_REQUEST)
 			return
 		}
@@ -96,7 +97,8 @@ func CreatePriceCategoryHandler(priceCategoriesController controllers.PriceCateg
 func UpdatePriceCategoryHandler(priceCategoriesController controllers.PriceCategoryControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var priceCategory model.PriceCategories
-		if err := c.ShouldBindJSON(&priceCategory); err != nil {
+		err := c.ShouldBindJSON(&priceCategory)
+		if err != nil || utils.ContainsEmptyString(priceCategory.CategoryName) {
 			utils.HandleErrorAndAbort(c, kts_errors.KTS_BAD_REQUEST)
 			return
 		}
@@ -107,7 +109,7 @@ func UpdatePriceCategoryHandler(priceCategoriesController controllers.PriceCateg
 			return
 		}
 
-		c.JSON(http.StatusCreated, priceCategoryID)
+		c.JSON(http.StatusOK, priceCategoryID)
 	}
 }
 
@@ -128,11 +130,11 @@ func DeletePriceCategoryHandler(priceCategoriesController controllers.PriceCateg
 			return
 		}
 		kts_err := priceCategoriesController.DeletePriceCategory(&priceCategoryId)
-		if err != nil {
+		if kts_err != nil {
 			utils.HandleErrorAndAbort(c, kts_err)
 			return
 		}
 
-		c.JSON(http.StatusOK, "Deleted")
+		c.JSON(http.StatusOK, nil)
 	}
 }

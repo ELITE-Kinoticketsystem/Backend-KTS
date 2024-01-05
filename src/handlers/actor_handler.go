@@ -30,7 +30,7 @@ func GetActorByIdHandler(actorController controllers.ActorControllerI) gin.Handl
 			return
 		}
 		actor, kts_err := actorController.GetActorById(&actorId)
-		if err != nil {
+		if kts_err != nil {
 			utils.HandleErrorAndAbort(c, kts_err)
 			return
 		}
