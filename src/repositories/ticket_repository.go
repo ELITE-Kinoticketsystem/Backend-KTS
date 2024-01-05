@@ -85,7 +85,7 @@ func (tr *TicketRepository) CreateTicket(ticket *model.Tickets) (*uuid.UUID, *mo
 	}
 
 	if rowsAffected == 0 {
-		return nil, kts_errors.KTS_NOT_FOUND
+		return nil, kts_errors.KTS_CONFLICT
 	}
 
 	return ticket.ID, nil
@@ -113,7 +113,7 @@ func (tr *TicketRepository) ValidateTicket(id *uuid.UUID) *models.KTSError {
 	}
 
 	if rowsAffected == 0 {
-		return kts_errors.KTS_NOT_FOUND
+		return kts_errors.KTS_CONFLICT
 	}
 
 	return nil

@@ -80,11 +80,11 @@ func TestValidateTicket(t *testing.T) {
 		expectedError   *models.KTSError
 	}{
 		{
-			name: "No ticket found",
+			name: "ticket conflict",
 			setExpectations: func(mockRepo mocks.MockTicketRepositoryI, id *uuid.UUID) {
-				mockRepo.EXPECT().ValidateTicket(id).Return(kts_errors.KTS_NOT_FOUND)
+				mockRepo.EXPECT().ValidateTicket(id).Return(kts_errors.KTS_CONFLICT)
 			},
-			expectedError: kts_errors.KTS_NOT_FOUND,
+			expectedError: kts_errors.KTS_CONFLICT,
 		},
 		{
 			name: "Ticket validated",

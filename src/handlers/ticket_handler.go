@@ -44,8 +44,7 @@ func GetTicketByIdHandler(ticketController controllers.TicketControllerI) gin.Ha
 // @Produce  json
 // @Param id path string true "Ticket ID"
 // @Success 200 {object} models.PatchValidateTicketResponse
-// @Failure 400 {object} models.KTSErrorMessage
-// @Failure 404 {object} models.KTSErrorMessage
+// @Failure 409 {object} models.KTSErrorMessage
 // @Failure 500 {object} models.KTSErrorMessage
 // @Router /tickets/{id} [patch]
 func ValidateTicketHandler(ticketController controllers.TicketControllerI) gin.HandlerFunc {

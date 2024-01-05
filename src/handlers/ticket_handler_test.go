@@ -124,13 +124,13 @@ func TestValidateTicketHandler(t *testing.T) {
 			expectedBody:   gin.H{"errorMessage": "INTERNAL_ERROR"},
 		},
 		{
-			name:          "Ticket not found",
+			name:          "Ticket CONFLICT",
 			paramTicketId: utils.NewUUID().String(),
 			setExpectations: func(mockController *mocks.MockTicketControllerI, ticketId string) {
-				mockController.EXPECT().ValidateTicket(gomock.Any()).Return(kts_errors.KTS_NOT_FOUND)
+				mockController.EXPECT().ValidateTicket(gomock.Any()).Return(kts_errors.KTS_CONFLICT)
 			},
-			expectedStatus: http.StatusNotFound,
-			expectedBody:   gin.H{"errorMessage": "NOT_FOUND"},
+			expectedStatus: http.StatusConflict,
+			expectedBody:   gin.H{"errorMessage": "CONFLICT"},
 		},
 		{
 			name:          "ID is empty",
