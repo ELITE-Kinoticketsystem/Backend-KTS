@@ -2,7 +2,7 @@ package utils
 
 import "time"
 
-const BLOCKED_TICKET_TIME time.Duration = 9e+11 // 15 minutes
+const BLOCKED_TICKET_TIME time.Duration = time.Minute * 15 // 15 minutes
 
 type SeatType string
 
