@@ -129,8 +129,10 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 			EventSeatRepo: eventSeatRepo,
 		},
 		OrderController: &controllers.OrderController{
-			OrderRepo:     &orderRepo,
-			EventSeatRepo: eventSeatRepo,
+			OrderRepo:         &orderRepo,
+			EventSeatRepo:     eventSeatRepo,
+			TicketRepo:        ticketRepo,
+			PriceCategoryRepo: priceCategoryRepo,
 		},
 		ReviewController: &controllers.ReviewController{
 			ReviewRepo: reviewsRepo,

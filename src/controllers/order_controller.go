@@ -23,7 +23,7 @@ type OrderController struct {
 }
 
 func (oc *OrderController) CreateOrder(createOrderDTO models.CreateOrderDTO, eventId *uuid.UUID, userId *uuid.UUID, isReservation bool) (*uuid.UUID, *models.KTSError) {
-	if isReservation && createOrderDTO.PaymentMethodID != nil {
+	if (isReservation) != (createOrderDTO.PaymentMethodID == nil) {
 		return nil, kts_errors.KTS_BAD_REQUEST
 	}
 
