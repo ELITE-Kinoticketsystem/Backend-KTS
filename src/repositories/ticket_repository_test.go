@@ -52,7 +52,7 @@ func TestGetTicketById(t *testing.T) {
 			expectedError:  nil,
 		},
 		{
-			name: "Ticket not found",
+			name: "Ticket conflict",
 			setExpectations: func(mock sqlmock.Sqlmock, id *uuid.UUID) {
 				mock.ExpectQuery(query).WithArgs(utils.EqUUID(ticketId)).WillReturnRows(
 					sqlmock.NewRows([]string{"ticket.id", "ticket.validated", "ticket.price", "seats.id", "seats.row_nr", "seats.column_nr", "seats.seat_category_id", "seats.cinema_hall_id", "seats.type", "events.id", "events.title", "events.start", "events.end", "events.description", "events.event_type", "events.cinema_hall_id", "orders.id", "orders.totalprice", "orders.is_paid", "orders.payment_method_id", "orders.user_id"}),
@@ -146,12 +146,12 @@ func TestCreateTicket(t *testing.T) {
 			expectedError:    kts_errors.KTS_INTERNAL_ERROR,
 		},
 		{
-			name: "PriceCategory not found",
+			name: "Ticket not KTS_CONFLICT",
 			setExpectations: func(mock sqlmock.Sqlmock, ticket *model.Tickets) {
 				mock.ExpectExec(query).WithArgs(sqlmock.AnyArg(), ticket.Validated, ticket.Price, sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg()).WillReturnResult(sqlmock.NewResult(1, 0))
 			},
 			expectedTicketID: false,
-			expectedError:    kts_errors.KTS_NOT_FOUND,
+			expectedError:    kts_errors.KTS_CONFLICT,
 		},
 	}
 
@@ -225,11 +225,11 @@ func TestValidateTicket(t *testing.T) {
 			expectedError: kts_errors.KTS_INTERNAL_ERROR,
 		},
 		{
-			name: "Ticket not found",
+			name: "Ticket conflict",
 			setExpectations: func(mock sqlmock.Sqlmock, id *uuid.UUID) {
 				mock.ExpectExec(query).WithArgs(true, sqlmock.AnyArg()).WillReturnResult(sqlmock.NewResult(1, 0))
 			},
-			expectedError: kts_errors.KTS_NOT_FOUND,
+			expectedError: kts_errors.KTS_CONFLICT,
 		},
 	}
 
