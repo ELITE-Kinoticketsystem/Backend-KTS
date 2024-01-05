@@ -9,6 +9,7 @@
 ~/go/bin/mockgen -source=./src/controllers/order_controller.go -destination=./src/mocks/order_controller_mock.go -package=mocks
 ~/go/bin/mockgen -source=./src/controllers/ticket_controller.go -destination=./src/mocks/ticket_controller_mock.go -package=mocks
 ~/go/bin/mockgen -source=./src/controllers/actor_controller.go -destination=./src/mocks/actor_controller_mock.go -package=mocks
+~/go/bin/mockgen -source=./src/controllers/price_category_controller.go -destination=./src/mocks/price_category_controller_mock.go -package=mocks
 
 # repositories
 ~/go/bin/mockgen -source=./src/repositories/user_repo.go -destination=./src/mocks/user_repo_mock.go -package=mocks
