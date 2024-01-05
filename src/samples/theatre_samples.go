@@ -3,6 +3,7 @@ package samples
 import (
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/gen/KinoTicketSystem/model"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
 	"github.com/google/uuid"
 )
 
@@ -15,6 +16,23 @@ func GetSampleAddress() model.Addresses {
 		Zipcode:  "Zipcode",
 		City:     "City",
 		Country:  "Country",
+	}
+}
+
+func GetSampleTheatres() []model.Theatres {
+	return []model.Theatres{
+		{
+			ID:        utils.NewUUID(),
+			Name:      "Theatre1",
+			LogoURL:   utils.GetStringPointer("LogoUr1"),
+			AddressID: utils.NewUUID(),
+		},
+		{
+			ID:        utils.NewUUID(),
+			Name:      "Theatre2",
+			LogoURL:   utils.GetStringPointer("LogoUrl2"),
+			AddressID: utils.NewUUID(),
+		},
 	}
 }
 

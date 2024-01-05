@@ -37,3 +37,15 @@ func CreateTheatre(theatreCtrl controllers.TheatreControllerI) gin.HandlerFunc {
 		c.JSON(http.StatusCreated, nil)
 	}
 }
+
+func GetTheatres(theatreCtrl controllers.TheatreControllerI) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		theatres, kts_err := theatreCtrl.GetTheatres()
+		if kts_err != nil {
+			utils.HandleErrorAndAbort(c, kts_err)
+			return
+		}
+
+		c.JSON(http.StatusOK, theatres)
+	}
+}

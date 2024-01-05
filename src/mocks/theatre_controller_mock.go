@@ -11,6 +11,7 @@ package mocks
 import (
 	reflect "reflect"
 
+	model "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/gen/KinoTicketSystem/model"
 	models "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
 	gomock "go.uber.org/mock/gomock"
 )
@@ -50,4 +51,19 @@ func (m *MockTheatreControllerI) CreateTheatre(arg0 *models.CreateTheatreRequest
 func (mr *MockTheatreControllerIMockRecorder) CreateTheatre(arg0 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateTheatre", reflect.TypeOf((*MockTheatreControllerI)(nil).CreateTheatre), arg0)
+}
+
+// GetTheatres mocks base method.
+func (m *MockTheatreControllerI) GetTheatres() (*[]model.Theatres, *models.KTSError) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetTheatres")
+	ret0, _ := ret[0].(*[]model.Theatres)
+	ret1, _ := ret[1].(*models.KTSError)
+	return ret0, ret1
+}
+
+// GetTheatres indicates an expected call of GetTheatres.
+func (mr *MockTheatreControllerIMockRecorder) GetTheatres() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetTheatres", reflect.TypeOf((*MockTheatreControllerI)(nil).GetTheatres))
 }

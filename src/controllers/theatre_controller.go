@@ -10,6 +10,7 @@ import (
 
 type TheatreControllerI interface {
 	CreateTheatre(*models.CreateTheatreRequest) *models.KTSError
+	GetTheatres() (*[]model.Theatres, *models.KTSError)
 }
 
 type TheatreController struct {
@@ -45,4 +46,8 @@ func (tc *TheatreController) CreateTheatre(theatreData *models.CreateTheatreRequ
 	}
 
 	return nil
+}
+
+func (tc *TheatreController) GetTheatres() (*[]model.Theatres, *models.KTSError){
+	return tc.TheatreRepo.GetTheatres()
 }

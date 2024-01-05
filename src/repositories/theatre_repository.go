@@ -1,6 +1,8 @@
 package repositories
 
 import (
+	"log"
+
 	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/gen/KinoTicketSystem/model"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/gen/KinoTicketSystem/table"
@@ -13,6 +15,7 @@ import (
 
 type TheaterRepoI interface {
 	CreateTheatre(theatre model.Theatres) *models.KTSError
+	GetTheatres() (*[]model.Theatres, *models.KTSError)
 	GetSeatsForCinemaHall(cinemaHallId *uuid.UUID) ([]model.Seats, *models.KTSError)
 	CreateAddress(address model.Addresses) *models.KTSError
 }
@@ -39,6 +42,22 @@ func (tr *TheatreRepository) CreateTheatre(theatre model.Theatres) *models.KTSEr
 		return kts_errors.KTS_INTERNAL_ERROR
 	}
 	return nil
+}
+
+func (tr *TheatreRepository) GetTheatres() (*[]model.Theatres, *models.KTSError) {
+	var theatres []model.Theatres
+	stmt := mysql.SELECT(
+		table.Theatres.AllColumns,
+	).FROM(table.Theatres)
+
+	err := stmt.Query(tr.DatabaseManager.GetDatabaseConnection(), &theatres)
+
+	if err != nil {
+		log.Println(err)
+		return nil, kts_errors.KTS_INTERNAL_ERROR
+	}
+
+	return &theatres, nil
 }
 
 func (tr *TheatreRepository) GetSeatsForCinemaHall(cinemaHallId *uuid.UUID) ([]model.Seats, *models.KTSError) {
