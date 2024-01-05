@@ -20,7 +20,8 @@ type GenreControllerI interface {
 }
 
 type GenreController struct {
-	GenreRepo repositories.GenreRepositoryI
+	GenreRepo      repositories.GenreRepositoryI
+	MovieGenreRepo repositories.MovieGenreRepositoryI
 }
 
 func (mc *GenreController) GetGenres() (*[]model.Genres, *models.KTSError) {
@@ -60,7 +61,12 @@ func (mc *GenreController) UpdateGenre(genre *model.Genres) *models.KTSError {
 }
 
 func (mc *GenreController) DeleteGenre(genre_id *uuid.UUID) *models.KTSError {
-	kts_errors := mc.GenreRepo.DeleteGenre(genre_id)
+	kts_errors := mc.MovieGenreRepo.RemoveAllMovieCombinationWithGenre(genre_id)
+	if kts_errors != nil {
+		return kts_errors
+	}
+
+	kts_errors = mc.GenreRepo.DeleteGenre(genre_id)
 	if kts_errors != nil {
 		return kts_errors
 	}

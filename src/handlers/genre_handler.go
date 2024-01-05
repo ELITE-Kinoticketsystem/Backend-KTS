@@ -44,6 +44,11 @@ func GetGenres(genreCtrl controllers.GenreControllerI) gin.HandlerFunc {
 func GetGenreByName(genreCtrl controllers.GenreControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		name := c.Param("name")
+		if utils.ContainsEmptyString(name) {
+			utils.HandleErrorAndAbort(c, kts_errors.KTS_BAD_REQUEST)
+			return
+		}
+
 		genre, kts_err := genreCtrl.GetGenreByName(&name)
 		if kts_err != nil {
 			utils.HandleErrorAndAbort(c, kts_err)
@@ -52,7 +57,6 @@ func GetGenreByName(genreCtrl controllers.GenreControllerI) gin.HandlerFunc {
 		c.JSON(http.StatusOK, genre)
 	}
 }
-
 
 // @Summary Create genre
 // @Description Create genre
@@ -66,21 +70,19 @@ func GetGenreByName(genreCtrl controllers.GenreControllerI) gin.HandlerFunc {
 // @Router /genres [post]
 func CreateGenre(genreCtrl controllers.GenreControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var genre model.Genres
-		err := c.ShouldBindJSON(&genre)
-		if err != nil || utils.ContainsEmptyString(genre.GenreName) {
+		name := c.Param("name")
+		if utils.ContainsEmptyString(name) {
 			utils.HandleErrorAndAbort(c, kts_errors.KTS_BAD_REQUEST)
 			return
 		}
 
-		genreId, kts_err := genreCtrl.CreateGenre(&genre.GenreName)
+		genreId, kts_err := genreCtrl.CreateGenre(&name)
 		if kts_err != nil {
 			utils.HandleErrorAndAbort(c, kts_err)
 			return
 		}
-		genre.ID = genreId
 
-		c.JSON(http.StatusCreated, genre)
+		c.JSON(http.StatusCreated, genreId)
 	}
 }
 
@@ -124,15 +126,18 @@ func UpdateGenre(genreCtrl controllers.GenreControllerI) gin.HandlerFunc {
 // @Router /genres/{id} [delete]
 func DeleteGenre(genreCtrl controllers.GenreControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		id := c.Param("id")
-		genreId := uuid.MustParse(id)
+		genreId, err := uuid.Parse(c.Param("id"))
+		if err != nil {
+			utils.HandleErrorAndAbort(c, kts_errors.KTS_BAD_REQUEST)
+			return
+		}
 
 		kts_err := genreCtrl.DeleteGenre(&genreId)
 		if kts_err != nil {
 			utils.HandleErrorAndAbort(c, kts_err)
 			return
 		}
-		c.Status(http.StatusOK)
+		c.JSON(http.StatusOK, nil)
 	}
 }
 

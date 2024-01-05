@@ -14,6 +14,7 @@ type MovieGenreRepositoryI interface {
 	AddMovieGenre(movieId *uuid.UUID, genreId *uuid.UUID) *models.KTSError
 	RemoveMovieGenre(movieId *uuid.UUID, genreId *uuid.UUID) *models.KTSError
 	RemoveAllGenreCombinationWithMovie(movieId *uuid.UUID) *models.KTSError
+	RemoveAllMovieCombinationWithGenre(genreId *uuid.UUID) *models.KTSError
 }
 
 type MovieGenreRepository struct {
@@ -73,6 +74,21 @@ func (mgr *MovieGenreRepository) RemoveMovieGenre(movieId *uuid.UUID, genreId *u
 func (mgr *MovieGenreRepository) RemoveAllGenreCombinationWithMovie(movieId *uuid.UUID) *models.KTSError {
 	deleteQuery := table.MovieGenres.DELETE().WHERE(
 		table.MovieGenres.MovieID.EQ(utils.MysqlUuid(movieId)),
+	)
+
+	// Execute the query
+	_, err := deleteQuery.Exec(mgr.DatabaseManager.GetDatabaseConnection())
+	if err != nil {
+		return kts_errors.KTS_INTERNAL_ERROR
+	}
+
+	return nil
+
+}
+
+func (mgr *MovieGenreRepository) RemoveAllMovieCombinationWithGenre(genreId *uuid.UUID) *models.KTSError {
+	deleteQuery := table.MovieGenres.DELETE().WHERE(
+		table.MovieGenres.GenreID.EQ(utils.MysqlUuid(genreId)),
 	)
 
 	// Execute the query
