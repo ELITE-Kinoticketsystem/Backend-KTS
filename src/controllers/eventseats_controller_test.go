@@ -32,8 +32,8 @@ func TestEventSeatController_GetEventSeats(t *testing.T) {
 			},
 			Seat: model.Seats{
 				ID:             utils.NewUUID(),
-				RowNr:          1,
-				ColumnNr:       1,
+				RowNr:          0,
+				ColumnNr:       0,
 				SeatCategoryID: utils.NewUUID(),
 			},
 			SeatCategory: model.SeatCategories{
@@ -57,8 +57,8 @@ func TestEventSeatController_GetEventSeats(t *testing.T) {
 			},
 			Seat: model.Seats{
 				ID:             utils.NewUUID(),
-				RowNr:          1,
-				ColumnNr:       2,
+				RowNr:          0,
+				ColumnNr:       1,
 				SeatCategoryID: utils.NewUUID(),
 			},
 			SeatCategory: model.SeatCategories{
@@ -82,8 +82,8 @@ func TestEventSeatController_GetEventSeats(t *testing.T) {
 			},
 			Seat: model.Seats{
 				ID:             utils.NewUUID(),
-				RowNr:          2,
-				ColumnNr:       1,
+				RowNr:          1,
+				ColumnNr:       0,
 				SeatCategoryID: utils.NewUUID(),
 			},
 			SeatCategory: model.SeatCategories{
