@@ -101,7 +101,7 @@ func createTicketsAndCalculateTotalPrice(slectedSeats *[]models.GetSlectedSeatsD
 			priceCategory = adultPriceCategory
 		}
 
-		price := utils.CalculatePrice(seat.EventSeatCategory.Price, priceCategory.Price)
+		price := utils.CalculatePrice(seat.EventSeatCategory.Price, priceCategory.Price, seat.Seat.Type)
 
 		totalPrice += price
 
