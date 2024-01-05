@@ -382,7 +382,7 @@ func TestGetSelectedSeats(t *testing.T) {
 	eventId := utils.NewUUID()
 	userId := utils.NewUUID()
 
-	eventSeats := []models.GetEventSeatsDTO{
+	eventSeats := []models.GetSlectedSeatsDTO{
 		{
 			EventSeat: model.EventSeats{
 				ID:           utils.NewUUID(),
@@ -440,7 +440,7 @@ func TestGetSelectedSeats(t *testing.T) {
 	testCases := []struct {
 		name            string
 		setExpectations func(mock sqlmock.Sqlmock)
-		expectedSeats   *[]models.GetEventSeatsDTO
+		expectedSeats   *[]models.GetSlectedSeatsDTO
 		expectedError   *models.KTSError
 	}{
 		{

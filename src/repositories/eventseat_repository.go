@@ -19,7 +19,7 @@ type EventSeatRepoI interface {
 	BlockEventSeatIfAvailable(eventId *uuid.UUID, seatId *uuid.UUID, userId *uuid.UUID, blockedUntil *time.Time) *models.KTSError
 	UnblockEventSeat(eventId *uuid.UUID, seatId *uuid.UUID, userId *uuid.UUID) *models.KTSError
 	UpdateBlockedUntilTimeForUserEventSeats(eventId *uuid.UUID, userId *uuid.UUID, blockedUntil *time.Time) (int64, *models.KTSError)
-	GetSelectedSeats(eventId *uuid.UUID, userId *uuid.UUID) (*[]models.GetEventSeatsDTO, *models.KTSError)
+	GetSelectedSeats(eventId *uuid.UUID, userId *uuid.UUID) (*[]models.GetSlectedSeatsDTO, *models.KTSError)
 	UpdateEventSeat(eventSeat *model.EventSeats) *models.KTSError
 }
 
@@ -126,18 +126,23 @@ func (esr *EventSeatRepository) UnblockEventSeat(eventId *uuid.UUID, seatId *uui
 	return nil
 }
 
-func (esr *EventSeatRepository) GetSelectedSeats(eventId *uuid.UUID, userId *uuid.UUID) (*[]models.GetEventSeatsDTO, *models.KTSError) {
-	selectedSeats := []models.GetEventSeatsDTO{}
+func (esr *EventSeatRepository) GetSelectedSeats(eventId *uuid.UUID, userId *uuid.UUID) (*[]models.GetSlectedSeatsDTO, *models.KTSError) {
+	selectedSeats := []models.GetSlectedSeatsDTO{}
 
 	stmt := mysql.SELECT(
 		table.EventSeats.AllColumns,
 		table.Seats.AllColumns,
 		table.SeatCategories.AllColumns,
 		table.EventSeatCategories.AllColumns,
+		table.CinemaHalls.AllColumns,
+		table.Theatres.AllColumns,
 	).FROM(table.EventSeats.
 		LEFT_JOIN(table.Seats, table.EventSeats.SeatID.EQ(table.Seats.ID)).
 		LEFT_JOIN(table.SeatCategories, table.Seats.SeatCategoryID.EQ(table.SeatCategories.ID)).
-		LEFT_JOIN(table.EventSeatCategories, table.EventSeatCategories.EventID.EQ(table.EventSeats.EventID).AND(table.EventSeatCategories.SeatCategoryID.EQ(table.Seats.SeatCategoryID)))).
+		LEFT_JOIN(table.EventSeatCategories, table.EventSeatCategories.EventID.EQ(table.EventSeats.EventID).AND(table.EventSeatCategories.SeatCategoryID.EQ(table.Seats.SeatCategoryID))).
+		LEFT_JOIN(table.CinemaHalls, table.CinemaHalls.ID.EQ(table.Events.CinemaHallID)).
+		LEFT_JOIN(table.Theatres, table.Theatres.ID.EQ(table.CinemaHalls.TheatreID)),
+	).
 		WHERE(table.EventSeats.EventID.EQ(utils.MysqlUuid(eventId)).AND(table.EventSeats.Booked.IS_FALSE()).AND(table.EventSeats.BlockedUntil.GT(mysql.CURRENT_TIMESTAMP()).AND(table.EventSeats.UserID.EQ(utils.MysqlUuid(userId))))).
 		ORDER_BY(table.Seats.ColumnNr.ASC(), table.Seats.RowNr.ASC())
 

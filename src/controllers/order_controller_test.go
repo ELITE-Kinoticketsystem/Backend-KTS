@@ -14,7 +14,7 @@ import (
 
 func TestOrderController_CreateOrder(t *testing.T) {
 	priceCategories := samples.GetPriceCategories()
-	eventSeats := samples.GetEventSeatsDTO()
+	eventSeats := samples.GetGetSlectedSeatsDTO()
 	order := samples.GetOrder(priceCategories, eventSeats, utils.NewUUID())
 
 	tests := []struct {

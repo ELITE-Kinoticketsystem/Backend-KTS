@@ -81,7 +81,7 @@ func (oc *OrderController) GetOrders(userId *uuid.UUID) (*[]models.GetOrderDTO, 
 	return oc.OrderRepo.GetOrders(userId)
 }
 
-func createTicketsAndCalculateTotalPrice(slectedSeats *[]models.GetEventSeatsDTO, createOrderDTO models.CreateOrderDTO, priceCategories *[]model.PriceCategories, adultPriceCategory *model.PriceCategories, orderId *uuid.UUID) ([]model.Tickets, int32) {
+func createTicketsAndCalculateTotalPrice(slectedSeats *[]models.GetSlectedSeatsDTO, createOrderDTO models.CreateOrderDTO, priceCategories *[]model.PriceCategories, adultPriceCategory *model.PriceCategories, orderId *uuid.UUID) ([]model.Tickets, int32) {
 	tickets := make([]model.Tickets, len(*slectedSeats))
 
 	totalPrice := int32(0)

@@ -88,10 +88,10 @@ func (mr *MockEventSeatControllerIMockRecorder) GetEventSeats(eventId, userId an
 }
 
 // GetSelectedSeats mocks base method.
-func (m *MockEventSeatControllerI) GetSelectedSeats(eventId, userId *uuid.UUID) (*[]models.GetEventSeatsDTO, *models.KTSError) {
+func (m *MockEventSeatControllerI) GetSelectedSeats(eventId, userId *uuid.UUID) (*[]models.GetSlectedSeatsDTO, *models.KTSError) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetSelectedSeats", eventId, userId)
-	ret0, _ := ret[0].(*[]models.GetEventSeatsDTO)
+	ret0, _ := ret[0].(*[]models.GetSlectedSeatsDTO)
 	ret1, _ := ret[1].(*models.KTSError)
 	return ret0, ret1
 }
