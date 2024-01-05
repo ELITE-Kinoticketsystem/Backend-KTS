@@ -23,4 +23,5 @@ const (
 	CHILDREN PriceCategories = "children"
 	ADULT    PriceCategories = "adult"
 	SENIOR   PriceCategories = "senior"
+	STUDENT  PriceCategories = "student"
 )
