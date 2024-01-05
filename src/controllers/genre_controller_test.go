@@ -328,27 +328,37 @@ func TestDeleteGenre(t *testing.T) {
 
 	testCases := []struct {
 		name            string
-		setExpectations func(mockRepo mocks.MockGenreRepositoryI, genreID *uuid.UUID)
+		setExpectations func(mockGenreRepo mocks.MockGenreRepositoryI, mockMovieGenreRepo mocks.MockMovieGenreRepositoryI, genreID *uuid.UUID)
 		expectedError   *models.KTSError
 	}{
 		{
+			name: "MovieGenre deletion failed",
+			setExpectations: func(mockGenreRepo mocks.MockGenreRepositoryI, mockMovieGenreRepo mocks.MockMovieGenreRepositoryI, genreID *uuid.UUID) {
+				mockMovieGenreRepo.EXPECT().RemoveAllMovieCombinationWithGenre(genreID).Return(kts_errors.KTS_INTERNAL_ERROR)
+			},
+			expectedError: kts_errors.KTS_INTERNAL_ERROR,
+		},
+		{
 			name: "Empty result",
-			setExpectations: func(mockRepo mocks.MockGenreRepositoryI, genreID *uuid.UUID) {
-				mockRepo.EXPECT().DeleteGenre(genreID).Return(kts_errors.KTS_NOT_FOUND)
+			setExpectations: func(mockGenreRepo mocks.MockGenreRepositoryI, mockMovieGenreRepo mocks.MockMovieGenreRepositoryI, genreID *uuid.UUID) {
+				mockMovieGenreRepo.EXPECT().RemoveAllMovieCombinationWithGenre(genreID).Return(nil)
+				mockGenreRepo.EXPECT().DeleteGenre(genreID).Return(kts_errors.KTS_NOT_FOUND)
 			},
 			expectedError: kts_errors.KTS_NOT_FOUND,
 		},
 		{
 			name: "Delete genre",
-			setExpectations: func(mockRepo mocks.MockGenreRepositoryI, genreID *uuid.UUID) {
-				mockRepo.EXPECT().DeleteGenre(genreID).Return(nil)
+			setExpectations: func(mockGenreRepo mocks.MockGenreRepositoryI, mockMovieGenreRepo mocks.MockMovieGenreRepositoryI, genreID *uuid.UUID) {
+				mockMovieGenreRepo.EXPECT().RemoveAllMovieCombinationWithGenre(genreID).Return(nil)
+				mockGenreRepo.EXPECT().DeleteGenre(genreID).Return(nil)
 			},
 			expectedError: nil,
 		},
 		{
 			name: "Error while deleting genre",
-			setExpectations: func(mockRepo mocks.MockGenreRepositoryI, genreID *uuid.UUID) {
-				mockRepo.EXPECT().DeleteGenre(genreID).Return(kts_errors.KTS_INTERNAL_ERROR)
+			setExpectations: func(mockGenreRepo mocks.MockGenreRepositoryI, mockMovieGenreRepo mocks.MockMovieGenreRepositoryI, genreID *uuid.UUID) {
+				mockMovieGenreRepo.EXPECT().RemoveAllMovieCombinationWithGenre(genreID).Return(nil)
+				mockGenreRepo.EXPECT().DeleteGenre(genreID).Return(kts_errors.KTS_INTERNAL_ERROR)
 			},
 			expectedError: kts_errors.KTS_INTERNAL_ERROR,
 		},
@@ -360,12 +370,14 @@ func TestDeleteGenre(t *testing.T) {
 			mockCtrl := gomock.NewController(t)
 			defer mockCtrl.Finish()
 			genreRepoMock := mocks.NewMockGenreRepositoryI(mockCtrl)
+			movieGenreRepoMock := mocks.NewMockMovieGenreRepositoryI(mockCtrl)
 			genreController := GenreController{
-				GenreRepo: genreRepoMock,
+				GenreRepo:      genreRepoMock,
+				MovieGenreRepo: movieGenreRepoMock,
 			}
 
 			// define expectations
-			tc.setExpectations(*genreRepoMock, genreID)
+			tc.setExpectations(*genreRepoMock, *movieGenreRepoMock, genreID)
 
 			// WHEN
 			kts_err := genreController.DeleteGenre(genreID)
