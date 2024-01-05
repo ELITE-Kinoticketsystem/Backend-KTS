@@ -192,9 +192,9 @@ func (mr *MovieRepository) GetMoviesWithGenres() (*[]models.MovieWithGenres, *mo
 		table.Movies.AllColumns,
 		table.Genres.AllColumns,
 	).FROM(
-		table.MovieGenres.
-			INNER_JOIN(table.Movies, table.Movies.ID.EQ(table.MovieGenres.MovieID)).
-			INNER_JOIN(table.Genres, table.Genres.ID.EQ(table.MovieGenres.GenreID)),
+		table.Movies.
+			LEFT_JOIN(table.MovieGenres, table.Movies.ID.EQ(table.MovieGenres.MovieID)).
+			LEFT_JOIN(table.Genres, table.Genres.ID.EQ(table.MovieGenres.GenreID)),
 	)
 
 	// Execute the query
@@ -220,6 +220,7 @@ func (mr *MovieRepository) GetMovieById(movieId *uuid.UUID) (*models.MovieWithEv
 		table.Actors.AllColumns,
 		table.Producers.AllColumns,
 		table.Reviews.AllColumns,
+		table.Users.Username,
 	).FROM(
 		table.Movies.
 			LEFT_JOIN(table.MovieGenres, table.MovieGenres.MovieID.EQ(table.Movies.ID)).
@@ -228,7 +229,8 @@ func (mr *MovieRepository) GetMovieById(movieId *uuid.UUID) (*models.MovieWithEv
 			LEFT_JOIN(table.Actors, table.Actors.ID.EQ(table.MovieActors.ActorID)).
 			LEFT_JOIN(table.MovieProducers, table.MovieProducers.MovieID.EQ(table.Movies.ID)).
 			LEFT_JOIN(table.Producers, table.Producers.ID.EQ(table.MovieProducers.ProducerID)).
-			LEFT_JOIN(table.Reviews, table.Reviews.MovieID.EQ(table.Movies.ID)),
+			LEFT_JOIN(table.Reviews, table.Reviews.MovieID.EQ(table.Movies.ID)).
+			INNER_JOIN(table.Users, table.Users.ID.EQ(table.Reviews.UserID)),
 	).WHERE(
 		table.Movies.ID.EQ(utils.MysqlUuid(movieId)),
 	)

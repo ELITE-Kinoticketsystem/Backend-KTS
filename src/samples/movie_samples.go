@@ -6,6 +6,7 @@ import (
 
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/gen/KinoTicketSystem/model"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
 	"github.com/google/uuid"
 )
 
@@ -374,12 +375,7 @@ func GetSampleMovieByIdWithEverything() *models.MovieWithEverything {
 	movieWithEverything := models.MovieWithEverything{}
 
 	// uuid1 := uuid.MustParse("6ba7b820-9dad-11d1-80b4-00c04fd430c4")
-	uuid1 := uuid.New()
-	uuid2 := uuid.MustParse("6ba7b827-9dad-11d1-80b4-00c04fd430c1")
-	uuid5 := uuid.MustParse("6ba7b829-9dad-11d1-80b4-00c04fd430c3")
-	uuid7 := uuid.MustParse("6ba7b82b-9dad-11d1-80b4-00c04fd430c5")
-	uuid9 := uuid.MustParse("6ba7b82d-9dad-11d1-80b4-00c04fd430c7")
-	uuid10 := uuid.MustParse("6ba7b82e-9dad-11d1-80b4-00c04fd430c8")
+	movieId := utils.NewUUID()
 
 	banner := ""
 	cover := ""
@@ -389,7 +385,7 @@ func GetSampleMovieByIdWithEverything() *models.MovieWithEverything {
 
 	movieWithEverything = models.MovieWithEverything{
 		Movies: model.Movies{
-			ID:           &uuid1,
+			ID:           movieId,
 			Title:        "Test Movie 1",
 			Description:  "Test Description 1",
 			BannerPicURL: &banner,
@@ -405,7 +401,7 @@ func GetSampleMovieByIdWithEverything() *models.MovieWithEverything {
 		}{
 			{
 				model.Genres{
-					ID:        &uuid2,
+					ID:        utils.NewUUID(),
 					GenreName: "Action",
 				},
 			},
@@ -415,7 +411,7 @@ func GetSampleMovieByIdWithEverything() *models.MovieWithEverything {
 		}{
 			{
 				model.Actors{
-					ID:          &uuid5,
+					ID:          utils.NewUUID(),
 					Name:        "MaxActor Mustermann",
 					Birthdate:   time.Now(),
 					Description: "This is a description",
@@ -427,26 +423,29 @@ func GetSampleMovieByIdWithEverything() *models.MovieWithEverything {
 		}{
 			{
 				model.Producers{
-					ID:          &uuid7,
+					ID:          utils.NewUUID(),
 					Name:        "MaxProducer Mustermann",
 					Birthdate:   time.Now(),
 					Description: "This is a description",
 				},
 			},
 		},
+
 		Reviews: []struct {
-			model.Reviews
+			Review   model.Reviews
+			Username string `alias:"users.username"`
 		}{
 			{
-				model.Reviews{
-					ID:        &uuid9,
+				Review: model.Reviews{
+					ID:        utils.NewUUID(),
 					Rating:    4.0,
 					Comment:   "This is a comment",
 					Datetime:  time.Now(),
 					IsSpoiler: &isSpoiler,
-					UserID:    &uuid10,
-					MovieID:   &uuid1,
+					UserID:    utils.NewUUID(),
+					MovieID:   movieId,
 				},
+				Username: "Max Mustermann",
 			},
 		},
 	}
