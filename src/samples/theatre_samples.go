@@ -2,6 +2,7 @@ package samples
 
 import (
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/gen/KinoTicketSystem/model"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
 	"github.com/google/uuid"
 )
 
@@ -26,5 +27,27 @@ func GetSampleTheatre() model.Theatres {
 		Name:      "Theatre",
 		LogoURL:   &logoUrl,
 		AddressID: &addressId,
+	}
+}
+
+func GetSampleTheatreCreate() models.CreateTheatreRequest {
+	logoUrl := "LogoURL"
+	return models.CreateTheatreRequest{
+		Name:    "Theatre",
+		LogoUrl: logoUrl,
+
+		Address: struct {
+			Street   string
+			StreetNr string
+			Zipcode  string
+			City     string
+			Country  string
+		}{
+			Street:   "Street",
+			StreetNr: "StreetNr",
+			Zipcode:  "Zipcode",
+			City:     "City",
+			Country:  "Country",
+		},
 	}
 }
