@@ -19,6 +19,7 @@ type EventSeatRepoI interface {
 	GetEventSeats(eventId *uuid.UUID) (*[]models.GetEventSeatsDTO, *models.KTSError)
 	BlockEventSeatIfAvailable(eventId *uuid.UUID, seatId *uuid.UUID, userId *uuid.UUID, blockedUntil *time.Time) *models.KTSError
 	UnblockEventSeat(eventId *uuid.UUID, seatId *uuid.UUID, userId *uuid.UUID) *models.KTSError
+	UnblockAllEventSeats(eventId *uuid.UUID, userId *uuid.UUID) *models.KTSError
 	UpdateBlockedUntilTimeForUserEventSeats(eventId *uuid.UUID, userId *uuid.UUID, blockedUntil *time.Time) (int64, *models.KTSError)
 	GetSelectedSeats(eventId *uuid.UUID, userId *uuid.UUID) (*[]models.GetSlectedSeatsDTO, *models.KTSError)
 	UpdateEventSeat(eventSeat *model.EventSeats) *models.KTSError
@@ -106,6 +107,31 @@ func (esr *EventSeatRepository) UnblockEventSeat(eventId *uuid.UUID, seatId *uui
 	stmt := table.EventSeats.UPDATE(table.EventSeats.BlockedUntil, table.EventSeats.UserID).
 		SET(nil, nil).
 		WHERE(table.EventSeats.EventID.EQ(utils.MysqlUuid(eventId)).AND(table.EventSeats.ID.EQ(utils.MysqlUuid(seatId))).
+			AND(table.EventSeats.UserID.EQ(utils.MysqlUuid(userId))).AND(table.EventSeats.BlockedUntil.GT(utils.MysqlTimeNow())).AND(table.EventSeats.Booked.IS_FALSE()))
+
+	result, err := stmt.Exec(esr.DatabaseManager.GetDatabaseConnection())
+
+	if err != nil {
+		return kts_errors.KTS_INTERNAL_ERROR
+	}
+
+	rowsAffected, err := result.RowsAffected()
+
+	if err != nil {
+		return kts_errors.KTS_INTERNAL_ERROR
+	}
+
+	if rowsAffected == 0 {
+		return kts_errors.KTS_NOT_FOUND
+	}
+
+	return nil
+}
+
+func (esr *EventSeatRepository) UnblockAllEventSeats(eventId *uuid.UUID, userId *uuid.UUID) *models.KTSError {
+	stmt := table.EventSeats.UPDATE(table.EventSeats.BlockedUntil, table.EventSeats.UserID).
+		SET(nil, nil).
+		WHERE(table.EventSeats.EventID.EQ(utils.MysqlUuid(eventId)).
 			AND(table.EventSeats.UserID.EQ(utils.MysqlUuid(userId))).AND(table.EventSeats.BlockedUntil.GT(utils.MysqlTimeNow())).AND(table.EventSeats.Booked.IS_FALSE()))
 
 	result, err := stmt.Exec(esr.DatabaseManager.GetDatabaseConnection())

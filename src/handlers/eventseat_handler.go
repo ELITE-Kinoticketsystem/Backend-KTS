@@ -130,6 +130,28 @@ func UnblockEventSeatHandler(eventSeatController controllers.EventSeatController
 	}
 }
 
+func UnblockAllEventSeatsHandler(eventSeatController controllers.EventSeatControllerI) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		eventId, err := uuid.Parse(c.Param("eventId"))
+
+		if err != nil {
+			utils.HandleErrorAndAbort(c, kts_errors.KTS_BAD_REQUEST)
+			return
+		}
+
+		userId := c.Request.Context().Value(models.ContextKeyUserID).(*uuid.UUID)
+
+		kts_err := eventSeatController.UnblockAllEventSeats(&eventId, userId)
+		if kts_err != nil {
+			utils.HandleErrorAndAbort(c, kts_err)
+			return
+		}
+
+		c.JSON(http.StatusOK, nil)
+
+	}
+}
+
 // @Summary Get selected seats
 // @Description Get selected seats
 // @Tags EventSeats

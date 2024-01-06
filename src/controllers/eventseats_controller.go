@@ -16,6 +16,7 @@ type EventSeatControllerI interface {
 	BlockEventSeat(eventId *uuid.UUID, eventSeatId *uuid.UUID, userId *uuid.UUID) (*time.Time, *models.KTSError)
 	AreUserSeatsNextToEachOther(eventId *uuid.UUID, userId *uuid.UUID, eventSeatId *uuid.UUID) (bool, *models.KTSError)
 	UnblockEventSeat(eventId *uuid.UUID, eventSeatId *uuid.UUID, userId *uuid.UUID) (*time.Time, *models.KTSError)
+	UnblockAllEventSeats(eventId *uuid.UUID, userId *uuid.UUID) *models.KTSError
 	GetSelectedSeats(eventId *uuid.UUID, userId *uuid.UUID) (*[]models.GetSlectedSeatsDTO, *models.KTSError)
 }
 
@@ -111,6 +112,10 @@ func (esc *EventSeatController) UnblockEventSeat(eventId *uuid.UUID, eventSeatId
 	}
 
 	return &blockedUntil, nil
+}
+
+func (esc *EventSeatController) UnblockAllEventSeats(eventId *uuid.UUID, userId *uuid.UUID) *models.KTSError {
+	return esc.EventSeatRepo.UnblockAllEventSeats(eventId, userId)
 }
 
 func (esc *EventSeatController) AreUserSeatsNextToEachOtherWithoutSeat(eventId *uuid.UUID, userId *uuid.UUID, eventSeatId *uuid.UUID) (bool, *models.KTSError) {
