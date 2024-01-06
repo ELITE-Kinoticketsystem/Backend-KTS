@@ -157,7 +157,7 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 
 	securedRoutes.Handle(http.MethodGet, "/test", handlers.TestJwtToken)
 
-	// Moive
+	// movies
 	publicRoutes.Handle(http.MethodGet, "/movies", handlers.GetMovies(controller.MovieController))
 	publicRoutes.Handle(http.MethodGet, "/movies/genres", handlers.GetMoviesWithGenres(controller.MovieController))
 	publicRoutes.Handle(http.MethodGet, "/movies/:id", handlers.GetMovieById(controller.MovieController))
@@ -215,6 +215,10 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 	securedRoutes.Handle(http.MethodPost, "/theatres", handlers.CreateTheatre(controller.TheatreController))
 	publicRoutes.Handle(http.MethodGet, "/theatres", handlers.GetTheatres(controller.TheatreController))
 
+	// cinema halls
+	publicRoutes.Handle(http.MethodPost, "/cinema-halls", handlers.CreateCinemaHallHandler(controller.TheatreController))
+
+	// orders
 	router.Handle(http.MethodGet, "/orders/:orderId", handlers.GetOrderByIdHandler(controller.OrderController))
 	router.Handle(http.MethodGet, "/orders", handlers.GetOrdersHandler(controller.OrderController))
 

@@ -39,6 +39,20 @@ func (m *MockTheatreControllerI) EXPECT() *MockTheatreControllerIMockRecorder {
 	return m.recorder
 }
 
+// CreateCinemaHall mocks base method.
+func (m *MockTheatreControllerI) CreateCinemaHall(arg0 *models.CreateCinemaHallRequest) *models.KTSError {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateCinemaHall", arg0)
+	ret0, _ := ret[0].(*models.KTSError)
+	return ret0
+}
+
+// CreateCinemaHall indicates an expected call of CreateCinemaHall.
+func (mr *MockTheatreControllerIMockRecorder) CreateCinemaHall(arg0 any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateCinemaHall", reflect.TypeOf((*MockTheatreControllerI)(nil).CreateCinemaHall), arg0)
+}
+
 // CreateTheatre mocks base method.
 func (m *MockTheatreControllerI) CreateTheatre(arg0 *models.CreateTheatreRequest) *models.KTSError {
 	m.ctrl.T.Helper()

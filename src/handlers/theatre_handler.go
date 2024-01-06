@@ -49,3 +49,27 @@ func GetTheatres(theatreCtrl controllers.TheatreControllerI) gin.HandlerFunc {
 		c.JSON(http.StatusOK, theatres)
 	}
 }
+
+func CreateCinemaHallHandler(theatreCtrl controllers.TheatreControllerI) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var cinemaHallData models.CreateCinemaHallRequest
+		err := c.ShouldBindJSON(&cinemaHallData)
+		if err != nil {
+			utils.HandleErrorAndAbort(c, kts_errors.KTS_BAD_REQUEST)
+			return
+		}
+
+		if utils.ContainsEmptyString(cinemaHallData.HallName) {
+			utils.HandleErrorAndAbort(c, kts_errors.KTS_BAD_REQUEST)
+			return
+		}
+
+		kts_err := theatreCtrl.CreateCinemaHall(&cinemaHallData)
+		if kts_err != nil {
+			utils.HandleErrorAndAbort(c, kts_err)
+			return
+		}
+
+		c.JSON(http.StatusCreated, nil)
+	}
+}

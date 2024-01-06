@@ -81,6 +81,223 @@ func TestCreateTheatre(t *testing.T) {
 	}
 }
 
+func TestCreateCinemaHall(t *testing.T) {
+	testCases := []struct {
+		name            string
+		data            model.CinemaHalls
+		setExpectations func(mock sqlmock.Sqlmock, cinemaHall *model.CinemaHalls)
+		expectedError   *models.KTSError
+	}{
+		{
+			name: "Success",
+			data: samples.GetSampleCinemaHall(),
+			setExpectations: func(mock sqlmock.Sqlmock, cinemaHall *model.CinemaHalls) {
+				mock.ExpectExec(
+					"INSERT INTO `KinoTicketSystem`.cinema_halls",
+				).WithArgs(
+					utils.EqUUID(cinemaHall.ID),
+					cinemaHall.Name,
+					cinemaHall.Capacity,
+					utils.EqUUID(cinemaHall.TheatreID),
+				).WillReturnResult(sqlmock.NewResult(1, 1))
+			},
+			expectedError: nil,
+		},
+		{
+			name: "Internal error",
+			data: samples.GetSampleCinemaHall(),
+			setExpectations: func(mock sqlmock.Sqlmock, cinemaHall *model.CinemaHalls) {
+				mock.ExpectExec(
+					"INSERT INTO `KinoTicketSystem`.cinema_halls",
+				).WithArgs(
+					utils.EqUUID(cinemaHall.ID),
+					cinemaHall.Name,
+					cinemaHall.Capacity,
+					utils.EqUUID(cinemaHall.TheatreID),
+				).WillReturnError(sql.ErrConnDone)
+			},
+			expectedError: kts_errors.KTS_INTERNAL_ERROR,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			// GIVEN
+			// create mock db manager
+			db, mock, err := sqlmock.New()
+			if err != nil {
+				t.Fatalf("error while setting up mock database: %s", err)
+			}
+			theatreRepo := TheatreRepository{
+				DatabaseManager: &managers.DatabaseManager{
+					Connection: db,
+				},
+			}
+
+			// define expectations
+			tc.setExpectations(mock, &tc.data)
+
+			// WHEN
+			// call CreateCinemaHall with cinema hall data
+			kts_err := theatreRepo.CreateCinemaHall(tc.data)
+
+			// THEN
+			// check expected error
+			assert.Equal(t, tc.expectedError, kts_err)
+			if err = mock.ExpectationsWereMet(); err != nil {
+				t.Errorf("There were unfulfilled expectations: %s", err)
+			}
+		})
+	}
+}
+
+func TestCreateSeat(t *testing.T) {
+	testCases := []struct {
+		name            string
+		data            model.Seats
+		setExpectations func(mock sqlmock.Sqlmock, seat *model.Seats)
+		expectedError   *models.KTSError
+	}{
+		{
+			name: "Success",
+			data: samples.GetSampleSeat(),
+			setExpectations: func(mock sqlmock.Sqlmock, seat *model.Seats) {
+				mock.ExpectExec(
+					"INSERT INTO `KinoTicketSystem`.seats",
+				).WithArgs(
+					utils.EqUUID(seat.ID),
+					seat.RowNr,
+					seat.ColumnNr,
+					seat.VisibleRowNr,
+					seat.VisibleColumnNr,
+					utils.EqUUID(seat.SeatCategoryID),
+					utils.EqUUID(seat.CinemaHallID),
+					seat.Type,
+				).WillReturnResult(sqlmock.NewResult(1, 1))
+			},
+			expectedError: nil,
+		},
+		{
+			name: "Internal error",
+			data: samples.GetSampleSeat(),
+			setExpectations: func(mock sqlmock.Sqlmock, seat *model.Seats) {
+				mock.ExpectExec(
+					"INSERT INTO `KinoTicketSystem`.seats",
+				).WithArgs(
+					utils.EqUUID(seat.ID),
+					seat.RowNr,
+					seat.ColumnNr,
+					seat.VisibleRowNr,
+					seat.VisibleColumnNr,
+					utils.EqUUID(seat.SeatCategoryID),
+					utils.EqUUID(seat.CinemaHallID),
+					seat.Type,
+				).WillReturnError(sql.ErrConnDone)
+			},
+			expectedError: kts_errors.KTS_INTERNAL_ERROR,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			// GIVEN
+			// create mock db manager
+			db, mock, err := sqlmock.New()
+			if err != nil {
+				t.Fatalf("error while setting up mock database: %s", err)
+			}
+			theatreRepo := TheatreRepository{
+				DatabaseManager: &managers.DatabaseManager{
+					Connection: db,
+				},
+			}
+
+			// define expectations
+			tc.setExpectations(mock, &tc.data)
+
+			// WHEN
+			// call CreateSeat with seat data
+			kts_err := theatreRepo.CreateSeat(tc.data)
+
+			// THEN
+			// check expected error
+			assert.Equal(t, tc.expectedError, kts_err)
+		})
+	}
+}
+
+func TestGetSeatCategories(t *testing.T) {
+	sampleSeatCategories := samples.GetSampleSeatCategories()
+	testCases := []struct {
+		name                   string
+		setExpectations        func(mock sqlmock.Sqlmock)
+		expectedSeatCategories []model.SeatCategories
+		expectedError          *models.KTSError
+	}{
+		{
+			name: "Success",
+			setExpectations: func(mock sqlmock.Sqlmock) {
+				mock.ExpectQuery(
+					"SELECT .* FROM `KinoTicketSystem`.seat_categories;",
+				).WillReturnRows(
+					sqlmock.NewRows([]string{"seat_categories.id", "seat_categories.category_name"}).
+						AddRow(sampleSeatCategories[0].ID, sampleSeatCategories[0].CategoryName).
+						AddRow(sampleSeatCategories[1].ID, sampleSeatCategories[1].CategoryName).
+						AddRow(sampleSeatCategories[2].ID, sampleSeatCategories[2].CategoryName),
+				)
+			},
+			expectedSeatCategories: sampleSeatCategories,
+			expectedError:          nil,
+		},
+		{
+			name: "Internal error",
+			setExpectations: func(mock sqlmock.Sqlmock) {
+				mock.ExpectQuery(
+					"SELECT .* FROM `KinoTicketSystem`.seat_categories;",
+				).WillReturnError(sql.ErrConnDone)
+			},
+			expectedSeatCategories: nil,
+			expectedError:          kts_errors.KTS_INTERNAL_ERROR,
+		},
+		{
+			name: "Not found",
+			setExpectations: func(mock sqlmock.Sqlmock) {
+				mock.ExpectQuery(
+					"SELECT .* FROM `KinoTicketSystem`.seat_categories;",
+				).WillReturnError(sql.ErrNoRows)
+			},
+			expectedSeatCategories: nil,
+			expectedError:          kts_errors.KTS_NOT_FOUND,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			db, mock, err := sqlmock.New()
+			if err != nil {
+				t.Fatalf("Failed to create mock database connection: %v", err)
+			}
+			defer db.Close()
+
+			theatreRepo := &TheatreRepository{
+				DatabaseManager: &managers.DatabaseManager{
+					Connection: db,
+				},
+			}
+
+			tc.setExpectations(mock)
+
+			seatCategories, kts_err := theatreRepo.GetSeatCategories()
+
+			if err := mock.ExpectationsWereMet(); err != nil {
+				t.Errorf("There were unfulfilled expectations: %s", err)
+			}
+			assert.Equal(t, tc.expectedError, kts_err)
+			assert.Equal(t, tc.expectedSeatCategories, seatCategories)
+		})
+	}
+}
+
 func TestGetSeatsForCinemaHall(t *testing.T) {
 	cinemaHallID := utils.NewUUID()
 
