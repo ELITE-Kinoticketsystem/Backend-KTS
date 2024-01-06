@@ -215,7 +215,7 @@ CREATE TABLE orders
      id                BINARY(16) DEFAULT (Uuid_to_bin(Uuid(), 1)),
      totalprice        INT NOT NULL,
      is_paid           BOOLEAN NOT NULL,
-     payment_method_id BINARY(16) NOT NULL,
+     payment_method_id BINARY(16),
      user_id           BINARY(16) NOT NULL,
      PRIMARY KEY (id),
      FOREIGN KEY (payment_method_id) REFERENCES payment_methods(id),
