@@ -88,3 +88,92 @@ func TestCreateTheatreHandler(t *testing.T) {
 		})
 	}
 }
+
+func TestCreateCinemaHall(t *testing.T) {
+	sampleCreateCinemaHall := samples.GetSampleCreateCinemaHallRequest()
+
+	testCases := []struct {
+		name            string
+		body            gin.H
+		setExpectations func(mockController *mocks.MockTheatreControllerI)
+		expectedStatus  int
+		expectedBody    interface{}
+	}{
+		{
+			name: "Success",
+			body: gin.H{
+				"hallName":  sampleCreateCinemaHall.HallName,
+				"seats":     sampleCreateCinemaHall.Seats,
+				"theatreId": sampleCreateCinemaHall.TheatreId,
+			},
+			setExpectations: func(mockController *mocks.MockTheatreControllerI) {
+				mockController.EXPECT().CreateCinemaHall(&sampleCreateCinemaHall).Return(nil)
+			},
+			expectedStatus: http.StatusCreated,
+			expectedBody:   nil,
+		},
+		{
+			name: "Internal error",
+			body: gin.H{
+				"hallName":  sampleCreateCinemaHall.HallName,
+				"seats":     sampleCreateCinemaHall.Seats,
+				"theatreId": sampleCreateCinemaHall.TheatreId,
+			},
+			setExpectations: func(mockController *mocks.MockTheatreControllerI) {
+				mockController.EXPECT().CreateCinemaHall(&sampleCreateCinemaHall).Return(kts_errors.KTS_INTERNAL_ERROR)
+			},
+			expectedStatus: http.StatusInternalServerError,
+			expectedBody:   gin.H{"errorMessage": "INTERNAL_ERROR"},
+		},
+		{
+			name: "Invalid id",
+			body: gin.H{
+				"HallName":  sampleCreateCinemaHall.HallName,
+				"TheatreId": "invalid id",
+				"Seats":     sampleCreateCinemaHall.Seats,
+			},
+			setExpectations: func(mockController *mocks.MockTheatreControllerI) {},
+			expectedStatus:  http.StatusBadRequest,
+			expectedBody:    gin.H{"errorMessage": "BAD_REQUEST"},
+		},
+		{
+			name: "Empty field",
+			body: gin.H{
+				"HallName":  "",
+				"TheatreId": sampleCreateCinemaHall.TheatreId,
+				"Seats":     sampleCreateCinemaHall.Seats,
+			},
+			setExpectations: func(mockController *mocks.MockTheatreControllerI) {},
+			expectedStatus:  http.StatusBadRequest,
+			expectedBody:    gin.H{"errorMessage": "BAD_REQUEST"},
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			// GIVEN
+			w := httptest.NewRecorder()
+			gin.SetMode(gin.TestMode)
+			c, _ := gin.CreateTestContext(w)
+
+			mockCtrl := gomock.NewController(t)
+			defer mockCtrl.Finish()
+			theatreController := mocks.NewMockTheatreControllerI(mockCtrl)
+
+			jsonData, _ := json.Marshal(tc.body)
+			req, _ := http.NewRequest("POST", "/theatre/hall/", bytes.NewBuffer(jsonData))
+			req.Header.Set("Content-Type", "application/json")
+			c.Request = req
+
+			tc.setExpectations(theatreController)
+
+			// WHEN
+			handlers.CreateCinemaHallHandler(theatreController)(c)
+
+			// THEN
+			assert.Equal(t, tc.expectedStatus, w.Code, "wrong HTTP status code")
+			expectedResponseBody, _ := json.Marshal(tc.expectedBody)
+			assert.Equal(t, bytes.NewBuffer(expectedResponseBody).String(), w.Body.String(), "wrong response body")
+		})
+	}
+}
