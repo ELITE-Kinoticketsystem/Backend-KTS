@@ -9,6 +9,7 @@ import (
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/samples"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
 )
@@ -96,6 +97,7 @@ func TestCreateTheatre(t *testing.T) {
 }
 
 func TestCreateCinemaHall(t *testing.T) {
+	sampleRequest := samples.GetSampleCreateCinemaHallRequest()
 	sampleCinemaHall := samples.GetSampleCinemaHall()
 	sampleSeatCategories := samples.GetSampleSeatCategories()
 	testCases := []struct {
@@ -105,16 +107,16 @@ func TestCreateCinemaHall(t *testing.T) {
 		expectedError   *models.KTSError
 	}{
 		{
-			name:           "Hall not rectangular",
-			cinemaHallData: samples.GetSampleCreateCinemaHallRequestNotRectangular(),
+			name:            "Hall not rectangular",
+			cinemaHallData:  samples.GetSampleCreateCinemaHallRequestNotRectangular(),
 			setExpectations: func(mockRepo mocks.MockTheaterRepoI, cinemaHallData models.CreateCinemaHallRequest) {},
-			expectedError: kts_errors.KTS_BAD_REQUEST,
+			expectedError:   kts_errors.KTS_BAD_REQUEST,
 		},
 		{
-			name:           "Invalid double seats",
-			cinemaHallData: samples.GetSampleCreateCinemaHallRequestInvalidDoubleSeats(),
+			name:            "Invalid double seats",
+			cinemaHallData:  samples.GetSampleCreateCinemaHallRequestInvalidDoubleSeats(),
 			setExpectations: func(mockRepo mocks.MockTheaterRepoI, cinemaHallData models.CreateCinemaHallRequest) {},
-			expectedError: kts_errors.KTS_BAD_REQUEST,
+			expectedError:   kts_errors.KTS_BAD_REQUEST,
 		},
 		{
 			name:           "Invalid seat category",
@@ -127,7 +129,7 @@ func TestCreateCinemaHall(t *testing.T) {
 		},
 		{
 			name:           "Create hall internal error",
-			cinemaHallData: samples.GetSampleCreateCinemaHallRequest(),
+			cinemaHallData: sampleRequest,
 			setExpectations: func(mockRepo mocks.MockTheaterRepoI, cinemaHallData models.CreateCinemaHallRequest) {
 				mockRepo.EXPECT().CreateCinemaHall(utils.EqExceptUUIDs(sampleCinemaHall)).Return(kts_errors.KTS_INTERNAL_ERROR)
 			},
@@ -135,7 +137,7 @@ func TestCreateCinemaHall(t *testing.T) {
 		},
 		{
 			name:           "Get seat categories internal error",
-			cinemaHallData: samples.GetSampleCreateCinemaHallRequest(),
+			cinemaHallData: sampleRequest,
 			setExpectations: func(mockRepo mocks.MockTheaterRepoI, cinemaHallData models.CreateCinemaHallRequest) {
 				mockRepo.EXPECT().CreateCinemaHall(utils.EqExceptUUIDs(sampleCinemaHall)).Return(nil)
 				mockRepo.EXPECT().GetSeatCategories().Return(nil, kts_errors.KTS_INTERNAL_ERROR)
@@ -144,7 +146,7 @@ func TestCreateCinemaHall(t *testing.T) {
 		},
 		{
 			name:           "Create seat internal error",
-			cinemaHallData: samples.GetSampleCreateCinemaHallRequest(),
+			cinemaHallData: sampleRequest,
 			setExpectations: func(mockRepo mocks.MockTheaterRepoI, cinemaHallData models.CreateCinemaHallRequest) {
 				mockRepo.EXPECT().CreateCinemaHall(utils.EqExceptUUIDs(sampleCinemaHall)).Return(nil)
 				mockRepo.EXPECT().GetSeatCategories().Return(sampleSeatCategories, nil)
@@ -154,11 +156,12 @@ func TestCreateCinemaHall(t *testing.T) {
 		},
 		{
 			name:           "Success",
-			cinemaHallData: samples.GetSampleCreateCinemaHallRequest(),
+			cinemaHallData: sampleRequest,
 			setExpectations: func(mockRepo mocks.MockTheaterRepoI, cinemaHallData models.CreateCinemaHallRequest) {
 				mockRepo.EXPECT().CreateCinemaHall(utils.EqExceptUUIDs(sampleCinemaHall)).Return(nil)
 				mockRepo.EXPECT().GetSeatCategories().Return(sampleSeatCategories, nil)
-				mockRepo.EXPECT().CreateSeat(gomock.AssignableToTypeOf(model.Seats{})).Times(int(sampleCinemaHall.Capacity)).Return(nil)
+				mockRepo.EXPECT().CreateSeat(gomock.AssignableToTypeOf(model.Seats{})).
+				Times(len(sampleRequest.Seats) * len(sampleRequest.Seats[0])).Return(nil)
 			},
 			expectedError: nil,
 		},
@@ -190,5 +193,59 @@ func TestCreateCinemaHall(t *testing.T) {
 			assert.Equal(t, err, tc.expectedError, "wrong error")
 		})
 	}
+}
 
+func TestGetCinemaHallsForTheatre(t *testing.T) {
+	sampleCinemaHalls := samples.GetSampleCinemaHalls()
+	theatreId := sampleCinemaHalls[0].TheatreID
+	testCases := []struct {
+		name            string
+		theatreId       *uuid.UUID
+		setExpectations func(mockRepo mocks.MockTheaterRepoI)
+		expectedError   *models.KTSError
+	}{
+		{
+			name:      "Internal error",
+			theatreId: theatreId,
+			setExpectations: func(mockRepo mocks.MockTheaterRepoI) {
+				mockRepo.EXPECT().GetCinemaHallsForTheatre(theatreId).Return(nil, kts_errors.KTS_INTERNAL_ERROR)
+			},
+			expectedError: kts_errors.KTS_INTERNAL_ERROR,
+		},
+		{
+			name:      "Success",
+			theatreId: theatreId,
+			setExpectations: func(mockRepo mocks.MockTheaterRepoI) {
+				mockRepo.EXPECT().GetCinemaHallsForTheatre(theatreId).Return(&sampleCinemaHalls, nil)
+			},
+			expectedError: nil,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			// GIVEN
+			// create mock theatre repo
+			mockCtrl := gomock.NewController(t)
+			defer mockCtrl.Finish()
+			theatreRepoMock := mocks.NewMockTheaterRepoI(mockCtrl)
+			theatreController := TheatreController{
+				TheatreRepo: theatreRepoMock,
+			}
+
+			// create mock data
+			theatreId := tc.theatreId
+
+			// define expectations
+			tc.setExpectations(*theatreRepoMock)
+
+			// WHEN
+			// call GetCinemaHallsForTheatre with theatreId
+			_, err := theatreController.GetCinemaHallsForTheatre(theatreId)
+
+			// THEN
+			// check expected error
+			assert.Equal(t, err, tc.expectedError, "wrong error")
+		})
+	}
 }

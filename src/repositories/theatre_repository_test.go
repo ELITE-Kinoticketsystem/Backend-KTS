@@ -152,9 +152,8 @@ func TestCreateCinemaHall(t *testing.T) {
 }
 
 func TestGetCinemaHallsForTheatre(t *testing.T) {
-	theatreId := utils.NewUUID()
-
 	sampleCinemaHalls := samples.GetSampleCinemaHalls()
+	theatreId := sampleCinemaHalls[0].TheatreID
 
 	testCases := []struct {
 		name                string
@@ -202,7 +201,7 @@ func TestGetCinemaHallsForTheatre(t *testing.T) {
 				)
 			},
 			expectedCinemaHalls: nil,
-			expectedError:       kts_errors.KTS_NOT_FOUND,
+			expectedError: 	 kts_errors.KTS_NOT_FOUND,
 		},
 	}
 
@@ -230,8 +229,8 @@ func TestGetCinemaHallsForTheatre(t *testing.T) {
 			assert.Equal(t, tc.expectedError, ktsErr)
 			assert.Equal(t, tc.expectedCinemaHalls, cinemaHalls)
 		})
-
 	}
+
 }
 
 func TestCreateSeat(t *testing.T) {
