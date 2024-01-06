@@ -214,6 +214,7 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 	// theatres
 	securedRoutes.Handle(http.MethodPost, "/theatres", handlers.CreateTheatre(controller.TheatreController))
 	publicRoutes.Handle(http.MethodGet, "/theatres", handlers.GetTheatres(controller.TheatreController))
+	publicRoutes.Handle(http.MethodGet, "/theatres/:theatreId/cinema-halls", handlers.GetCinemaHallsForTheatreHandler(controller.TheatreController))
 
 	// cinema halls
 	publicRoutes.Handle(http.MethodPost, "/cinema-halls", handlers.CreateCinemaHallHandler(controller.TheatreController))

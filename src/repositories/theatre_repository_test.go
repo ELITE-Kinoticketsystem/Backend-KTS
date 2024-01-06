@@ -151,6 +151,89 @@ func TestCreateCinemaHall(t *testing.T) {
 	}
 }
 
+func TestGetCinemaHallsForTheatre(t *testing.T) {
+	theatreId := utils.NewUUID()
+
+	sampleCinemaHalls := samples.GetSampleCinemaHalls()
+
+	testCases := []struct {
+		name                string
+		setExpectations     func(mock sqlmock.Sqlmock)
+		expectedCinemaHalls *[]model.CinemaHalls
+		expectedError       *models.KTSError
+	}{
+		{
+			name: "Success",
+			setExpectations: func(mock sqlmock.Sqlmock) {
+				mock.ExpectQuery(
+					"SELECT .* FROM `KinoTicketSystem`.cinema_halls .*",
+				).WithArgs(
+					sqlmock.AnyArg(),
+				).WillReturnRows(
+					sqlmock.NewRows([]string{"cinema_halls.id", "cinema_halls.name", "cinema_halls.capacity", "cinema_halls.theatre_id"}).
+						AddRow(sampleCinemaHalls[0].ID, sampleCinemaHalls[0].Name, sampleCinemaHalls[0].Capacity, sampleCinemaHalls[0].TheatreID).
+						AddRow(sampleCinemaHalls[1].ID, sampleCinemaHalls[1].Name, sampleCinemaHalls[1].Capacity, sampleCinemaHalls[1].TheatreID),
+				)
+			},
+			expectedCinemaHalls: &sampleCinemaHalls,
+			expectedError:       nil,
+		},
+		{
+			name: "Internal error",
+			setExpectations: func(mock sqlmock.Sqlmock) {
+				mock.ExpectQuery(
+					"SELECT .* FROM `KinoTicketSystem`.cinema_halls .*",
+				).WithArgs(
+					sqlmock.AnyArg(),
+				).WillReturnError(sql.ErrConnDone)
+			},
+			expectedCinemaHalls: nil,
+			expectedError:       kts_errors.KTS_INTERNAL_ERROR,
+		},
+		{
+			name: "Not found",
+			setExpectations: func(mock sqlmock.Sqlmock) {
+				mock.ExpectQuery(
+					"SELECT .* FROM `KinoTicketSystem`.cinema_halls .*",
+				).WithArgs(
+					sqlmock.AnyArg(),
+				).WillReturnRows(
+					sqlmock.NewRows([]string{"cinema_halls.id", "cinema_halls.name", "cinema_halls.capacity", "cinema_halls.theatre_id"}),
+				)
+			},
+			expectedCinemaHalls: nil,
+			expectedError:       kts_errors.KTS_NOT_FOUND,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			db, mock, err := sqlmock.New()
+			if err != nil {
+				t.Fatalf("Failed to create mock database connection: %v", err)
+			}
+			defer db.Close()
+
+			theatreRepo := &TheatreRepository{
+				DatabaseManager: &managers.DatabaseManager{
+					Connection: db,
+				},
+			}
+
+			tc.setExpectations(mock)
+
+			cinemaHalls, ktsErr := theatreRepo.GetCinemaHallsForTheatre(theatreId)
+
+			if err := mock.ExpectationsWereMet(); err != nil {
+				t.Errorf("There were unfulfilled expectations: %s", err)
+			}
+			assert.Equal(t, tc.expectedError, ktsErr)
+			assert.Equal(t, tc.expectedCinemaHalls, cinemaHalls)
+		})
+
+	}
+}
+
 func TestCreateSeat(t *testing.T) {
 	testCases := []struct {
 		name            string

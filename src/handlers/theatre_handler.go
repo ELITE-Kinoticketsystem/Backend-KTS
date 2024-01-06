@@ -8,6 +8,7 @@ import (
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 // @Summary Create theatre
@@ -71,5 +72,22 @@ func CreateCinemaHallHandler(theatreCtrl controllers.TheatreControllerI) gin.Han
 		}
 
 		c.JSON(http.StatusCreated, nil)
+	}
+}
+
+func GetCinemaHallsForTheatreHandler(theatreCtrl controllers.TheatreControllerI) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		theatreId, err := uuid.Parse(c.Param("theatreId"))
+		if err != nil {
+			utils.HandleErrorAndAbort(c, kts_errors.KTS_BAD_REQUEST)
+			return
+		}
+		cinemaHalls, kts_err := theatreCtrl.GetCinemaHallsForTheatre(&theatreId)
+		if kts_err != nil {
+			utils.HandleErrorAndAbort(c, kts_err)
+			return
+		}
+
+		c.JSON(http.StatusOK, cinemaHalls)
 	}
 }

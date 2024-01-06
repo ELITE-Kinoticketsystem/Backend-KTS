@@ -17,6 +17,7 @@ type TheaterRepoI interface {
 	CreateTheatre(theatre model.Theatres) *models.KTSError
 	GetTheatres() (*[]model.Theatres, *models.KTSError)
 	CreateCinemaHall(cinemaHall model.CinemaHalls) *models.KTSError
+	GetCinemaHallsForTheatre(theatreId *uuid.UUID) (*[]model.CinemaHalls, *models.KTSError)
 	CreateSeat(seat model.Seats) *models.KTSError
 	GetSeatCategories() ([]model.SeatCategories, *models.KTSError)
 	GetSeatsForCinemaHall(cinemaHallId *uuid.UUID) ([]model.Seats, *models.KTSError)
@@ -81,6 +82,31 @@ func (tr *TheatreRepository) CreateCinemaHall(cinemaHall model.CinemaHalls) *mod
 		return kts_errors.KTS_INTERNAL_ERROR
 	}
 	return nil
+}
+
+func (tr *TheatreRepository) GetCinemaHallsForTheatre(theatreId *uuid.UUID) (*[]model.CinemaHalls, *models.KTSError) {
+	var cinemaHalls []model.CinemaHalls
+
+	stmt := mysql.SELECT(
+		table.CinemaHalls.ID,
+		table.CinemaHalls.Name,
+		table.CinemaHalls.Capacity,
+		table.CinemaHalls.TheatreID,
+	).FROM(
+		table.CinemaHalls,
+	).WHERE(
+		table.CinemaHalls.TheatreID.EQ(utils.MysqlUuid(theatreId)),
+	)
+
+	err := stmt.Query(tr.DatabaseManager.GetDatabaseConnection(), &cinemaHalls)
+	if err != nil {
+		return nil, kts_errors.KTS_INTERNAL_ERROR
+	}
+	if len(cinemaHalls) == 0 {
+		return nil, kts_errors.KTS_NOT_FOUND
+	}
+
+	return &cinemaHalls, nil
 }
 
 func (tr *TheatreRepository) CreateSeat(seat model.Seats) *models.KTSError {

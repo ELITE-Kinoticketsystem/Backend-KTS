@@ -12,6 +12,7 @@ type TheatreControllerI interface {
 	CreateTheatre(*models.CreateTheatreRequest) *models.KTSError
 	GetTheatres() (*[]model.Theatres, *models.KTSError)
 	CreateCinemaHall(*models.CreateCinemaHallRequest) *models.KTSError
+	GetCinemaHallsForTheatre(*uuid.UUID) (*[]model.CinemaHalls, *models.KTSError)
 }
 
 type TheatreController struct {
@@ -154,4 +155,8 @@ func seatCategoriesToMap(seatCategories []model.SeatCategories) map[string]uuid.
 		seatCategoriesMap[seatCategory.CategoryName] = *seatCategory.ID
 	}
 	return seatCategoriesMap
+}
+
+func (tc *TheatreController) GetCinemaHallsForTheatre(theatreId *uuid.UUID) (*[]model.CinemaHalls, *models.KTSError) {
+	return tc.TheatreRepo.GetCinemaHallsForTheatre(theatreId)
 }

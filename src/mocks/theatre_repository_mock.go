@@ -96,6 +96,21 @@ func (mr *MockTheaterRepoIMockRecorder) CreateTheatre(theatre any) *gomock.Call 
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateTheatre", reflect.TypeOf((*MockTheaterRepoI)(nil).CreateTheatre), theatre)
 }
 
+// GetCinemaHallsForTheatre mocks base method.
+func (m *MockTheaterRepoI) GetCinemaHallsForTheatre(theatreId *uuid.UUID) (*[]model.CinemaHalls, *models.KTSError) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetCinemaHallsForTheatre", theatreId)
+	ret0, _ := ret[0].(*[]model.CinemaHalls)
+	ret1, _ := ret[1].(*models.KTSError)
+	return ret0, ret1
+}
+
+// GetCinemaHallsForTheatre indicates an expected call of GetCinemaHallsForTheatre.
+func (mr *MockTheaterRepoIMockRecorder) GetCinemaHallsForTheatre(theatreId any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCinemaHallsForTheatre", reflect.TypeOf((*MockTheaterRepoI)(nil).GetCinemaHallsForTheatre), theatreId)
+}
+
 // GetSeatCategories mocks base method.
 func (m *MockTheaterRepoI) GetSeatCategories() ([]model.SeatCategories, *models.KTSError) {
 	m.ctrl.T.Helper()

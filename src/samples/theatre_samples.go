@@ -2226,6 +2226,24 @@ func GetSampleCinemaHall() model.CinemaHalls {
 	}
 }
 
+func GetSampleCinemaHalls() []model.CinemaHalls {
+	theatreId := uuid.MustParse(theatreId)
+	return []model.CinemaHalls{
+		{
+			ID:        utils.NewUUID(),
+			TheatreID: &theatreId,
+			Name:      "Hall 1",
+			Capacity:  100,
+		},
+		{
+			ID:        utils.NewUUID(),
+			TheatreID: &theatreId,
+			Name:      "Hall 2",
+			Capacity:  200,
+		},
+	}
+}
+
 func GetSampleSeat() model.Seats {
 	id := uuid.MustParse(seatId)
 	cinemaHallId := uuid.MustParse(cinemaHallId)
