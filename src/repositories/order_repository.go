@@ -55,12 +55,26 @@ func (or *OrderRepository) CreateOrder(order *model.Orders) (*uuid.UUID, *models
 func (or *OrderRepository) GetOrderById(orderId *uuid.UUID, userId *uuid.UUID) (*models.GetOrderDTO, *models.KTSError) {
 	order := models.GetOrderDTO{}
 
-	stmt := table.Orders.SELECT(table.Orders.AllColumns, table.Tickets.AllColumns, table.Seats.AllColumns).
+	stmt := table.Orders.SELECT(
+		table.Orders.AllColumns,
+		table.Tickets.AllColumns,
+		table.Seats.AllColumns,
+		table.Events.AllColumns,
+		table.CinemaHalls.AllColumns,
+		table.Theatres.AllColumns,
+		table.Movies.AllColumns,
+	).
 		FROM(table.Orders.
 			LEFT_JOIN(table.Tickets, table.Tickets.OrderID.EQ(table.Orders.ID)).
 			LEFT_JOIN(table.EventSeats, table.EventSeats.ID.EQ(table.Tickets.EventSeatID)).
-			LEFT_JOIN(table.Seats, table.Seats.ID.EQ(table.EventSeats.SeatID))).
-		WHERE(table.Orders.ID.EQ(utils.MysqlUuid(orderId)).AND(table.Orders.UserID.EQ(utils.MysqlUuid(userId))))
+			LEFT_JOIN(table.Seats, table.Seats.ID.EQ(table.EventSeats.SeatID)).
+			LEFT_JOIN(table.Events, table.Events.ID.EQ(table.EventSeats.EventID)).
+			LEFT_JOIN(table.CinemaHalls, table.CinemaHalls.ID.EQ(table.Events.CinemaHallID)).
+			LEFT_JOIN(table.Theatres, table.Theatres.ID.EQ(table.CinemaHalls.TheatreID)).
+			LEFT_JOIN(table.EventMovies, table.EventMovies.EventID.EQ(table.Events.ID)).
+			LEFT_JOIN(table.Movies, table.Movies.ID.EQ(table.EventMovies.MovieID)),
+		).
+		WHERE(table.Orders.UserID.EQ(utils.MysqlUuid(userId)).AND(table.Orders.UserID.EQ(utils.MysqlUuid(userId))))
 
 	err := stmt.Query(or.DatabaseManager.GetDatabaseConnection(), &order)
 
@@ -74,11 +88,25 @@ func (or *OrderRepository) GetOrderById(orderId *uuid.UUID, userId *uuid.UUID) (
 func (or *OrderRepository) GetOrders(userId *uuid.UUID) (*[]models.GetOrderDTO, *models.KTSError) {
 	orders := &[]models.GetOrderDTO{}
 
-	stmt := table.Orders.SELECT(table.Orders.AllColumns, table.Tickets.AllColumns, table.Seats.AllColumns).
+	stmt := table.Orders.SELECT(
+		table.Orders.AllColumns,
+		table.Tickets.AllColumns,
+		table.Seats.AllColumns,
+		table.Events.AllColumns,
+		table.CinemaHalls.AllColumns,
+		table.Theatres.AllColumns,
+		table.Movies.AllColumns,
+	).
 		FROM(table.Orders.
 			LEFT_JOIN(table.Tickets, table.Tickets.OrderID.EQ(table.Orders.ID)).
 			LEFT_JOIN(table.EventSeats, table.EventSeats.ID.EQ(table.Tickets.EventSeatID)).
-			LEFT_JOIN(table.Seats, table.Seats.ID.EQ(table.EventSeats.SeatID))).
+			LEFT_JOIN(table.Seats, table.Seats.ID.EQ(table.EventSeats.SeatID)).
+			LEFT_JOIN(table.Events, table.Events.ID.EQ(table.EventSeats.EventID)).
+			LEFT_JOIN(table.CinemaHalls, table.CinemaHalls.ID.EQ(table.Events.CinemaHallID)).
+			LEFT_JOIN(table.Theatres, table.Theatres.ID.EQ(table.CinemaHalls.TheatreID)).
+			LEFT_JOIN(table.EventMovies, table.EventMovies.EventID.EQ(table.Events.ID)).
+			LEFT_JOIN(table.Movies, table.Movies.ID.EQ(table.EventMovies.MovieID)),
+		).
 		WHERE(table.Orders.UserID.EQ(utils.MysqlUuid(userId)))
 
 	err := stmt.Query(or.DatabaseManager.GetDatabaseConnection(), orders)

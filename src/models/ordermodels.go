@@ -15,8 +15,12 @@ type CreateOrderDTO struct {
 }
 
 type GetOrderDTO struct {
-	Order   model.Orders
-	Tickets []struct {
+	Order      model.Orders
+	Event      model.Events
+	CinemaHall model.CinemaHalls
+	Theatre    model.Theatres
+	Movies     []model.Movies
+	Tickets    []struct {
 		Ticket model.Tickets
 		Seat   model.Seats
 	}
