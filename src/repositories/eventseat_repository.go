@@ -1,6 +1,7 @@
 package repositories
 
 import (
+	"log"
 	"time"
 
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/gen/KinoTicketSystem/model"
@@ -140,11 +141,14 @@ func (esr *EventSeatRepository) GetSelectedSeats(eventId *uuid.UUID, userId *uui
 		LEFT_JOIN(table.Seats, table.EventSeats.SeatID.EQ(table.Seats.ID)).
 		LEFT_JOIN(table.SeatCategories, table.Seats.SeatCategoryID.EQ(table.SeatCategories.ID)).
 		LEFT_JOIN(table.EventSeatCategories, table.EventSeatCategories.EventID.EQ(table.EventSeats.EventID).AND(table.EventSeatCategories.SeatCategoryID.EQ(table.Seats.SeatCategoryID))).
+		LEFT_JOIN(table.Events, table.Events.ID.EQ(table.EventSeats.EventID)).
 		LEFT_JOIN(table.CinemaHalls, table.CinemaHalls.ID.EQ(table.Events.CinemaHallID)).
 		LEFT_JOIN(table.Theatres, table.Theatres.ID.EQ(table.CinemaHalls.TheatreID)),
 	).
 		WHERE(table.EventSeats.EventID.EQ(utils.MysqlUuid(eventId)).AND(table.EventSeats.Booked.IS_FALSE()).AND(table.EventSeats.BlockedUntil.GT(mysql.CURRENT_TIMESTAMP()).AND(table.EventSeats.UserID.EQ(utils.MysqlUuid(userId))))).
 		ORDER_BY(table.Seats.ColumnNr.ASC(), table.Seats.RowNr.ASC())
+
+	log.Println(stmt.DebugSql())
 
 	err := stmt.Query(esr.DatabaseManager.GetDatabaseConnection(), &selectedSeats)
 
