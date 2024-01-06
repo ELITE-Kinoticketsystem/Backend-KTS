@@ -108,6 +108,6 @@ func GetOrdersHandler(orderController controllers.OrderControllerI) gin.HandlerF
 			return
 		}
 
-		c.JSON(200, orders)
+		c.JSON(http.StatusOK, orders)
 	}
 }
