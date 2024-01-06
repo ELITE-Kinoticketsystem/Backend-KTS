@@ -29,10 +29,10 @@ func (or *OrderRepository) CreateOrder(order *model.Orders) (*uuid.UUID, *models
 			utils.MysqlUuid(order.ID),
 			order.Totalprice,
 			order.IsPaid,
-			utils.MysqlUuid(order.PaymentMethodID),
+			utils.MysqlUuidOrNil(order.PaymentMethodID),
 			utils.MysqlUuid(order.UserID),
 		)
-
+	log.Println(insertStmt.DebugSql())
 	rows, err := insertStmt.Exec(or.DatabaseManager.GetDatabaseConnection())
 
 	if err != nil {

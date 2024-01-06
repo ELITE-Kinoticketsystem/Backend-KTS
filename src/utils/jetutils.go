@@ -16,6 +16,14 @@ func MysqlUuid(uuid *uuid.UUID) mysql.StringExpression {
 	return mysql.String(string(binary_id))
 }
 
+func MysqlUuidOrNil(uuid *uuid.UUID) mysql.Expression {
+	if uuid == nil {
+		return mysql.NULL
+	}
+	binary_id, _ := uuid.MarshalBinary()
+	return mysql.String(string(binary_id))
+}
+
 func MysqlTime(time *time.Time) mysql.TimeExpression {
 	return mysql.TimeT(*time)
 }
