@@ -86,7 +86,7 @@ func (tc *TheatreController) CreateCinemaHall(cinemaHallData *models.CreateCinem
 		for _, seat := range row {
 			if seat.Type == "empty" {
 				emtpy_seats++
-				continue
+				visible_column--
 			}
 			seatId := uuid.New()
 			seatCategoryId, ok := seatCategoriesMap[seat.Category]
