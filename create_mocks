@@ -22,3 +22,4 @@
 ~/go/bin/mockgen -source=./src/repositories/theatre_repository.go -destination=./src/mocks/theatre_repository_mock.go -package=mocks
 ~/go/bin/mockgen -source=./src/repositories/price_category_repository.go -destination=./src/mocks/price_category_repository_mock.go -package=mocks
 ~/go/bin/mockgen -source=./src/repositories/ticket_repository.go -destination=./src/mocks/ticket_repository_mock.go -package=mocks
+~/go/bin/mockgen -source=./src/repositories/review_repository.go -destination=./src/mocks/review_repository_mock.go -package=mocks
