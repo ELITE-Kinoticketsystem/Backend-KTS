@@ -230,7 +230,7 @@ func (mr *MovieRepository) GetMovieById(movieId *uuid.UUID) (*models.MovieWithEv
 			LEFT_JOIN(table.MovieProducers, table.MovieProducers.MovieID.EQ(table.Movies.ID)).
 			LEFT_JOIN(table.Producers, table.Producers.ID.EQ(table.MovieProducers.ProducerID)).
 			LEFT_JOIN(table.Reviews, table.Reviews.MovieID.EQ(table.Movies.ID)).
-			INNER_JOIN(table.Users, table.Users.ID.EQ(table.Reviews.UserID)),
+			LEFT_JOIN(table.Users, table.Users.ID.EQ(table.Reviews.UserID)),
 	).WHERE(
 		table.Movies.ID.EQ(utils.MysqlUuid(movieId)),
 	)
