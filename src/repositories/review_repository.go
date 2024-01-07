@@ -1,12 +1,15 @@
 package repositories
 
 import (
+	"log"
+
 	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/gen/KinoTicketSystem/model"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/gen/KinoTicketSystem/table"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/managers"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
+	"github.com/go-jet/jet/v2/mysql"
 	"github.com/google/uuid"
 )
 
@@ -14,6 +17,8 @@ type ReviewRepositoryI interface {
 	CreateReview(review model.Reviews) *models.KTSError
 	GetReviewById(id *uuid.UUID) (*model.Reviews, *models.KTSError)
 	DeleteReview(id *uuid.UUID) *models.KTSError
+
+	GetRatingForMovie(movieId *uuid.UUID) (*float64, *models.KTSError)
 }
 
 type ReviewRepository struct {
@@ -93,4 +98,25 @@ func (rr *ReviewRepository) DeleteReview(id *uuid.UUID) *models.KTSError {
 	}
 
 	return nil
+}
+
+func (rr *ReviewRepository) GetRatingForMovie(movieId *uuid.UUID) (*float64, *models.KTSError) {
+	var rating float64
+	stmt := table.Reviews.SELECT(
+		mysql.SUM(table.Reviews.Rating).AS("rating"),
+	).WHERE(
+		table.Reviews.MovieID.EQ(utils.MysqlUuid(movieId)),
+	)
+
+	log.Print(stmt.DebugSql())
+
+	err := stmt.Query(rr.DatabaseManager.GetDatabaseConnection(), &rating)
+	if err != nil {
+		if err.Error() == "qrm: no rows in result set" {
+			return nil, kts_errors.KTS_NOT_FOUND
+		}
+		return nil, kts_errors.KTS_INTERNAL_ERROR
+	}
+
+	return &rating, nil
 }

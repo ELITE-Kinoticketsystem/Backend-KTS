@@ -142,3 +142,17 @@ func (mr *MockMovieRepositoryIMockRecorder) UpdateMovie(movie any) *gomock.Call 
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateMovie", reflect.TypeOf((*MockMovieRepositoryI)(nil).UpdateMovie), movie)
 }
+
+// UpdateRating mocks base method.
+func (m *MockMovieRepositoryI) UpdateRating(movieId *uuid.UUID, rating *float64) *models.KTSError {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateRating", movieId, rating)
+	ret0, _ := ret[0].(*models.KTSError)
+	return ret0
+}
+
+// UpdateRating indicates an expected call of UpdateRating.
+func (mr *MockMovieRepositoryIMockRecorder) UpdateRating(movieId, rating any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateRating", reflect.TypeOf((*MockMovieRepositoryI)(nil).UpdateRating), movieId, rating)
+}

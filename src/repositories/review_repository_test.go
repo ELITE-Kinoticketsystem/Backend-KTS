@@ -345,3 +345,86 @@ func TestDeleteReview(t *testing.T) {
 		})
 	}
 }
+
+func TestGetRatingForMovie(t *testing.T) {
+
+	query := ""
+
+	testCases := []struct {
+		name            string
+		movieId         *uuid.UUID
+		setExpectations func(mock sqlmock.Sqlmock, movieId *uuid.UUID)
+		expectedRating  float64
+		expectedError   *models.KTSError
+	}{
+		{
+			name:    "Success",
+			movieId: utils.NewUUID(),
+			setExpectations: func(mock sqlmock.Sqlmock, movieId *uuid.UUID) {
+				mock.ExpectQuery(query).WithArgs(utils.EqUUID(movieId)).WillReturnRows(
+					sqlmock.NewRows([]string{"rating"}).
+						AddRow(3.5),
+				)
+			},
+			expectedRating: 3.5,
+			expectedError:  nil,
+		},
+		// {
+		// 	name:    "Internal error",
+		// 	movieId: utils.NewUUID(),
+		// 	setExpectations: func(mock sqlmock.Sqlmock, movieId *uuid.UUID) {
+		// 		mock.ExpectQuery(query).WithArgs(
+		// 			utils.EqUUID(movieId),
+		// 		).WillReturnError(
+		// 			sqlmock.ErrCancelled,
+		// 		)
+		// 	},
+		// 	expectedRating: 0,
+		// 	expectedError:  kts_errors.KTS_INTERNAL_ERROR,
+		// },
+		// {
+		// 	name:    "Not found",
+		// 	movieId: utils.NewUUID(),
+		// 	setExpectations: func(mock sqlmock.Sqlmock, movieId *uuid.UUID) {
+		// 		mock.ExpectQuery(query).WithArgs(
+		// 			utils.EqUUID(movieId),
+		// 		).WillReturnError(
+		// 			sql.ErrNoRows,
+		// 		)
+		// 	},
+		// 	expectedRating: 0,
+		// 	expectedError:  kts_errors.KTS_NOT_FOUND,
+		// },
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			// GIVEN
+			// create mock db manager
+			db, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
+			if err != nil {
+				t.Fatalf("error while setting up mock database: %s", err)
+			}
+			reviewRepo := ReviewRepository{
+				DatabaseManager: &managers.DatabaseManager{
+					Connection: db,
+				},
+			}
+
+			// define expectations
+			tc.setExpectations(mock, tc.movieId)
+
+			// WHEN
+			// call DeleteReview with id
+			rating, kts_err := reviewRepo.GetRatingForMovie(tc.movieId)
+
+			// THEN
+			// check expected error and expectations
+			assert.Equal(t, tc.expectedRating, rating)
+			assert.Equal(t, tc.expectedError, kts_err)
+			if err = mock.ExpectationsWereMet(); err != nil {
+				t.Errorf("There were unfulfilled expectations: %s", err)
+			}
+		})
+	}
+}
