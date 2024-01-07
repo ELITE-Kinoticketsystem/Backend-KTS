@@ -63,7 +63,7 @@ func GetGenreByName(genreCtrl controllers.GenreControllerI) gin.HandlerFunc {
 // @Tags Genres
 // @Accept  json
 // @Produce  json
-// @Param genre body model.Genres true "Genres model"
+// @Param name path string true "Genre name"
 // @Success 201 {object} model.Genres
 // @Failure 400 {object} models.KTSErrorMessage
 // @Failure 500 {object} models.KTSErrorMessage
