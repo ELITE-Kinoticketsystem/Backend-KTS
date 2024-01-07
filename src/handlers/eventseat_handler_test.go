@@ -286,7 +286,7 @@ func TestGetSelectedSeatsHandler(t *testing.T) {
 			paramEventId: utils.NewUUID(),
 			setExpectations: func(mockController *mocks.MockEventSeatControllerI, eventId *uuid.UUID, userId *uuid.UUID) {
 				mockController.EXPECT().GetSelectedSeats(gomock.Any(), gomock.Any()).Return(
-					&[]models.GetEventSeatsDTO{},
+					&[]models.GetSlectedSeatsDTO{},
 					nil,
 				)
 			},

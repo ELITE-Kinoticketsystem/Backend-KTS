@@ -14,8 +14,8 @@ import (
 
 func TestOrderController_CreateOrder(t *testing.T) {
 	priceCategories := samples.GetPriceCategories()
-	eventSeats := samples.GetEventSeatsDTO()
-	order := samples.GetOrder(priceCategories, eventSeats)
+	eventSeats := samples.GetGetSlectedSeatsDTO()
+	order := samples.GetOrder(priceCategories, eventSeats, utils.NewUUID())
 
 	tests := []struct {
 		name          string
@@ -95,14 +95,10 @@ func TestOrderController_CreateOrder(t *testing.T) {
 		{
 			name: "Create Order - Empty OrderRequest",
 			expectedFuncs: func(mockOrderRepo *mocks.MockOrderRepoI, mockEventSeatRepo *mocks.MockEventSeatRepoI, mockPriceCategoryRepo *mocks.MockPriceCategoryRepositoryI, mockTicketRepo *mocks.MockTicketRepositoryI) {
-				mockEventSeatRepo.EXPECT().GetSelectedSeats(gomock.Any(), gomock.Any()).Return(eventSeats, nil)
-				mockPriceCategoryRepo.EXPECT().GetPriceCategories().Return(priceCategories, nil)
-				mockOrderRepo.EXPECT().CreateOrder(gomock.Any()).Return(utils.NewUUID(), nil)
-				mockTicketRepo.EXPECT().CreateTicket(gomock.Any()).Return(utils.NewUUID(), nil).Times(2)
-				mockEventSeatRepo.EXPECT().UpdateEventSeat(gomock.Any()).Return(nil).Times(2)
+
 			},
-			expectedErr:   nil,
-			expectOrderId: true,
+			expectedErr:   kts_errors.KTS_BAD_REQUEST,
+			expectOrderId: false,
 			orderRequest:  models.CreateOrderDTO{},
 		},
 	}

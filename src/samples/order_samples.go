@@ -7,7 +7,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func GetOrder(priceCategories *[]model.PriceCategories, eventSeats *[]models.GetEventSeatsDTO) *models.CreateOrderDTO {
+func GetOrder(priceCategories *[]model.PriceCategories, eventSeats *[]models.GetSlectedSeatsDTO, paymentMethodId *uuid.UUID) *models.CreateOrderDTO {
 
 	return &models.CreateOrderDTO{
 		EventSeatPriceCategories: []struct {
@@ -23,7 +23,7 @@ func GetOrder(priceCategories *[]model.PriceCategories, eventSeats *[]models.Get
 				PriceCategoryId: (*priceCategories)[1].ID,
 			},
 		},
-		PaymentMethodID: nil,
+		PaymentMethodID: paymentMethodId,
 	}
 }
 

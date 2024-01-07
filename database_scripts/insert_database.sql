@@ -592,12 +592,12 @@ VALUES
 
 
 -- Insert statements for the first cinemaHall 2x2 seats for the first theatre
-INSERT INTO seats (id, row_nr, column_nr, seat_category_id, cinema_hall_id)
-VALUES 
-    (UUID_TO_BIN('29653bcb-a57e-4ac8-a87b-c5219ba1f5cf'), 1, 1, UUID_TO_BIN('b50dcee9-cd61-4fb1-a541-e0c1a4beb5d1'), UUID_TO_BIN('c3e8a9e5-9c2e-4e6d-9a0d-7e3a4b6c5d01')),
-    (UUID_TO_BIN('c9370954-eab1-4e99-9e97-6dc845c1b433'), 1, 2, UUID_TO_BIN('b50dcee9-cd61-4fb1-a541-e0c1a4beb5d1'), UUID_TO_BIN('c3e8a9e5-9c2e-4e6d-9a0d-7e3a4b6c5d01')),
-    (UUID_TO_BIN('1778c52c-f2f7-4ee9-b4b4-fb15844f7343'), 2, 1, UUID_TO_BIN('b50dcee9-cd61-4fb1-a541-e0c1a4beb5d1'), UUID_TO_BIN('c3e8a9e5-9c2e-4e6d-9a0d-7e3a4b6c5d01')),
-    (UUID_TO_BIN('fe1b8a0c-67fe-49e9-a98f-1555e702711e'), 2, 2, UUID_TO_BIN('b50dcee9-cd61-4fb1-a541-e0c1a4beb5d1'), UUID_TO_BIN('c3e8a9e5-9c2e-4e6d-9a0d-7e3a4b6c5d01'));
+INSERT INTO seats (id, row_nr, column_nr, visible_row_nr, visible_column_nr, seat_category_id, cinema_hall_id)
+VALUES
+    (UUID_TO_BIN('29653bcb-a57e-4ac8-a87b-c5219ba1f5cf'), 1, 1, 1, 1, UUID_TO_BIN('b50dcee9-cd61-4fb1-a541-e0c1a4beb5d1'), UUID_TO_BIN('c3e8a9e5-9c2e-4e6d-9a0d-7e3a4b6c5d01')),
+    (UUID_TO_BIN('c9370954-eab1-4e99-9e97-6dc845c1b433'), 1, 2, 1, 2, UUID_TO_BIN('b50dcee9-cd61-4fb1-a541-e0c1a4beb5d1'), UUID_TO_BIN('c3e8a9e5-9c2e-4e6d-9a0d-7e3a4b6c5d01')),
+    (UUID_TO_BIN('1778c52c-f2f7-4ee9-b4b4-fb15844f7343'), 2, 1, 2, 1, UUID_TO_BIN('b50dcee9-cd61-4fb1-a541-e0c1a4beb5d1'), UUID_TO_BIN('c3e8a9e5-9c2e-4e6d-9a0d-7e3a4b6c5d01')),
+    (UUID_TO_BIN('fe1b8a0c-67fe-49e9-a98f-1555e702711e'), 2, 2, 2, 2, UUID_TO_BIN('b50dcee9-cd61-4fb1-a541-e0c1a4beb5d1'), UUID_TO_BIN('c3e8a9e5-9c2e-4e6d-9a0d-7e3a4b6c5d01'));
 
 
 Insert into payment_methods (id, methodname) 

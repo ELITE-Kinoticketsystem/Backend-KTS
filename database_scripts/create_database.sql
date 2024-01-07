@@ -191,11 +191,13 @@ CREATE TABLE seat_categories
 CREATE TABLE seats
   (
      id               BINARY(16) DEFAULT (Uuid_to_bin(Uuid(), 1)),
-     row_nr           INT NOT NULL,
-     column_nr        INT NOT NULL,
-     seat_category_id BINARY(16) NOT NULL,
-     cinema_hall_id   BINARY(16) NOT NULL,
-     type             VARCHAR(15) DEFAULT "regular" NOT NULL,
+     row_nr            INT NOT NULL,
+     column_nr         INT NOT NULL,
+     visible_row_nr    INT NOT NULL,
+     visible_column_nr INT NOT NULL,
+     type              VARCHAR(15) DEFAULT "regular" NOT NULL,
+     seat_category_id  BINARY(16) NOT NULL,
+     cinema_hall_id    BINARY(16) NOT NULL,
      PRIMARY KEY (id),
      FOREIGN KEY (seat_category_id) REFERENCES seat_categories(id),
      FOREIGN KEY (cinema_hall_id) REFERENCES cinema_halls(id)
@@ -213,7 +215,7 @@ CREATE TABLE orders
      id                BINARY(16) DEFAULT (Uuid_to_bin(Uuid(), 1)),
      totalprice        INT NOT NULL,
      is_paid           BOOLEAN NOT NULL,
-     payment_method_id BINARY(16) NOT NULL,
+     payment_method_id BINARY(16),
      user_id           BINARY(16) NOT NULL,
      PRIMARY KEY (id),
      FOREIGN KEY (payment_method_id) REFERENCES payment_methods(id),

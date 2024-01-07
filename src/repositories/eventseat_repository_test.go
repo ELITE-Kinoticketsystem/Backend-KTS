@@ -378,11 +378,109 @@ func TestUnblockEventSeat(t *testing.T) {
 		})
 	}
 }
+
+func TestUnblockAllEventSeats(t *testing.T) {
+	eventId := utils.NewUUID()
+	userId := utils.NewUUID()
+
+	query := "UPDATE" // `KinoTicketSystem`.event_seats SET .* WHERE .*"
+
+	testCases := []struct {
+		name            string
+		setExpectations func(mock sqlmock.Sqlmock)
+		expectedError   *models.KTSError
+	}{
+		{
+			name: "Success",
+			setExpectations: func(mock sqlmock.Sqlmock) {
+				mock.ExpectExec(
+					query,
+				).
+					WithArgs(
+						nil,
+						nil,
+						utils.EqUUID(eventId),
+						utils.EqUUID(userId),
+					).WillReturnResult(sqlmock.NewResult(1, 1))
+			},
+			expectedError: nil,
+		},
+		{
+			name: "Not found",
+			setExpectations: func(mock sqlmock.Sqlmock) {
+				mock.ExpectExec(query).
+					WithArgs(
+						nil,
+						nil,
+						utils.EqUUID(eventId),
+						utils.EqUUID(userId),
+					).WillReturnResult(sqlmock.NewResult(0, 0))
+			},
+			expectedError: kts_errors.KTS_NOT_FOUND,
+		},
+		{
+			name: "Internal error",
+			setExpectations: func(mock sqlmock.Sqlmock) {
+				mock.ExpectExec(query).
+					WithArgs(
+						nil,
+						nil,
+						utils.EqUUID(eventId),
+						utils.EqUUID(userId),
+					).WillReturnError(sqlmock.ErrCancelled)
+			},
+			expectedError: kts_errors.KTS_INTERNAL_ERROR,
+		},
+		{
+			name: "Rows affected internal error",
+			setExpectations: func(mock sqlmock.Sqlmock) {
+				mock.ExpectExec(query).
+					WithArgs(
+						nil,
+						nil,
+						utils.EqUUID(eventId),
+						utils.EqUUID(userId),
+					).WillReturnResult(sqlmock.NewErrorResult(sqlmock.ErrCancelled))
+			},
+			expectedError: kts_errors.KTS_INTERNAL_ERROR,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			// GIVEN
+			db, mock, err := sqlmock.New()
+			if err != nil {
+				t.Fatalf("Failed to create mock database connection: %v", err)
+			}
+			defer db.Close()
+
+			esr := &EventSeatRepository{
+				DatabaseManager: &managers.DatabaseManager{
+					Connection: db,
+				},
+			}
+
+			tc.setExpectations(mock)
+
+			// WHEN
+			ktsErr := esr.UnblockAllEventSeats(eventId, userId)
+
+			// THEN
+			if err := mock.ExpectationsWereMet(); err != nil {
+				t.Errorf("There were unfulfilled expectations: %s", err)
+			}
+
+			assert.Equal(t, tc.expectedError, ktsErr)
+		})
+	}
+}
+
 func TestGetSelectedSeats(t *testing.T) {
 	eventId := utils.NewUUID()
 	userId := utils.NewUUID()
 
-	eventSeats := []models.GetEventSeatsDTO{
+	eventSeats := []models.GetSlectedSeatsDTO{
 		{
 			EventSeat: model.EventSeats{
 				ID:           utils.NewUUID(),
@@ -440,7 +538,7 @@ func TestGetSelectedSeats(t *testing.T) {
 	testCases := []struct {
 		name            string
 		setExpectations func(mock sqlmock.Sqlmock)
-		expectedSeats   *[]models.GetEventSeatsDTO
+		expectedSeats   *[]models.GetSlectedSeatsDTO
 		expectedError   *models.KTSError
 	}{
 		{

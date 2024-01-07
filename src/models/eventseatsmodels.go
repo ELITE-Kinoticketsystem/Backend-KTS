@@ -14,6 +14,15 @@ type GetEventSeatsDTO struct {
 	EventSeatCategory model.EventSeatCategories
 }
 
+type GetSlectedSeatsDTO struct {
+	EventSeat         model.EventSeats
+	Seat              model.Seats
+	SeatCategory      model.SeatCategories
+	EventSeatCategory model.EventSeatCategories
+	CinemaHall        model.CinemaHalls
+	Theatre           model.Theatres
+}
+
 type GetSeatsForSeatSelectorDTO struct {
 	ID             *uuid.UUID
 	RowNr          int32
@@ -36,5 +45,5 @@ type PatchEventSeatResponse struct {
 }
 
 type GetSelectedSeatsResponse struct {
-	Seats *[]GetEventSeatsDTO `json:"selectedSeats"`
+	Seats *[]GetSlectedSeatsDTO `json:"selectedSeats"`
 }
