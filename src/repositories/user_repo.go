@@ -9,13 +9,13 @@ import (
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/gen/KinoTicketSystem/table"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/managers"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/myid"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
 	"github.com/go-jet/jet/v2/mysql"
-	"github.com/google/uuid"
 )
 
 type UserRepositoryI interface {
-	GetUserById(id *uuid.UUID) (*model.Users, *models.KTSError)
+	GetUserById(id *myid.UUID) (*model.Users, *models.KTSError)
 	GetUserByUsername(username string) (*model.Users, *models.KTSError)
 	CreateUser(user model.Users) *models.KTSError
 	CheckIfUsernameExists(username string) *models.KTSError
@@ -26,7 +26,7 @@ type UserRepository struct {
 	DatabaseManager managers.DatabaseManagerI
 }
 
-func (ur *UserRepository) GetUserById(id *uuid.UUID) (*model.Users, *models.KTSError) {
+func (ur *UserRepository) GetUserById(id *myid.UUID) (*model.Users, *models.KTSError) {
 	var user model.Users
 	stmt := mysql.SELECT(
 		table.Users.ID,
@@ -38,7 +38,7 @@ func (ur *UserRepository) GetUserById(id *uuid.UUID) (*model.Users, *models.KTSE
 	).FROM(
 		table.Users,
 	).WHERE(
-		table.Users.ID.EQ(utils.MysqlUuid(id)),
+		table.Users.ID.EQ(utils.MysqlUuid(*id)),
 	)
 	err := stmt.Query(ur.DatabaseManager.GetDatabaseConnection(), &user)
 	if err != nil {

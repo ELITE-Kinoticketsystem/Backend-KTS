@@ -6,9 +6,9 @@ import (
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/controllers"
 	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/myid"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 )
 
 // @Summary Get event seats
@@ -24,14 +24,14 @@ import (
 // @Router /events/{eventId}/seats [get]
 func GetEventSeatsHandler(eventSeatController controllers.EventSeatControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		eventSeatId, err := uuid.Parse(c.Param("eventId"))
+		eventSeatId, err := myid.Parse(c.Param("eventId"))
 
 		if err != nil {
 			utils.HandleErrorAndAbort(c, kts_errors.KTS_BAD_REQUEST)
 			return
 		}
 
-		userId := c.Request.Context().Value(models.ContextKeyUserID).(*uuid.UUID)
+		userId := c.Request.Context().Value(models.ContextKeyUserID).(*myid.UUID)
 
 		seatMap, currentUserSeats, blockedUntil, kts_err := eventSeatController.GetEventSeats(&eventSeatId, userId)
 		if kts_err != nil {
@@ -60,21 +60,21 @@ func GetEventSeatsHandler(eventSeatController controllers.EventSeatControllerI) 
 // @Router /events/{eventId}/seats/{seatId}/block [patch]
 func BlockEventSeatHandler(eventSeatController controllers.EventSeatControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		eventId, err := uuid.Parse(c.Param("eventId"))
+		eventId, err := myid.Parse(c.Param("eventId"))
 
 		if err != nil {
 			utils.HandleErrorAndAbort(c, kts_errors.KTS_BAD_REQUEST)
 			return
 		}
 
-		eventSeatId, err := uuid.Parse(c.Param("seatId"))
+		eventSeatId, err := myid.Parse(c.Param("seatId"))
 
 		if err != nil {
 			utils.HandleErrorAndAbort(c, kts_errors.KTS_BAD_REQUEST)
 			return
 		}
 
-		userId := c.Request.Context().Value(models.ContextKeyUserID).(*uuid.UUID)
+		userId := c.Request.Context().Value(models.ContextKeyUserID).(*myid.UUID)
 
 		blockedUntil, kts_err := eventSeatController.BlockEventSeat(&eventId, &eventSeatId, userId)
 		if kts_err != nil {
@@ -102,21 +102,21 @@ func BlockEventSeatHandler(eventSeatController controllers.EventSeatControllerI)
 // @Router /events/{eventId}/seats/{seatId}/unblock [patch]
 func UnblockEventSeatHandler(eventSeatController controllers.EventSeatControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		eventId, err := uuid.Parse(c.Param("eventId"))
+		eventId, err := myid.Parse(c.Param("eventId"))
 
 		if err != nil {
 			utils.HandleErrorAndAbort(c, kts_errors.KTS_BAD_REQUEST)
 			return
 		}
 
-		eventSeatId, err := uuid.Parse(c.Param("seatId"))
+		eventSeatId, err := myid.Parse(c.Param("seatId"))
 
 		if err != nil {
 			utils.HandleErrorAndAbort(c, kts_errors.KTS_BAD_REQUEST)
 			return
 		}
 
-		userId := c.Request.Context().Value(models.ContextKeyUserID).(*uuid.UUID)
+		userId := c.Request.Context().Value(models.ContextKeyUserID).(*myid.UUID)
 
 		blockedUntil, kts_err := eventSeatController.UnblockEventSeat(&eventId, &eventSeatId, userId)
 		if kts_err != nil {
@@ -132,14 +132,14 @@ func UnblockEventSeatHandler(eventSeatController controllers.EventSeatController
 
 func UnblockAllEventSeatsHandler(eventSeatController controllers.EventSeatControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		eventId, err := uuid.Parse(c.Param("eventId"))
+		eventId, err := myid.Parse(c.Param("eventId"))
 
 		if err != nil {
 			utils.HandleErrorAndAbort(c, kts_errors.KTS_BAD_REQUEST)
 			return
 		}
 
-		userId := c.Request.Context().Value(models.ContextKeyUserID).(*uuid.UUID)
+		userId := c.Request.Context().Value(models.ContextKeyUserID).(*myid.UUID)
 
 		kts_err := eventSeatController.UnblockAllEventSeats(&eventId, userId)
 		if kts_err != nil {
@@ -165,14 +165,14 @@ func UnblockAllEventSeatsHandler(eventSeatController controllers.EventSeatContro
 // @Router /events/{eventId}/user-seats [get]
 func GetSelectedSeatsHandler(eventSeatController controllers.EventSeatControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		eventId, err := uuid.Parse(c.Param("eventId"))
+		eventId, err := myid.Parse(c.Param("eventId"))
 
 		if err != nil {
 			utils.HandleErrorAndAbort(c, kts_errors.KTS_BAD_REQUEST)
 			return
 		}
 
-		userId := c.Request.Context().Value(models.ContextKeyUserID).(*uuid.UUID)
+		userId := c.Request.Context().Value(models.ContextKeyUserID).(*myid.UUID)
 
 		selectedSeats, kts_err := eventSeatController.GetSelectedSeats(&eventId, userId)
 		if kts_err != nil {

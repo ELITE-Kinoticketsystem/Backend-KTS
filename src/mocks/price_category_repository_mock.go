@@ -13,7 +13,7 @@ import (
 
 	model "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/gen/KinoTicketSystem/model"
 	models "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
-	uuid "github.com/google/uuid"
+	myid "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/myid"
 	gomock "go.uber.org/mock/gomock"
 )
 
@@ -41,10 +41,10 @@ func (m *MockPriceCategoryRepositoryI) EXPECT() *MockPriceCategoryRepositoryIMoc
 }
 
 // CreatePriceCategory mocks base method.
-func (m *MockPriceCategoryRepositoryI) CreatePriceCategory(priceCategory *model.PriceCategories) (*uuid.UUID, *models.KTSError) {
+func (m *MockPriceCategoryRepositoryI) CreatePriceCategory(priceCategory *model.PriceCategories) (*myid.UUID, *models.KTSError) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreatePriceCategory", priceCategory)
-	ret0, _ := ret[0].(*uuid.UUID)
+	ret0, _ := ret[0].(*myid.UUID)
 	ret1, _ := ret[1].(*models.KTSError)
 	return ret0, ret1
 }
@@ -56,7 +56,7 @@ func (mr *MockPriceCategoryRepositoryIMockRecorder) CreatePriceCategory(priceCat
 }
 
 // DeletePriceCategory mocks base method.
-func (m *MockPriceCategoryRepositoryI) DeletePriceCategory(id *uuid.UUID) *models.KTSError {
+func (m *MockPriceCategoryRepositoryI) DeletePriceCategory(id *myid.UUID) *models.KTSError {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DeletePriceCategory", id)
 	ret0, _ := ret[0].(*models.KTSError)
@@ -85,7 +85,7 @@ func (mr *MockPriceCategoryRepositoryIMockRecorder) GetPriceCategories() *gomock
 }
 
 // GetPriceCategoryById mocks base method.
-func (m *MockPriceCategoryRepositoryI) GetPriceCategoryById(id *uuid.UUID) (*model.PriceCategories, *models.KTSError) {
+func (m *MockPriceCategoryRepositoryI) GetPriceCategoryById(id *myid.UUID) (*model.PriceCategories, *models.KTSError) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetPriceCategoryById", id)
 	ret0, _ := ret[0].(*model.PriceCategories)
@@ -100,10 +100,10 @@ func (mr *MockPriceCategoryRepositoryIMockRecorder) GetPriceCategoryById(id any)
 }
 
 // UpdatePriceCategory mocks base method.
-func (m *MockPriceCategoryRepositoryI) UpdatePriceCategory(priceCategory *model.PriceCategories) (*uuid.UUID, *models.KTSError) {
+func (m *MockPriceCategoryRepositoryI) UpdatePriceCategory(priceCategory *model.PriceCategories) (*myid.UUID, *models.KTSError) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UpdatePriceCategory", priceCategory)
-	ret0, _ := ret[0].(*uuid.UUID)
+	ret0, _ := ret[0].(*myid.UUID)
 	ret1, _ := ret[1].(*models.KTSError)
 	return ret0, ret1
 }

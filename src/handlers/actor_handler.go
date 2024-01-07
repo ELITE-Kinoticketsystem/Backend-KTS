@@ -6,9 +6,9 @@ import (
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/controllers"
 	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/myid"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 )
 
 // @Summary Get actor by id
@@ -24,7 +24,7 @@ import (
 // @Router /actors/{id} [get]
 func GetActorByIdHandler(actorController controllers.ActorControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		actorId, err := uuid.Parse(c.Param("id"))
+		actorId, err := myid.Parse(c.Param("id"))
 		if err != nil {
 			utils.HandleErrorAndAbort(c, kts_errors.KTS_BAD_REQUEST)
 			return
@@ -65,7 +65,7 @@ func GetActorsHandler(actorController controllers.ActorControllerI) gin.HandlerF
 // @Accept  json
 // @Produce  json
 // @Param actor body models.CreateActorDTO true "Actor"
-// @Success 201 {object} uuid.UUID
+// @Success 201 {object} myid.UUID
 // @Failure 400 {object} models.KTSErrorMessage
 // @Failure 500 {object} models.KTSErrorMessage
 // @Router /actors [post]

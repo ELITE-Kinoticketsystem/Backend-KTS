@@ -9,9 +9,9 @@ import (
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/gen/KinoTicketSystem/model"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/mocks"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/myid"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/samples"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
-	"github.com/google/uuid"
 	"go.uber.org/mock/gomock"
 )
 
@@ -24,14 +24,14 @@ func TestEventController_CreateEvent(t *testing.T) {
 			End:          time.Now().Add(time.Hour),
 			Description:  nil,
 			EventType:    "Test event type",
-			CinemaHallID: utils.NewUUID(),
+			CinemaHallID: *myid.NewUUID(),
 		},
-		Movies: []*uuid.UUID{
-			utils.NewUUID(),
+		Movies: []*myid.UUID{
+			myid.NewUUID(),
 		},
 		EventSeatCategories: []model.EventSeatCategories{
 			{
-				SeatCategoryID: utils.NewUUID(),
+				SeatCategoryID: *myid.NewUUID(),
 				Price:          100,
 			},
 		},
@@ -41,18 +41,18 @@ func TestEventController_CreateEvent(t *testing.T) {
 		name            string
 		expectFuncs     func(mockEventRepo *mocks.MockEventRepo, mockTheatreRepo *mocks.MockTheaterRepoI, t *testing.T)
 		expectedError   *models.KTSError
-		expectedEventId *uuid.UUID
+		expectedEventId *myid.UUID
 		eventRequest    *models.CreateEvtDTO
 	}{
 		{
 			name: "Create Event",
 			expectFuncs: func(mockEventRepo *mocks.MockEventRepo, mockTheatreRepo *mocks.MockTheaterRepoI, t *testing.T) {
-				mockEventRepo.EXPECT().CreateEvent(&eventRequest.Events).Return(eventRequest.Events.ID, nil)
-				mockEventRepo.EXPECT().AddEventMovie(eventRequest.Events.ID, eventRequest.Movies[0]).Return(nil)
+				mockEventRepo.EXPECT().CreateEvent(&eventRequest.Events).Return(&eventRequest.Events.ID, nil)
+				mockEventRepo.EXPECT().AddEventMovie(&eventRequest.Events.ID, eventRequest.Movies[0]).Return(nil)
 				mockEventRepo.EXPECT().CreateEventSeatCategory(&eventRequest.EventSeatCategories[0]).Return(nil)
-				mockTheatreRepo.EXPECT().GetSeatsForCinemaHall(eventRequest.Events.CinemaHallID).Return([]model.Seats{
+				mockTheatreRepo.EXPECT().GetSeatsForCinemaHall(&eventRequest.Events.CinemaHallID).Return([]model.Seats{
 					{
-						ID:             utils.NewUUID(),
+						ID:             *myid.NewUUID(),
 						RowNr:          1,
 						ColumnNr:       1,
 						CinemaHallID:   eventRequest.Events.CinemaHallID,
@@ -62,7 +62,7 @@ func TestEventController_CreateEvent(t *testing.T) {
 				mockEventRepo.EXPECT().CreateEventSeat(gomock.Any()).Return(nil)
 			},
 			expectedError:   nil,
-			expectedEventId: eventRequest.Events.ID,
+			expectedEventId: &eventRequest.Events.ID,
 			eventRequest:    eventRequest,
 		},
 		{
@@ -77,8 +77,8 @@ func TestEventController_CreateEvent(t *testing.T) {
 		{
 			name: "Add Event Movie returns error",
 			expectFuncs: func(mockEventRepo *mocks.MockEventRepo, mockTheatreRepo *mocks.MockTheaterRepoI, t *testing.T) {
-				mockEventRepo.EXPECT().CreateEvent(&eventRequest.Events).Return(eventRequest.Events.ID, nil)
-				mockEventRepo.EXPECT().AddEventMovie(eventRequest.Events.ID, eventRequest.Movies[0]).Return(kts_errors.KTS_INTERNAL_ERROR)
+				mockEventRepo.EXPECT().CreateEvent(&eventRequest.Events).Return(&eventRequest.Events.ID, nil)
+				mockEventRepo.EXPECT().AddEventMovie(&eventRequest.Events.ID, eventRequest.Movies[0]).Return(kts_errors.KTS_INTERNAL_ERROR)
 			},
 			expectedError:   kts_errors.KTS_INTERNAL_ERROR,
 			expectedEventId: nil,
@@ -87,8 +87,8 @@ func TestEventController_CreateEvent(t *testing.T) {
 		{
 			name: "Create Event Seat Category returns error",
 			expectFuncs: func(mockEventRepo *mocks.MockEventRepo, mockTheatreRepo *mocks.MockTheaterRepoI, t *testing.T) {
-				mockEventRepo.EXPECT().CreateEvent(&eventRequest.Events).Return(eventRequest.Events.ID, nil)
-				mockEventRepo.EXPECT().AddEventMovie(eventRequest.Events.ID, eventRequest.Movies[0]).Return(nil)
+				mockEventRepo.EXPECT().CreateEvent(&eventRequest.Events).Return(&eventRequest.Events.ID, nil)
+				mockEventRepo.EXPECT().AddEventMovie(&eventRequest.Events.ID, eventRequest.Movies[0]).Return(nil)
 				mockEventRepo.EXPECT().CreateEventSeatCategory(&eventRequest.EventSeatCategories[0]).Return(kts_errors.KTS_INTERNAL_ERROR)
 			},
 			expectedError:   kts_errors.KTS_INTERNAL_ERROR,
@@ -98,10 +98,10 @@ func TestEventController_CreateEvent(t *testing.T) {
 		{
 			name: "Get Seats For Cinema Hall returns error",
 			expectFuncs: func(mockEventRepo *mocks.MockEventRepo, mockTheatreRepo *mocks.MockTheaterRepoI, t *testing.T) {
-				mockEventRepo.EXPECT().CreateEvent(&eventRequest.Events).Return(eventRequest.Events.ID, nil)
-				mockEventRepo.EXPECT().AddEventMovie(eventRequest.Events.ID, eventRequest.Movies[0]).Return(nil)
+				mockEventRepo.EXPECT().CreateEvent(&eventRequest.Events).Return(&eventRequest.Events.ID, nil)
+				mockEventRepo.EXPECT().AddEventMovie(&eventRequest.Events.ID, eventRequest.Movies[0]).Return(nil)
 				mockEventRepo.EXPECT().CreateEventSeatCategory(&eventRequest.EventSeatCategories[0]).Return(nil)
-				mockTheatreRepo.EXPECT().GetSeatsForCinemaHall(eventRequest.Events.CinemaHallID).Return(nil, kts_errors.KTS_INTERNAL_ERROR)
+				mockTheatreRepo.EXPECT().GetSeatsForCinemaHall(&eventRequest.Events.CinemaHallID).Return(nil, kts_errors.KTS_INTERNAL_ERROR)
 			},
 			expectedError:   kts_errors.KTS_INTERNAL_ERROR,
 			expectedEventId: nil,
@@ -110,12 +110,12 @@ func TestEventController_CreateEvent(t *testing.T) {
 		{
 			name: "Create Event Seat returns error",
 			expectFuncs: func(mockEventRepo *mocks.MockEventRepo, mockTheatreRepo *mocks.MockTheaterRepoI, t *testing.T) {
-				mockEventRepo.EXPECT().CreateEvent(&eventRequest.Events).Return(eventRequest.Events.ID, nil)
-				mockEventRepo.EXPECT().AddEventMovie(eventRequest.Events.ID, eventRequest.Movies[0]).Return(nil)
+				mockEventRepo.EXPECT().CreateEvent(&eventRequest.Events).Return(&eventRequest.Events.ID, nil)
+				mockEventRepo.EXPECT().AddEventMovie(&eventRequest.Events.ID, eventRequest.Movies[0]).Return(nil)
 				mockEventRepo.EXPECT().CreateEventSeatCategory(&eventRequest.EventSeatCategories[0]).Return(nil)
-				mockTheatreRepo.EXPECT().GetSeatsForCinemaHall(eventRequest.Events.CinemaHallID).Return([]model.Seats{
+				mockTheatreRepo.EXPECT().GetSeatsForCinemaHall(&eventRequest.Events.CinemaHallID).Return([]model.Seats{
 					{
-						ID:             utils.NewUUID(),
+						ID:             *myid.NewUUID(),
 						RowNr:          1,
 						ColumnNr:       1,
 						CinemaHallID:   eventRequest.Events.CinemaHallID,
@@ -139,7 +139,7 @@ func TestEventController_CreateEvent(t *testing.T) {
 		{
 			name: "Movies nil or empty",
 			expectFuncs: func(mockEventRepo *mocks.MockEventRepo, mockTheatreRepo *mocks.MockTheaterRepoI, t *testing.T) {
-				mockEventRepo.EXPECT().CreateEvent(&eventRequest.Events).Return(eventRequest.Events.ID, nil)
+				mockEventRepo.EXPECT().CreateEvent(&eventRequest.Events).Return(&eventRequest.Events.ID, nil)
 			},
 			expectedError:   kts_errors.KTS_BAD_REQUEST,
 			expectedEventId: nil,
@@ -150,8 +150,8 @@ func TestEventController_CreateEvent(t *testing.T) {
 		{
 			name: "EventSeatCategories nil or empty",
 			expectFuncs: func(mockEventRepo *mocks.MockEventRepo, mockTheatreRepo *mocks.MockTheaterRepoI, t *testing.T) {
-				mockEventRepo.EXPECT().CreateEvent(&eventRequest.Events).Return(eventRequest.Events.ID, nil)
-				mockEventRepo.EXPECT().AddEventMovie(eventRequest.Events.ID, eventRequest.Movies[0]).Return(nil)
+				mockEventRepo.EXPECT().CreateEvent(&eventRequest.Events).Return(&eventRequest.Events.ID, nil)
+				mockEventRepo.EXPECT().AddEventMovie(&eventRequest.Events.ID, eventRequest.Movies[0]).Return(nil)
 			},
 			expectedError:   kts_errors.KTS_BAD_REQUEST,
 			expectedEventId: nil,
@@ -194,8 +194,8 @@ func TestEventController_CreateEvent(t *testing.T) {
 }
 
 func TestEventController_GetEventsForMovie(t *testing.T) {
-	movieId := utils.NewUUID()
-	theatreId := utils.NewUUID()
+	movieId := myid.NewUUID()
+	theatreId := myid.NewUUID()
 
 	expectedEvents := samples.GetModelEvents()
 
@@ -306,11 +306,11 @@ func TestEventController_GetSpecialEvents(t *testing.T) {
 	}
 }
 func TestEventController_GetEventById(t *testing.T) {
-	eventId := utils.NewUUID()
+	eventId := myid.NewUUID()
 
 	expectedEvent := &models.GetSpecialEventsDTO{
 		Events: model.Events{
-			ID:          eventId,
+			ID:          *eventId,
 			Title:       "Test Event",
 			Description: utils.GetStringPointer("Test Description"),
 		},
@@ -318,7 +318,7 @@ func TestEventController_GetEventById(t *testing.T) {
 
 	tests := []struct {
 		name             string
-		eventId          *uuid.UUID
+		eventId          *myid.UUID
 		expectedEventDTO *models.GetSpecialEventsDTO
 		expectedError    *models.KTSError
 	}{

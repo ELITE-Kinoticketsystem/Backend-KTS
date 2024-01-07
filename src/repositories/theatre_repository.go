@@ -8,19 +8,20 @@ import (
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/gen/KinoTicketSystem/table"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/managers"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/myid"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
 	"github.com/go-jet/jet/v2/mysql"
-	"github.com/google/uuid"
 )
 
 type TheaterRepoI interface {
 	CreateTheatre(theatre model.Theatres) *models.KTSError
 	GetTheatres() (*[]model.Theatres, *models.KTSError)
 	CreateCinemaHall(cinemaHall model.CinemaHalls) *models.KTSError
-	GetCinemaHallsForTheatre(theatreId *uuid.UUID) (*[]model.CinemaHalls, *models.KTSError)
+	GetCinemaHallsForTheatre(theatreId *myid.UUID) (*[]model.CinemaHalls, *models.KTSError)
 	CreateSeat(seat model.Seats) *models.KTSError
+	CreateSeats(seat []model.Seats) *models.KTSError
 	GetSeatCategories() ([]model.SeatCategories, *models.KTSError)
-	GetSeatsForCinemaHall(cinemaHallId *uuid.UUID) ([]model.Seats, *models.KTSError)
+	GetSeatsForCinemaHall(cinemaHallId *myid.UUID) ([]model.Seats, *models.KTSError)
 	CreateAddress(address model.Addresses) *models.KTSError
 }
 
@@ -35,10 +36,10 @@ func (tr *TheatreRepository) CreateTheatre(theatre model.Theatres) *models.KTSEr
 		table.Theatres.LogoURL,
 		table.Theatres.AddressID,
 	).VALUES(
-		utils.MysqlUuid(theatre.ID),
+		theatre.ID,
 		theatre.Name,
 		utils.MySqlStringPtr(theatre.LogoURL),
-		utils.MysqlUuid(theatre.AddressID),
+		theatre.AddressID,
 	)
 
 	_, err := stmt.Exec(tr.DatabaseManager.GetDatabaseConnection())
@@ -71,10 +72,10 @@ func (tr *TheatreRepository) CreateCinemaHall(cinemaHall model.CinemaHalls) *mod
 		table.CinemaHalls.Capacity,
 		table.CinemaHalls.TheatreID,
 	).VALUES(
-		utils.MysqlUuid(cinemaHall.ID),
+		cinemaHall.ID,
 		cinemaHall.Name,
 		cinemaHall.Capacity,
-		utils.MysqlUuid(cinemaHall.TheatreID),
+		cinemaHall.TheatreID,
 	)
 
 	_, err := stmt.Exec(tr.DatabaseManager.GetDatabaseConnection())
@@ -84,7 +85,7 @@ func (tr *TheatreRepository) CreateCinemaHall(cinemaHall model.CinemaHalls) *mod
 	return nil
 }
 
-func (tr *TheatreRepository) GetCinemaHallsForTheatre(theatreId *uuid.UUID) (*[]model.CinemaHalls, *models.KTSError) {
+func (tr *TheatreRepository) GetCinemaHallsForTheatre(theatreId *myid.UUID) (*[]model.CinemaHalls, *models.KTSError) {
 	var cinemaHalls []model.CinemaHalls
 
 	stmt := mysql.SELECT(
@@ -95,7 +96,7 @@ func (tr *TheatreRepository) GetCinemaHallsForTheatre(theatreId *uuid.UUID) (*[]
 	).FROM(
 		table.CinemaHalls,
 	).WHERE(
-		table.CinemaHalls.TheatreID.EQ(utils.MysqlUuid(theatreId)),
+		table.CinemaHalls.TheatreID.EQ(utils.MysqlUuid(*theatreId)),
 	)
 
 	err := stmt.Query(tr.DatabaseManager.GetDatabaseConnection(), &cinemaHalls)
@@ -120,14 +121,36 @@ func (tr *TheatreRepository) CreateSeat(seat model.Seats) *models.KTSError {
 		table.Seats.CinemaHallID,
 		table.Seats.Type,
 	).VALUES(
-		utils.MysqlUuid(seat.ID),
+		seat.ID,
 		seat.RowNr,
 		seat.ColumnNr,
 		seat.VisibleRowNr,
 		seat.VisibleColumnNr,
-		utils.MysqlUuid(seat.SeatCategoryID),
-		utils.MysqlUuid(seat.CinemaHallID),
+		seat.SeatCategoryID,
+		seat.CinemaHallID,
 		seat.Type,
+	)
+
+	_, err := stmt.Exec(tr.DatabaseManager.GetDatabaseConnection())
+	if err != nil {
+		return kts_errors.KTS_INTERNAL_ERROR
+	}
+
+	return nil
+}
+
+func (tr *TheatreRepository) CreateSeats(seats []model.Seats) *models.KTSError {
+	stmt := table.Seats.INSERT(
+		table.Seats.ID,
+		table.Seats.RowNr,
+		table.Seats.ColumnNr,
+		table.Seats.VisibleRowNr,
+		table.Seats.VisibleColumnNr,
+		table.Seats.SeatCategoryID,
+		table.Seats.CinemaHallID,
+		table.Seats.Type,
+	).MODELS(
+		seats,
 	)
 
 	_, err := stmt.Exec(tr.DatabaseManager.GetDatabaseConnection())
@@ -159,7 +182,7 @@ func (tr *TheatreRepository) GetSeatCategories() ([]model.SeatCategories, *model
 	return seatCategories, nil
 }
 
-func (tr *TheatreRepository) GetSeatsForCinemaHall(cinemaHallId *uuid.UUID) ([]model.Seats, *models.KTSError) {
+func (tr *TheatreRepository) GetSeatsForCinemaHall(cinemaHallId *myid.UUID) ([]model.Seats, *models.KTSError) {
 	var seats []model.Seats
 
 	stmt := mysql.SELECT(
@@ -172,7 +195,7 @@ func (tr *TheatreRepository) GetSeatsForCinemaHall(cinemaHallId *uuid.UUID) ([]m
 	).FROM(
 		table.Seats,
 	).WHERE(
-		table.Seats.CinemaHallID.EQ(utils.MysqlUuid(cinemaHallId)),
+		table.Seats.CinemaHallID.EQ(utils.MysqlUuid(*cinemaHallId)),
 	)
 	err := stmt.Query(tr.DatabaseManager.GetDatabaseConnection(), &seats)
 
@@ -195,7 +218,7 @@ func (tr *TheatreRepository) CreateAddress(address model.Addresses) *models.KTSE
 		table.Addresses.City,
 		table.Addresses.Country,
 	).VALUES(
-		utils.MysqlUuid(address.ID),
+		// utils.MysqlUuid(address.ID),
 		address.Street,
 		address.StreetNr,
 		address.Zipcode,

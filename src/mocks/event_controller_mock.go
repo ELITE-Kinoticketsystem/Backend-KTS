@@ -13,7 +13,7 @@ import (
 
 	model "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/gen/KinoTicketSystem/model"
 	models "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
-	uuid "github.com/google/uuid"
+	myid "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/myid"
 	gomock "go.uber.org/mock/gomock"
 )
 
@@ -41,10 +41,10 @@ func (m *MockEventControllerI) EXPECT() *MockEventControllerIMockRecorder {
 }
 
 // CreateEvent mocks base method.
-func (m *MockEventControllerI) CreateEvent(event *models.CreateEvtDTO) (*uuid.UUID, *models.KTSError) {
+func (m *MockEventControllerI) CreateEvent(event *models.CreateEvtDTO) (*myid.UUID, *models.KTSError) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateEvent", event)
-	ret0, _ := ret[0].(*uuid.UUID)
+	ret0, _ := ret[0].(*myid.UUID)
 	ret1, _ := ret[1].(*models.KTSError)
 	return ret0, ret1
 }
@@ -56,7 +56,7 @@ func (mr *MockEventControllerIMockRecorder) CreateEvent(event any) *gomock.Call 
 }
 
 // GetEventById mocks base method.
-func (m *MockEventControllerI) GetEventById(eventId *uuid.UUID) (*models.GetSpecialEventsDTO, *models.KTSError) {
+func (m *MockEventControllerI) GetEventById(eventId *myid.UUID) (*models.GetSpecialEventsDTO, *models.KTSError) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetEventById", eventId)
 	ret0, _ := ret[0].(*models.GetSpecialEventsDTO)
@@ -71,7 +71,7 @@ func (mr *MockEventControllerIMockRecorder) GetEventById(eventId any) *gomock.Ca
 }
 
 // GetEventsForMovie mocks base method.
-func (m *MockEventControllerI) GetEventsForMovie(movieId, theatreId *uuid.UUID) ([]*model.Events, *models.KTSError) {
+func (m *MockEventControllerI) GetEventsForMovie(movieId, theatreId *myid.UUID) ([]*model.Events, *models.KTSError) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetEventsForMovie", movieId, theatreId)
 	ret0, _ := ret[0].([]*model.Events)

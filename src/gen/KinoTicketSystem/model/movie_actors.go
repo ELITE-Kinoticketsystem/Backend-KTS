@@ -8,10 +8,10 @@
 package model
 
 import (
-	"github.com/google/uuid"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/myid"
 )
 
 type MovieActors struct {
-	MovieID *uuid.UUID `sql:"primary_key"`
-	ActorID *uuid.UUID `sql:"primary_key"`
+	MovieID myid.UUID `sql:"primary_key"`
+	ActorID myid.UUID `sql:"primary_key"`
 }

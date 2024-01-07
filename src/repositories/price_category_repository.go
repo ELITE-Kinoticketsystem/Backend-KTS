@@ -5,8 +5,8 @@ import (
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/gen/KinoTicketSystem/table"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/managers"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/myid"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
-	"github.com/google/uuid"
 
 	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
 
@@ -15,10 +15,10 @@ import (
 
 type PriceCategoryRepositoryI interface {
 	GetPriceCategories() (*[]model.PriceCategories, *models.KTSError)
-	GetPriceCategoryById(id *uuid.UUID) (*model.PriceCategories, *models.KTSError)
-	CreatePriceCategory(priceCategory *model.PriceCategories) (*uuid.UUID, *models.KTSError)
-	UpdatePriceCategory(priceCategory *model.PriceCategories) (*uuid.UUID, *models.KTSError)
-	DeletePriceCategory(id *uuid.UUID) *models.KTSError
+	GetPriceCategoryById(id *myid.UUID) (*model.PriceCategories, *models.KTSError)
+	CreatePriceCategory(priceCategory *model.PriceCategories) (*myid.UUID, *models.KTSError)
+	UpdatePriceCategory(priceCategory *model.PriceCategories) (*myid.UUID, *models.KTSError)
+	DeletePriceCategory(id *myid.UUID) *models.KTSError
 }
 
 type PriceCategoryRepository struct {
@@ -48,7 +48,7 @@ func (pcr *PriceCategoryRepository) GetPriceCategories() (*[]model.PriceCategori
 	return &priceCategory, nil
 }
 
-func (pcr *PriceCategoryRepository) GetPriceCategoryById(id *uuid.UUID) (*model.PriceCategories, *models.KTSError) {
+func (pcr *PriceCategoryRepository) GetPriceCategoryById(id *myid.UUID) (*model.PriceCategories, *models.KTSError) {
 	var priceCategory model.PriceCategories
 
 	// Create the query
@@ -57,7 +57,7 @@ func (pcr *PriceCategoryRepository) GetPriceCategoryById(id *uuid.UUID) (*model.
 	).FROM(
 		table.PriceCategories,
 	).WHERE(
-		table.PriceCategories.ID.EQ(utils.MysqlUuid(id)),
+		table.PriceCategories.ID.EQ(utils.MysqlUuid(*id)),
 	)
 
 	// Execute the query
@@ -72,13 +72,13 @@ func (pcr *PriceCategoryRepository) GetPriceCategoryById(id *uuid.UUID) (*model.
 	return &priceCategory, nil
 }
 
-func (pcr *PriceCategoryRepository) CreatePriceCategory(priceCategory *model.PriceCategories) (*uuid.UUID, *models.KTSError) {
-	priceCategory.ID = utils.NewUUID()
+func (pcr *PriceCategoryRepository) CreatePriceCategory(priceCategory *model.PriceCategories) (*myid.UUID, *models.KTSError) {
+	priceCategory.ID = myid.New()
 	// Create the query
 	stmt := table.PriceCategories.INSERT(
 		table.PriceCategories.AllColumns,
 	).VALUES(
-		utils.MysqlUuid(priceCategory.ID),
+		priceCategory.ID,
 		priceCategory.CategoryName,
 		priceCategory.Price,
 	)
@@ -98,15 +98,15 @@ func (pcr *PriceCategoryRepository) CreatePriceCategory(priceCategory *model.Pri
 		return nil, kts_errors.KTS_NOT_FOUND
 	}
 
-	return priceCategory.ID, nil
+	return &priceCategory.ID, nil
 }
 
-func (pcr *PriceCategoryRepository) UpdatePriceCategory(priceCategory *model.PriceCategories) (*uuid.UUID, *models.KTSError) {
+func (pcr *PriceCategoryRepository) UpdatePriceCategory(priceCategory *model.PriceCategories) (*myid.UUID, *models.KTSError) {
 	// Create the query
 	stmt := table.PriceCategories.UPDATE(
 		table.PriceCategories.AllColumns,
 	).SET(
-		utils.MysqlUuid(priceCategory.ID),
+		priceCategory.ID,
 		priceCategory.CategoryName,
 		priceCategory.Price,
 	).WHERE(
@@ -128,12 +128,12 @@ func (pcr *PriceCategoryRepository) UpdatePriceCategory(priceCategory *model.Pri
 		return nil, kts_errors.KTS_NOT_FOUND
 	}
 
-	return priceCategory.ID, nil
+	return &priceCategory.ID, nil
 }
 
-func (pcr *PriceCategoryRepository) DeletePriceCategory(id *uuid.UUID) *models.KTSError {
+func (pcr *PriceCategoryRepository) DeletePriceCategory(id *myid.UUID) *models.KTSError {
 	// Create the query
-	stmt := table.PriceCategories.DELETE().WHERE(table.PriceCategories.ID.EQ(utils.MysqlUuid(id)))
+	stmt := table.PriceCategories.DELETE().WHERE(table.PriceCategories.ID.EQ(utils.MysqlUuid(*id)))
 
 	// Execute the query
 	rows, err := stmt.Exec(pcr.DatabaseManager.GetDatabaseConnection())

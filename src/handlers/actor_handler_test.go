@@ -152,7 +152,7 @@ func TestCreateActorHandler(t *testing.T) {
 			name: "Success",
 			body: sampleCreateActor,
 			setExpectations: func(mockController *mocks.MockActorControllerI, actor interface{}) {
-				mockController.EXPECT().CreateActor(gomock.Any()).Return(sampleCreateActor.ID, nil)
+				mockController.EXPECT().CreateActor(gomock.Any()).Return(&sampleCreateActor.ID, nil)
 			},
 			expectedStatus: http.StatusCreated,
 			expectedBody:   sampleCreateActor.ID,

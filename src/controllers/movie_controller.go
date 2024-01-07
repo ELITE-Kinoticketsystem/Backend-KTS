@@ -6,22 +6,22 @@ import (
 	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/gen/KinoTicketSystem/model"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/myid"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/repositories"
-	"github.com/google/uuid"
 )
 
 type MovieControllerI interface {
 	// Movie
 	GetMovies() (*[]model.Movies, *models.KTSError)
-	GetMovieById(movieId *uuid.UUID) (*models.MovieWithEverything, *models.KTSError)
+	GetMovieById(movieId *myid.UUID) (*models.MovieWithEverything, *models.KTSError)
 	GetMovieByName(name *string) (*model.Movies, *models.KTSError)
-	CreateMovie(movie *models.MovieDTOCreate) (*uuid.UUID, *models.KTSError)
+	CreateMovie(movie *models.MovieDTOCreate) (*myid.UUID, *models.KTSError)
 	UpdateMovie(movie *model.Movies) *models.KTSError
-	DeleteMovie(movieId *uuid.UUID) *models.KTSError
+	DeleteMovie(movieId *myid.UUID) *models.KTSError
 
 	// Combine Movie and Genre
-	// AddMovieGenre(movieId *uuid.UUID, genreId *uuid.UUID) *models.KTSError
-	// RemoveMovieGenre(movieId *uuid.UUID, genreId *uuid.UUID) *models.KTSError
+	// AddMovieGenre(movieId *myid.UUID, genreId *myid.UUID) *models.KTSError
+	// RemoveMovieGenre(movieId *myid.UUID, genreId *myid.UUID) *models.KTSError
 
 	// All Movies with all Genres - Grouped by Movie
 	GetMoviesWithGenres() (*[]models.MovieWithGenres, *models.KTSError)
@@ -53,7 +53,7 @@ func (mc *MovieController) GetMovieByName(name *string) (*model.Movies, *models.
 	return movie, nil
 }
 
-func (mc *MovieController) CreateMovie(movie *models.MovieDTOCreate) (*uuid.UUID, *models.KTSError) {
+func (mc *MovieController) CreateMovie(movie *models.MovieDTOCreate) (*myid.UUID, *models.KTSError) {
 	if movie.Movies == (model.Movies{}) {
 		log.Print("Movie is nil")
 		return nil, kts_errors.KTS_BAD_REQUEST
@@ -108,7 +108,7 @@ func (mc *MovieController) UpdateMovie(movie *model.Movies) *models.KTSError {
 	return mc.MovieRepo.UpdateMovie(movie)
 }
 
-func (mc *MovieController) DeleteMovie(movieId *uuid.UUID) *models.KTSError {
+func (mc *MovieController) DeleteMovie(movieId *myid.UUID) *models.KTSError {
 	// MovieGenre
 	kts_errors := mc.MovieGenreRepo.RemoveAllGenreCombinationWithMovie(movieId)
 	if kts_errors != nil {
@@ -157,7 +157,7 @@ func (mc *MovieController) GetMoviesWithGenres() (*[]models.MovieWithGenres, *mo
 	return movies, nil
 }
 
-func (mc *MovieController) GetMovieById(movieId *uuid.UUID) (*models.MovieWithEverything, *models.KTSError) {
+func (mc *MovieController) GetMovieById(movieId *myid.UUID) (*models.MovieWithEverything, *models.KTSError) {
 	movie, kts_errors := mc.MovieRepo.GetMovieById(movieId)
 	if kts_errors != nil {
 		return nil, kts_errors

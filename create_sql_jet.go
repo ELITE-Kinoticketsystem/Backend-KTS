@@ -5,9 +5,9 @@ import (
 	"os"
 	"strconv"
 
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/myid"
 	"github.com/go-jet/jet/v2/generator/metadata"
 	"github.com/go-jet/jet/v2/generator/template"
-	"github.com/google/uuid"
 
 	mysql2 "github.com/go-jet/jet/v2/generator/mysql"
 	mysql3 "github.com/go-jet/jet/v2/mysql"
@@ -51,9 +51,12 @@ func GenerateJetMySQL(dbMySQLConnection mysql2.DBConnection) {
 									defaultTableModelField := template.DefaultTableModelField(columnMetaData)
 
 									switch defaultTableModelField.Type.Name {
-									case "[]byte", "*[]byte":
-										defaultTableModelField.Type = template.NewType(&uuid.UUID{})
+									case "[]byte":
+										defaultTableModelField.Type = template.NewType(myid.UUID{})
+									case "*[]byte":
+										defaultTableModelField.Type = template.NewType(&myid.UUID{})
 									}
+									
 									if columnMetaData.Name == "password" {
 										defaultTableModelField = defaultTableModelField.UseTags("json:\"-\"")
 									}

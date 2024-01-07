@@ -8,11 +8,11 @@
 package model
 
 import (
-	"github.com/google/uuid"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/myid"
 )
 
 type ProducerPictures struct {
-	ID         *uuid.UUID `sql:"primary_key"`
-	ProducerID *uuid.UUID
+	ID         myid.UUID `sql:"primary_key"`
+	ProducerID myid.UUID
 	PicURL     *string
 }

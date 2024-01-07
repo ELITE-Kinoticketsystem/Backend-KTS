@@ -5,21 +5,21 @@ import (
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/gen/KinoTicketSystem/table"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/managers"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/myid"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
-	"github.com/google/uuid"
 )
 
 type UserMovieRepositoryI interface {
-	RemoveAllUserMovieCombinationWithMovie(movieId *uuid.UUID) *models.KTSError
+	RemoveAllUserMovieCombinationWithMovie(movieId *myid.UUID) *models.KTSError
 }
 
 type UserMovieRepository struct {
 	DatabaseManager managers.DatabaseManagerI
 }
 
-func (umr *UserMovieRepository) RemoveAllUserMovieCombinationWithMovie(movieId *uuid.UUID) *models.KTSError {
+func (umr *UserMovieRepository) RemoveAllUserMovieCombinationWithMovie(movieId *myid.UUID) *models.KTSError {
 	deleteQuery := table.UserMovies.DELETE().WHERE(
-		table.UserMovies.MovieID.EQ(utils.MysqlUuid(movieId)),
+		table.UserMovies.MovieID.EQ(utils.MysqlUuid(*movieId)),
 	)
 
 	// Execute the query

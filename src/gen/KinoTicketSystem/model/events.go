@@ -8,17 +8,17 @@
 package model
 
 import (
-	"github.com/google/uuid"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/myid"
 	"time"
 )
 
 type Events struct {
-	ID           *uuid.UUID `sql:"primary_key"`
+	ID           myid.UUID `sql:"primary_key"`
 	Title        string
 	Start        time.Time
 	End          time.Time
 	Description  *string
 	EventType    string
-	CinemaHallID *uuid.UUID
+	CinemaHallID myid.UUID
 	Is3d         bool
 }

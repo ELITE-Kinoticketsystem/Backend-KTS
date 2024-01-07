@@ -8,11 +8,11 @@
 package model
 
 import (
-	"github.com/google/uuid"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/myid"
 )
 
 type Addresses struct {
-	ID       *uuid.UUID `sql:"primary_key"`
+	ID       myid.UUID `sql:"primary_key"`
 	Street   string
 	StreetNr string
 	Zipcode  string

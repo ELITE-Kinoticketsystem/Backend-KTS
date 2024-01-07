@@ -9,9 +9,9 @@ import (
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/gen/KinoTicketSystem/model"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/managers"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/myid"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/samples"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
-	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -108,13 +108,13 @@ func TestGetPriceCategoryById(t *testing.T) {
 
 	testCases := []struct {
 		name                    string
-		setExpectations         func(mock sqlmock.Sqlmock, id *uuid.UUID)
+		setExpectations         func(mock sqlmock.Sqlmock)
 		expectedpricecategories *model.PriceCategories
 		expectedError           *models.KTSError
 	}{
 		{
 			name: "PriceCategory found",
-			setExpectations: func(mock sqlmock.Sqlmock, id *uuid.UUID) {
+			setExpectations: func(mock sqlmock.Sqlmock) {
 				mock.ExpectQuery(query).WithArgs(utils.EqUUID(priceCategoryId)).WillReturnRows(
 					sqlmock.NewRows(
 						[]string{"price_categories.id", "price_categories.category_name", "price_categories.price"},
@@ -128,7 +128,7 @@ func TestGetPriceCategoryById(t *testing.T) {
 		},
 		{
 			name: "PriceCategory not found",
-			setExpectations: func(mock sqlmock.Sqlmock, id *uuid.UUID) {
+			setExpectations: func(mock sqlmock.Sqlmock) {
 				mock.ExpectQuery(query).WithArgs(utils.EqUUID(priceCategoryId)).WillReturnRows(
 					sqlmock.NewRows([]string{"price_categories.id", "price_categories.category_name", "price_categories.price"}),
 				)
@@ -138,7 +138,7 @@ func TestGetPriceCategoryById(t *testing.T) {
 		},
 		{
 			name: "Error while querying PriceCategory",
-			setExpectations: func(mock sqlmock.Sqlmock, id *uuid.UUID) {
+			setExpectations: func(mock sqlmock.Sqlmock) {
 				mock.ExpectQuery(query).WithArgs(utils.EqUUID(priceCategoryId)).WillReturnError(sqlmock.ErrCancelled)
 			},
 			expectedpricecategories: nil,
@@ -163,11 +163,11 @@ func TestGetPriceCategoryById(t *testing.T) {
 				},
 			}
 
-			tc.setExpectations(mock, priceCategoryId)
+			tc.setExpectations(mock)
 
 			// WHEN
 			// Call the method under test
-			priceCategory, kts_err := priceCategoryRepo.GetPriceCategoryById(priceCategoryId)
+			priceCategory, kts_err := priceCategoryRepo.GetPriceCategoryById(&priceCategoryId)
 
 			// THEN
 			// Verify the results
@@ -357,26 +357,26 @@ func TestDeletePriceCategory(t *testing.T) {
 
 	testCases := []struct {
 		name            string
-		setExpectations func(mock sqlmock.Sqlmock, id *uuid.UUID)
+		setExpectations func(mock sqlmock.Sqlmock, id myid.UUID)
 		expectedError   *models.KTSError
 	}{
 		{
 			name: "PriceCategory deleted",
-			setExpectations: func(mock sqlmock.Sqlmock, id *uuid.UUID) {
+			setExpectations: func(mock sqlmock.Sqlmock, id myid.UUID) {
 				mock.ExpectExec(query).WithArgs(utils.EqUUID(id)).WillReturnResult(sqlmock.NewResult(1, 1))
 			},
 			expectedError: nil,
 		},
 		{
 			name: "Error while deleting PriceCategory",
-			setExpectations: func(mock sqlmock.Sqlmock, id *uuid.UUID) {
+			setExpectations: func(mock sqlmock.Sqlmock, id myid.UUID) {
 				mock.ExpectExec(query).WithArgs(utils.EqUUID(id)).WillReturnError(sqlmock.ErrCancelled)
 			},
 			expectedError: kts_errors.KTS_INTERNAL_ERROR,
 		},
 		{
 			name: "Error while converting rows affected",
-			setExpectations: func(mock sqlmock.Sqlmock, id *uuid.UUID) {
+			setExpectations: func(mock sqlmock.Sqlmock, id myid.UUID) {
 				mock.ExpectExec(query).WithArgs(utils.EqUUID(id)).WillReturnResult(
 					sqlmock.NewErrorResult(errors.New("rows affected conversion did not work")),
 				)
@@ -385,7 +385,7 @@ func TestDeletePriceCategory(t *testing.T) {
 		},
 		{
 			name: "PriceCategory not found",
-			setExpectations: func(mock sqlmock.Sqlmock, id *uuid.UUID) {
+			setExpectations: func(mock sqlmock.Sqlmock, id myid.UUID) {
 				mock.ExpectExec(query).WithArgs(utils.EqUUID(id)).WillReturnResult(sqlmock.NewResult(1, 0))
 			},
 			expectedError: kts_errors.KTS_NOT_FOUND,
@@ -413,7 +413,7 @@ func TestDeletePriceCategory(t *testing.T) {
 
 			// WHEN
 			// Call the method under test
-			kts_err := priceCategoryRepo.DeletePriceCategory(priceCategoryId)
+			kts_err := priceCategoryRepo.DeletePriceCategory(&priceCategoryId)
 
 			// THEN
 			// Verify the results

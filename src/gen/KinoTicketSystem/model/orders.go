@@ -8,13 +8,13 @@
 package model
 
 import (
-	"github.com/google/uuid"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/myid"
 )
 
 type Orders struct {
-	ID              *uuid.UUID `sql:"primary_key"`
+	ID              myid.UUID `sql:"primary_key"`
 	Totalprice      int32
 	IsPaid          bool
-	PaymentMethodID *uuid.UUID
-	UserID          *uuid.UUID
+	PaymentMethodID *myid.UUID
+	UserID          myid.UUID
 }

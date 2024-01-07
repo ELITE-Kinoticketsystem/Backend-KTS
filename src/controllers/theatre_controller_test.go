@@ -7,9 +7,9 @@ import (
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/gen/KinoTicketSystem/model"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/mocks"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/myid"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/samples"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
-	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
 )
@@ -161,7 +161,7 @@ func TestCreateCinemaHall(t *testing.T) {
 				mockRepo.EXPECT().CreateCinemaHall(utils.EqExceptUUIDs(sampleCinemaHall)).Return(nil)
 				mockRepo.EXPECT().GetSeatCategories().Return(sampleSeatCategories, nil)
 				mockRepo.EXPECT().CreateSeat(gomock.AssignableToTypeOf(model.Seats{})).
-				Times(len(sampleRequest.Seats) * len(sampleRequest.Seats[0])).Return(nil)
+					Times(len(sampleRequest.Seats) * len(sampleRequest.Seats[0])).Return(nil)
 			},
 			expectedError: nil,
 		},
@@ -197,10 +197,10 @@ func TestCreateCinemaHall(t *testing.T) {
 
 func TestGetCinemaHallsForTheatre(t *testing.T) {
 	sampleCinemaHalls := samples.GetSampleCinemaHalls()
-	theatreId := sampleCinemaHalls[0].TheatreID
+	theatreId := &sampleCinemaHalls[0].TheatreID
 	testCases := []struct {
 		name            string
-		theatreId       *uuid.UUID
+		theatreId       *myid.UUID
 		setExpectations func(mockRepo mocks.MockTheaterRepoI)
 		expectedError   *models.KTSError
 	}{

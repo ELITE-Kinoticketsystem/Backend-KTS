@@ -13,7 +13,7 @@ import (
 
 	model "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/gen/KinoTicketSystem/model"
 	models "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
-	uuid "github.com/google/uuid"
+	myid "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/myid"
 	gomock "go.uber.org/mock/gomock"
 )
 
@@ -41,10 +41,10 @@ func (m *MockActorRepoI) EXPECT() *MockActorRepoIMockRecorder {
 }
 
 // CreateActor mocks base method.
-func (m *MockActorRepoI) CreateActor(actor *model.Actors) (*uuid.UUID, *models.KTSError) {
+func (m *MockActorRepoI) CreateActor(actor *model.Actors) (*myid.UUID, *models.KTSError) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateActor", actor)
-	ret0, _ := ret[0].(*uuid.UUID)
+	ret0, _ := ret[0].(*myid.UUID)
 	ret1, _ := ret[1].(*models.KTSError)
 	return ret0, ret1
 }
@@ -56,10 +56,10 @@ func (mr *MockActorRepoIMockRecorder) CreateActor(actor any) *gomock.Call {
 }
 
 // CreateActorPicture mocks base method.
-func (m *MockActorRepoI) CreateActorPicture(actorPicture *model.ActorPictures) (*uuid.UUID, *models.KTSError) {
+func (m *MockActorRepoI) CreateActorPicture(actorPicture *model.ActorPictures) (*myid.UUID, *models.KTSError) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateActorPicture", actorPicture)
-	ret0, _ := ret[0].(*uuid.UUID)
+	ret0, _ := ret[0].(*myid.UUID)
 	ret1, _ := ret[1].(*models.KTSError)
 	return ret0, ret1
 }
@@ -71,7 +71,7 @@ func (mr *MockActorRepoIMockRecorder) CreateActorPicture(actorPicture any) *gomo
 }
 
 // GetActorById mocks base method.
-func (m *MockActorRepoI) GetActorById(actorId *uuid.UUID) (*models.ActorDTO, *models.KTSError) {
+func (m *MockActorRepoI) GetActorById(actorId *myid.UUID) (*models.ActorDTO, *models.KTSError) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetActorById", actorId)
 	ret0, _ := ret[0].(*models.ActorDTO)

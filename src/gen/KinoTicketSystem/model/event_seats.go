@@ -8,15 +8,15 @@
 package model
 
 import (
-	"github.com/google/uuid"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/myid"
 	"time"
 )
 
 type EventSeats struct {
-	ID           *uuid.UUID `sql:"primary_key"`
+	ID           myid.UUID `sql:"primary_key"`
 	Booked       bool
 	BlockedUntil *time.Time
-	UserID       *uuid.UUID
-	SeatID       *uuid.UUID
-	EventID      *uuid.UUID
+	UserID       *myid.UUID
+	SeatID       myid.UUID
+	EventID      myid.UUID
 }

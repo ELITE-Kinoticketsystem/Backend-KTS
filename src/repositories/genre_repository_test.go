@@ -9,9 +9,9 @@ import (
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/gen/KinoTicketSystem/model"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/managers"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/myid"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/samples"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
-	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -339,33 +339,33 @@ func TestUpdateGenre(t *testing.T) {
 }
 
 func TestDeleteGenre(t *testing.T) {
-	genreId := uuid.New()
+	genreId := myid.New()
 
 	query := "DELETE FROM `KinoTicketSystem`.genres WHERE genres.id = ?;"
 
 	testCases := []struct {
 		name            string
-		setExpectations func(mock sqlmock.Sqlmock, genre *uuid.UUID)
+		setExpectations func(mock sqlmock.Sqlmock, genre *myid.UUID)
 		expectedError   *models.KTSError
 	}{
 		{
 			name: "Successful deletion",
-			setExpectations: func(mock sqlmock.Sqlmock, genre *uuid.UUID) {
-				mock.ExpectExec(query).WithArgs(utils.EqUUID(&genreId)).WillReturnResult(sqlmock.NewResult(1, 1))
+			setExpectations: func(mock sqlmock.Sqlmock, genre *myid.UUID) {
+				mock.ExpectExec(query).WithArgs(utils.EqUUID(genreId)).WillReturnResult(sqlmock.NewResult(1, 1))
 			},
 			expectedError: nil,
 		},
 		{
 			name: "Error while deleting genre",
-			setExpectations: func(mock sqlmock.Sqlmock, genre *uuid.UUID) {
-				mock.ExpectExec(query).WithArgs(utils.EqUUID(&genreId)).WillReturnError(sqlmock.ErrCancelled)
+			setExpectations: func(mock sqlmock.Sqlmock, genre *myid.UUID) {
+				mock.ExpectExec(query).WithArgs(utils.EqUUID(genreId)).WillReturnError(sqlmock.ErrCancelled)
 			},
 			expectedError: kts_errors.KTS_INTERNAL_ERROR,
 		},
 		{
 			name: "Error while converting rows affected",
-			setExpectations: func(mock sqlmock.Sqlmock, genre *uuid.UUID) {
-				mock.ExpectExec(query).WithArgs(utils.EqUUID(&genreId)).WillReturnResult(
+			setExpectations: func(mock sqlmock.Sqlmock, genre *myid.UUID) {
+				mock.ExpectExec(query).WithArgs(utils.EqUUID(genreId)).WillReturnResult(
 					sqlmock.NewErrorResult(errors.New("rows affected conversion did not work")),
 				)
 			},
@@ -373,8 +373,8 @@ func TestDeleteGenre(t *testing.T) {
 		},
 		{
 			name: "Genre not found",
-			setExpectations: func(mock sqlmock.Sqlmock, genre *uuid.UUID) {
-				mock.ExpectExec(query).WithArgs(utils.EqUUID(&genreId)).WillReturnResult(sqlmock.NewResult(1, 0))
+			setExpectations: func(mock sqlmock.Sqlmock, genre *myid.UUID) {
+				mock.ExpectExec(query).WithArgs(utils.EqUUID(genreId)).WillReturnResult(sqlmock.NewResult(1, 0))
 			},
 			expectedError: kts_errors.KTS_NOT_FOUND,
 		},

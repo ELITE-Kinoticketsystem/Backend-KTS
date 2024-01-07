@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/gen/KinoTicketSystem/model"
-	"github.com/google/uuid"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/myid"
 )
 
 type MovieWithGenres struct {
@@ -48,15 +48,15 @@ type MovieDTOCreate struct {
 	model.Movies
 
 	GenresID []struct {
-		ID *uuid.UUID
+		ID *myid.UUID
 	}
 
 	ActorsID []struct {
-		ID *uuid.UUID
+		ID *myid.UUID
 	}
 
 	ProducersID []struct {
-		ID *uuid.UUID
+		ID *myid.UUID
 	}
 }
 

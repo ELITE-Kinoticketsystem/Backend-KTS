@@ -6,9 +6,9 @@ import (
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/gen/KinoTicketSystem/table"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/managers"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/myid"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
 	"github.com/go-jet/jet/v2/mysql"
-	"github.com/google/uuid"
 )
 
 const (
@@ -17,24 +17,25 @@ const (
 )
 
 type EventRepo interface {
-	CreateEvent(event *model.Events) (*uuid.UUID, *models.KTSError)
-	GetEventsForMovie(movieId *uuid.UUID, theatreId *uuid.UUID) ([]*model.Events, *models.KTSError)
+	CreateEvent(event *model.Events) (*myid.UUID, *models.KTSError)
+	GetEventsForMovie(movieId *myid.UUID, theatreId *myid.UUID) ([]*model.Events, *models.KTSError)
 
-	AddEventMovie(eventId *uuid.UUID, movieId *uuid.UUID) *models.KTSError
+	AddEventMovie(eventId *myid.UUID, movieId *myid.UUID) *models.KTSError
 
 	GetSpecialEvents() (*[]models.GetSpecialEventsDTO, *models.KTSError)
 	CreateEventSeat(eventSeat *model.EventSeats) *models.KTSError
+	CreateEventSeats(eventSeats []*model.EventSeats) *models.KTSError
 
 	CreateEventSeatCategory(eventSeatCategory *model.EventSeatCategories) *models.KTSError
-	GetEventById(eventId *uuid.UUID) (*models.GetSpecialEventsDTO, *models.KTSError)
+	GetEventById(eventId *myid.UUID) (*models.GetSpecialEventsDTO, *models.KTSError)
 }
 
 type EventRepository struct {
 	DatabaseManager managers.DatabaseManagerI
 }
 
-func (er *EventRepository) CreateEvent(event *model.Events) (*uuid.UUID, *models.KTSError) {
-	event.ID = utils.NewUUID()
+func (er *EventRepository) CreateEvent(event *model.Events) (*myid.UUID, *models.KTSError) {
+	event.ID = myid.New()
 
 	stmt := table.Events.INSERT(table.Events.AllColumns).VALUES(
 		utils.MysqlUuid(event.ID),
@@ -53,7 +54,7 @@ func (er *EventRepository) CreateEvent(event *model.Events) (*uuid.UUID, *models
 		return nil, kts_err
 	}
 
-	return event.ID, nil
+	return &event.ID, nil
 }
 
 func (er *EventRepository) CreateEventSeatCategory(eventSeatCategory *model.EventSeatCategories) *models.KTSError {
@@ -66,10 +67,10 @@ func (er *EventRepository) CreateEventSeatCategory(eventSeatCategory *model.Even
 	return utils.ExcecuteInsertStatement(insertStmt, er.DatabaseManager.GetDatabaseConnection())
 }
 
-func (er *EventRepository) AddEventMovie(eventId *uuid.UUID, movieId *uuid.UUID) *models.KTSError {
+func (er *EventRepository) AddEventMovie(eventId *myid.UUID, movieId *myid.UUID) *models.KTSError {
 	insertStmt := table.EventMovies.INSERT(table.EventMovies.EventID, table.EventMovies.MovieID).VALUES(
-		utils.MysqlUuid(eventId),
-		utils.MysqlUuid(movieId),
+		utils.MysqlUuid(*eventId),
+		utils.MysqlUuid(*movieId),
 	)
 
 	return utils.ExcecuteInsertStatement(insertStmt, er.DatabaseManager.GetDatabaseConnection())
@@ -84,6 +85,20 @@ func (er *EventRepository) CreateEventSeat(eventSeat *model.EventSeats) *models.
 	)
 
 	return utils.ExcecuteInsertStatement(insertStmt, er.DatabaseManager.GetDatabaseConnection())
+}
+
+func (er *EventRepository) CreateEventSeats(eventSeats []*model.EventSeats) *models.KTSError {
+	insertStmt := table.EventSeats.INSERT(table.EventSeats.ID, table.EventSeats.EventID, table.EventSeats.SeatID, table.EventSeats.Booked).MODELS(
+		eventSeats,
+	)
+
+	_, err := insertStmt.Exec(er.DatabaseManager.GetDatabaseConnection())
+
+	if err != nil {
+		return kts_errors.KTS_INTERNAL_ERROR
+	}
+
+	return nil
 }
 
 func (er *EventRepository) GetSpecialEvents() (*[]models.GetSpecialEventsDTO, *models.KTSError) {
@@ -115,15 +130,15 @@ func (er *EventRepository) GetSpecialEvents() (*[]models.GetSpecialEventsDTO, *m
 	return &specialEvents, nil
 }
 
-func (er *EventRepository) GetEventsForMovie(movieId *uuid.UUID, theatreId *uuid.UUID) ([]*model.Events, *models.KTSError) {
+func (er *EventRepository) GetEventsForMovie(movieId *myid.UUID, theatreId *myid.UUID) ([]*model.Events, *models.KTSError) {
 	stmt := table.Events.SELECT(table.Events.AllColumns).
 		FROM(table.Events.
 			LEFT_JOIN(table.EventMovies, table.EventMovies.EventID.EQ(table.Events.ID)).
 			LEFT_JOIN(table.CinemaHalls, table.CinemaHalls.ID.EQ(table.Events.CinemaHallID))).
-		WHERE(table.EventMovies.MovieID.EQ(utils.MysqlUuid(movieId)).
+		WHERE(table.EventMovies.MovieID.EQ(utils.MysqlUuid(*movieId)).
 			AND(table.Events.Start.GT(utils.MysqlTimeNow())).
 			AND(table.Events.EventType.EQ(utils.MySqlString(showing))).
-			AND(table.CinemaHalls.TheatreID.EQ(utils.MysqlUuid(theatreId)))).
+			AND(table.CinemaHalls.TheatreID.EQ(utils.MysqlUuid(*theatreId)))).
 		ORDER_BY(table.Events.Start.ASC())
 
 	var events []*model.Events
@@ -137,7 +152,7 @@ func (er *EventRepository) GetEventsForMovie(movieId *uuid.UUID, theatreId *uuid
 	return events, nil
 }
 
-func (er *EventRepository) GetEventById(eventId *uuid.UUID) (*models.GetSpecialEventsDTO, *models.KTSError) {
+func (er *EventRepository) GetEventById(eventId *myid.UUID) (*models.GetSpecialEventsDTO, *models.KTSError) {
 	var event models.GetSpecialEventsDTO
 
 	stmt := mysql.SELECT(
@@ -150,7 +165,7 @@ func (er *EventRepository) GetEventById(eventId *uuid.UUID) (*models.GetSpecialE
 				LEFT_JOIN(table.Movies, table.Movies.ID.EQ(table.EventMovies.MovieID)),
 		).
 		WHERE(
-			table.Events.ID.EQ(utils.MysqlUuid(eventId)),
+			table.Events.ID.EQ(utils.MysqlUuid(*eventId)),
 		)
 
 	err := stmt.Query(er.DatabaseManager.GetDatabaseConnection(), &event)

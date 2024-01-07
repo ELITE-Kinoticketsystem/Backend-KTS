@@ -13,7 +13,7 @@ import (
 
 	model "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/gen/KinoTicketSystem/model"
 	models "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
-	uuid "github.com/google/uuid"
+	myid "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/myid"
 	gomock "go.uber.org/mock/gomock"
 )
 
@@ -82,6 +82,20 @@ func (mr *MockTheaterRepoIMockRecorder) CreateSeat(seat any) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateSeat", reflect.TypeOf((*MockTheaterRepoI)(nil).CreateSeat), seat)
 }
 
+// CreateSeats mocks base method.
+func (m *MockTheaterRepoI) CreateSeats(seat []model.Seats) *models.KTSError {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateSeats", seat)
+	ret0, _ := ret[0].(*models.KTSError)
+	return ret0
+}
+
+// CreateSeats indicates an expected call of CreateSeats.
+func (mr *MockTheaterRepoIMockRecorder) CreateSeats(seat any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateSeats", reflect.TypeOf((*MockTheaterRepoI)(nil).CreateSeats), seat)
+}
+
 // CreateTheatre mocks base method.
 func (m *MockTheaterRepoI) CreateTheatre(theatre model.Theatres) *models.KTSError {
 	m.ctrl.T.Helper()
@@ -97,7 +111,7 @@ func (mr *MockTheaterRepoIMockRecorder) CreateTheatre(theatre any) *gomock.Call 
 }
 
 // GetCinemaHallsForTheatre mocks base method.
-func (m *MockTheaterRepoI) GetCinemaHallsForTheatre(theatreId *uuid.UUID) (*[]model.CinemaHalls, *models.KTSError) {
+func (m *MockTheaterRepoI) GetCinemaHallsForTheatre(theatreId *myid.UUID) (*[]model.CinemaHalls, *models.KTSError) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetCinemaHallsForTheatre", theatreId)
 	ret0, _ := ret[0].(*[]model.CinemaHalls)
@@ -127,7 +141,7 @@ func (mr *MockTheaterRepoIMockRecorder) GetSeatCategories() *gomock.Call {
 }
 
 // GetSeatsForCinemaHall mocks base method.
-func (m *MockTheaterRepoI) GetSeatsForCinemaHall(cinemaHallId *uuid.UUID) ([]model.Seats, *models.KTSError) {
+func (m *MockTheaterRepoI) GetSeatsForCinemaHall(cinemaHallId *myid.UUID) ([]model.Seats, *models.KTSError) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetSeatsForCinemaHall", cinemaHallId)
 	ret0, _ := ret[0].([]model.Seats)

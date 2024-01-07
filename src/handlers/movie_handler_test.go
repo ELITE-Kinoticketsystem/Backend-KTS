@@ -13,8 +13,8 @@ import (
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/handlers"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/mocks"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/myid"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/samples"
-	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
@@ -100,7 +100,7 @@ func TestUpdateMovieHandler(t *testing.T) {
 }
 
 func TestDeleteMovieHandler(t *testing.T) {
-	sampleUpdateMovieId := utils.NewUUID()
+	sampleUpdateMovieId := myid.NewUUID()
 
 	testCases := []struct {
 		name            string
@@ -355,7 +355,7 @@ func TestCreateMovieHandler(t *testing.T) {
 			name: "Success",
 			body: sampleCreateMovie,
 			setExpectations: func(mockController *mocks.MockMovieControllerI, movieData interface{}) {
-				mockController.EXPECT().CreateMovie(gomock.Any()).Return(sampleCreateMovie.ID, nil)
+				mockController.EXPECT().CreateMovie(gomock.Any()).Return(&sampleCreateMovie.ID, nil)
 			},
 			expectedStatus: http.StatusCreated,
 			expectedBody:   sampleCreateMovie.ID,

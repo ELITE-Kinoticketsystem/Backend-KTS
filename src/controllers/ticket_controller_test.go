@@ -6,9 +6,8 @@ import (
 	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/mocks"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/myid"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/samples"
-	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
-	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
 )
@@ -18,13 +17,13 @@ func TestGetTicketById(t *testing.T) {
 
 	testCases := []struct {
 		name            string
-		setExpectations func(mockRepo mocks.MockTicketRepositoryI, id *uuid.UUID)
+		setExpectations func(mockRepo mocks.MockTicketRepositoryI, id *myid.UUID)
 		expectedTicket  *models.TicketDTO
 		expectedError   *models.KTSError
 	}{
 		{
 			name: "Empty result",
-			setExpectations: func(mockRepo mocks.MockTicketRepositoryI, id *uuid.UUID) {
+			setExpectations: func(mockRepo mocks.MockTicketRepositoryI, id *myid.UUID) {
 				mockRepo.EXPECT().GetTicketById(id).Return(nil, kts_errors.KTS_NOT_FOUND)
 			},
 			expectedTicket: nil,
@@ -32,7 +31,7 @@ func TestGetTicketById(t *testing.T) {
 		},
 		{
 			name: "One Ticket",
-			setExpectations: func(mockRepo mocks.MockTicketRepositoryI, id *uuid.UUID) {
+			setExpectations: func(mockRepo mocks.MockTicketRepositoryI, id *myid.UUID) {
 				mockRepo.EXPECT().GetTicketById(sampleTicket.ID).Return(sampleTicket, nil)
 			},
 			expectedTicket: sampleTicket,
@@ -40,7 +39,7 @@ func TestGetTicketById(t *testing.T) {
 		},
 		{
 			name: "Error while querying for ticket",
-			setExpectations: func(mockRepo mocks.MockTicketRepositoryI, id *uuid.UUID) {
+			setExpectations: func(mockRepo mocks.MockTicketRepositoryI, id *myid.UUID) {
 				mockRepo.EXPECT().GetTicketById(id).Return(nil, kts_errors.KTS_INTERNAL_ERROR)
 			},
 			expectedTicket: nil,
@@ -72,30 +71,30 @@ func TestGetTicketById(t *testing.T) {
 }
 
 func TestValidateTicket(t *testing.T) {
-	id := utils.NewUUID()
+	id := myid.NewUUID()
 
 	testCases := []struct {
 		name            string
-		setExpectations func(mockRepo mocks.MockTicketRepositoryI, id *uuid.UUID)
+		setExpectations func(mockRepo mocks.MockTicketRepositoryI, id *myid.UUID)
 		expectedError   *models.KTSError
 	}{
 		{
 			name: "ticket conflict",
-			setExpectations: func(mockRepo mocks.MockTicketRepositoryI, id *uuid.UUID) {
+			setExpectations: func(mockRepo mocks.MockTicketRepositoryI, id *myid.UUID) {
 				mockRepo.EXPECT().ValidateTicket(id).Return(kts_errors.KTS_CONFLICT)
 			},
 			expectedError: kts_errors.KTS_CONFLICT,
 		},
 		{
 			name: "Ticket validated",
-			setExpectations: func(mockRepo mocks.MockTicketRepositoryI, id *uuid.UUID) {
+			setExpectations: func(mockRepo mocks.MockTicketRepositoryI, id *myid.UUID) {
 				mockRepo.EXPECT().ValidateTicket(id).Return(nil)
 			},
 			expectedError: nil,
 		},
 		{
 			name: "Error while validating ticket",
-			setExpectations: func(mockRepo mocks.MockTicketRepositoryI, id *uuid.UUID) {
+			setExpectations: func(mockRepo mocks.MockTicketRepositoryI, id *myid.UUID) {
 				mockRepo.EXPECT().ValidateTicket(id).Return(kts_errors.KTS_INTERNAL_ERROR)
 			},
 			expectedError: kts_errors.KTS_INTERNAL_ERROR,

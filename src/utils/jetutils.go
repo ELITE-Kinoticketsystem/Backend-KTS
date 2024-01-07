@@ -5,18 +5,18 @@ import (
 	"time"
 
 	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/myid"
 
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
 	"github.com/go-jet/jet/v2/mysql"
-	"github.com/google/uuid"
 )
 
-func MysqlUuid(uuid *uuid.UUID) mysql.StringExpression {
+func MysqlUuid(uuid myid.UUID) mysql.StringExpression {
 	binary_id, _ := uuid.MarshalBinary()
 	return mysql.String(string(binary_id))
 }
 
-func MysqlUuidOrNil(uuid *uuid.UUID) mysql.Expression {
+func MysqlUuidOrNil(uuid *myid.UUID) mysql.Expression {
 	if uuid == nil {
 		return mysql.NULL
 	}

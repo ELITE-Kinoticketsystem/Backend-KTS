@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/gen/KinoTicketSystem/model"
-	"github.com/google/uuid"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/myid"
 )
 
 type GetEventSeatsDTO struct {
@@ -24,7 +24,7 @@ type GetSlectedSeatsDTO struct {
 }
 
 type GetSeatsForSeatSelectorDTO struct {
-	ID             *uuid.UUID
+	ID             *myid.UUID
 	RowNr          int32
 	ColumnNr       int32
 	Available      bool

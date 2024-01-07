@@ -6,9 +6,9 @@ import (
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/controllers"
 	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/gen/KinoTicketSystem/model"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/myid"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 )
 
 // @Summary Get price category by id
@@ -22,7 +22,7 @@ import (
 // @Router /price-categories/{id} [get]
 func GetPriceCategoryByIdHandler(priceCategoriesController controllers.PriceCategoryControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		priceCategoryId, err := uuid.Parse(c.Param("id"))
+		priceCategoryId, err := myid.Parse(c.Param("id"))
 		if err != nil {
 			utils.HandleErrorAndAbort(c, kts_errors.KTS_BAD_REQUEST)
 			return
@@ -63,7 +63,7 @@ func GetPriceCategoriesHandler(priceCategoriesController controllers.PriceCatego
 // @Accept  json
 // @Produce  json
 // @Param priceCategory body model.PriceCategories true "Price category data"
-// @Success 200 {object} uuid.UUID
+// @Success 200 {object} myid.UUID
 // @Failure 500 {object} models.KTSErrorMessage
 // @Router /price-categories [post]
 func CreatePriceCategoryHandler(priceCategoriesController controllers.PriceCategoryControllerI) gin.HandlerFunc {
@@ -91,7 +91,7 @@ func CreatePriceCategoryHandler(priceCategoriesController controllers.PriceCateg
 // @Accept  json
 // @Produce  json
 // @Param priceCategory body model.PriceCategories true "Price category data"
-// @Success 200 {object} uuid.UUID
+// @Success 200 {object} myid.UUID
 // @Failure 500 {object} models.KTSErrorMessage
 // @Router /price-categories [put]
 func UpdatePriceCategoryHandler(priceCategoriesController controllers.PriceCategoryControllerI) gin.HandlerFunc {
@@ -124,7 +124,7 @@ func UpdatePriceCategoryHandler(priceCategoriesController controllers.PriceCateg
 // @Router /price-categories/{id} [delete]
 func DeletePriceCategoryHandler(priceCategoriesController controllers.PriceCategoryControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		priceCategoryId, err := uuid.Parse(c.Param("id"))
+		priceCategoryId, err := myid.Parse(c.Param("id"))
 		if err != nil {
 			utils.HandleErrorAndAbort(c, kts_errors.KTS_BAD_REQUEST)
 			return

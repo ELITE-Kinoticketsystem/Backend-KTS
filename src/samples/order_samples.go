@@ -3,24 +3,23 @@ package samples
 import (
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/gen/KinoTicketSystem/model"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
-	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
-	"github.com/google/uuid"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/myid"
 )
 
-func GetOrder(priceCategories *[]model.PriceCategories, eventSeats *[]models.GetSlectedSeatsDTO, paymentMethodId *uuid.UUID) *models.CreateOrderDTO {
+func GetOrder(priceCategories *[]model.PriceCategories, eventSeats *[]models.GetSlectedSeatsDTO, paymentMethodId *myid.UUID) *models.CreateOrderDTO {
 
 	return &models.CreateOrderDTO{
 		EventSeatPriceCategories: []struct {
-			EventSeatId     *uuid.UUID
-			PriceCategoryId *uuid.UUID
+			EventSeatId     *myid.UUID
+			PriceCategoryId *myid.UUID
 		}{
 			{
-				EventSeatId:     (*eventSeats)[0].EventSeat.ID,
-				PriceCategoryId: (*priceCategories)[0].ID,
+				EventSeatId:     &(*eventSeats)[0].EventSeat.ID,
+				PriceCategoryId: &(*priceCategories)[0].ID,
 			},
 			{
-				EventSeatId:     (*eventSeats)[1].EventSeat.ID,
-				PriceCategoryId: (*priceCategories)[1].ID,
+				EventSeatId:     &(*eventSeats)[1].EventSeat.ID,
+				PriceCategoryId: &(*priceCategories)[1].ID,
 			},
 		},
 		PaymentMethodID: paymentMethodId,
@@ -30,12 +29,12 @@ func GetOrder(priceCategories *[]model.PriceCategories, eventSeats *[]models.Get
 func GetOrderDTO() *models.CreateOrderDTO {
 	return &models.CreateOrderDTO{
 		EventSeatPriceCategories: []struct {
-			EventSeatId     *uuid.UUID
-			PriceCategoryId *uuid.UUID
+			EventSeatId     *myid.UUID
+			PriceCategoryId *myid.UUID
 		}{
 			{
-				EventSeatId:     utils.NewUUID(),
-				PriceCategoryId: utils.NewUUID(),
+				EventSeatId:     myid.NewUUID(),
+				PriceCategoryId: myid.NewUUID(),
 			},
 		},
 		PaymentMethodID: nil,
@@ -43,8 +42,8 @@ func GetOrderDTO() *models.CreateOrderDTO {
 }
 
 func GetGetOrderDto() *[]models.GetOrderDTO {
-	orderId := utils.NewUUID()
-	order2Id := utils.NewUUID()
+	orderId := myid.New()
+	order2Id := myid.New()
 
 	return &[]models.GetOrderDTO{
 		{
@@ -59,11 +58,11 @@ func GetGetOrderDto() *[]models.GetOrderDTO {
 			}{
 				{
 					Ticket: model.Tickets{
-						ID:      utils.NewUUID(),
+						ID:      myid.New(),
 						OrderID: orderId,
 					},
 					Seat: model.Seats{
-						ID: utils.NewUUID(),
+						ID: myid.New(),
 					},
 				},
 			},
@@ -80,11 +79,11 @@ func GetGetOrderDto() *[]models.GetOrderDTO {
 			}{
 				{
 					Ticket: model.Tickets{
-						ID:      utils.NewUUID(),
+						ID:      myid.New(),
 						OrderID: order2Id,
 					},
 					Seat: model.Seats{
-						ID: utils.NewUUID(),
+						ID: myid.New(),
 					},
 				},
 			},
@@ -94,10 +93,10 @@ func GetGetOrderDto() *[]models.GetOrderDTO {
 
 func GetModelOrder() *model.Orders {
 	return &model.Orders{
-		ID:              utils.NewUUID(),
+		ID:              myid.New(),
 		Totalprice:      100,
 		IsPaid:          false,
-		PaymentMethodID: utils.NewUUID(),
-		UserID:          utils.NewUUID(),
+		PaymentMethodID: myid.NewUUID(),
+		UserID:          myid.New(),
 	}
 }

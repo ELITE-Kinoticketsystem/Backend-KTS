@@ -2,62 +2,62 @@ package samples
 
 import (
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
-	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/myid"
 
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/gen/KinoTicketSystem/model"
 )
 
 func GetEventSeatsDTO() *[]models.GetEventSeatsDTO {
-	eventId := utils.NewUUID()
+	eventId := myid.NewUUID()
 
 	return &[]models.GetEventSeatsDTO{
 		{
 			EventSeat: model.EventSeats{
-				ID:           utils.NewUUID(),
+				ID:           myid.New(),
 				Booked:       false,
 				BlockedUntil: nil,
 				UserID:       nil,
-				EventID:      eventId,
-				SeatID:       utils.NewUUID(),
+				EventID:      *eventId,
+				SeatID:       myid.New(),
 			},
 			Seat: model.Seats{
-				ID:             utils.NewUUID(),
+				ID:             myid.New(),
 				RowNr:          1,
 				ColumnNr:       1,
-				SeatCategoryID: utils.NewUUID(),
+				SeatCategoryID: myid.New(),
 			},
 			SeatCategory: model.SeatCategories{
-				ID:           utils.NewUUID(),
+				ID:           myid.New(),
 				CategoryName: "standard",
 			},
 			EventSeatCategory: model.EventSeatCategories{
-				EventID:        eventId,
-				SeatCategoryID: utils.NewUUID(),
+				EventID:        *eventId,
+				SeatCategoryID: myid.New(),
 				Price:          100,
 			},
 		},
 		{
 			EventSeat: model.EventSeats{
-				ID:           utils.NewUUID(),
+				ID:           myid.New(),
 				Booked:       false,
 				BlockedUntil: nil,
 				UserID:       nil,
-				EventID:      eventId,
-				SeatID:       utils.NewUUID(),
+				EventID:      *eventId,
+				SeatID:       myid.New(),
 			},
 			Seat: model.Seats{
-				ID:             utils.NewUUID(),
+				ID:             myid.New(),
 				RowNr:          1,
 				ColumnNr:       2,
-				SeatCategoryID: utils.NewUUID(),
+				SeatCategoryID: myid.New(),
 			},
 			SeatCategory: model.SeatCategories{
-				ID:           utils.NewUUID(),
+				ID:           myid.New(),
 				CategoryName: "standard",
 			},
 			EventSeatCategory: model.EventSeatCategories{
-				EventID:        eventId,
-				SeatCategoryID: utils.NewUUID(),
+				EventID:        *eventId,
+				SeatCategoryID: myid.New(),
 				Price:          100,
 			},
 		},
@@ -65,56 +65,56 @@ func GetEventSeatsDTO() *[]models.GetEventSeatsDTO {
 }
 
 func GetGetSlectedSeatsDTO() *[]models.GetSlectedSeatsDTO {
-	eventId := utils.NewUUID()
+	eventId := myid.NewUUID()
 
 	return &[]models.GetSlectedSeatsDTO{
 		{
 			EventSeat: model.EventSeats{
-				ID:           utils.NewUUID(),
+				ID:           myid.New(),
 				Booked:       false,
 				BlockedUntil: nil,
 				UserID:       nil,
-				EventID:      eventId,
-				SeatID:       utils.NewUUID(),
+				EventID:      *eventId,
+				SeatID:       myid.New(),
 			},
 			Seat: model.Seats{
-				ID:             utils.NewUUID(),
+				ID:             myid.New(),
 				RowNr:          1,
 				ColumnNr:       1,
-				SeatCategoryID: utils.NewUUID(),
+				SeatCategoryID: myid.New(),
 			},
 			SeatCategory: model.SeatCategories{
-				ID:           utils.NewUUID(),
+				ID:           myid.New(),
 				CategoryName: "standard",
 			},
 			EventSeatCategory: model.EventSeatCategories{
-				EventID:        eventId,
-				SeatCategoryID: utils.NewUUID(),
+				EventID:        *eventId,
+				SeatCategoryID: myid.New(),
 				Price:          100,
 			},
 		},
 		{
 			EventSeat: model.EventSeats{
-				ID:           utils.NewUUID(),
+				ID:           myid.New(),
 				Booked:       false,
 				BlockedUntil: nil,
 				UserID:       nil,
-				EventID:      eventId,
-				SeatID:       utils.NewUUID(),
+				EventID:      *eventId,
+				SeatID:       myid.New(),
 			},
 			Seat: model.Seats{
-				ID:             utils.NewUUID(),
+				ID:             myid.New(),
 				RowNr:          1,
 				ColumnNr:       2,
-				SeatCategoryID: utils.NewUUID(),
+				SeatCategoryID: myid.New(),
 			},
 			SeatCategory: model.SeatCategories{
-				ID:           utils.NewUUID(),
+				ID:           myid.New(),
 				CategoryName: "standard",
 			},
 			EventSeatCategory: model.EventSeatCategories{
-				EventID:        eventId,
-				SeatCategoryID: utils.NewUUID(),
+				EventID:        *eventId,
+				SeatCategoryID: myid.New(),
 				Price:          100,
 			},
 		},

@@ -13,7 +13,7 @@ import (
 
 	model "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/gen/KinoTicketSystem/model"
 	models "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
-	uuid "github.com/google/uuid"
+	myid "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/myid"
 	gomock "go.uber.org/mock/gomock"
 )
 
@@ -83,7 +83,7 @@ func (mr *MockUserRepositoryIMockRecorder) CreateUser(user any) *gomock.Call {
 }
 
 // GetUserById mocks base method.
-func (m *MockUserRepositoryI) GetUserById(id *uuid.UUID) (*model.Users, *models.KTSError) {
+func (m *MockUserRepositoryI) GetUserById(id *myid.UUID) (*model.Users, *models.KTSError) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetUserById", id)
 	ret0, _ := ret[0].(*model.Users)

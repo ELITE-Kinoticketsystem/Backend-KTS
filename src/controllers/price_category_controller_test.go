@@ -3,7 +3,6 @@ package controllers
 import (
 	"testing"
 
-	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
 
@@ -11,19 +10,19 @@ import (
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/gen/KinoTicketSystem/model"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/mocks"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
-	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/myid"
 )
 
 func TestGetProducers(t *testing.T) {
 
 	samplePriceCategories := &[]model.PriceCategories{
 		{
-			ID:           utils.NewUUID(),
+			ID:           myid.New(),
 			CategoryName: "StudentDiscount",
 			Price:        16,
 		},
 		{
-			ID:           utils.NewUUID(),
+			ID:           myid.New(),
 			CategoryName: "ChildDiscount",
 			Price:        16,
 		},
@@ -85,20 +84,20 @@ func TestGetProducers(t *testing.T) {
 
 func TestGetProducerByID(t *testing.T) {
 	samplePriceCategory := &model.PriceCategories{
-		ID:           utils.NewUUID(),
+		ID:           myid.New(),
 		CategoryName: "StudentDiscount",
 		Price:        16,
 	}
 
 	testCases := []struct {
 		name                  string
-		setExpectations       func(mockRepo mocks.MockPriceCategoryRepositoryI, priceCategoryID *uuid.UUID)
+		setExpectations       func(mockRepo mocks.MockPriceCategoryRepositoryI, priceCategoryID *myid.UUID)
 		expectedPriceCategory *model.PriceCategories
 		expectedError         *models.KTSError
 	}{
 		{
 			name: "Empty result",
-			setExpectations: func(mockRepo mocks.MockPriceCategoryRepositoryI, priceCategoryID *uuid.UUID) {
+			setExpectations: func(mockRepo mocks.MockPriceCategoryRepositoryI, priceCategoryID *myid.UUID) {
 				mockRepo.EXPECT().GetPriceCategoryById(priceCategoryID).Return(nil, kts_errors.KTS_NOT_FOUND)
 			},
 			expectedPriceCategory: nil,
@@ -106,7 +105,7 @@ func TestGetProducerByID(t *testing.T) {
 		},
 		{
 			name: "One priceCategory",
-			setExpectations: func(mockRepo mocks.MockPriceCategoryRepositoryI, priceCategoryID *uuid.UUID) {
+			setExpectations: func(mockRepo mocks.MockPriceCategoryRepositoryI, priceCategoryID *myid.UUID) {
 				mockRepo.EXPECT().GetPriceCategoryById(priceCategoryID).Return(samplePriceCategory, nil)
 			},
 			expectedPriceCategory: samplePriceCategory,
@@ -114,7 +113,7 @@ func TestGetProducerByID(t *testing.T) {
 		},
 		{
 			name: "Error while querying for priceCategory",
-			setExpectations: func(mockRepo mocks.MockPriceCategoryRepositoryI, priceCategoryID *uuid.UUID) {
+			setExpectations: func(mockRepo mocks.MockPriceCategoryRepositoryI, priceCategoryID *myid.UUID) {
 				mockRepo.EXPECT().GetPriceCategoryById(priceCategoryID).Return(nil, kts_errors.KTS_INTERNAL_ERROR)
 			},
 			expectedPriceCategory: nil,
@@ -133,10 +132,10 @@ func TestGetProducerByID(t *testing.T) {
 			}
 
 			// define expectations
-			tc.setExpectations(*priceCategoryRepoMock, samplePriceCategory.ID)
+			tc.setExpectations(*priceCategoryRepoMock, &samplePriceCategory.ID)
 
 			// WHEN
-			priceCategory, kts_err := priceCategoryController.GetPriceCategoryById(samplePriceCategory.ID)
+			priceCategory, kts_err := priceCategoryController.GetPriceCategoryById(&samplePriceCategory.ID)
 
 			// THEN
 			assert.Equal(t, tc.expectedPriceCategory, priceCategory)
@@ -148,7 +147,7 @@ func TestGetProducerByID(t *testing.T) {
 func TestCreateProducer(t *testing.T) {
 
 	samplePriceCategory := &model.PriceCategories{
-		ID:           utils.NewUUID(),
+		ID:           myid.New(),
 		CategoryName: "StudentDiscount",
 		Price:        16,
 	}
@@ -173,7 +172,7 @@ func TestCreateProducer(t *testing.T) {
 			name:          "Create priceCategory",
 			priceCategory: samplePriceCategory,
 			setExpectations: func(mockProducerRepo mocks.MockPriceCategoryRepositoryI, priceCategory *model.PriceCategories) {
-				mockProducerRepo.EXPECT().CreatePriceCategory(priceCategory).Return(samplePriceCategory.ID, nil)
+				mockProducerRepo.EXPECT().CreatePriceCategory(priceCategory).Return(&samplePriceCategory.ID, nil)
 			},
 			expectedPriceCategoryID: true,
 			expectedError:           nil,
@@ -217,7 +216,7 @@ func TestCreateProducer(t *testing.T) {
 func TestUpdateProducer(t *testing.T) {
 
 	samplePriceCategory := &model.PriceCategories{
-		ID:           utils.NewUUID(),
+		ID:           myid.New(),
 		CategoryName: "StudentDiscount",
 		Price:        16,
 	}
@@ -242,7 +241,7 @@ func TestUpdateProducer(t *testing.T) {
 			name:          "Create priceCategory",
 			priceCategory: samplePriceCategory,
 			setExpectations: func(mockProducerRepo mocks.MockPriceCategoryRepositoryI, priceCategory *model.PriceCategories) {
-				mockProducerRepo.EXPECT().UpdatePriceCategory(priceCategory).Return(samplePriceCategory.ID, nil)
+				mockProducerRepo.EXPECT().UpdatePriceCategory(priceCategory).Return(&samplePriceCategory.ID, nil)
 			},
 			expectedPriceCategoryID: true,
 			expectedError:           nil,
@@ -285,18 +284,18 @@ func TestUpdateProducer(t *testing.T) {
 
 func TestDeleteProducer(t *testing.T) {
 
-	priceCategoryID := utils.NewUUID()
+	priceCategoryID := myid.NewUUID()
 
 	testCases := []struct {
 		name            string
-		priceCategoryID *uuid.UUID
-		setExpectations func(mockProducerRepo mocks.MockPriceCategoryRepositoryI, priceCategoryID *uuid.UUID)
+		priceCategoryID *myid.UUID
+		setExpectations func(mockProducerRepo mocks.MockPriceCategoryRepositoryI, priceCategoryID *myid.UUID)
 		expectedError   *models.KTSError
 	}{
 		{
 			name:            "priceCategory == nil",
 			priceCategoryID: nil,
-			setExpectations: func(mockProducerRepo mocks.MockPriceCategoryRepositoryI, priceCategoryID *uuid.UUID) {
+			setExpectations: func(mockProducerRepo mocks.MockPriceCategoryRepositoryI, priceCategoryID *myid.UUID) {
 
 			},
 			expectedError: kts_errors.KTS_BAD_REQUEST,
@@ -304,7 +303,7 @@ func TestDeleteProducer(t *testing.T) {
 		{
 			name:            "Create priceCategory",
 			priceCategoryID: priceCategoryID,
-			setExpectations: func(mockProducerRepo mocks.MockPriceCategoryRepositoryI, priceCategoryID *uuid.UUID) {
+			setExpectations: func(mockProducerRepo mocks.MockPriceCategoryRepositoryI, priceCategoryID *myid.UUID) {
 				mockProducerRepo.EXPECT().DeletePriceCategory(priceCategoryID).Return(nil)
 			},
 			expectedError: nil,
@@ -312,7 +311,7 @@ func TestDeleteProducer(t *testing.T) {
 		{
 			name:            "Create priceCategory fails",
 			priceCategoryID: priceCategoryID,
-			setExpectations: func(mockProducerRepo mocks.MockPriceCategoryRepositoryI, priceCategoryID *uuid.UUID) {
+			setExpectations: func(mockProducerRepo mocks.MockPriceCategoryRepositoryI, priceCategoryID *myid.UUID) {
 				mockProducerRepo.EXPECT().DeletePriceCategory(priceCategoryID).Return(kts_errors.KTS_INTERNAL_ERROR)
 			},
 			expectedError: kts_errors.KTS_INTERNAL_ERROR,

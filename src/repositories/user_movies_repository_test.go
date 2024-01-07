@@ -7,32 +7,32 @@ import (
 	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/managers"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/myid"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
-	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestRemoveAllUserMovieCombinationWithMovie(t *testing.T) {
 
-	movieId := uuid.New()
+	movieId := myid.New()
 
 	query := "DELETE FROM `KinoTicketSystem`.user_movies WHERE user_movies.movie_id = ?;"
 
 	testCases := []struct {
 		name            string
-		setExpectations func(mock sqlmock.Sqlmock, movieId *uuid.UUID)
+		setExpectations func(mock sqlmock.Sqlmock)
 		expectedError   *models.KTSError
 	}{
 		{
 			name: "Remove all movies corresponding to one movieId",
-			setExpectations: func(mock sqlmock.Sqlmock, movieId *uuid.UUID) {
+			setExpectations: func(mock sqlmock.Sqlmock) {
 				mock.ExpectExec(query).WithArgs(utils.EqUUID(movieId)).WillReturnResult(sqlmock.NewResult(1, 1))
 			},
 			expectedError: nil,
 		},
 		{
 			name: "Error while removing user_movies",
-			setExpectations: func(mock sqlmock.Sqlmock, movieId *uuid.UUID) {
+			setExpectations: func(mock sqlmock.Sqlmock) {
 				mock.ExpectExec(query).WithArgs(utils.EqUUID(movieId)).WillReturnError(sqlmock.ErrCancelled)
 			},
 			expectedError: kts_errors.KTS_INTERNAL_ERROR,
@@ -55,7 +55,7 @@ func TestRemoveAllUserMovieCombinationWithMovie(t *testing.T) {
 				},
 			}
 
-			tc.setExpectations(mock, &movieId)
+			tc.setExpectations(mock)
 
 			// Call the method under test
 			kts_err := userMovieRepo.RemoveAllUserMovieCombinationWithMovie(&movieId)

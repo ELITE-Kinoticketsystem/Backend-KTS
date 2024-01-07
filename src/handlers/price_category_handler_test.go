@@ -11,8 +11,8 @@ import (
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/gen/KinoTicketSystem/model"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/handlers"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/mocks"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/myid"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/samples"
-	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
@@ -32,7 +32,7 @@ func TestUpdatePriceCategoryHandler(t *testing.T) {
 			name: "Success",
 			body: sampleUpdatePriceCategory,
 			setExpectations: func(mockController *mocks.MockPriceCategoryControllerI, priceCategoryData interface{}) {
-				mockController.EXPECT().UpdatePriceCategory(gomock.Any()).Return(sampleUpdatePriceCategory.ID, nil)
+				mockController.EXPECT().UpdatePriceCategory(gomock.Any()).Return(&sampleUpdatePriceCategory.ID, nil)
 			},
 			expectedStatus: http.StatusOK,
 			expectedBody:   sampleUpdatePriceCategory.ID,
@@ -91,7 +91,7 @@ func TestUpdatePriceCategoryHandler(t *testing.T) {
 }
 
 func TestDeletePriceCategoryHandler(t *testing.T) {
-	sampleUpdatePriceCategoryId := utils.NewUUID()
+	sampleUpdatePriceCategoryId := myid.NewUUID()
 
 	testCases := []struct {
 		name            string
@@ -292,7 +292,7 @@ func TestCreatePriceCategoryHandler(t *testing.T) {
 			name: "Success",
 			body: sampleCreatePriceCategory,
 			setExpectations: func(mockController *mocks.MockPriceCategoryControllerI, priceCategoryData interface{}) {
-				mockController.EXPECT().CreatePriceCategory(gomock.Any()).Return(sampleCreatePriceCategory.ID, nil)
+				mockController.EXPECT().CreatePriceCategory(gomock.Any()).Return(&sampleCreatePriceCategory.ID, nil)
 			},
 			expectedStatus: http.StatusCreated,
 			expectedBody:   sampleCreatePriceCategory.ID,

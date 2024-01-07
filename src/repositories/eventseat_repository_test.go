@@ -6,6 +6,7 @@ import (
 
 	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/gen/KinoTicketSystem/model"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/myid"
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/managers"
@@ -15,17 +16,17 @@ import (
 )
 
 func GetEventSeats() *[]models.GetEventSeatsDTO {
-	seatId := utils.NewUUID()
-	seatCategoryId := utils.NewUUID()
+	seatId := myid.New()
+	seatCategoryId := myid.New()
 
 	eventSeats := []models.GetEventSeatsDTO{
 		{
 			EventSeat: model.EventSeats{
-				ID:           utils.NewUUID(),
+				ID:           myid.New(),
 				Booked:       false,
 				BlockedUntil: nil,
 				UserID:       nil,
-				EventID:      utils.NewUUID(),
+				EventID:      myid.New(),
 				SeatID:       seatId,
 			},
 			Seat: model.Seats{
@@ -40,18 +41,18 @@ func GetEventSeats() *[]models.GetEventSeatsDTO {
 				CategoryName: "standard",
 			},
 			EventSeatCategory: model.EventSeatCategories{
-				EventID:        utils.NewUUID(),
+				EventID:        myid.New(),
 				SeatCategoryID: seatCategoryId,
 				Price:          100,
 			},
 		},
 		{
 			EventSeat: model.EventSeats{
-				ID:           utils.NewUUID(),
+				ID:           myid.New(),
 				Booked:       false,
 				BlockedUntil: nil,
 				UserID:       nil,
-				EventID:      utils.NewUUID(),
+				EventID:      myid.New(),
 				SeatID:       seatId,
 			},
 			Seat: model.Seats{
@@ -65,7 +66,7 @@ func GetEventSeats() *[]models.GetEventSeatsDTO {
 				CategoryName: "standard",
 			},
 			EventSeatCategory: model.EventSeatCategories{
-				EventID:        utils.NewUUID(),
+				EventID:        myid.New(),
 				SeatCategoryID: seatCategoryId,
 				Price:          100,
 			},
@@ -141,7 +142,7 @@ func TestGetEventSeats(t *testing.T) {
 			tc.setExpectations(mock)
 
 			// Call the method on the repository instance
-			seats, kts_err := eventSeatRepo.GetEventSeats(eventSeats[0].EventSeat.EventID)
+			seats, kts_err := eventSeatRepo.GetEventSeats(&eventSeats[0].EventSeat.EventID)
 
 			// Verify that all expectations were met
 
@@ -160,9 +161,9 @@ func TestGetEventSeats(t *testing.T) {
 }
 
 func TestBlockEventSeatIfAvailable(t *testing.T) {
-	eventId := utils.NewUUID()
-	seatId := utils.NewUUID()
-	userId := utils.NewUUID()
+	eventId := myid.NewUUID()
+	seatId := myid.NewUUID()
+	userId := myid.NewUUID()
 	blockedUntil := time.Now()
 
 	query := "UPDATE `KinoTicketSystem`.event_seats SET .* WHERE .*"
@@ -232,8 +233,8 @@ func TestBlockEventSeatIfAvailable(t *testing.T) {
 	}
 }
 func TestUpdateBlockedUntilTimeForUserEventSeats(t *testing.T) {
-	eventId := utils.NewUUID()
-	userId := utils.NewUUID()
+	eventId := myid.NewUUID()
+	userId := myid.NewUUID()
 	blockedUntil := time.Now()
 
 	query := "UPDATE `KinoTicketSystem`.event_seats SET .* WHERE .*"
@@ -309,9 +310,9 @@ func TestUpdateBlockedUntilTimeForUserEventSeats(t *testing.T) {
 }
 
 func TestUnblockEventSeat(t *testing.T) {
-	eventId := utils.NewUUID()
-	seatId := utils.NewUUID()
-	userId := utils.NewUUID()
+	eventId := myid.NewUUID()
+	seatId := myid.NewUUID()
+	userId := myid.NewUUID()
 
 	query := "UPDATE `KinoTicketSystem`.event_seats SET .* WHERE .*"
 
@@ -380,8 +381,8 @@ func TestUnblockEventSeat(t *testing.T) {
 }
 
 func TestUnblockAllEventSeats(t *testing.T) {
-	eventId := utils.NewUUID()
-	userId := utils.NewUUID()
+	eventId := myid.NewUUID()
+	userId := myid.NewUUID()
 
 	query := "UPDATE" // `KinoTicketSystem`.event_seats SET .* WHERE .*"
 
@@ -399,8 +400,8 @@ func TestUnblockAllEventSeats(t *testing.T) {
 					WithArgs(
 						nil,
 						nil,
-						utils.EqUUID(eventId),
-						utils.EqUUID(userId),
+						utils.EqUUID(*eventId),
+						utils.EqUUID(*userId),
 					).WillReturnResult(sqlmock.NewResult(1, 1))
 			},
 			expectedError: nil,
@@ -412,8 +413,8 @@ func TestUnblockAllEventSeats(t *testing.T) {
 					WithArgs(
 						nil,
 						nil,
-						utils.EqUUID(eventId),
-						utils.EqUUID(userId),
+						utils.EqUUID(*eventId),
+						utils.EqUUID(*userId),
 					).WillReturnResult(sqlmock.NewResult(0, 0))
 			},
 			expectedError: kts_errors.KTS_NOT_FOUND,
@@ -425,8 +426,8 @@ func TestUnblockAllEventSeats(t *testing.T) {
 					WithArgs(
 						nil,
 						nil,
-						utils.EqUUID(eventId),
-						utils.EqUUID(userId),
+						utils.EqUUID(*eventId),
+						utils.EqUUID(*userId),
 					).WillReturnError(sqlmock.ErrCancelled)
 			},
 			expectedError: kts_errors.KTS_INTERNAL_ERROR,
@@ -438,8 +439,8 @@ func TestUnblockAllEventSeats(t *testing.T) {
 					WithArgs(
 						nil,
 						nil,
-						utils.EqUUID(eventId),
-						utils.EqUUID(userId),
+						utils.EqUUID(*eventId),
+						utils.EqUUID(*userId),
 					).WillReturnResult(sqlmock.NewErrorResult(sqlmock.ErrCancelled))
 			},
 			expectedError: kts_errors.KTS_INTERNAL_ERROR,
@@ -477,57 +478,57 @@ func TestUnblockAllEventSeats(t *testing.T) {
 }
 
 func TestGetSelectedSeats(t *testing.T) {
-	eventId := utils.NewUUID()
-	userId := utils.NewUUID()
+	eventId := myid.NewUUID()
+	userId := myid.NewUUID()
 
 	eventSeats := []models.GetSlectedSeatsDTO{
 		{
 			EventSeat: model.EventSeats{
-				ID:           utils.NewUUID(),
+				ID:           myid.New(),
 				Booked:       false,
 				BlockedUntil: nil,
 				UserID:       nil,
-				EventID:      eventId,
-				SeatID:       utils.NewUUID(),
+				EventID:      *eventId,
+				SeatID:       myid.New(),
 			},
 			Seat: model.Seats{
-				ID:             utils.NewUUID(),
+				ID:             myid.New(),
 				RowNr:          1,
 				ColumnNr:       1,
-				SeatCategoryID: utils.NewUUID(),
+				SeatCategoryID: myid.New(),
 			},
 			SeatCategory: model.SeatCategories{
-				ID:           utils.NewUUID(),
+				ID:           myid.New(),
 				CategoryName: "standard",
 			},
 			EventSeatCategory: model.EventSeatCategories{
-				EventID:        eventId,
-				SeatCategoryID: utils.NewUUID(),
+				EventID:        *eventId,
+				SeatCategoryID: myid.New(),
 				Price:          100,
 			},
 		},
 		{
 			EventSeat: model.EventSeats{
-				ID:           utils.NewUUID(),
+				ID:           myid.New(),
 				Booked:       false,
 				BlockedUntil: nil,
 				UserID:       nil,
-				EventID:      eventId,
-				SeatID:       utils.NewUUID(),
+				EventID:      *eventId,
+				SeatID:       myid.New(),
 			},
 			Seat: model.Seats{
-				ID:             utils.NewUUID(),
+				ID:             myid.New(),
 				RowNr:          1,
 				ColumnNr:       2,
-				SeatCategoryID: utils.NewUUID(),
+				SeatCategoryID: myid.New(),
 			},
 			SeatCategory: model.SeatCategories{
-				ID:           utils.NewUUID(),
+				ID:           myid.New(),
 				CategoryName: "standard",
 			},
 			EventSeatCategory: model.EventSeatCategories{
-				EventID:        eventId,
-				SeatCategoryID: utils.NewUUID(),
+				EventID:        *eventId,
+				SeatCategoryID: myid.New(),
 				Price:          100,
 			},
 		},

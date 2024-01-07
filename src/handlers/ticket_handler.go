@@ -6,9 +6,9 @@ import (
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/controllers"
 	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/myid"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 )
 
 // @Summary Get Ticket By Id
@@ -22,7 +22,7 @@ import (
 // @Router /tickets/{id} [get]
 func GetTicketByIdHandler(ticketController controllers.TicketControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		ticketId, err := uuid.Parse(c.Param("ticketId"))
+		ticketId, err := myid.Parse(c.Param("ticketId"))
 		if err != nil {
 			utils.HandleErrorAndAbort(c, kts_errors.KTS_BAD_REQUEST)
 			return
@@ -49,7 +49,7 @@ func GetTicketByIdHandler(ticketController controllers.TicketControllerI) gin.Ha
 // @Router /tickets/{id} [patch]
 func ValidateTicketHandler(ticketController controllers.TicketControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		ticketId, err := uuid.Parse(c.Param("ticketId"))
+		ticketId, err := myid.Parse(c.Param("ticketId"))
 
 		if err != nil {
 			utils.HandleErrorAndAbort(c, kts_errors.KTS_BAD_REQUEST)

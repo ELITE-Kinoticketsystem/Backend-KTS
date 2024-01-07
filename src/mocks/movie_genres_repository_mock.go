@@ -12,7 +12,7 @@ import (
 	reflect "reflect"
 
 	models "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
-	uuid "github.com/google/uuid"
+	myid "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/myid"
 	gomock "go.uber.org/mock/gomock"
 )
 
@@ -40,7 +40,7 @@ func (m *MockMovieGenreRepositoryI) EXPECT() *MockMovieGenreRepositoryIMockRecor
 }
 
 // AddMovieGenre mocks base method.
-func (m *MockMovieGenreRepositoryI) AddMovieGenre(movieId, genreId *uuid.UUID) *models.KTSError {
+func (m *MockMovieGenreRepositoryI) AddMovieGenre(movieId, genreId *myid.UUID) *models.KTSError {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "AddMovieGenre", movieId, genreId)
 	ret0, _ := ret[0].(*models.KTSError)
@@ -54,7 +54,7 @@ func (mr *MockMovieGenreRepositoryIMockRecorder) AddMovieGenre(movieId, genreId 
 }
 
 // RemoveAllGenreCombinationWithMovie mocks base method.
-func (m *MockMovieGenreRepositoryI) RemoveAllGenreCombinationWithMovie(movieId *uuid.UUID) *models.KTSError {
+func (m *MockMovieGenreRepositoryI) RemoveAllGenreCombinationWithMovie(movieId *myid.UUID) *models.KTSError {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "RemoveAllGenreCombinationWithMovie", movieId)
 	ret0, _ := ret[0].(*models.KTSError)
@@ -68,7 +68,7 @@ func (mr *MockMovieGenreRepositoryIMockRecorder) RemoveAllGenreCombinationWithMo
 }
 
 // RemoveAllMovieCombinationWithGenre mocks base method.
-func (m *MockMovieGenreRepositoryI) RemoveAllMovieCombinationWithGenre(genreId *uuid.UUID) *models.KTSError {
+func (m *MockMovieGenreRepositoryI) RemoveAllMovieCombinationWithGenre(genreId *myid.UUID) *models.KTSError {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "RemoveAllMovieCombinationWithGenre", genreId)
 	ret0, _ := ret[0].(*models.KTSError)
@@ -82,7 +82,7 @@ func (mr *MockMovieGenreRepositoryIMockRecorder) RemoveAllMovieCombinationWithGe
 }
 
 // RemoveMovieGenre mocks base method.
-func (m *MockMovieGenreRepositoryI) RemoveMovieGenre(movieId, genreId *uuid.UUID) *models.KTSError {
+func (m *MockMovieGenreRepositoryI) RemoveMovieGenre(movieId, genreId *myid.UUID) *models.KTSError {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "RemoveMovieGenre", movieId, genreId)
 	ret0, _ := ret[0].(*models.KTSError)

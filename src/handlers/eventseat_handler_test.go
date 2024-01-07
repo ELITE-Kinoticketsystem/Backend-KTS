@@ -13,9 +13,8 @@ import (
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/handlers"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/mocks"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
-	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/myid"
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
 )
@@ -23,15 +22,15 @@ import (
 func TestGetEventSeatsHandler(t *testing.T) {
 	testCases := []struct {
 		name                 string
-		paramId              *uuid.UUID
-		setExpectations      func(mockController *mocks.MockEventSeatControllerI, eventSeatId *uuid.UUID, userId *uuid.UUID)
+		paramId              *myid.UUID
+		setExpectations      func(mockController *mocks.MockEventSeatControllerI, eventSeatId *myid.UUID, userId *myid.UUID)
 		expectedResponseBody gin.H
 		expectedStatus       int
 	}{
 		{
 			name:    "Success",
-			paramId: utils.NewUUID(),
-			setExpectations: func(mockController *mocks.MockEventSeatControllerI, eventSeatId *uuid.UUID, userId *uuid.UUID) {
+			paramId: myid.NewUUID(),
+			setExpectations: func(mockController *mocks.MockEventSeatControllerI, eventSeatId *myid.UUID, userId *myid.UUID) {
 				mockController.EXPECT().GetEventSeats(gomock.Any(), gomock.Any()).Return(
 
 					&[][]models.GetSeatsForSeatSelectorDTO{},
@@ -48,8 +47,8 @@ func TestGetEventSeatsHandler(t *testing.T) {
 		},
 		{
 			name:    "Internal error",
-			paramId: utils.NewUUID(),
-			setExpectations: func(mockController *mocks.MockEventSeatControllerI, eventSeatId *uuid.UUID, userId *uuid.UUID) {
+			paramId: myid.NewUUID(),
+			setExpectations: func(mockController *mocks.MockEventSeatControllerI, eventSeatId *myid.UUID, userId *myid.UUID) {
 				mockController.EXPECT().GetEventSeats(gomock.Any(), gomock.Any()).Return(
 					nil,
 					nil,
@@ -63,8 +62,8 @@ func TestGetEventSeatsHandler(t *testing.T) {
 		},
 		{
 			name:    "Event seat not found",
-			paramId: utils.NewUUID(),
-			setExpectations: func(mockController *mocks.MockEventSeatControllerI, eventSeatId *uuid.UUID, userId *uuid.UUID) {
+			paramId: myid.NewUUID(),
+			setExpectations: func(mockController *mocks.MockEventSeatControllerI, eventSeatId *myid.UUID, userId *myid.UUID) {
 				mockController.EXPECT().GetEventSeats(gomock.Any(), gomock.Any()).Return(
 					nil,
 					nil,
@@ -92,8 +91,8 @@ func TestGetEventSeatsHandler(t *testing.T) {
 			defer mockCtrl.Finish()
 			eventSeatController := mocks.NewMockEventSeatControllerI(mockCtrl)
 
-			userId := utils.NewUUID()
-			id := uuid.New()
+			userId := myid.NewUUID()
+			id := myid.New()
 			c.Params = []gin.Param{{Key: "eventId", Value: id.String()}}
 
 			ctx := context.WithValue(c.Request.Context(), models.ContextKeyUserID, userId)
@@ -119,17 +118,17 @@ func TestBlockEventSeatHandler(t *testing.T) {
 
 	testCases := []struct {
 		name            string
-		paramEventId    *uuid.UUID
-		paramSeatId     *uuid.UUID
-		setExpectations func(mockController *mocks.MockEventSeatControllerI, eventId *uuid.UUID, eventSeatId *uuid.UUID, userId *uuid.UUID)
+		paramEventId    *myid.UUID
+		paramSeatId     *myid.UUID
+		setExpectations func(mockController *mocks.MockEventSeatControllerI, eventId *myid.UUID, eventSeatId *myid.UUID, userId *myid.UUID)
 		expectedStatus  int
 		expectedBody    string
 	}{
 		{
 			name:         "Success",
-			paramEventId: utils.NewUUID(),
-			paramSeatId:  utils.NewUUID(),
-			setExpectations: func(mockController *mocks.MockEventSeatControllerI, eventId *uuid.UUID, eventSeatId *uuid.UUID, userId *uuid.UUID) {
+			paramEventId: myid.NewUUID(),
+			paramSeatId:  myid.NewUUID(),
+			setExpectations: func(mockController *mocks.MockEventSeatControllerI, eventId *myid.UUID, eventSeatId *myid.UUID, userId *myid.UUID) {
 				mockController.EXPECT().BlockEventSeat(gomock.Any(), gomock.Any(), gomock.Any()).Return(&resTime, nil)
 			},
 			expectedStatus: http.StatusOK,
@@ -137,9 +136,9 @@ func TestBlockEventSeatHandler(t *testing.T) {
 		},
 		{
 			name:         "Internal error",
-			paramEventId: utils.NewUUID(),
-			paramSeatId:  utils.NewUUID(),
-			setExpectations: func(mockController *mocks.MockEventSeatControllerI, eventId *uuid.UUID, eventSeatId *uuid.UUID, userId *uuid.UUID) {
+			paramEventId: myid.NewUUID(),
+			paramSeatId:  myid.NewUUID(),
+			setExpectations: func(mockController *mocks.MockEventSeatControllerI, eventId *myid.UUID, eventSeatId *myid.UUID, userId *myid.UUID) {
 				mockController.EXPECT().BlockEventSeat(gomock.Any(), gomock.Any(), gomock.Any()).Return(nil, kts_errors.KTS_INTERNAL_ERROR)
 			},
 			expectedStatus: http.StatusInternalServerError,
@@ -147,9 +146,9 @@ func TestBlockEventSeatHandler(t *testing.T) {
 		},
 		{
 			name:         "Event seat not found",
-			paramEventId: utils.NewUUID(),
-			paramSeatId:  utils.NewUUID(),
-			setExpectations: func(mockController *mocks.MockEventSeatControllerI, eventId *uuid.UUID, eventSeatId *uuid.UUID, userId *uuid.UUID) {
+			paramEventId: myid.NewUUID(),
+			paramSeatId:  myid.NewUUID(),
+			setExpectations: func(mockController *mocks.MockEventSeatControllerI, eventId *myid.UUID, eventSeatId *myid.UUID, userId *myid.UUID) {
 				mockController.EXPECT().BlockEventSeat(gomock.Any(), gomock.Any(), gomock.Any()).Return(nil, kts_errors.KTS_NOT_FOUND)
 			},
 			expectedStatus: http.StatusNotFound,
@@ -157,9 +156,9 @@ func TestBlockEventSeatHandler(t *testing.T) {
 		},
 		{
 			name:         "Event seat already booked",
-			paramEventId: utils.NewUUID(),
-			paramSeatId:  utils.NewUUID(),
-			setExpectations: func(mockController *mocks.MockEventSeatControllerI, eventId *uuid.UUID, eventSeatId *uuid.UUID, userId *uuid.UUID) {
+			paramEventId: myid.NewUUID(),
+			paramSeatId:  myid.NewUUID(),
+			setExpectations: func(mockController *mocks.MockEventSeatControllerI, eventId *myid.UUID, eventSeatId *myid.UUID, userId *myid.UUID) {
 				mockController.EXPECT().BlockEventSeat(gomock.Any(), gomock.Any(), gomock.Any()).Return(nil, kts_errors.KTS_CONFLICT)
 			},
 			expectedStatus: http.StatusConflict,
@@ -177,7 +176,7 @@ func TestBlockEventSeatHandler(t *testing.T) {
 			c.Request = req
 			c.Params = []gin.Param{{Key: "eventId", Value: tc.paramEventId.String()}, {Key: "seatId", Value: tc.paramSeatId.String()}}
 
-			userId := utils.NewUUID()
+			userId := myid.NewUUID()
 
 			ctx := context.WithValue(c.Request.Context(), models.ContextKeyUserID, userId)
 			c.Request = c.Request.WithContext(ctx)
@@ -205,17 +204,17 @@ func TestUnblockEventSeatHandler(t *testing.T) {
 
 	testCases := []struct {
 		name            string
-		paramEventId    *uuid.UUID
-		paramSeatId     *uuid.UUID
-		setExpectations func(mockController *mocks.MockEventSeatControllerI, eventId *uuid.UUID, eventSeatId *uuid.UUID, userId *uuid.UUID)
+		paramEventId    *myid.UUID
+		paramSeatId     *myid.UUID
+		setExpectations func(mockController *mocks.MockEventSeatControllerI, eventId *myid.UUID, eventSeatId *myid.UUID, userId *myid.UUID)
 		expectedStatus  int
 		expectedBody    string
 	}{
 		{
 			name:         "Success",
-			paramEventId: utils.NewUUID(),
-			paramSeatId:  utils.NewUUID(),
-			setExpectations: func(mockController *mocks.MockEventSeatControllerI, eventId *uuid.UUID, eventSeatId *uuid.UUID, userId *uuid.UUID) {
+			paramEventId: myid.NewUUID(),
+			paramSeatId:  myid.NewUUID(),
+			setExpectations: func(mockController *mocks.MockEventSeatControllerI, eventId *myid.UUID, eventSeatId *myid.UUID, userId *myid.UUID) {
 				mockController.EXPECT().UnblockEventSeat(gomock.Any(), gomock.Any(), gomock.Any()).Return(&resTime, nil)
 			},
 			expectedStatus: http.StatusOK,
@@ -223,9 +222,9 @@ func TestUnblockEventSeatHandler(t *testing.T) {
 		},
 		{
 			name:         "Internal error",
-			paramEventId: utils.NewUUID(),
-			paramSeatId:  utils.NewUUID(),
-			setExpectations: func(mockController *mocks.MockEventSeatControllerI, eventId *uuid.UUID, eventSeatId *uuid.UUID, userId *uuid.UUID) {
+			paramEventId: myid.NewUUID(),
+			paramSeatId:  myid.NewUUID(),
+			setExpectations: func(mockController *mocks.MockEventSeatControllerI, eventId *myid.UUID, eventSeatId *myid.UUID, userId *myid.UUID) {
 				mockController.EXPECT().UnblockEventSeat(gomock.Any(), gomock.Any(), gomock.Any()).Return(nil, kts_errors.KTS_INTERNAL_ERROR)
 			},
 			expectedStatus: http.StatusInternalServerError,
@@ -233,9 +232,9 @@ func TestUnblockEventSeatHandler(t *testing.T) {
 		},
 		{
 			name:         "Event seat not found",
-			paramEventId: utils.NewUUID(),
-			paramSeatId:  utils.NewUUID(),
-			setExpectations: func(mockController *mocks.MockEventSeatControllerI, eventId *uuid.UUID, eventSeatId *uuid.UUID, userId *uuid.UUID) {
+			paramEventId: myid.NewUUID(),
+			paramSeatId:  myid.NewUUID(),
+			setExpectations: func(mockController *mocks.MockEventSeatControllerI, eventId *myid.UUID, eventSeatId *myid.UUID, userId *myid.UUID) {
 				mockController.EXPECT().UnblockEventSeat(gomock.Any(), gomock.Any(), gomock.Any()).Return(nil, kts_errors.KTS_NOT_FOUND)
 			},
 			expectedStatus: http.StatusNotFound,
@@ -253,7 +252,7 @@ func TestUnblockEventSeatHandler(t *testing.T) {
 			c.Request = req
 			c.Params = []gin.Param{{Key: "eventId", Value: tc.paramEventId.String()}, {Key: "seatId", Value: tc.paramSeatId.String()}}
 
-			userId := utils.NewUUID()
+			userId := myid.NewUUID()
 
 			ctx := context.WithValue(c.Request.Context(), models.ContextKeyUserID, userId)
 			c.Request = c.Request.WithContext(ctx)
@@ -276,15 +275,15 @@ func TestUnblockEventSeatHandler(t *testing.T) {
 func TestGetSelectedSeatsHandler(t *testing.T) {
 	testCases := []struct {
 		name                 string
-		paramEventId         *uuid.UUID
-		setExpectations      func(mockController *mocks.MockEventSeatControllerI, eventId *uuid.UUID, userId *uuid.UUID)
+		paramEventId         *myid.UUID
+		setExpectations      func(mockController *mocks.MockEventSeatControllerI, eventId *myid.UUID, userId *myid.UUID)
 		expectedResponseBody gin.H
 		expectedStatus       int
 	}{
 		{
 			name:         "Success",
-			paramEventId: utils.NewUUID(),
-			setExpectations: func(mockController *mocks.MockEventSeatControllerI, eventId *uuid.UUID, userId *uuid.UUID) {
+			paramEventId: myid.NewUUID(),
+			setExpectations: func(mockController *mocks.MockEventSeatControllerI, eventId *myid.UUID, userId *myid.UUID) {
 				mockController.EXPECT().GetSelectedSeats(gomock.Any(), gomock.Any()).Return(
 					&[]models.GetSlectedSeatsDTO{},
 					nil,
@@ -297,8 +296,8 @@ func TestGetSelectedSeatsHandler(t *testing.T) {
 		},
 		{
 			name:         "Bad request",
-			paramEventId: utils.NewUUID(),
-			setExpectations: func(mockController *mocks.MockEventSeatControllerI, eventId *uuid.UUID, userId *uuid.UUID) {
+			paramEventId: myid.NewUUID(),
+			setExpectations: func(mockController *mocks.MockEventSeatControllerI, eventId *myid.UUID, userId *myid.UUID) {
 				mockController.EXPECT().GetSelectedSeats(gomock.Any(), gomock.Any()).Return(
 					nil,
 					kts_errors.KTS_BAD_REQUEST,
@@ -311,8 +310,8 @@ func TestGetSelectedSeatsHandler(t *testing.T) {
 		},
 		{
 			name:         "Internal error",
-			paramEventId: utils.NewUUID(),
-			setExpectations: func(mockController *mocks.MockEventSeatControllerI, eventId *uuid.UUID, userId *uuid.UUID) {
+			paramEventId: myid.NewUUID(),
+			setExpectations: func(mockController *mocks.MockEventSeatControllerI, eventId *myid.UUID, userId *myid.UUID) {
 				mockController.EXPECT().GetSelectedSeats(gomock.Any(), gomock.Any()).Return(
 					nil,
 					kts_errors.KTS_INTERNAL_ERROR,
@@ -335,7 +334,7 @@ func TestGetSelectedSeatsHandler(t *testing.T) {
 			c.Request = req
 			c.Params = []gin.Param{{Key: "eventId", Value: tc.paramEventId.String()}}
 
-			userId := utils.NewUUID()
+			userId := myid.NewUUID()
 
 			ctx := context.WithValue(c.Request.Context(), models.ContextKeyUserID, userId)
 			c.Request = c.Request.WithContext(ctx)

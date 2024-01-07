@@ -2,7 +2,7 @@ package models
 
 import (
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/gen/KinoTicketSystem/model"
-	"github.com/google/uuid"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/myid"
 )
 
 type RegistrationRequest struct {
@@ -34,5 +34,5 @@ type CheckUsernameRequest struct {
 
 type LoggedInResponse struct {
 	LoggedIn bool       `json:"loggedIn"`
-	Id       *uuid.UUID `json:"id"`
+	Id       *myid.UUID `json:"id"`
 }

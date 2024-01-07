@@ -6,9 +6,9 @@ import (
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/controllers"
 	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/myid"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 )
 
 // @Summary Create theatre
@@ -65,7 +65,7 @@ func CreateCinemaHallHandler(theatreCtrl controllers.TheatreControllerI) gin.Han
 			return
 		}
 
-		kts_err := theatreCtrl.CreateCinemaHall(&cinemaHallData)
+		kts_err := theatreCtrl.CreateCinemaHallFast(&cinemaHallData)
 		if kts_err != nil {
 			utils.HandleErrorAndAbort(c, kts_err)
 			return
@@ -77,7 +77,7 @@ func CreateCinemaHallHandler(theatreCtrl controllers.TheatreControllerI) gin.Han
 
 func GetCinemaHallsForTheatreHandler(theatreCtrl controllers.TheatreControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		theatreId, err := uuid.Parse(c.Param("theatreId"))
+		theatreId, err := myid.Parse(c.Param("theatreId"))
 		if err != nil {
 			utils.HandleErrorAndAbort(c, kts_errors.KTS_BAD_REQUEST)
 			return

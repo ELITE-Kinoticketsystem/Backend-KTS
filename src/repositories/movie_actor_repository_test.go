@@ -8,41 +8,41 @@ import (
 	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/managers"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/myid"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
-	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestAddMovieActor(t *testing.T) {
 
-	uuid1 := uuid.New()
-	uuid2 := uuid.New()
+	uuid1 := myid.New()
+	uuid2 := myid.New()
 
 	query := "INSERT INTO `KinoTicketSystem`.movie_actors (movie_id, actor_id) VALUES (?, ?);"
 
 	testCases := []struct {
 		name            string
-		setExpectations func(mock sqlmock.Sqlmock, movieId *uuid.UUID, actorId *uuid.UUID)
+		setExpectations func(mock sqlmock.Sqlmock, movieId *myid.UUID, actorId *myid.UUID)
 		expectedError   *models.KTSError
 	}{
 		{
 			name: "Create movieActor",
-			setExpectations: func(mock sqlmock.Sqlmock, movieId *uuid.UUID, actorId *uuid.UUID) {
-				mock.ExpectExec(query).WithArgs(utils.EqUUID(&uuid1), utils.EqUUID(&uuid2)).WillReturnResult(sqlmock.NewResult(1, 1))
+			setExpectations: func(mock sqlmock.Sqlmock, movieId *myid.UUID, actorId *myid.UUID) {
+				mock.ExpectExec(query).WithArgs(utils.EqUUID(uuid1), utils.EqUUID(uuid2)).WillReturnResult(sqlmock.NewResult(1, 1))
 			},
 			expectedError: nil,
 		},
 		{
 			name: "Error while creating movieActor",
-			setExpectations: func(mock sqlmock.Sqlmock, movieId *uuid.UUID, actorId *uuid.UUID) {
-				mock.ExpectExec(query).WithArgs(utils.EqUUID(&uuid1), utils.EqUUID(&uuid2)).WillReturnError(sqlmock.ErrCancelled)
+			setExpectations: func(mock sqlmock.Sqlmock, movieId *myid.UUID, actorId *myid.UUID) {
+				mock.ExpectExec(query).WithArgs(utils.EqUUID(uuid1), utils.EqUUID(uuid2)).WillReturnError(sqlmock.ErrCancelled)
 			},
 			expectedError: kts_errors.KTS_INTERNAL_ERROR,
 		},
 		{
 			name: "Error while converting rows affected",
-			setExpectations: func(mock sqlmock.Sqlmock, movieId *uuid.UUID, actorId *uuid.UUID) {
-				mock.ExpectExec(query).WithArgs(utils.EqUUID(&uuid1), utils.EqUUID(&uuid2)).WillReturnResult(
+			setExpectations: func(mock sqlmock.Sqlmock, movieId *myid.UUID, actorId *myid.UUID) {
+				mock.ExpectExec(query).WithArgs(utils.EqUUID(uuid1), utils.EqUUID(uuid2)).WillReturnResult(
 					sqlmock.NewErrorResult(errors.New("rows affected conversion did not work")),
 				)
 			},
@@ -50,8 +50,8 @@ func TestAddMovieActor(t *testing.T) {
 		},
 		{
 			name: "movieActor not found",
-			setExpectations: func(mock sqlmock.Sqlmock, movieId *uuid.UUID, actorId *uuid.UUID) {
-				mock.ExpectExec(query).WithArgs(utils.EqUUID(&uuid1), utils.EqUUID(&uuid2)).WillReturnResult(sqlmock.NewResult(1, 0))
+			setExpectations: func(mock sqlmock.Sqlmock, movieId *myid.UUID, actorId *myid.UUID) {
+				mock.ExpectExec(query).WithArgs(utils.EqUUID(uuid1), utils.EqUUID(uuid2)).WillReturnResult(sqlmock.NewResult(1, 0))
 			},
 			expectedError: kts_errors.KTS_NOT_FOUND,
 		},
@@ -94,34 +94,34 @@ func TestAddMovieActor(t *testing.T) {
 
 func TestRemoveMovieActor(t *testing.T) {
 
-	uuid1 := uuid.New()
-	uuid2 := uuid.New()
+	uuid1 := myid.New()
+	uuid2 := myid.New()
 
 	query := "DELETE FROM `KinoTicketSystem`.movie_genres WHERE (movie_actors.movie_id = ?) AND (movie_actors.actor_id = ?);"
 
 	testCases := []struct {
 		name            string
-		setExpectations func(mock sqlmock.Sqlmock, movieId *uuid.UUID, actorId *uuid.UUID)
+		setExpectations func(mock sqlmock.Sqlmock, movieId *myid.UUID, actorId *myid.UUID)
 		expectedError   *models.KTSError
 	}{
 		{
 			name: "Add movie_actor",
-			setExpectations: func(mock sqlmock.Sqlmock, movieId *uuid.UUID, actorId *uuid.UUID) {
-				mock.ExpectExec(query).WithArgs(utils.EqUUID(&uuid1), utils.EqUUID(&uuid2)).WillReturnResult(sqlmock.NewResult(1, 1))
+			setExpectations: func(mock sqlmock.Sqlmock, movieId *myid.UUID, actorId *myid.UUID) {
+				mock.ExpectExec(query).WithArgs(utils.EqUUID(uuid1), utils.EqUUID(uuid2)).WillReturnResult(sqlmock.NewResult(1, 1))
 			},
 			expectedError: nil,
 		},
 		{
 			name: "Error while adding movie_actor",
-			setExpectations: func(mock sqlmock.Sqlmock, movieId *uuid.UUID, actorId *uuid.UUID) {
-				mock.ExpectExec(query).WithArgs(utils.EqUUID(&uuid1), utils.EqUUID(&uuid2)).WillReturnError(sqlmock.ErrCancelled)
+			setExpectations: func(mock sqlmock.Sqlmock, movieId *myid.UUID, actorId *myid.UUID) {
+				mock.ExpectExec(query).WithArgs(utils.EqUUID(uuid1), utils.EqUUID(uuid2)).WillReturnError(sqlmock.ErrCancelled)
 			},
 			expectedError: kts_errors.KTS_INTERNAL_ERROR,
 		},
 		{
 			name: "Error while converting rows affected",
-			setExpectations: func(mock sqlmock.Sqlmock, movieId *uuid.UUID, actorId *uuid.UUID) {
-				mock.ExpectExec(query).WithArgs(utils.EqUUID(&uuid1), utils.EqUUID(&uuid2)).WillReturnResult(
+			setExpectations: func(mock sqlmock.Sqlmock, movieId *myid.UUID, actorId *myid.UUID) {
+				mock.ExpectExec(query).WithArgs(utils.EqUUID(uuid1), utils.EqUUID(uuid2)).WillReturnResult(
 					sqlmock.NewErrorResult(errors.New("rows affected conversion did not work")),
 				)
 			},
@@ -129,8 +129,8 @@ func TestRemoveMovieActor(t *testing.T) {
 		},
 		{
 			name: "MovieActor not found",
-			setExpectations: func(mock sqlmock.Sqlmock, movieId *uuid.UUID, actorId *uuid.UUID) {
-				mock.ExpectExec(query).WithArgs(utils.EqUUID(&uuid1), utils.EqUUID(&uuid2)).WillReturnResult(sqlmock.NewResult(1, 0))
+			setExpectations: func(mock sqlmock.Sqlmock, movieId *myid.UUID, actorId *myid.UUID) {
+				mock.ExpectExec(query).WithArgs(utils.EqUUID(uuid1), utils.EqUUID(uuid2)).WillReturnResult(sqlmock.NewResult(1, 0))
 			},
 			expectedError: kts_errors.KTS_NOT_FOUND,
 		},
@@ -171,26 +171,26 @@ func TestRemoveMovieActor(t *testing.T) {
 
 func TestRemoveAllActorCombinationWithMovie(t *testing.T) {
 
-	movieId := uuid.New()
+	movieId := myid.New()
 
 	query := "DELETE FROM `KinoTicketSystem`.movie_actors WHERE movie_actors.movie_id = ?;"
 
 	testCases := []struct {
 		name            string
-		setExpectations func(mock sqlmock.Sqlmock, movieId *uuid.UUID)
+		setExpectations func(mock sqlmock.Sqlmock, movieId *myid.UUID)
 		expectedError   *models.KTSError
 	}{
 		{
 			name: "Remove all actors corresponding to one movie",
-			setExpectations: func(mock sqlmock.Sqlmock, movieId *uuid.UUID) {
-				mock.ExpectExec(query).WithArgs(utils.EqUUID(movieId)).WillReturnResult(sqlmock.NewResult(1, 1))
+			setExpectations: func(mock sqlmock.Sqlmock, movieId *myid.UUID) {
+				mock.ExpectExec(query).WithArgs(utils.EqUUID(*movieId)).WillReturnResult(sqlmock.NewResult(1, 1))
 			},
 			expectedError: nil,
 		},
 		{
 			name: "Error while removing movie_actor",
-			setExpectations: func(mock sqlmock.Sqlmock, movieId *uuid.UUID) {
-				mock.ExpectExec(query).WithArgs(utils.EqUUID(movieId)).WillReturnError(sqlmock.ErrCancelled)
+			setExpectations: func(mock sqlmock.Sqlmock, movieId *myid.UUID) {
+				mock.ExpectExec(query).WithArgs(utils.EqUUID(*movieId)).WillReturnError(sqlmock.ErrCancelled)
 			},
 			expectedError: kts_errors.KTS_INTERNAL_ERROR,
 		},

@@ -8,29 +8,29 @@ import (
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/gen/KinoTicketSystem/table"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/managers"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/myid"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
-	"github.com/google/uuid"
 )
 
 type OrderRepoI interface {
-	CreateOrder(order *model.Orders) (*uuid.UUID, *models.KTSError)
-	GetOrderById(orderId *uuid.UUID, userId *uuid.UUID) (*models.GetOrderDTO, *models.KTSError)
-	GetOrders(userId *uuid.UUID) (*[]models.GetOrderDTO, *models.KTSError)
+	CreateOrder(order *model.Orders) (*myid.UUID, *models.KTSError)
+	GetOrderById(orderId *myid.UUID, userId *myid.UUID) (*models.GetOrderDTO, *models.KTSError)
+	GetOrders(userId *myid.UUID) (*[]models.GetOrderDTO, *models.KTSError)
 }
 
 type OrderRepository struct {
 	DatabaseManager managers.DatabaseManagerI
 }
 
-func (or *OrderRepository) CreateOrder(order *model.Orders) (*uuid.UUID, *models.KTSError) {
+func (or *OrderRepository) CreateOrder(order *model.Orders) (*myid.UUID, *models.KTSError) {
 
 	insertStmt := table.Orders.INSERT(table.Orders.AllColumns).
 		VALUES(
-			utils.MysqlUuid(order.ID),
+			order.ID,
 			order.Totalprice,
 			order.IsPaid,
 			utils.MysqlUuidOrNil(order.PaymentMethodID),
-			utils.MysqlUuid(order.UserID),
+			order.UserID,
 		)
 	log.Println(insertStmt.DebugSql())
 	rows, err := insertStmt.Exec(or.DatabaseManager.GetDatabaseConnection())
@@ -49,10 +49,10 @@ func (or *OrderRepository) CreateOrder(order *model.Orders) (*uuid.UUID, *models
 		return nil, kts_errors.KTS_INTERNAL_ERROR
 	}
 
-	return order.ID, nil
+	return &order.ID, nil
 }
 
-func (or *OrderRepository) GetOrderById(orderId *uuid.UUID, userId *uuid.UUID) (*models.GetOrderDTO, *models.KTSError) {
+func (or *OrderRepository) GetOrderById(orderId *myid.UUID, userId *myid.UUID) (*models.GetOrderDTO, *models.KTSError) {
 	order := models.GetOrderDTO{}
 
 	stmt := table.Orders.SELECT(
@@ -74,7 +74,7 @@ func (or *OrderRepository) GetOrderById(orderId *uuid.UUID, userId *uuid.UUID) (
 			LEFT_JOIN(table.EventMovies, table.EventMovies.EventID.EQ(table.Events.ID)).
 			LEFT_JOIN(table.Movies, table.Movies.ID.EQ(table.EventMovies.MovieID)),
 		).
-		WHERE(table.Orders.UserID.EQ(utils.MysqlUuid(userId)).AND(table.Orders.UserID.EQ(utils.MysqlUuid(userId))))
+		WHERE(table.Orders.UserID.EQ(utils.MysqlUuid(*userId)).AND(table.Orders.UserID.EQ(utils.MysqlUuid(*userId))))
 
 	err := stmt.Query(or.DatabaseManager.GetDatabaseConnection(), &order)
 
@@ -85,7 +85,7 @@ func (or *OrderRepository) GetOrderById(orderId *uuid.UUID, userId *uuid.UUID) (
 	return &order, nil
 }
 
-func (or *OrderRepository) GetOrders(userId *uuid.UUID) (*[]models.GetOrderDTO, *models.KTSError) {
+func (or *OrderRepository) GetOrders(userId *myid.UUID) (*[]models.GetOrderDTO, *models.KTSError) {
 	orders := &[]models.GetOrderDTO{}
 
 	stmt := table.Orders.SELECT(
@@ -107,7 +107,7 @@ func (or *OrderRepository) GetOrders(userId *uuid.UUID) (*[]models.GetOrderDTO, 
 			LEFT_JOIN(table.EventMovies, table.EventMovies.EventID.EQ(table.Events.ID)).
 			LEFT_JOIN(table.Movies, table.Movies.ID.EQ(table.EventMovies.MovieID)),
 		).
-		WHERE(table.Orders.UserID.EQ(utils.MysqlUuid(userId)))
+		WHERE(table.Orders.UserID.EQ(utils.MysqlUuid(*userId)))
 
 	err := stmt.Query(or.DatabaseManager.GetDatabaseConnection(), orders)
 

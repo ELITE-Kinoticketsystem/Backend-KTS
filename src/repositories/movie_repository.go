@@ -3,6 +3,7 @@ package repositories
 import (
 	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/gen/KinoTicketSystem/table"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/myid"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
 
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/gen/KinoTicketSystem/model"
@@ -10,17 +11,16 @@ import (
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
 
 	"github.com/go-jet/jet/v2/mysql"
-	"github.com/google/uuid"
 )
 
 type MovieRepositoryI interface {
 	// Movie
 	GetMovies() (*[]model.Movies, *models.KTSError)
-	GetMovieById(movieId *uuid.UUID) (*models.MovieWithEverything, *models.KTSError)
+	GetMovieById(movieId *myid.UUID) (*models.MovieWithEverything, *models.KTSError)
 	GetMovieByName(movieName *string) (*model.Movies, *models.KTSError)
-	CreateMovie(movie *model.Movies) (*uuid.UUID, *models.KTSError)
+	CreateMovie(movie *model.Movies) (*myid.UUID, *models.KTSError)
 	UpdateMovie(movie *model.Movies) *models.KTSError
-	DeleteMovie(movieId *uuid.UUID) *models.KTSError
+	DeleteMovie(movieId *myid.UUID) *models.KTSError
 
 	// All Movies with all Genres - Grouped by Movie
 	GetMoviesWithGenres() (*[]models.MovieWithGenres, *models.KTSError)
@@ -79,9 +79,9 @@ func (mr *MovieRepository) GetMovieByName(movieName *string) (*model.Movies, *mo
 	return &movie, nil
 }
 
-func (mr *MovieRepository) CreateMovie(movie *model.Movies) (*uuid.UUID, *models.KTSError) {
-	newId := uuid.New()
-	movie.ID = &newId
+func (mr *MovieRepository) CreateMovie(movie *model.Movies) (*myid.UUID, *models.KTSError) {
+	newId := myid.New()
+	movie.ID = newId
 
 	// Create the insert statement
 	insertQuery := table.Movies.INSERT(
@@ -96,7 +96,7 @@ func (mr *MovieRepository) CreateMovie(movie *model.Movies) (*uuid.UUID, *models
 		table.Movies.TimeInMin,
 		table.Movies.Fsk,
 	).VALUES(
-		utils.MysqlUuid(movie.ID),
+		movie.ID,
 		movie.Title,
 		movie.Description,
 		movie.BannerPicURL,
@@ -123,7 +123,7 @@ func (mr *MovieRepository) CreateMovie(movie *model.Movies) (*uuid.UUID, *models
 		return nil, kts_errors.KTS_NOT_FOUND
 	}
 
-	return movie.ID, nil
+	return &movie.ID, nil
 }
 
 func (mr *MovieRepository) UpdateMovie(movie *model.Movies) *models.KTSError {
@@ -161,9 +161,9 @@ func (mr *MovieRepository) UpdateMovie(movie *model.Movies) *models.KTSError {
 	return nil
 }
 
-func (mr *MovieRepository) DeleteMovie(movieId *uuid.UUID) *models.KTSError {
+func (mr *MovieRepository) DeleteMovie(movieId *myid.UUID) *models.KTSError {
 	// Create the delete statement
-	deleteQuery := table.Movies.DELETE().WHERE(table.Movies.ID.EQ(utils.MysqlUuid(movieId)))
+	deleteQuery := table.Movies.DELETE().WHERE(table.Movies.ID.EQ(utils.MysqlUuid(*movieId)))
 
 	// Execute the query
 	rows, err := deleteQuery.Exec(mr.DatabaseManager.GetDatabaseConnection())
@@ -210,7 +210,7 @@ func (mr *MovieRepository) GetMoviesWithGenres() (*[]models.MovieWithGenres, *mo
 	return &moviesWithGenres, nil
 }
 
-func (mr *MovieRepository) GetMovieById(movieId *uuid.UUID) (*models.MovieWithEverything, *models.KTSError) {
+func (mr *MovieRepository) GetMovieById(movieId *myid.UUID) (*models.MovieWithEverything, *models.KTSError) {
 	var movie models.MovieWithEverything
 
 	// Create the query
@@ -232,7 +232,7 @@ func (mr *MovieRepository) GetMovieById(movieId *uuid.UUID) (*models.MovieWithEv
 			LEFT_JOIN(table.Reviews, table.Reviews.MovieID.EQ(table.Movies.ID)).
 			LEFT_JOIN(table.Users, table.Users.ID.EQ(table.Reviews.UserID)),
 	).WHERE(
-		table.Movies.ID.EQ(utils.MysqlUuid(movieId)),
+		table.Movies.ID.EQ(utils.MysqlUuid(*movieId)),
 	)
 
 	// Execute the query

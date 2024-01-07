@@ -13,7 +13,7 @@ import (
 
 	model "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/gen/KinoTicketSystem/model"
 	models "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
-	uuid "github.com/google/uuid"
+	myid "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/myid"
 	gomock "go.uber.org/mock/gomock"
 )
 
@@ -41,7 +41,7 @@ func (m *MockEventRepo) EXPECT() *MockEventRepoMockRecorder {
 }
 
 // AddEventMovie mocks base method.
-func (m *MockEventRepo) AddEventMovie(eventId, movieId *uuid.UUID) *models.KTSError {
+func (m *MockEventRepo) AddEventMovie(eventId, movieId *myid.UUID) *models.KTSError {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "AddEventMovie", eventId, movieId)
 	ret0, _ := ret[0].(*models.KTSError)
@@ -55,10 +55,10 @@ func (mr *MockEventRepoMockRecorder) AddEventMovie(eventId, movieId any) *gomock
 }
 
 // CreateEvent mocks base method.
-func (m *MockEventRepo) CreateEvent(event *model.Events) (*uuid.UUID, *models.KTSError) {
+func (m *MockEventRepo) CreateEvent(event *model.Events) (*myid.UUID, *models.KTSError) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateEvent", event)
-	ret0, _ := ret[0].(*uuid.UUID)
+	ret0, _ := ret[0].(*myid.UUID)
 	ret1, _ := ret[1].(*models.KTSError)
 	return ret0, ret1
 }
@@ -97,8 +97,22 @@ func (mr *MockEventRepoMockRecorder) CreateEventSeatCategory(eventSeatCategory a
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateEventSeatCategory", reflect.TypeOf((*MockEventRepo)(nil).CreateEventSeatCategory), eventSeatCategory)
 }
 
+// CreateEventSeats mocks base method.
+func (m *MockEventRepo) CreateEventSeats(eventSeats []*model.EventSeats) *models.KTSError {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateEventSeats", eventSeats)
+	ret0, _ := ret[0].(*models.KTSError)
+	return ret0
+}
+
+// CreateEventSeats indicates an expected call of CreateEventSeats.
+func (mr *MockEventRepoMockRecorder) CreateEventSeats(eventSeats any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateEventSeats", reflect.TypeOf((*MockEventRepo)(nil).CreateEventSeats), eventSeats)
+}
+
 // GetEventById mocks base method.
-func (m *MockEventRepo) GetEventById(eventId *uuid.UUID) (*models.GetSpecialEventsDTO, *models.KTSError) {
+func (m *MockEventRepo) GetEventById(eventId *myid.UUID) (*models.GetSpecialEventsDTO, *models.KTSError) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetEventById", eventId)
 	ret0, _ := ret[0].(*models.GetSpecialEventsDTO)
@@ -113,7 +127,7 @@ func (mr *MockEventRepoMockRecorder) GetEventById(eventId any) *gomock.Call {
 }
 
 // GetEventsForMovie mocks base method.
-func (m *MockEventRepo) GetEventsForMovie(movieId, theatreId *uuid.UUID) ([]*model.Events, *models.KTSError) {
+func (m *MockEventRepo) GetEventsForMovie(movieId, theatreId *myid.UUID) ([]*model.Events, *models.KTSError) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetEventsForMovie", movieId, theatreId)
 	ret0, _ := ret[0].([]*model.Events)

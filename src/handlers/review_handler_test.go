@@ -11,6 +11,7 @@ import (
 	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/mocks"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/myid"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/samples"
 
 	"github.com/gin-gonic/gin"
@@ -47,7 +48,7 @@ func TestCreateReview(t *testing.T) {
 					IsSpoiler: body["isSpoiler"].(bool),
 					MovieID:   body["movieId"].(string),
 				}
-				mockCtrl.EXPECT().CreateReview(reviewData, user.ID).Return(&review, *user.Username, nil)
+				mockCtrl.EXPECT().CreateReview(reviewData, &user.ID).Return(&review, *user.Username, nil)
 			},
 			expectedBody:   gin.H{"review": review, "username": user.Username},
 			expectedStatus: 201,
@@ -70,7 +71,7 @@ func TestCreateReview(t *testing.T) {
 					IsSpoiler: body["isSpoiler"].(bool),
 					MovieID:   body["movieId"].(string),
 				}
-				mockCtrl.EXPECT().CreateReview(reviewData, user.ID).Return(nil, "", kts_errors.KTS_INTERNAL_ERROR)
+				mockCtrl.EXPECT().CreateReview(reviewData, &user.ID).Return(nil, "", kts_errors.KTS_INTERNAL_ERROR)
 			},
 			expectedBody:   gin.H{"errorMessage": "INTERNAL_ERROR"},
 			expectedStatus: 500,
@@ -139,7 +140,7 @@ func TestDeleteReview(t *testing.T) {
 		name                 string
 		id                   string
 		userId               string
-		setExpectations      func(mockCtrl *mocks.MockReviewControllerI, id uuid.UUID, userId uuid.UUID)
+		setExpectations      func(mockCtrl *mocks.MockReviewControllerI, id myid.UUID, userId myid.UUID)
 		expectedStatus       int
 		expectedResponseBody string
 	}{
@@ -147,7 +148,7 @@ func TestDeleteReview(t *testing.T) {
 			name:   "Success",
 			id:     uuid.NewString(),
 			userId: uuid.NewString(),
-			setExpectations: func(mockCtrl *mocks.MockReviewControllerI, id uuid.UUID, userId uuid.UUID) {
+			setExpectations: func(mockCtrl *mocks.MockReviewControllerI, id myid.UUID, userId myid.UUID) {
 				mockCtrl.EXPECT().DeleteReview(&id, &userId).Return(nil)
 			},
 			expectedStatus:       200,
@@ -157,7 +158,7 @@ func TestDeleteReview(t *testing.T) {
 			name:   "Unauthorized",
 			id:     uuid.NewString(),
 			userId: uuid.NewString(),
-			setExpectations: func(mockCtrl *mocks.MockReviewControllerI, id uuid.UUID, userId uuid.UUID) {
+			setExpectations: func(mockCtrl *mocks.MockReviewControllerI, id myid.UUID, userId myid.UUID) {
 				mockCtrl.EXPECT().DeleteReview(&id, &userId).Return(kts_errors.KTS_FORBIDDEN)
 			},
 			expectedStatus: 403,
@@ -172,7 +173,7 @@ func TestDeleteReview(t *testing.T) {
 			name:   "Internal error",
 			id:     uuid.NewString(),
 			userId: uuid.NewString(),
-			setExpectations: func(mockCtrl *mocks.MockReviewControllerI, id uuid.UUID, userId uuid.UUID) {
+			setExpectations: func(mockCtrl *mocks.MockReviewControllerI, id myid.UUID, userId myid.UUID) {
 				mockCtrl.EXPECT().DeleteReview(&id, &userId).Return(kts_errors.KTS_INTERNAL_ERROR)
 			},
 			expectedStatus: 500,
@@ -186,7 +187,7 @@ func TestDeleteReview(t *testing.T) {
 		{
 			name:            "Invalid id",
 			id:              "invalid id",
-			setExpectations: func(mockCtrl *mocks.MockReviewControllerI, id uuid.UUID, userId uuid.UUID) {},
+			setExpectations: func(mockCtrl *mocks.MockReviewControllerI, id myid.UUID, userId myid.UUID) {},
 			expectedStatus:  400,
 			expectedResponseBody: func() string {
 				expectedResponseBody, _ := json.Marshal(gin.H{
@@ -211,8 +212,8 @@ func TestDeleteReview(t *testing.T) {
 			reviewController := mocks.NewMockReviewControllerI(mockCtrl)
 
 			// create mock request
-			id, _ := uuid.Parse(tc.id)
-			userId, _ := uuid.Parse(tc.userId)
+			id, _ := myid.Parse(tc.id)
+			userId, _ := myid.Parse(tc.userId)
 
 			req := httptest.NewRequest("DELETE", "/reviews/:id", nil)
 			ctx := context.WithValue(req.Context(), models.ContextKeyUserID, &userId)

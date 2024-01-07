@@ -2,24 +2,24 @@ package samples
 
 import (
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/gen/KinoTicketSystem/model"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/myid"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
-	"github.com/google/uuid"
 )
 
 func GetPriceCategories() *[]model.PriceCategories {
 	return &[]model.PriceCategories{
 		{
-			ID:           utils.NewUUID(),
+			ID:           myid.New(),
 			CategoryName: utils.ADULT.String(),
 			Price:        0,
 		},
 		{
-			ID:           utils.NewUUID(),
+			ID:           myid.New(),
 			CategoryName: utils.CHILDREN.String(),
 			Price:        10,
 		},
 		{
-			ID:           utils.NewUUID(),
+			ID:           myid.New(),
 			CategoryName: utils.SENIOR.String(),
 			Price:        5,
 		},
@@ -29,17 +29,17 @@ func GetPriceCategories() *[]model.PriceCategories {
 func GetSamplePriceCategories() *[]model.PriceCategories {
 	priceCategories := []model.PriceCategories{}
 
-	uuid1 := uuid.New()
-	uuid2 := uuid.New()
+	uuid1 := myid.New()
+	uuid2 := myid.New()
 
 	priceCategories = append(priceCategories, model.PriceCategories{
-		ID:           &uuid1,
+		ID:           uuid1,
 		CategoryName: "StudentDiscount",
 		Price:        1000,
 	})
 
 	priceCategories = append(priceCategories, model.PriceCategories{
-		ID:           &uuid2,
+		ID:           uuid2,
 		CategoryName: "regular_price",
 		Price:        500,
 	})
@@ -50,14 +50,13 @@ func GetSamplePriceCategories() *[]model.PriceCategories {
 func GetSamplePriceCategory() *model.PriceCategories {
 	priceCategory := model.PriceCategories{}
 
-	uuid1 := uuid.MustParse("6ba7b820-9dad-11d1-80b4-00c04fd430c4")
+	uuid1 := myid.MustParse("6ba7b820-9dad-11d1-80b4-00c04fd430c4")
 
 	priceCategory = model.PriceCategories{
-		ID:           &uuid1,
+		ID:           uuid1,
 		CategoryName: "StudentDiscount",
 		Price:        1000,
 	}
 
 	return &priceCategory
 }
-

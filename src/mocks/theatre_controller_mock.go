@@ -13,7 +13,7 @@ import (
 
 	model "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/gen/KinoTicketSystem/model"
 	models "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
-	uuid "github.com/google/uuid"
+	myid "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/myid"
 	gomock "go.uber.org/mock/gomock"
 )
 
@@ -54,6 +54,20 @@ func (mr *MockTheatreControllerIMockRecorder) CreateCinemaHall(arg0 any) *gomock
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateCinemaHall", reflect.TypeOf((*MockTheatreControllerI)(nil).CreateCinemaHall), arg0)
 }
 
+// CreateCinemaHallFast mocks base method.
+func (m *MockTheatreControllerI) CreateCinemaHallFast(arg0 *models.CreateCinemaHallRequest) *models.KTSError {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateCinemaHallFast", arg0)
+	ret0, _ := ret[0].(*models.KTSError)
+	return ret0
+}
+
+// CreateCinemaHallFast indicates an expected call of CreateCinemaHallFast.
+func (mr *MockTheatreControllerIMockRecorder) CreateCinemaHallFast(arg0 any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateCinemaHallFast", reflect.TypeOf((*MockTheatreControllerI)(nil).CreateCinemaHallFast), arg0)
+}
+
 // CreateTheatre mocks base method.
 func (m *MockTheatreControllerI) CreateTheatre(arg0 *models.CreateTheatreRequest) *models.KTSError {
 	m.ctrl.T.Helper()
@@ -69,7 +83,7 @@ func (mr *MockTheatreControllerIMockRecorder) CreateTheatre(arg0 any) *gomock.Ca
 }
 
 // GetCinemaHallsForTheatre mocks base method.
-func (m *MockTheatreControllerI) GetCinemaHallsForTheatre(arg0 *uuid.UUID) (*[]model.CinemaHalls, *models.KTSError) {
+func (m *MockTheatreControllerI) GetCinemaHallsForTheatre(arg0 *myid.UUID) (*[]model.CinemaHalls, *models.KTSError) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetCinemaHallsForTheatre", arg0)
 	ret0, _ := ret[0].(*[]model.CinemaHalls)
