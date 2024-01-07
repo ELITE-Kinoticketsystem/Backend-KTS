@@ -462,22 +462,24 @@ func TestDeleteMovie(t *testing.T) {
 
 	testCases := []struct {
 		name            string
-		setExpectations func(mockMovieRepo mocks.MockMovieRepositoryI, mockMovieGenreRepo mocks.MockMovieGenreRepositoryI, mockMovieActorRepo mocks.MockMovieActorRepositoryI, mockMovieProducerRepo mocks.MockMovieProducerRepositoryI, movieId *uuid.UUID)
+		setExpectations func(mockMovieRepo mocks.MockMovieRepositoryI, mockMovieGenreRepo mocks.MockMovieGenreRepositoryI, mockMovieActorRepo mocks.MockMovieActorRepositoryI, mockMovieProducerRepo mocks.MockMovieProducerRepositoryI, mockReviewRepo mocks.MockReviewRepositoryI, mockUserMovieRepo mocks.MockUserMovieRepositoryI, movieId *uuid.UUID)
 		expectedError   *models.KTSError
 	}{
 		{
 			name: "Delete movie",
-			setExpectations: func(mockMovieRepo mocks.MockMovieRepositoryI, mockMovieGenreRepo mocks.MockMovieGenreRepositoryI, mockMovieActorRepo mocks.MockMovieActorRepositoryI, mockMovieProducerRepo mocks.MockMovieProducerRepositoryI, movieId *uuid.UUID) {
+			setExpectations: func(mockMovieRepo mocks.MockMovieRepositoryI, mockMovieGenreRepo mocks.MockMovieGenreRepositoryI, mockMovieActorRepo mocks.MockMovieActorRepositoryI, mockMovieProducerRepo mocks.MockMovieProducerRepositoryI, mockReviewRepo mocks.MockReviewRepositoryI, mockUserMovieRepo mocks.MockUserMovieRepositoryI, movieId *uuid.UUID) {
 				mockMovieGenreRepo.EXPECT().RemoveAllGenreCombinationWithMovie(movieId).Return(nil)
 				mockMovieActorRepo.EXPECT().RemoveAllActorCombinationWithMovie(movieId).Return(nil)
 				mockMovieProducerRepo.EXPECT().RemoveAllProducerCombinationWithMovie(movieId).Return(nil)
+				mockReviewRepo.EXPECT().DeleteReviewForMovie(movieId).Return(nil)
+				mockUserMovieRepo.EXPECT().RemoveAllUserMovieCombinationWithMovie(movieId).Return(nil)
 				mockMovieRepo.EXPECT().DeleteMovie(movieId).Return(nil)
 			},
 			expectedError: nil,
 		},
 		{
 			name: "Error while deleting MovieProducer",
-			setExpectations: func(mockMovieRepo mocks.MockMovieRepositoryI, mockMovieGenreRepo mocks.MockMovieGenreRepositoryI, mockMovieActorRepo mocks.MockMovieActorRepositoryI, mockMovieProducerRepo mocks.MockMovieProducerRepositoryI, movieId *uuid.UUID) {
+			setExpectations: func(mockMovieRepo mocks.MockMovieRepositoryI, mockMovieGenreRepo mocks.MockMovieGenreRepositoryI, mockMovieActorRepo mocks.MockMovieActorRepositoryI, mockMovieProducerRepo mocks.MockMovieProducerRepositoryI, mockReviewRepo mocks.MockReviewRepositoryI, mockUserMovieRepo mocks.MockUserMovieRepositoryI, movieId *uuid.UUID) {
 				mockMovieGenreRepo.EXPECT().RemoveAllGenreCombinationWithMovie(movieId).Return(nil)
 				mockMovieActorRepo.EXPECT().RemoveAllActorCombinationWithMovie(movieId).Return(nil)
 				mockMovieProducerRepo.EXPECT().RemoveAllProducerCombinationWithMovie(movieId).Return(kts_errors.KTS_INTERNAL_ERROR)
@@ -486,7 +488,7 @@ func TestDeleteMovie(t *testing.T) {
 		},
 		{
 			name: "Error while deleting MovieActor",
-			setExpectations: func(mockMovieRepo mocks.MockMovieRepositoryI, mockMovieGenreRepo mocks.MockMovieGenreRepositoryI, mockMovieActorRepo mocks.MockMovieActorRepositoryI, mockMovieProducerRepo mocks.MockMovieProducerRepositoryI, movieId *uuid.UUID) {
+			setExpectations: func(mockMovieRepo mocks.MockMovieRepositoryI, mockMovieGenreRepo mocks.MockMovieGenreRepositoryI, mockMovieActorRepo mocks.MockMovieActorRepositoryI, mockMovieProducerRepo mocks.MockMovieProducerRepositoryI, mockReviewRepo mocks.MockReviewRepositoryI, mockUserMovieRepo mocks.MockUserMovieRepositoryI, movieId *uuid.UUID) {
 				mockMovieGenreRepo.EXPECT().RemoveAllGenreCombinationWithMovie(movieId).Return(nil)
 				mockMovieActorRepo.EXPECT().RemoveAllActorCombinationWithMovie(movieId).Return(kts_errors.KTS_INTERNAL_ERROR)
 			},
@@ -494,20 +496,43 @@ func TestDeleteMovie(t *testing.T) {
 		},
 		{
 			name: "Error while deleting MovieGenre",
-			setExpectations: func(mockMovieRepo mocks.MockMovieRepositoryI, mockMovieGenreRepo mocks.MockMovieGenreRepositoryI, mockMovieActorRepo mocks.MockMovieActorRepositoryI, mockMovieProducerRepo mocks.MockMovieProducerRepositoryI, movieId *uuid.UUID) {
+			setExpectations: func(mockMovieRepo mocks.MockMovieRepositoryI, mockMovieGenreRepo mocks.MockMovieGenreRepositoryI, mockMovieActorRepo mocks.MockMovieActorRepositoryI, mockMovieProducerRepo mocks.MockMovieProducerRepositoryI, mockReviewRepo mocks.MockReviewRepositoryI, mockUserMovieRepo mocks.MockUserMovieRepositoryI, movieId *uuid.UUID) {
 				mockMovieGenreRepo.EXPECT().RemoveAllGenreCombinationWithMovie(movieId).Return(kts_errors.KTS_INTERNAL_ERROR)
 			},
 			expectedError: kts_errors.KTS_INTERNAL_ERROR,
 		},
 		{
 			name: "Movie not found",
-			setExpectations: func(mockMovieRepo mocks.MockMovieRepositoryI, mockMovieGenreRepo mocks.MockMovieGenreRepositoryI, mockMovieActorRepo mocks.MockMovieActorRepositoryI, mockMovieProducerRepo mocks.MockMovieProducerRepositoryI, movieId *uuid.UUID) {
+			setExpectations: func(mockMovieRepo mocks.MockMovieRepositoryI, mockMovieGenreRepo mocks.MockMovieGenreRepositoryI, mockMovieActorRepo mocks.MockMovieActorRepositoryI, mockMovieProducerRepo mocks.MockMovieProducerRepositoryI, mockReviewRepo mocks.MockReviewRepositoryI, mockUserMovieRepo mocks.MockUserMovieRepositoryI, movieId *uuid.UUID) {
 				mockMovieGenreRepo.EXPECT().RemoveAllGenreCombinationWithMovie(movieId).Return(nil)
 				mockMovieActorRepo.EXPECT().RemoveAllActorCombinationWithMovie(movieId).Return(nil)
 				mockMovieProducerRepo.EXPECT().RemoveAllProducerCombinationWithMovie(movieId).Return(nil)
+				mockReviewRepo.EXPECT().DeleteReviewForMovie(movieId).Return(nil)
+				mockUserMovieRepo.EXPECT().RemoveAllUserMovieCombinationWithMovie(movieId).Return(nil)
 				mockMovieRepo.EXPECT().DeleteMovie(movieId).Return(kts_errors.KTS_NOT_FOUND)
 			},
 			expectedError: kts_errors.KTS_NOT_FOUND,
+		},
+		{
+			name: "MovieReview internal error",
+			setExpectations: func(mockMovieRepo mocks.MockMovieRepositoryI, mockMovieGenreRepo mocks.MockMovieGenreRepositoryI, mockMovieActorRepo mocks.MockMovieActorRepositoryI, mockMovieProducerRepo mocks.MockMovieProducerRepositoryI, mockReviewRepo mocks.MockReviewRepositoryI, mockUserMovieRepo mocks.MockUserMovieRepositoryI, movieId *uuid.UUID) {
+				mockMovieGenreRepo.EXPECT().RemoveAllGenreCombinationWithMovie(movieId).Return(nil)
+				mockMovieActorRepo.EXPECT().RemoveAllActorCombinationWithMovie(movieId).Return(nil)
+				mockMovieProducerRepo.EXPECT().RemoveAllProducerCombinationWithMovie(movieId).Return(nil)
+				mockReviewRepo.EXPECT().DeleteReviewForMovie(movieId).Return(kts_errors.KTS_INTERNAL_ERROR)
+			},
+			expectedError: kts_errors.KTS_INTERNAL_ERROR,
+		},
+		{
+			name: "UserMovie internal error",
+			setExpectations: func(mockMovieRepo mocks.MockMovieRepositoryI, mockMovieGenreRepo mocks.MockMovieGenreRepositoryI, mockMovieActorRepo mocks.MockMovieActorRepositoryI, mockMovieProducerRepo mocks.MockMovieProducerRepositoryI, mockReviewRepo mocks.MockReviewRepositoryI, mockUserMovieRepo mocks.MockUserMovieRepositoryI, movieId *uuid.UUID) {
+				mockMovieGenreRepo.EXPECT().RemoveAllGenreCombinationWithMovie(movieId).Return(nil)
+				mockMovieActorRepo.EXPECT().RemoveAllActorCombinationWithMovie(movieId).Return(nil)
+				mockMovieProducerRepo.EXPECT().RemoveAllProducerCombinationWithMovie(movieId).Return(nil)
+				mockReviewRepo.EXPECT().DeleteReviewForMovie(movieId).Return(nil)
+				mockUserMovieRepo.EXPECT().RemoveAllUserMovieCombinationWithMovie(movieId).Return(kts_errors.KTS_INTERNAL_ERROR)
+			},
+			expectedError: kts_errors.KTS_INTERNAL_ERROR,
 		},
 	}
 
@@ -519,16 +544,20 @@ func TestDeleteMovie(t *testing.T) {
 			genreRepoMock := mocks.NewMockMovieGenreRepositoryI(mockCtrl)
 			actorRepoMock := mocks.NewMockMovieActorRepositoryI(mockCtrl)
 			producerRepoMock := mocks.NewMockMovieProducerRepositoryI(mockCtrl)
+			reviewRepoMock := mocks.NewMockReviewRepositoryI(mockCtrl)
+			userMovieRepoMock := mocks.NewMockUserMovieRepositoryI(mockCtrl)
 
 			movieController := MovieController{
 				MovieRepo:         movieRepoMock,
 				MovieGenreRepo:    genreRepoMock,
 				MovieActorRepo:    actorRepoMock,
 				MovieProducerRepo: producerRepoMock,
+				ReviewRepo:        reviewRepoMock,
+				UserMovieRepo:     userMovieRepoMock,
 			}
 
 			// define expectations
-			tc.setExpectations(*movieRepoMock, *genreRepoMock, *actorRepoMock, *producerRepoMock, sampleMovie.ID)
+			tc.setExpectations(*movieRepoMock, *genreRepoMock, *actorRepoMock, *producerRepoMock, *reviewRepoMock, *userMovieRepoMock, sampleMovie.ID)
 
 			// WHEN
 			// Call the method under test

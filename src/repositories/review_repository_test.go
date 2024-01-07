@@ -345,3 +345,73 @@ func TestDeleteReview(t *testing.T) {
 		})
 	}
 }
+
+func TestDeleteReviewForMovie(t *testing.T) {
+	testCases := []struct {
+		name            string
+		movieId         uuid.UUID
+		setExpectations func(mock sqlmock.Sqlmock, movieId uuid.UUID)
+		expectedError   *models.KTSError
+	}{
+		{
+			name:    "Success",
+			movieId: uuid.MustParse("123e4567-e89b-12d3-a456-426614174000"),
+			setExpectations: func(mock sqlmock.Sqlmock, movieId uuid.UUID) {
+				mock.ExpectExec(
+					"DELETE FROM `KinoTicketSystem`.reviews\n" +
+						"WHERE reviews.movie_id = ?;",
+				).WithArgs(
+					utils.EqUUID(&movieId),
+				).WillReturnResult(
+					sqlmock.NewResult(1, 1),
+				)
+			},
+			expectedError: nil,
+		},
+		{
+			name:    "Delete internal error",
+			movieId: uuid.MustParse("123e4567-e89b-12d3-a456-426614174000"),
+			setExpectations: func(mock sqlmock.Sqlmock, movieId uuid.UUID) {
+				mock.ExpectExec(
+					"DELETE FROM `KinoTicketSystem`.reviews\n" +
+						"WHERE reviews.movie_id = ?;",
+				).WithArgs(
+					utils.EqUUID(&movieId),
+				).WillReturnError(
+					sqlmock.ErrCancelled,
+				)
+			},
+			expectedError: kts_errors.KTS_INTERNAL_ERROR,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			// GIVEN
+			// create mock db manager
+			db, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
+			if err != nil {
+				t.Fatalf("error while setting up mock database: %s", err)
+			}
+			reviewRepo := ReviewRepository{
+				DatabaseManager: &managers.DatabaseManager{
+					Connection: db,
+				},
+			}
+
+			// define expectations
+			tc.setExpectations(mock, tc.movieId)
+
+			// WHEN
+			// call DeleteReview with id
+			kts_err := reviewRepo.DeleteReviewForMovie(&tc.movieId)
+
+			// THEN
+			// check expected error and expectations
+			assert.Equal(t, tc.expectedError, kts_err)
+			if err = mock.ExpectationsWereMet(); err != nil {
+				t.Errorf("There were unfulfilled expectations: %s", err)
+			}
+		})
+	}
+}
