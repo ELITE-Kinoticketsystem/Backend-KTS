@@ -1,6 +1,8 @@
 package repositories
 
 import (
+	"log"
+
 	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/gen/KinoTicketSystem/model"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/gen/KinoTicketSystem/table"
@@ -14,6 +16,7 @@ type ReviewRepositoryI interface {
 	CreateReview(review model.Reviews) *models.KTSError
 	GetReviewById(id *uuid.UUID) (*model.Reviews, *models.KTSError)
 	DeleteReview(id *uuid.UUID) *models.KTSError
+	DeleteReviewForMovie(movieId *uuid.UUID) *models.KTSError
 }
 
 type ReviewRepository struct {
@@ -90,6 +93,17 @@ func (rr *ReviewRepository) DeleteReview(id *uuid.UUID) *models.KTSError {
 	}
 	if rowsAffected == 0 {
 		return kts_errors.KTS_NOT_FOUND
+	}
+
+	return nil
+}
+
+func (rr *ReviewRepository) DeleteReviewForMovie(movieId *uuid.UUID) *models.KTSError {
+	stmt := table.Reviews.DELETE().WHERE(table.Reviews.MovieID.EQ(utils.MysqlUuid(movieId)))
+	log.Print(stmt.DebugSql())
+	_, err := stmt.Exec(rr.DatabaseManager.GetDatabaseConnection())
+	if err != nil {
+		return kts_errors.KTS_INTERNAL_ERROR
 	}
 
 	return nil

@@ -101,6 +101,10 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 		DatabaseManager: databaseManager,
 	}
 
+	userMovieRepo := &repositories.UserMovieRepository{
+		DatabaseManager: databaseManager,
+	}
+
 	// Create controllers
 	controller := Controllers{
 		UserController: &controllers.UserController{
@@ -111,9 +115,12 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 			MovieGenreRepo:    movieGenreRepo,
 			MovieActorRepo:    movieActorRepo,
 			MovieProducerRepo: movieProducerRepo,
+			ReviewRepo:        reviewsRepo,
+			UserMovieRepo:     userMovieRepo,
 		},
 		GenreController: &controllers.GenreController{
-			GenreRepo: genreRepo,
+			GenreRepo:      genreRepo,
+			MovieGenreRepo: movieGenreRepo,
 		},
 		ActorController: &controllers.ActorController{
 			ActorRepo: actorRepo,
