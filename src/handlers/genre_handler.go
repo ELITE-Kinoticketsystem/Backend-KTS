@@ -67,7 +67,7 @@ func GetGenreByName(genreCtrl controllers.GenreControllerI) gin.HandlerFunc {
 // @Success 201 {object} model.Genres
 // @Failure 400 {object} models.KTSErrorMessage
 // @Failure 500 {object} models.KTSErrorMessage
-// @Router /genres [post]
+// @Router /genres/{name} [post]
 func CreateGenre(genreCtrl controllers.GenreControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		name := c.Param("name")
