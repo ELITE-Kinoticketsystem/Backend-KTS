@@ -8,9 +8,9 @@ import (
 	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/gen/KinoTicketSystem/model"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/myid"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 )
 
 // @Summary Get movies
@@ -38,7 +38,7 @@ func GetMovies(movieCtrl controllers.MovieControllerI) gin.HandlerFunc {
 // @Accept  json
 // @Produce  json
 // @Param movie body models.MovieDTOCreate true "Movie data"
-// @Success 200 {object} uuid.UUID
+// @Success 200 {object} myid.UUID
 // @Failure 500 {object} models.KTSErrorMessage
 // @Router /movies [post]
 func CreateMovie(movieCtrl controllers.MovieControllerI) gin.HandlerFunc {
@@ -134,7 +134,7 @@ func UpdateMovie(movieCtrl controllers.MovieControllerI) gin.HandlerFunc {
 // @Router /movies/{id} [delete]
 func DeleteMovie(movieCtrl controllers.MovieControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		movieId, err := uuid.Parse(c.Param("movieId"))
+		movieId, err := myid.Parse(c.Param("movieId"))
 
 		if err != nil {
 			utils.HandleErrorAndAbort(c, kts_errors.KTS_BAD_REQUEST)
@@ -182,7 +182,7 @@ func GetMoviesWithGenres(movieCtrl controllers.MovieControllerI) gin.HandlerFunc
 // @Router /movies/{id} [get]
 func GetMovieById(movieCtrl controllers.MovieControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		movieId, err := uuid.Parse(c.Param("id"))
+		movieId, err := myid.Parse(c.Param("id"))
 		if err != nil {
 			utils.HandleErrorAndAbort(c, kts_errors.KTS_BAD_REQUEST)
 			return

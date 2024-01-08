@@ -12,7 +12,7 @@ import (
 	reflect "reflect"
 
 	models "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
-	uuid "github.com/google/uuid"
+	myid "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/myid"
 	gomock "go.uber.org/mock/gomock"
 )
 
@@ -40,7 +40,7 @@ func (m *MockMovieActorRepositoryI) EXPECT() *MockMovieActorRepositoryIMockRecor
 }
 
 // AddMovieActor mocks base method.
-func (m *MockMovieActorRepositoryI) AddMovieActor(movieId, actorId *uuid.UUID) *models.KTSError {
+func (m *MockMovieActorRepositoryI) AddMovieActor(movieId, actorId *myid.UUID) *models.KTSError {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "AddMovieActor", movieId, actorId)
 	ret0, _ := ret[0].(*models.KTSError)
@@ -54,7 +54,7 @@ func (mr *MockMovieActorRepositoryIMockRecorder) AddMovieActor(movieId, actorId 
 }
 
 // RemoveAllActorCombinationWithMovie mocks base method.
-func (m *MockMovieActorRepositoryI) RemoveAllActorCombinationWithMovie(movieId *uuid.UUID) *models.KTSError {
+func (m *MockMovieActorRepositoryI) RemoveAllActorCombinationWithMovie(movieId *myid.UUID) *models.KTSError {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "RemoveAllActorCombinationWithMovie", movieId)
 	ret0, _ := ret[0].(*models.KTSError)
@@ -68,7 +68,7 @@ func (mr *MockMovieActorRepositoryIMockRecorder) RemoveAllActorCombinationWithMo
 }
 
 // RemoveMovieActor mocks base method.
-func (m *MockMovieActorRepositoryI) RemoveMovieActor(movieId, actorId *uuid.UUID) *models.KTSError {
+func (m *MockMovieActorRepositoryI) RemoveMovieActor(movieId, actorId *myid.UUID) *models.KTSError {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "RemoveMovieActor", movieId, actorId)
 	ret0, _ := ret[0].(*models.KTSError)

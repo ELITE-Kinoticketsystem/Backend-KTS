@@ -6,25 +6,25 @@ import (
 
 	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/myid"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/repositories"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
-	"github.com/google/uuid"
 )
 
 type EventSeatControllerI interface {
-	GetEventSeats(eventId *uuid.UUID, userId *uuid.UUID) (*[][]models.GetSeatsForSeatSelectorDTO, *[]models.GetSeatsForSeatSelectorDTO, *time.Time, *models.KTSError)
-	BlockEventSeat(eventId *uuid.UUID, eventSeatId *uuid.UUID, userId *uuid.UUID) (*time.Time, *models.KTSError)
-	AreUserSeatsNextToEachOther(eventId *uuid.UUID, userId *uuid.UUID, eventSeatId *uuid.UUID) (bool, *models.KTSError)
-	UnblockEventSeat(eventId *uuid.UUID, eventSeatId *uuid.UUID, userId *uuid.UUID) (*time.Time, *models.KTSError)
-	UnblockAllEventSeats(eventId *uuid.UUID, userId *uuid.UUID) *models.KTSError
-	GetSelectedSeats(eventId *uuid.UUID, userId *uuid.UUID) (*[]models.GetSlectedSeatsDTO, *models.KTSError)
+	GetEventSeats(eventId *myid.UUID, userId *myid.UUID) (*[][]models.GetSeatsForSeatSelectorDTO, *[]models.GetSeatsForSeatSelectorDTO, *time.Time, *models.KTSError)
+	BlockEventSeat(eventId *myid.UUID, eventSeatId *myid.UUID, userId *myid.UUID) (*time.Time, *models.KTSError)
+	AreUserSeatsNextToEachOther(eventId *myid.UUID, userId *myid.UUID, eventSeatId *myid.UUID) (bool, *models.KTSError)
+	UnblockEventSeat(eventId *myid.UUID, eventSeatId *myid.UUID, userId *myid.UUID) (*time.Time, *models.KTSError)
+	UnblockAllEventSeats(eventId *myid.UUID, userId *myid.UUID) *models.KTSError
+	GetSelectedSeats(eventId *myid.UUID, userId *myid.UUID) (*[]models.GetSlectedSeatsDTO, *models.KTSError)
 }
 
 type EventSeatController struct {
 	EventSeatRepo repositories.EventSeatRepoI
 }
 
-func (esc *EventSeatController) GetEventSeats(eventId *uuid.UUID, userId *uuid.UUID) (*[][]models.GetSeatsForSeatSelectorDTO, *[]models.GetSeatsForSeatSelectorDTO, *time.Time, *models.KTSError) {
+func (esc *EventSeatController) GetEventSeats(eventId *myid.UUID, userId *myid.UUID) (*[][]models.GetSeatsForSeatSelectorDTO, *[]models.GetSeatsForSeatSelectorDTO, *time.Time, *models.KTSError) {
 	seats, kts_err := esc.EventSeatRepo.GetEventSeats(eventId)
 
 	if kts_err != nil {
@@ -36,15 +36,16 @@ func (esc *EventSeatController) GetEventSeats(eventId *uuid.UUID, userId *uuid.U
 	var blockedUntil *time.Time
 
 	for _, seat := range *seats {
+		localSeat := seat
 		currentSeat := models.GetSeatsForSeatSelectorDTO{
-			ID:             seat.EventSeat.ID,
-			RowNr:          seat.Seat.RowNr,
-			ColumnNr:       seat.Seat.ColumnNr,
-			Available:      (seat.EventSeat.BlockedUntil == nil || seat.EventSeat.BlockedUntil.Before(time.Now()) || seat.EventSeat.UserID == nil) && !seat.EventSeat.Booked,
-			BlockedByOther: (seat.EventSeat.BlockedUntil != nil && (seat.EventSeat.BlockedUntil.After(time.Now()) && (seat.EventSeat.UserID != nil && *seat.EventSeat.UserID != *userId))) || seat.EventSeat.Booked,
-			Category:       seat.SeatCategory.CategoryName,
-			Type:           seat.Seat.Type,
-			Price:          seat.EventSeatCategory.Price,
+			ID:             &localSeat.EventSeat.ID,
+			RowNr:          localSeat.Seat.RowNr,
+			ColumnNr:       localSeat.Seat.ColumnNr,
+			Available:      (localSeat.EventSeat.BlockedUntil == nil || localSeat.EventSeat.BlockedUntil.Before(time.Now()) || localSeat.EventSeat.UserID == nil) && !localSeat.EventSeat.Booked,
+			BlockedByOther: (localSeat.EventSeat.BlockedUntil != nil && (localSeat.EventSeat.BlockedUntil.After(time.Now()) && (localSeat.EventSeat.UserID != nil && *localSeat.EventSeat.UserID != *userId))) || localSeat.EventSeat.Booked,
+			Category:       localSeat.SeatCategory.CategoryName,
+			Type:           localSeat.Seat.Type,
+			Price:          localSeat.EventSeatCategory.Price,
 		}
 
 		if seat.EventSeat.UserID != nil && *seat.EventSeat.UserID == *userId && !seat.EventSeat.Booked && seat.EventSeat.BlockedUntil != nil && seat.EventSeat.BlockedUntil.After(time.Now()) {
@@ -61,7 +62,7 @@ func (esc *EventSeatController) GetEventSeats(eventId *uuid.UUID, userId *uuid.U
 	return seatMapToSlice(seatRows), &currentUserSeats, blockedUntil, nil
 }
 
-func (esc *EventSeatController) BlockEventSeat(eventId *uuid.UUID, eventSeatId *uuid.UUID, userId *uuid.UUID) (*time.Time, *models.KTSError) {
+func (esc *EventSeatController) BlockEventSeat(eventId *myid.UUID, eventSeatId *myid.UUID, userId *myid.UUID) (*time.Time, *models.KTSError) {
 	currentTime := time.Now()
 	blockedUntil := currentTime.Add(utils.BLOCKED_TICKET_TIME)
 
@@ -86,7 +87,7 @@ func (esc *EventSeatController) BlockEventSeat(eventId *uuid.UUID, eventSeatId *
 	return &blockedUntil, nil
 }
 
-func (esc *EventSeatController) UnblockEventSeat(eventId *uuid.UUID, eventSeatId *uuid.UUID, userId *uuid.UUID) (*time.Time, *models.KTSError) {
+func (esc *EventSeatController) UnblockEventSeat(eventId *myid.UUID, eventSeatId *myid.UUID, userId *myid.UUID) (*time.Time, *models.KTSError) {
 	currentTime := time.Now()
 	blockedUntil := currentTime.Add(utils.BLOCKED_TICKET_TIME)
 
@@ -114,11 +115,11 @@ func (esc *EventSeatController) UnblockEventSeat(eventId *uuid.UUID, eventSeatId
 	return &blockedUntil, nil
 }
 
-func (esc *EventSeatController) UnblockAllEventSeats(eventId *uuid.UUID, userId *uuid.UUID) *models.KTSError {
+func (esc *EventSeatController) UnblockAllEventSeats(eventId *myid.UUID, userId *myid.UUID) *models.KTSError {
 	return esc.EventSeatRepo.UnblockAllEventSeats(eventId, userId)
 }
 
-func (esc *EventSeatController) AreUserSeatsNextToEachOtherWithoutSeat(eventId *uuid.UUID, userId *uuid.UUID, eventSeatId *uuid.UUID) (bool, *models.KTSError) {
+func (esc *EventSeatController) AreUserSeatsNextToEachOtherWithoutSeat(eventId *myid.UUID, userId *myid.UUID, eventSeatId *myid.UUID) (bool, *models.KTSError) {
 	seats, err := esc.EventSeatRepo.GetEventSeats(eventId)
 
 	if err != nil {
@@ -130,7 +131,7 @@ func (esc *EventSeatController) AreUserSeatsNextToEachOtherWithoutSeat(eventId *
 	var emtpySeatArray []models.GetEventSeatsDTO
 
 	for _, seat := range *seats {
-		if ((seat.EventSeat.UserID != nil && *seat.EventSeat.UserID == *userId) && (seat.EventSeat.BlockedUntil != nil && seat.EventSeat.BlockedUntil.After(time.Now())) && !seat.EventSeat.Booked) && *seat.EventSeat.ID != *eventSeatId {
+		if ((seat.EventSeat.UserID != nil && *seat.EventSeat.UserID == *userId) && (seat.EventSeat.BlockedUntil != nil && seat.EventSeat.BlockedUntil.After(time.Now())) && !seat.EventSeat.Booked) && seat.EventSeat.ID != *eventSeatId {
 			if rowNr == -1 {
 				rowNr = seat.Seat.RowNr
 			} else if rowNr != seat.Seat.RowNr {
@@ -173,7 +174,7 @@ func (esc *EventSeatController) AreUserSeatsNextToEachOtherWithoutSeat(eventId *
 	return true, nil
 }
 
-func (esc *EventSeatController) AreUserSeatsNextToEachOther(eventId *uuid.UUID, userId *uuid.UUID, eventSeatId *uuid.UUID) (bool, *models.KTSError) {
+func (esc *EventSeatController) AreUserSeatsNextToEachOther(eventId *myid.UUID, userId *myid.UUID, eventSeatId *myid.UUID) (bool, *models.KTSError) {
 	seats, err := esc.EventSeatRepo.GetEventSeats(eventId)
 
 	if err != nil {
@@ -185,7 +186,7 @@ func (esc *EventSeatController) AreUserSeatsNextToEachOther(eventId *uuid.UUID, 
 	var emtpySeatArray []models.GetEventSeatsDTO
 
 	for _, seat := range *seats {
-		if (((seat.EventSeat.UserID != nil && *seat.EventSeat.UserID == *userId) && (seat.EventSeat.BlockedUntil != nil && seat.EventSeat.BlockedUntil.After(time.Now()))) && !seat.EventSeat.Booked) || *seat.EventSeat.ID == *eventSeatId {
+		if (((seat.EventSeat.UserID != nil && *seat.EventSeat.UserID == *userId) && (seat.EventSeat.BlockedUntil != nil && seat.EventSeat.BlockedUntil.After(time.Now()))) && !seat.EventSeat.Booked) || seat.EventSeat.ID == *eventSeatId {
 			if rowNr == -1 {
 				rowNr = seat.Seat.RowNr
 			} else if rowNr != seat.Seat.RowNr {
@@ -228,7 +229,7 @@ func (esc *EventSeatController) AreUserSeatsNextToEachOther(eventId *uuid.UUID, 
 	return true, nil
 }
 
-func (esc *EventSeatController) GetSelectedSeats(eventId *uuid.UUID, userId *uuid.UUID) (*[]models.GetSlectedSeatsDTO, *models.KTSError) {
+func (esc *EventSeatController) GetSelectedSeats(eventId *myid.UUID, userId *myid.UUID) (*[]models.GetSlectedSeatsDTO, *models.KTSError) {
 	return esc.EventSeatRepo.GetSelectedSeats(eventId, userId)
 }
 

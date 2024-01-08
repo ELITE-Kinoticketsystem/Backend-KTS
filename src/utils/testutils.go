@@ -6,9 +6,9 @@ import (
 	"reflect"
 
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/gen/KinoTicketSystem/model"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/myid"
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
-	"github.com/google/uuid"
 )
 
 // Compare two users while ignoring their ids and hashed passwords.
@@ -56,7 +56,7 @@ type ExceptUuidMatcher struct {
 }
 
 func (m ExceptUuidMatcher) Matches(otherValue interface{}) bool {
-	return cmp.Equal(m.value, otherValue, cmpopts.IgnoreTypes(&uuid.UUID{}))
+	return cmp.Equal(m.value, otherValue, cmpopts.IgnoreTypes(myid.UUID{}))
 }
 
 func (m ExceptUuidMatcher) String() string {
@@ -70,7 +70,7 @@ func EqExceptUUIDs(value interface{}) ExceptUuidMatcher {
 
 // for matching a uuid with its binary representation
 type UUIDMatcher struct {
-	id *uuid.UUID
+	id myid.UUID
 }
 
 func (m UUIDMatcher) Match(v driver.Value) bool {
@@ -78,7 +78,7 @@ func (m UUIDMatcher) Match(v driver.Value) bool {
 	if !ok {
 		return false
 	}
-	id, err := m.id.MarshalBinary()
+	id, err := m.id.UUID.MarshalBinary()
 	if err != nil {
 		return false
 	}
@@ -86,7 +86,7 @@ func (m UUIDMatcher) Match(v driver.Value) bool {
 }
 
 // Returns a matcher that matches the uuid with its binary representation.
-func EqUUID(id *uuid.UUID) UUIDMatcher {
+func EqUUID(id myid.UUID) UUIDMatcher {
 	return UUIDMatcher{id: id}
 }
 

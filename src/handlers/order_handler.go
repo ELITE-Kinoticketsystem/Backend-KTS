@@ -6,9 +6,9 @@ import (
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/controllers"
 	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/myid"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 )
 
 // User has to be logged in
@@ -26,14 +26,14 @@ import (
 // @Router /events/{eventId}/book [post]
 func CreateOrderHandler(orderController controllers.OrderControllerI, isReservation bool) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		eventId, err := uuid.Parse(c.Param("eventId"))
+		eventId, err := myid.Parse(c.Param("eventId"))
 
 		if err != nil {
 			utils.HandleErrorAndAbort(c, kts_errors.KTS_BAD_REQUEST)
 			return
 		}
 
-		userId := c.Request.Context().Value(models.ContextKeyUserID).(*uuid.UUID)
+		userId := c.Request.Context().Value(models.ContextKeyUserID).(*myid.UUID)
 
 		createOrderDTO := models.CreateOrderDTO{}
 
@@ -69,14 +69,14 @@ func CreateOrderHandler(orderController controllers.OrderControllerI, isReservat
 // @Router /orders/{orderId} [get]
 func GetOrderByIdHandler(orderController controllers.OrderControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		orderId, err := uuid.Parse(c.Param("orderId"))
+		orderId, err := myid.Parse(c.Param("orderId"))
 
 		if err != nil {
 			utils.HandleErrorAndAbort(c, kts_errors.KTS_BAD_REQUEST)
 			return
 		}
 
-		userId := c.Request.Context().Value(models.ContextKeyUserID).(*uuid.UUID)
+		userId := c.Request.Context().Value(models.ContextKeyUserID).(*myid.UUID)
 
 		order, kts_err := orderController.GetOrderById(&orderId, userId)
 
@@ -99,7 +99,7 @@ func GetOrderByIdHandler(orderController controllers.OrderControllerI) gin.Handl
 // @Router /orders [get]
 func GetOrdersHandler(orderController controllers.OrderControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		userId := c.Request.Context().Value(models.ContextKeyUserID).(*uuid.UUID)
+		userId := c.Request.Context().Value(models.ContextKeyUserID).(*myid.UUID)
 
 		orders, kts_err := orderController.GetOrders(userId)
 

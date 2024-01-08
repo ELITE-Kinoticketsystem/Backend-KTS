@@ -6,9 +6,9 @@ import (
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/controllers"
 	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/myid"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 )
 
 // @Summary Create review
@@ -17,7 +17,7 @@ import (
 // @Accept  json
 // @Produce  json
 // @Param review body models.CreateReviewRequest true "Review data"
-// @Success 201 {object} uuid.UUID
+// @Success 201 {object} myid.UUID
 // @Failure 400 {object} models.KTSErrorMessage
 // @Router /reviews [post]
 func CreateReviewHandler(reviewCtrl controllers.ReviewControllerI) gin.HandlerFunc {
@@ -29,13 +29,14 @@ func CreateReviewHandler(reviewCtrl controllers.ReviewControllerI) gin.HandlerFu
 			return
 		}
 
-		userId, ok := c.Request.Context().Value(models.ContextKeyUserID).(*uuid.UUID)
+		usId := c.Request.Context().Value(models.ContextKeyUserID)
+		userId, ok := usId.(myid.UUID)
 		if !ok {
 			utils.HandleErrorAndAbort(c, kts_errors.KTS_UNAUTHORIZED)
 			return
 		}
 
-		review, username, kts_err := reviewCtrl.CreateReview(reviewData, userId)
+		review, username, kts_err := reviewCtrl.CreateReview(reviewData, &userId)
 		if kts_err != nil {
 			utils.HandleErrorAndAbort(c, kts_err)
 			return
@@ -56,13 +57,13 @@ func CreateReviewHandler(reviewCtrl controllers.ReviewControllerI) gin.HandlerFu
 // @Router /reviews/{id} [delete]
 func DeleteReviewHandler(reviewCtrl controllers.ReviewControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		id, err := uuid.Parse(c.Param("id"))
+		id, err := myid.Parse(c.Param("id"))
 		if err != nil {
 			utils.HandleErrorAndAbort(c, kts_errors.KTS_BAD_REQUEST)
 			return
 		}
 
-		userId, ok := c.Request.Context().Value(models.ContextKeyUserID).(*uuid.UUID)
+		userId, ok := c.Request.Context().Value(models.ContextKeyUserID).(*myid.UUID)
 		if !ok {
 			utils.HandleErrorAndAbort(c, kts_errors.KTS_UNAUTHORIZED)
 			return

@@ -6,18 +6,18 @@ import (
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/gen/KinoTicketSystem/table"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/managers"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/myid"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
 	"github.com/go-jet/jet/v2/mysql"
-	"github.com/google/uuid"
 )
 
 type GenreRepositoryI interface {
 	// Genre
 	GetGenres() (*[]model.Genres, *models.KTSError)
 	GetGenreByName(name *string) (*model.Genres, *models.KTSError)
-	CreateGenre(name *string) (*uuid.UUID, *models.KTSError)
+	CreateGenre(name *string) (*myid.UUID, *models.KTSError)
 	UpdateGenre(genre *model.Genres) *models.KTSError
-	DeleteGenre(genreId *uuid.UUID) *models.KTSError
+	DeleteGenre(genreId *myid.UUID) *models.KTSError
 
 	// All Movies with all Genres - Grouped by Genre
 	GetGenresWithMovies() (*[]models.GenreWithMovies, *models.KTSError)
@@ -75,18 +75,19 @@ func (mr *GenreRepository) GetGenreByName(name *string) (*model.Genres, *models.
 	return &genre, nil
 }
 
-func (mr *GenreRepository) CreateGenre(name *string) (*uuid.UUID, *models.KTSError) {
-	uuid := uuid.New()
+func (mr *GenreRepository) CreateGenre(name *string) (*myid.UUID, *models.KTSError) {
+	uuid := myid.New()
 
 	// Create the insert statement
 	insertQuery := table.Genres.INSERT(
 		table.Genres.ID,
 		table.Genres.GenreName,
-	).
-		VALUES(
-			utils.MysqlUuid(&uuid),
-			name,
-		)
+	).MODEL(
+		model.Genres{
+			ID:        uuid,
+			GenreName: *name,
+		},
+	)
 
 	// Execute the query
 	rows, err := insertQuery.Exec(mr.DatabaseManager.GetDatabaseConnection())
@@ -131,11 +132,11 @@ func (mr *GenreRepository) UpdateGenre(genre *model.Genres) *models.KTSError {
 	return nil
 }
 
-func (mr *GenreRepository) DeleteGenre(genreId *uuid.UUID) *models.KTSError {
+func (mr *GenreRepository) DeleteGenre(genreId *myid.UUID) *models.KTSError {
 
 	// Create the delete statement
 	deleteQuery := table.Genres.DELETE().
-		WHERE(table.Genres.ID.EQ(utils.MysqlUuid(genreId)))
+		WHERE(table.Genres.ID.EQ(utils.MysqlUuid(*genreId)))
 
 	// Execute the query
 	rows, err := deleteQuery.Exec(mr.DatabaseManager.GetDatabaseConnection())

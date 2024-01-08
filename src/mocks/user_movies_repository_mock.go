@@ -12,7 +12,7 @@ import (
 	reflect "reflect"
 
 	models "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
-	uuid "github.com/google/uuid"
+	myid "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/myid"
 	gomock "go.uber.org/mock/gomock"
 )
 
@@ -40,7 +40,7 @@ func (m *MockUserMovieRepositoryI) EXPECT() *MockUserMovieRepositoryIMockRecorde
 }
 
 // RemoveAllUserMovieCombinationWithMovie mocks base method.
-func (m *MockUserMovieRepositoryI) RemoveAllUserMovieCombinationWithMovie(movieId *uuid.UUID) *models.KTSError {
+func (m *MockUserMovieRepositoryI) RemoveAllUserMovieCombinationWithMovie(movieId *myid.UUID) *models.KTSError {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "RemoveAllUserMovieCombinationWithMovie", movieId)
 	ret0, _ := ret[0].(*models.KTSError)

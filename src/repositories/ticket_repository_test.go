@@ -11,9 +11,9 @@ import (
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/gen/KinoTicketSystem/model"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/managers"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/myid"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/samples"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
-	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -33,14 +33,14 @@ func TestGetTicketById(t *testing.T) {
 
 	testCases := []struct {
 		name            string
-		setExpectations func(mock sqlmock.Sqlmock, id *uuid.UUID)
+		setExpectations func(mock sqlmock.Sqlmock, id *myid.UUID)
 		expectedTicket  *models.TicketDTO
 		expectedError   *models.KTSError
 	}{
 		{
 			name: "Ticket found",
-			setExpectations: func(mock sqlmock.Sqlmock, id *uuid.UUID) {
-				mock.ExpectQuery(query).WithArgs(utils.EqUUID(ticketId)).WillReturnRows(
+			setExpectations: func(mock sqlmock.Sqlmock, id *myid.UUID) {
+				mock.ExpectQuery(query).WithArgs(utils.EqUUID(*ticketId)).WillReturnRows(
 					sqlmock.NewRows(
 						[]string{"ticket.id", "ticket.validated", "ticket.price", "seats.id", "seats.row_nr", "seats.column_nr", "seats.visible_row_nr", "seats.visible_column_nr", "seats.seat_category_id", "seats.cinema_hall_id", "seats.type", "events.id", "events.title", "events.start", "events.end", "events.description", "events.event_type", "events.cinema_hall_id", "orders.id", "orders.totalprice", "orders.is_paid", "orders.payment_method_id", "orders.user_id"},
 					).AddRow(
@@ -53,8 +53,8 @@ func TestGetTicketById(t *testing.T) {
 		},
 		{
 			name: "Ticket conflict",
-			setExpectations: func(mock sqlmock.Sqlmock, id *uuid.UUID) {
-				mock.ExpectQuery(query).WithArgs(utils.EqUUID(ticketId)).WillReturnRows(
+			setExpectations: func(mock sqlmock.Sqlmock, id *myid.UUID) {
+				mock.ExpectQuery(query).WithArgs(utils.EqUUID(*ticketId)).WillReturnRows(
 					sqlmock.NewRows([]string{"ticket.id", "ticket.validated", "ticket.price", "seats.id", "seats.row_nr", "seats.column_nr", "seats.visible_row_nr", "seats.visible_column_nr", "seats.seat_category_id", "seats.cinema_hall_id", "seats.type", "events.id", "events.title", "events.start", "events.end", "events.description", "events.event_type", "events.cinema_hall_id", "orders.id", "orders.totalprice", "orders.is_paid", "orders.payment_method_id", "orders.user_id"}),
 				)
 			},
@@ -63,8 +63,8 @@ func TestGetTicketById(t *testing.T) {
 		},
 		{
 			name: "Error while querying Ticket",
-			setExpectations: func(mock sqlmock.Sqlmock, id *uuid.UUID) {
-				mock.ExpectQuery(query).WithArgs(utils.EqUUID(ticketId)).WillReturnError(sqlmock.ErrCancelled)
+			setExpectations: func(mock sqlmock.Sqlmock, id *myid.UUID) {
+				mock.ExpectQuery(query).WithArgs(utils.EqUUID(*ticketId)).WillReturnError(sqlmock.ErrCancelled)
 			},
 			expectedTicket: nil,
 			expectedError:  kts_errors.KTS_INTERNAL_ERROR,
@@ -192,32 +192,32 @@ func TestCreateTicket(t *testing.T) {
 }
 
 func TestValidateTicket(t *testing.T) {
-	ticketID := utils.NewUUID()
+	ticketID := myid.NewUUID()
 
 	query := "UPDATE `KinoTicketSystem`.tickets SET validated = ? WHERE tickets.id = ?;"
 
 	testCases := []struct {
 		name            string
-		setExpectations func(mock sqlmock.Sqlmock, id *uuid.UUID)
+		setExpectations func(mock sqlmock.Sqlmock, id *myid.UUID)
 		expectedError   *models.KTSError
 	}{
 		{
 			name: "Validated Ticket successfully",
-			setExpectations: func(mock sqlmock.Sqlmock, id *uuid.UUID) {
-				mock.ExpectExec(query).WithArgs(true, utils.EqUUID(ticketID)).WillReturnResult(sqlmock.NewResult(1, 1))
+			setExpectations: func(mock sqlmock.Sqlmock, id *myid.UUID) {
+				mock.ExpectExec(query).WithArgs(true, utils.EqUUID(*ticketID)).WillReturnResult(sqlmock.NewResult(1, 1))
 			},
 			expectedError: nil,
 		},
 		{
 			name: "Error while validating ticket",
-			setExpectations: func(mock sqlmock.Sqlmock, id *uuid.UUID) {
+			setExpectations: func(mock sqlmock.Sqlmock, id *myid.UUID) {
 				mock.ExpectExec(query).WithArgs(true, sqlmock.AnyArg()).WillReturnError(sqlmock.ErrCancelled)
 			},
 			expectedError: kts_errors.KTS_INTERNAL_ERROR,
 		},
 		{
 			name: "Error while converting rows affected",
-			setExpectations: func(mock sqlmock.Sqlmock, id *uuid.UUID) {
+			setExpectations: func(mock sqlmock.Sqlmock, id *myid.UUID) {
 				mock.ExpectExec(query).WithArgs(true, sqlmock.AnyArg()).WillReturnResult(
 					sqlmock.NewErrorResult(errors.New("rows affected conversion did not work")),
 				)
@@ -226,7 +226,7 @@ func TestValidateTicket(t *testing.T) {
 		},
 		{
 			name: "Ticket conflict",
-			setExpectations: func(mock sqlmock.Sqlmock, id *uuid.UUID) {
+			setExpectations: func(mock sqlmock.Sqlmock, id *myid.UUID) {
 				mock.ExpectExec(query).WithArgs(true, sqlmock.AnyArg()).WillReturnResult(sqlmock.NewResult(1, 0))
 			},
 			expectedError: kts_errors.KTS_CONFLICT,

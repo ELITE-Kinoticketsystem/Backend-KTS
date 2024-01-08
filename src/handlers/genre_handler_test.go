@@ -11,8 +11,8 @@ import (
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/gen/KinoTicketSystem/model"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/handlers"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/mocks"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/myid"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/samples"
-	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
@@ -90,7 +90,7 @@ func TestUpdateGenreHandler(t *testing.T) {
 }
 
 func TestDeleteGenreHandler(t *testing.T) {
-	sampleUpdateGenreId := utils.NewUUID()
+	sampleUpdateGenreId := myid.NewUUID()
 
 	testCases := []struct {
 		name            string
@@ -293,7 +293,7 @@ func TestCreateGenreHandler(t *testing.T) {
 			name:      "Success",
 			genreName: genreName,
 			setExpectations: func(mockController *mocks.MockGenreControllerI, genreName string) {
-				mockController.EXPECT().CreateGenre(gomock.Any()).Return(genreId, nil)
+				mockController.EXPECT().CreateGenre(gomock.Any()).Return(&genreId, nil)
 			},
 			expectedStatus: http.StatusCreated,
 			expectedBody:   genreId,
@@ -346,7 +346,6 @@ func TestCreateGenreHandler(t *testing.T) {
 		})
 	}
 }
-
 
 func TestGetGenresWithMoviesHandler(t *testing.T) {
 	sampleGenreWithMovie := samples.GetSampleGenresWithMovies()

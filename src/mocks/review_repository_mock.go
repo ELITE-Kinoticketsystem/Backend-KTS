@@ -13,7 +13,7 @@ import (
 
 	model "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/gen/KinoTicketSystem/model"
 	models "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
-	uuid "github.com/google/uuid"
+	myid "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/myid"
 	gomock "go.uber.org/mock/gomock"
 )
 
@@ -55,7 +55,7 @@ func (mr *MockReviewRepositoryIMockRecorder) CreateReview(review any) *gomock.Ca
 }
 
 // DeleteReview mocks base method.
-func (m *MockReviewRepositoryI) DeleteReview(id *uuid.UUID) *models.KTSError {
+func (m *MockReviewRepositoryI) DeleteReview(id *myid.UUID) *models.KTSError {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DeleteReview", id)
 	ret0, _ := ret[0].(*models.KTSError)
@@ -69,7 +69,7 @@ func (mr *MockReviewRepositoryIMockRecorder) DeleteReview(id any) *gomock.Call {
 }
 
 // DeleteReviewForMovie mocks base method.
-func (m *MockReviewRepositoryI) DeleteReviewForMovie(movieId *uuid.UUID) *models.KTSError {
+func (m *MockReviewRepositoryI) DeleteReviewForMovie(movieId *myid.UUID) *models.KTSError {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DeleteReviewForMovie", movieId)
 	ret0, _ := ret[0].(*models.KTSError)
@@ -83,7 +83,7 @@ func (mr *MockReviewRepositoryIMockRecorder) DeleteReviewForMovie(movieId any) *
 }
 
 // GetReviewById mocks base method.
-func (m *MockReviewRepositoryI) GetReviewById(id *uuid.UUID) (*model.Reviews, *models.KTSError) {
+func (m *MockReviewRepositoryI) GetReviewById(id *myid.UUID) (*model.Reviews, *models.KTSError) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetReviewById", id)
 	ret0, _ := ret[0].(*model.Reviews)

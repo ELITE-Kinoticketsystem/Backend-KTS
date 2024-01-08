@@ -11,6 +11,7 @@ import (
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/gen/KinoTicketSystem/model"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/managers"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/myid"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/samples"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
 )
@@ -25,7 +26,7 @@ func TestCreateEvent(t *testing.T) {
 		End:          time.Now().Add(time.Hour),
 		Description:  &description,
 		EventType:    "Test event type",
-		CinemaHallID: utils.NewUUID(),
+		CinemaHallID: myid.New(),
 	}
 
 	testCases := []struct {
@@ -94,8 +95,8 @@ func TestCreateEvent(t *testing.T) {
 }
 func TestCreateEventSeatCategory(t *testing.T) {
 	eventSeatCategory := &model.EventSeatCategories{
-		EventID:        utils.NewUUID(),
-		SeatCategoryID: utils.NewUUID(),
+		EventID:        myid.New(),
+		SeatCategoryID: myid.New(),
 		Price:          999,
 	}
 
@@ -165,8 +166,8 @@ func TestCreateEventSeatCategory(t *testing.T) {
 }
 
 func TestAddEventMovie(t *testing.T) {
-	eventID := utils.NewUUID()
-	movieID := utils.NewUUID()
+	eventID := myid.NewUUID()
+	movieID := myid.NewUUID()
 
 	testCases := []struct {
 		name            string
@@ -227,9 +228,9 @@ func TestAddEventMovie(t *testing.T) {
 
 func TestCreateEventSeat(t *testing.T) {
 	eventSeat := &model.EventSeats{
-		ID:      utils.NewUUID(),
-		EventID: utils.NewUUID(),
-		SeatID:  utils.NewUUID(),
+		ID:      myid.New(),
+		EventID: myid.New(),
+		SeatID:  myid.New(),
 		Booked:  false,
 	}
 
@@ -290,27 +291,27 @@ func TestCreateEventSeat(t *testing.T) {
 	}
 }
 func TestGetEventsForMovie(t *testing.T) {
-	movieID := utils.NewUUID()
-	theatreId := utils.NewUUID()
+	movieID := myid.NewUUID()
+	theatreId := myid.NewUUID()
 
 	expectedEvents := []*model.Events{
 		{
-			ID:           utils.NewUUID(),
+			ID:           myid.New(),
 			Title:        "Test Event 1",
 			Start:        time.Now(),
 			End:          time.Now().Add(time.Hour),
 			Description:  utils.GetStringPointer("Test event description 1"),
 			EventType:    "showing",
-			CinemaHallID: utils.NewUUID(),
+			CinemaHallID: myid.New(),
 		},
 		{
-			ID:           utils.NewUUID(),
+			ID:           myid.New(),
 			Title:        "Test Event 2",
 			Start:        time.Now(),
 			End:          time.Now().Add(time.Hour),
 			Description:  utils.GetStringPointer("Test event description 2"),
 			EventType:    "showing",
-			CinemaHallID: utils.NewUUID(),
+			CinemaHallID: myid.New(),
 		},
 	}
 
@@ -379,7 +380,7 @@ func TestGetSpecialEvents(t *testing.T) {
 	expectedSpecialEvents := []models.GetSpecialEventsDTO{
 		{
 			Events: model.Events{
-				ID:          utils.NewUUID(),
+				ID:          myid.New(),
 				Title:       "Special Event 1",
 				Start:       time.Now(),
 				End:         time.Now().Add(time.Hour),
@@ -387,14 +388,14 @@ func TestGetSpecialEvents(t *testing.T) {
 			},
 			Movies: []*model.Movies{
 				{
-					ID:    utils.NewUUID(),
+					ID:    myid.New(),
 					Title: "Movie 1",
 				},
 			},
 		},
 		{
 			Events: model.Events{
-				ID:          utils.NewUUID(),
+				ID:          myid.New(),
 				Title:       "Special Event 2",
 				Start:       time.Now(),
 				End:         time.Now().Add(time.Hour),
@@ -402,7 +403,7 @@ func TestGetSpecialEvents(t *testing.T) {
 			},
 			Movies: []*model.Movies{
 				{
-					ID:    utils.NewUUID(),
+					ID:    myid.New(),
 					Title: "Movie 2",
 				},
 			},
@@ -481,7 +482,7 @@ func TestGetSpecialEvents(t *testing.T) {
 }
 
 func TestGetEventById(t *testing.T) {
-	eventID := utils.NewUUID()
+	eventID := myid.NewUUID()
 
 	expectedEvent := samples.GetGetSpecialEventsDTO(eventID)
 
@@ -496,7 +497,7 @@ func TestGetEventById(t *testing.T) {
 		{
 			name: "Get event by ID",
 			setExpectations: func(mock sqlmock.Sqlmock) {
-				mock.ExpectQuery(query).WithArgs(utils.EqUUID(eventID)).
+				mock.ExpectQuery(query).WithArgs(utils.EqUUID(*eventID)).
 					WillReturnRows(sqlmock.NewRows([]string{
 						"events.id", "events.title", "events.start", "events.end", "events.description", "events.event_type", "events.cinema_hall_id",
 						"movies.id", "movies.title", "movies.description", "movies.banner_pic_url", "movies.cover_pic_url",
@@ -517,7 +518,7 @@ func TestGetEventById(t *testing.T) {
 		{
 			name: "Get event by ID sql error",
 			setExpectations: func(mock sqlmock.Sqlmock) {
-				mock.ExpectQuery(query).WithArgs(utils.EqUUID(eventID)).WillReturnError(sql.ErrConnDone)
+				mock.ExpectQuery(query).WithArgs(utils.EqUUID(*eventID)).WillReturnError(sql.ErrConnDone)
 			},
 			expectedEvent: nil,
 			expectedError: kts_errors.KTS_INTERNAL_ERROR,

@@ -8,8 +8,8 @@ import (
 	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/managers"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/myid"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/samples"
-	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -138,7 +138,7 @@ func TestGetOrderById(t *testing.T) {
 
 			tc.setExpectations(mock)
 
-			order, kts_err := orderRepo.GetOrderById(utils.NewUUID(), utils.NewUUID())
+			order, kts_err := orderRepo.GetOrderById(myid.NewUUID(), myid.NewUUID())
 
 			if kts_err != tc.expectedError {
 				t.Errorf("Unexpected error: %v", kts_err)
@@ -203,7 +203,7 @@ func TestGetOrders(t *testing.T) {
 
 			tc.setExpectations(mock)
 
-			orders, kts_err := orderRepo.GetOrders(utils.NewUUID())
+			orders, kts_err := orderRepo.GetOrders(myid.NewUUID())
 
 			if kts_err != tc.expectedError {
 				t.Errorf("Unexpected error: %v", kts_err)

@@ -7,8 +7,8 @@ import (
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/gen/KinoTicketSystem/model"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/mocks"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/myid"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/samples"
-	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
 )
@@ -202,17 +202,17 @@ func TestGetMoviesWithGenres(t *testing.T) {
 func TestGetMovieById(t *testing.T) {
 	sampleMovie := samples.GetSampleMovieByIdWithEverything()
 
-	id := sampleMovie.ID
+	id := &sampleMovie.ID
 
 	testCases := []struct {
 		name            string
-		setExpectations func(mockRepo mocks.MockMovieRepositoryI, movieId *uuid.UUID)
+		setExpectations func(mockRepo mocks.MockMovieRepositoryI, movieId *myid.UUID)
 		expectedMovies  *models.MovieWithEverything
 		expectedError   *models.KTSError
 	}{
 		{
 			name: "Empty result",
-			setExpectations: func(mockRepo mocks.MockMovieRepositoryI, movieId *uuid.UUID) {
+			setExpectations: func(mockRepo mocks.MockMovieRepositoryI, movieId *myid.UUID) {
 				mockRepo.EXPECT().GetMovieById(id).Return(nil, kts_errors.KTS_NOT_FOUND)
 			},
 			expectedMovies: nil,
@@ -220,7 +220,7 @@ func TestGetMovieById(t *testing.T) {
 		},
 		{
 			name: "Multiple movies",
-			setExpectations: func(mockRepo mocks.MockMovieRepositoryI, movieId *uuid.UUID) {
+			setExpectations: func(mockRepo mocks.MockMovieRepositoryI, movieId *myid.UUID) {
 				mockRepo.EXPECT().GetMovieById(id).Return(sampleMovie, nil)
 			},
 			expectedMovies: sampleMovie,
@@ -228,7 +228,7 @@ func TestGetMovieById(t *testing.T) {
 		},
 		{
 			name: "Error while querying movies",
-			setExpectations: func(mockRepo mocks.MockMovieRepositoryI, movieId *uuid.UUID) {
+			setExpectations: func(mockRepo mocks.MockMovieRepositoryI, movieId *myid.UUID) {
 				mockRepo.EXPECT().GetMovieById(id).Return(nil, kts_errors.KTS_INTERNAL_ERROR)
 			},
 			expectedMovies: nil,
@@ -301,8 +301,8 @@ func TestCreateMovie(t *testing.T) {
 				GenresID: sampleMovie.GenresID,
 			},
 			setExpectations: func(mockMovieRepo mocks.MockMovieRepositoryI, mockMovieGenreRepo mocks.MockMovieGenreRepositoryI, mockMovieActorRepo mocks.MockMovieActorRepositoryI, mockMovieProducerRepo mocks.MockMovieProducerRepositoryI, movie *models.MovieDTOCreate) {
-				mockMovieRepo.EXPECT().CreateMovie(&movie.Movies).Return(sampleMovie.ID, nil)
-				mockMovieGenreRepo.EXPECT().AddMovieGenre(sampleMovie.ID, gomock.Any()).Return(kts_errors.KTS_INTERNAL_ERROR)
+				mockMovieRepo.EXPECT().CreateMovie(&movie.Movies).Return(&sampleMovie.ID, nil)
+				mockMovieGenreRepo.EXPECT().AddMovieGenre(&sampleMovie.ID, gomock.Any()).Return(kts_errors.KTS_INTERNAL_ERROR)
 			},
 			expectedMoviesId: false,
 			expectedError:    kts_errors.KTS_INTERNAL_ERROR,
@@ -316,9 +316,9 @@ func TestCreateMovie(t *testing.T) {
 				ActorsID: sampleMovie.ActorsID,
 			},
 			setExpectations: func(mockMovieRepo mocks.MockMovieRepositoryI, mockMovieGenreRepo mocks.MockMovieGenreRepositoryI, mockMovieActorRepo mocks.MockMovieActorRepositoryI, mockMovieProducerRepo mocks.MockMovieProducerRepositoryI, movie *models.MovieDTOCreate) {
-				mockMovieRepo.EXPECT().CreateMovie(&movie.Movies).Return(sampleMovie.ID, nil)
-				mockMovieGenreRepo.EXPECT().AddMovieGenre(sampleMovie.ID, gomock.Any()).Return(nil)
-				mockMovieActorRepo.EXPECT().AddMovieActor(sampleMovie.ID, gomock.Any()).Return(kts_errors.KTS_INTERNAL_ERROR)
+				mockMovieRepo.EXPECT().CreateMovie(&movie.Movies).Return(&sampleMovie.ID, nil)
+				mockMovieGenreRepo.EXPECT().AddMovieGenre(&sampleMovie.ID, gomock.Any()).Return(nil)
+				mockMovieActorRepo.EXPECT().AddMovieActor(&sampleMovie.ID, gomock.Any()).Return(kts_errors.KTS_INTERNAL_ERROR)
 			},
 			expectedMoviesId: false,
 			expectedError:    kts_errors.KTS_INTERNAL_ERROR,
@@ -333,10 +333,10 @@ func TestCreateMovie(t *testing.T) {
 				ProducersID: sampleMovie.ProducersID,
 			},
 			setExpectations: func(mockMovieRepo mocks.MockMovieRepositoryI, mockMovieGenreRepo mocks.MockMovieGenreRepositoryI, mockMovieActorRepo mocks.MockMovieActorRepositoryI, mockMovieProducerRepo mocks.MockMovieProducerRepositoryI, movie *models.MovieDTOCreate) {
-				mockMovieRepo.EXPECT().CreateMovie(&movie.Movies).Return(sampleMovie.ID, nil)
-				mockMovieGenreRepo.EXPECT().AddMovieGenre(sampleMovie.ID, gomock.Any()).Return(nil)
-				mockMovieActorRepo.EXPECT().AddMovieActor(sampleMovie.ID, gomock.Any()).Return(nil)
-				mockMovieProducerRepo.EXPECT().AddMovieProducer(sampleMovie.ID, gomock.Any()).Return(kts_errors.KTS_INTERNAL_ERROR)
+				mockMovieRepo.EXPECT().CreateMovie(&movie.Movies).Return(&sampleMovie.ID, nil)
+				mockMovieGenreRepo.EXPECT().AddMovieGenre(&sampleMovie.ID, gomock.Any()).Return(nil)
+				mockMovieActorRepo.EXPECT().AddMovieActor(&sampleMovie.ID, gomock.Any()).Return(nil)
+				mockMovieProducerRepo.EXPECT().AddMovieProducer(&sampleMovie.ID, gomock.Any()).Return(kts_errors.KTS_INTERNAL_ERROR)
 			},
 			expectedMoviesId: false,
 			expectedError:    kts_errors.KTS_INTERNAL_ERROR,
@@ -351,10 +351,10 @@ func TestCreateMovie(t *testing.T) {
 				ProducersID: sampleMovie.ProducersID,
 			},
 			setExpectations: func(mockMovieRepo mocks.MockMovieRepositoryI, mockMovieGenreRepo mocks.MockMovieGenreRepositoryI, mockMovieActorRepo mocks.MockMovieActorRepositoryI, mockMovieProducerRepo mocks.MockMovieProducerRepositoryI, movie *models.MovieDTOCreate) {
-				mockMovieRepo.EXPECT().CreateMovie(&movie.Movies).Return(sampleMovie.ID, nil)
-				mockMovieGenreRepo.EXPECT().AddMovieGenre(sampleMovie.ID, gomock.Any()).Return(nil)
-				mockMovieActorRepo.EXPECT().AddMovieActor(sampleMovie.ID, gomock.Any()).Return(nil)
-				mockMovieProducerRepo.EXPECT().AddMovieProducer(sampleMovie.ID, gomock.Any()).Return(nil)
+				mockMovieRepo.EXPECT().CreateMovie(&movie.Movies).Return(&sampleMovie.ID, nil)
+				mockMovieGenreRepo.EXPECT().AddMovieGenre(&sampleMovie.ID, gomock.Any()).Return(nil)
+				mockMovieActorRepo.EXPECT().AddMovieActor(&sampleMovie.ID, gomock.Any()).Return(nil)
+				mockMovieProducerRepo.EXPECT().AddMovieProducer(&sampleMovie.ID, gomock.Any()).Return(nil)
 			},
 			expectedMoviesId: true,
 			expectedError:    nil,
@@ -462,12 +462,12 @@ func TestDeleteMovie(t *testing.T) {
 
 	testCases := []struct {
 		name            string
-		setExpectations func(mockMovieRepo mocks.MockMovieRepositoryI, mockMovieGenreRepo mocks.MockMovieGenreRepositoryI, mockMovieActorRepo mocks.MockMovieActorRepositoryI, mockMovieProducerRepo mocks.MockMovieProducerRepositoryI, mockReviewRepo mocks.MockReviewRepositoryI, mockUserMovieRepo mocks.MockUserMovieRepositoryI, movieId *uuid.UUID)
+		setExpectations func(mockMovieRepo mocks.MockMovieRepositoryI, mockMovieGenreRepo mocks.MockMovieGenreRepositoryI, mockMovieActorRepo mocks.MockMovieActorRepositoryI, mockMovieProducerRepo mocks.MockMovieProducerRepositoryI, mockReviewRepo mocks.MockReviewRepositoryI, mockUserMovieRepo mocks.MockUserMovieRepositoryI, movieId *myid.UUID)
 		expectedError   *models.KTSError
 	}{
 		{
 			name: "Delete movie",
-			setExpectations: func(mockMovieRepo mocks.MockMovieRepositoryI, mockMovieGenreRepo mocks.MockMovieGenreRepositoryI, mockMovieActorRepo mocks.MockMovieActorRepositoryI, mockMovieProducerRepo mocks.MockMovieProducerRepositoryI, mockReviewRepo mocks.MockReviewRepositoryI, mockUserMovieRepo mocks.MockUserMovieRepositoryI, movieId *uuid.UUID) {
+			setExpectations: func(mockMovieRepo mocks.MockMovieRepositoryI, mockMovieGenreRepo mocks.MockMovieGenreRepositoryI, mockMovieActorRepo mocks.MockMovieActorRepositoryI, mockMovieProducerRepo mocks.MockMovieProducerRepositoryI, mockReviewRepo mocks.MockReviewRepositoryI, mockUserMovieRepo mocks.MockUserMovieRepositoryI, movieId *myid.UUID) {
 				mockMovieGenreRepo.EXPECT().RemoveAllGenreCombinationWithMovie(movieId).Return(nil)
 				mockMovieActorRepo.EXPECT().RemoveAllActorCombinationWithMovie(movieId).Return(nil)
 				mockMovieProducerRepo.EXPECT().RemoveAllProducerCombinationWithMovie(movieId).Return(nil)
@@ -479,7 +479,7 @@ func TestDeleteMovie(t *testing.T) {
 		},
 		{
 			name: "Error while deleting MovieProducer",
-			setExpectations: func(mockMovieRepo mocks.MockMovieRepositoryI, mockMovieGenreRepo mocks.MockMovieGenreRepositoryI, mockMovieActorRepo mocks.MockMovieActorRepositoryI, mockMovieProducerRepo mocks.MockMovieProducerRepositoryI, mockReviewRepo mocks.MockReviewRepositoryI, mockUserMovieRepo mocks.MockUserMovieRepositoryI, movieId *uuid.UUID) {
+			setExpectations: func(mockMovieRepo mocks.MockMovieRepositoryI, mockMovieGenreRepo mocks.MockMovieGenreRepositoryI, mockMovieActorRepo mocks.MockMovieActorRepositoryI, mockMovieProducerRepo mocks.MockMovieProducerRepositoryI, mockReviewRepo mocks.MockReviewRepositoryI, mockUserMovieRepo mocks.MockUserMovieRepositoryI, movieId *myid.UUID) {
 				mockMovieGenreRepo.EXPECT().RemoveAllGenreCombinationWithMovie(movieId).Return(nil)
 				mockMovieActorRepo.EXPECT().RemoveAllActorCombinationWithMovie(movieId).Return(nil)
 				mockMovieProducerRepo.EXPECT().RemoveAllProducerCombinationWithMovie(movieId).Return(kts_errors.KTS_INTERNAL_ERROR)
@@ -488,7 +488,7 @@ func TestDeleteMovie(t *testing.T) {
 		},
 		{
 			name: "Error while deleting MovieActor",
-			setExpectations: func(mockMovieRepo mocks.MockMovieRepositoryI, mockMovieGenreRepo mocks.MockMovieGenreRepositoryI, mockMovieActorRepo mocks.MockMovieActorRepositoryI, mockMovieProducerRepo mocks.MockMovieProducerRepositoryI, mockReviewRepo mocks.MockReviewRepositoryI, mockUserMovieRepo mocks.MockUserMovieRepositoryI, movieId *uuid.UUID) {
+			setExpectations: func(mockMovieRepo mocks.MockMovieRepositoryI, mockMovieGenreRepo mocks.MockMovieGenreRepositoryI, mockMovieActorRepo mocks.MockMovieActorRepositoryI, mockMovieProducerRepo mocks.MockMovieProducerRepositoryI, mockReviewRepo mocks.MockReviewRepositoryI, mockUserMovieRepo mocks.MockUserMovieRepositoryI, movieId *myid.UUID) {
 				mockMovieGenreRepo.EXPECT().RemoveAllGenreCombinationWithMovie(movieId).Return(nil)
 				mockMovieActorRepo.EXPECT().RemoveAllActorCombinationWithMovie(movieId).Return(kts_errors.KTS_INTERNAL_ERROR)
 			},
@@ -496,14 +496,14 @@ func TestDeleteMovie(t *testing.T) {
 		},
 		{
 			name: "Error while deleting MovieGenre",
-			setExpectations: func(mockMovieRepo mocks.MockMovieRepositoryI, mockMovieGenreRepo mocks.MockMovieGenreRepositoryI, mockMovieActorRepo mocks.MockMovieActorRepositoryI, mockMovieProducerRepo mocks.MockMovieProducerRepositoryI, mockReviewRepo mocks.MockReviewRepositoryI, mockUserMovieRepo mocks.MockUserMovieRepositoryI, movieId *uuid.UUID) {
+			setExpectations: func(mockMovieRepo mocks.MockMovieRepositoryI, mockMovieGenreRepo mocks.MockMovieGenreRepositoryI, mockMovieActorRepo mocks.MockMovieActorRepositoryI, mockMovieProducerRepo mocks.MockMovieProducerRepositoryI, mockReviewRepo mocks.MockReviewRepositoryI, mockUserMovieRepo mocks.MockUserMovieRepositoryI, movieId *myid.UUID) {
 				mockMovieGenreRepo.EXPECT().RemoveAllGenreCombinationWithMovie(movieId).Return(kts_errors.KTS_INTERNAL_ERROR)
 			},
 			expectedError: kts_errors.KTS_INTERNAL_ERROR,
 		},
 		{
 			name: "Movie not found",
-			setExpectations: func(mockMovieRepo mocks.MockMovieRepositoryI, mockMovieGenreRepo mocks.MockMovieGenreRepositoryI, mockMovieActorRepo mocks.MockMovieActorRepositoryI, mockMovieProducerRepo mocks.MockMovieProducerRepositoryI, mockReviewRepo mocks.MockReviewRepositoryI, mockUserMovieRepo mocks.MockUserMovieRepositoryI, movieId *uuid.UUID) {
+			setExpectations: func(mockMovieRepo mocks.MockMovieRepositoryI, mockMovieGenreRepo mocks.MockMovieGenreRepositoryI, mockMovieActorRepo mocks.MockMovieActorRepositoryI, mockMovieProducerRepo mocks.MockMovieProducerRepositoryI, mockReviewRepo mocks.MockReviewRepositoryI, mockUserMovieRepo mocks.MockUserMovieRepositoryI, movieId *myid.UUID) {
 				mockMovieGenreRepo.EXPECT().RemoveAllGenreCombinationWithMovie(movieId).Return(nil)
 				mockMovieActorRepo.EXPECT().RemoveAllActorCombinationWithMovie(movieId).Return(nil)
 				mockMovieProducerRepo.EXPECT().RemoveAllProducerCombinationWithMovie(movieId).Return(nil)
@@ -515,7 +515,7 @@ func TestDeleteMovie(t *testing.T) {
 		},
 		{
 			name: "MovieReview internal error",
-			setExpectations: func(mockMovieRepo mocks.MockMovieRepositoryI, mockMovieGenreRepo mocks.MockMovieGenreRepositoryI, mockMovieActorRepo mocks.MockMovieActorRepositoryI, mockMovieProducerRepo mocks.MockMovieProducerRepositoryI, mockReviewRepo mocks.MockReviewRepositoryI, mockUserMovieRepo mocks.MockUserMovieRepositoryI, movieId *uuid.UUID) {
+			setExpectations: func(mockMovieRepo mocks.MockMovieRepositoryI, mockMovieGenreRepo mocks.MockMovieGenreRepositoryI, mockMovieActorRepo mocks.MockMovieActorRepositoryI, mockMovieProducerRepo mocks.MockMovieProducerRepositoryI, mockReviewRepo mocks.MockReviewRepositoryI, mockUserMovieRepo mocks.MockUserMovieRepositoryI, movieId *myid.UUID) {
 				mockMovieGenreRepo.EXPECT().RemoveAllGenreCombinationWithMovie(movieId).Return(nil)
 				mockMovieActorRepo.EXPECT().RemoveAllActorCombinationWithMovie(movieId).Return(nil)
 				mockMovieProducerRepo.EXPECT().RemoveAllProducerCombinationWithMovie(movieId).Return(nil)
@@ -525,7 +525,7 @@ func TestDeleteMovie(t *testing.T) {
 		},
 		{
 			name: "UserMovie internal error",
-			setExpectations: func(mockMovieRepo mocks.MockMovieRepositoryI, mockMovieGenreRepo mocks.MockMovieGenreRepositoryI, mockMovieActorRepo mocks.MockMovieActorRepositoryI, mockMovieProducerRepo mocks.MockMovieProducerRepositoryI, mockReviewRepo mocks.MockReviewRepositoryI, mockUserMovieRepo mocks.MockUserMovieRepositoryI, movieId *uuid.UUID) {
+			setExpectations: func(mockMovieRepo mocks.MockMovieRepositoryI, mockMovieGenreRepo mocks.MockMovieGenreRepositoryI, mockMovieActorRepo mocks.MockMovieActorRepositoryI, mockMovieProducerRepo mocks.MockMovieProducerRepositoryI, mockReviewRepo mocks.MockReviewRepositoryI, mockUserMovieRepo mocks.MockUserMovieRepositoryI, movieId *myid.UUID) {
 				mockMovieGenreRepo.EXPECT().RemoveAllGenreCombinationWithMovie(movieId).Return(nil)
 				mockMovieActorRepo.EXPECT().RemoveAllActorCombinationWithMovie(movieId).Return(nil)
 				mockMovieProducerRepo.EXPECT().RemoveAllProducerCombinationWithMovie(movieId).Return(nil)
@@ -557,11 +557,11 @@ func TestDeleteMovie(t *testing.T) {
 			}
 
 			// define expectations
-			tc.setExpectations(*movieRepoMock, *genreRepoMock, *actorRepoMock, *producerRepoMock, *reviewRepoMock, *userMovieRepoMock, sampleMovie.ID)
+			tc.setExpectations(*movieRepoMock, *genreRepoMock, *actorRepoMock, *producerRepoMock, *reviewRepoMock, *userMovieRepoMock, &sampleMovie.ID)
 
 			// WHEN
 			// Call the method under test
-			kts_err := movieController.DeleteMovie(sampleMovie.ID)
+			kts_err := movieController.DeleteMovie(&sampleMovie.ID)
 
 			// Verify
 			assert.Equal(t, tc.expectedError, kts_err)

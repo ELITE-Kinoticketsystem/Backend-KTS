@@ -8,11 +8,11 @@
 package model
 
 import (
-	"github.com/google/uuid"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/myid"
 )
 
 type EventSeatCategories struct {
-	EventID        *uuid.UUID `sql:"primary_key"`
-	SeatCategoryID *uuid.UUID `sql:"primary_key"`
+	EventID        myid.UUID `sql:"primary_key"`
+	SeatCategoryID myid.UUID `sql:"primary_key"`
 	Price          int32
 }

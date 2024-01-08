@@ -13,28 +13,27 @@ import (
 	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/mocks"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/myid"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/samples"
-	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
 )
 
 func TestCreateOrderHandler(t *testing.T) {
-	orderId := utils.NewUUID()
+	orderId := myid.NewUUID()
 	tests := []struct {
 		name                 string
-		paramEventId         *uuid.UUID
-		setExpectations      func(mockOrderController *mocks.MockOrderControllerI, eventId *uuid.UUID, userId *uuid.UUID)
+		paramEventId         *myid.UUID
+		setExpectations      func(mockOrderController *mocks.MockOrderControllerI, eventId *myid.UUID, userId *myid.UUID)
 		expectedResponseBody gin.H
 		expectedStatus       int
 		createOrderDTO       *models.CreateOrderDTO
 	}{
 		{
 			name:         "Success",
-			paramEventId: utils.NewUUID(),
-			setExpectations: func(mockOrderController *mocks.MockOrderControllerI, eventId *uuid.UUID, userId *uuid.UUID) {
+			paramEventId: myid.NewUUID(),
+			setExpectations: func(mockOrderController *mocks.MockOrderControllerI, eventId *myid.UUID, userId *myid.UUID) {
 				mockOrderController.EXPECT().CreateOrder(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Return(
 					orderId,
 					nil,
@@ -48,8 +47,8 @@ func TestCreateOrderHandler(t *testing.T) {
 		},
 		{
 			name:         "Bad Request",
-			paramEventId: utils.NewUUID(),
-			setExpectations: func(mockOrderController *mocks.MockOrderControllerI, eventId *uuid.UUID, userId *uuid.UUID) {
+			paramEventId: myid.NewUUID(),
+			setExpectations: func(mockOrderController *mocks.MockOrderControllerI, eventId *myid.UUID, userId *myid.UUID) {
 				mockOrderController.EXPECT().CreateOrder(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Return(
 					nil,
 					kts_errors.KTS_INTERNAL_ERROR,
@@ -74,7 +73,7 @@ func TestCreateOrderHandler(t *testing.T) {
 			c.Request = req
 			c.Params = []gin.Param{{Key: "eventId", Value: tc.paramEventId.String()}}
 
-			userId := utils.NewUUID()
+			userId := myid.NewUUID()
 
 			ctx := context.WithValue(c.Request.Context(), models.ContextKeyUserID, userId)
 			c.Request = c.Request.WithContext(ctx)
@@ -106,14 +105,14 @@ func TestGetOrderById(t *testing.T) {
 	orderJson, _ := json.Marshal(order)
 	tests := []struct {
 		name               string
-		paramOrderId       *uuid.UUID
+		paramOrderId       *myid.UUID
 		setExpectations    func(mockOrderController *mocks.MockOrderControllerI)
 		expectedStatus     int
 		ExpectedBodyString string
 	}{
 		{
 			name:         "Success",
-			paramOrderId: utils.NewUUID(),
+			paramOrderId: myid.NewUUID(),
 			setExpectations: func(mockOrderController *mocks.MockOrderControllerI) {
 				mockOrderController.EXPECT().GetOrderById(gomock.Any(), gomock.Any()).Return(
 					order,
@@ -125,7 +124,7 @@ func TestGetOrderById(t *testing.T) {
 		},
 		{
 			name:         "Bad Request",
-			paramOrderId: utils.NewUUID(),
+			paramOrderId: myid.NewUUID(),
 			setExpectations: func(mockOrderController *mocks.MockOrderControllerI) {
 				mockOrderController.EXPECT().GetOrderById(gomock.Any(), gomock.Any()).Return(
 					nil,
@@ -148,7 +147,7 @@ func TestGetOrderById(t *testing.T) {
 			c.Request = req
 			c.Params = []gin.Param{{Key: "orderId", Value: tc.paramOrderId.String()}}
 
-			userId := utils.NewUUID()
+			userId := myid.NewUUID()
 
 			ctx := context.WithValue(c.Request.Context(), models.ContextKeyUserID, userId)
 			c.Request = c.Request.WithContext(ctx)
@@ -213,7 +212,7 @@ func TestGetOrders(t *testing.T) {
 			c, _ := gin.CreateTestContext(w)
 			c.Request = req
 
-			userId := utils.NewUUID()
+			userId := myid.NewUUID()
 
 			ctx := context.WithValue(c.Request.Context(), models.ContextKeyUserID, userId)
 			c.Request = c.Request.WithContext(ctx)

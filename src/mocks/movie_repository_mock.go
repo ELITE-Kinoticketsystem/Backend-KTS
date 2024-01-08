@@ -13,7 +13,7 @@ import (
 
 	model "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/gen/KinoTicketSystem/model"
 	models "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
-	uuid "github.com/google/uuid"
+	myid "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/myid"
 	gomock "go.uber.org/mock/gomock"
 )
 
@@ -41,10 +41,10 @@ func (m *MockMovieRepositoryI) EXPECT() *MockMovieRepositoryIMockRecorder {
 }
 
 // CreateMovie mocks base method.
-func (m *MockMovieRepositoryI) CreateMovie(movie *model.Movies) (*uuid.UUID, *models.KTSError) {
+func (m *MockMovieRepositoryI) CreateMovie(movie *model.Movies) (*myid.UUID, *models.KTSError) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateMovie", movie)
-	ret0, _ := ret[0].(*uuid.UUID)
+	ret0, _ := ret[0].(*myid.UUID)
 	ret1, _ := ret[1].(*models.KTSError)
 	return ret0, ret1
 }
@@ -56,7 +56,7 @@ func (mr *MockMovieRepositoryIMockRecorder) CreateMovie(movie any) *gomock.Call 
 }
 
 // DeleteMovie mocks base method.
-func (m *MockMovieRepositoryI) DeleteMovie(movieId *uuid.UUID) *models.KTSError {
+func (m *MockMovieRepositoryI) DeleteMovie(movieId *myid.UUID) *models.KTSError {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DeleteMovie", movieId)
 	ret0, _ := ret[0].(*models.KTSError)
@@ -70,7 +70,7 @@ func (mr *MockMovieRepositoryIMockRecorder) DeleteMovie(movieId any) *gomock.Cal
 }
 
 // GetMovieById mocks base method.
-func (m *MockMovieRepositoryI) GetMovieById(movieId *uuid.UUID) (*models.MovieWithEverything, *models.KTSError) {
+func (m *MockMovieRepositoryI) GetMovieById(movieId *myid.UUID) (*models.MovieWithEverything, *models.KTSError) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetMovieById", movieId)
 	ret0, _ := ret[0].(*models.MovieWithEverything)

@@ -12,7 +12,7 @@ import (
 	reflect "reflect"
 
 	models "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
-	uuid "github.com/google/uuid"
+	myid "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/myid"
 	gomock "go.uber.org/mock/gomock"
 )
 
@@ -40,10 +40,10 @@ func (m *MockActorControllerI) EXPECT() *MockActorControllerIMockRecorder {
 }
 
 // CreateActor mocks base method.
-func (m *MockActorControllerI) CreateActor(actor *models.CreateActorDTO) (*uuid.UUID, *models.KTSError) {
+func (m *MockActorControllerI) CreateActor(actor *models.CreateActorDTO) (*myid.UUID, *models.KTSError) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateActor", actor)
-	ret0, _ := ret[0].(*uuid.UUID)
+	ret0, _ := ret[0].(*myid.UUID)
 	ret1, _ := ret[1].(*models.KTSError)
 	return ret0, ret1
 }
@@ -55,7 +55,7 @@ func (mr *MockActorControllerIMockRecorder) CreateActor(actor any) *gomock.Call 
 }
 
 // GetActorById mocks base method.
-func (m *MockActorControllerI) GetActorById(actorId *uuid.UUID) (*models.ActorDTO, *models.KTSError) {
+func (m *MockActorControllerI) GetActorById(actorId *myid.UUID) (*models.ActorDTO, *models.KTSError) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetActorById", actorId)
 	ret0, _ := ret[0].(*models.ActorDTO)

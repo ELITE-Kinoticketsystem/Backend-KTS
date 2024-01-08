@@ -8,22 +8,22 @@ import (
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/gen/KinoTicketSystem/table"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/managers"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/myid"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
 	"github.com/go-jet/jet/v2/mysql"
-	"github.com/google/uuid"
 )
 
 type TicketRepositoryI interface {
-	GetTicketById(id *uuid.UUID) (*models.TicketDTO, *models.KTSError)
-	CreateTicket(ticket *model.Tickets) (*uuid.UUID, *models.KTSError)
-	ValidateTicket(id *uuid.UUID) *models.KTSError
+	GetTicketById(id *myid.UUID) (*models.TicketDTO, *models.KTSError)
+	CreateTicket(ticket *model.Tickets) (*myid.UUID, *models.KTSError)
+	ValidateTicket(id *myid.UUID) *models.KTSError
 }
 
 type TicketRepository struct {
 	DatabaseManager managers.DatabaseManagerI
 }
 
-func (tr *TicketRepository) GetTicketById(id *uuid.UUID) (*models.TicketDTO, *models.KTSError) {
+func (tr *TicketRepository) GetTicketById(id *myid.UUID) (*models.TicketDTO, *models.KTSError) {
 	var ticket models.TicketDTO
 
 	// Create the query
@@ -42,7 +42,7 @@ func (tr *TicketRepository) GetTicketById(id *uuid.UUID) (*models.TicketDTO, *mo
 			INNER_JOIN(table.Events, table.Events.ID.EQ(table.EventSeats.EventID)).
 			INNER_JOIN(table.Orders, table.Orders.ID.EQ(table.Tickets.OrderID)),
 	).WHERE(
-		table.Tickets.ID.EQ(utils.MysqlUuid(id)),
+		table.Tickets.ID.EQ(utils.MysqlUuid(*id)),
 	)
 
 	// Execute the query
@@ -57,18 +57,18 @@ func (tr *TicketRepository) GetTicketById(id *uuid.UUID) (*models.TicketDTO, *mo
 	return &ticket, nil
 }
 
-func (tr *TicketRepository) CreateTicket(ticket *model.Tickets) (*uuid.UUID, *models.KTSError) {
-	ticket.ID = utils.NewUUID()
+func (tr *TicketRepository) CreateTicket(ticket *model.Tickets) (*myid.UUID, *models.KTSError) {
+	ticket.ID = myid.New()
 	// Create the query
 	stmt := table.Tickets.INSERT(
 		table.Tickets.AllColumns,
 	).VALUES(
-		utils.MysqlUuid(ticket.ID),
+		ticket.ID,
 		ticket.Validated,
 		ticket.Price,
-		utils.MysqlUuid(ticket.PriceCategoryID),
-		utils.MysqlUuid(ticket.OrderID),
-		utils.MysqlUuid(ticket.EventSeatID),
+		ticket.PriceCategoryID,
+		ticket.OrderID,
+		ticket.EventSeatID,
 	)
 
 	log.Print(stmt.DebugSql())
@@ -88,17 +88,17 @@ func (tr *TicketRepository) CreateTicket(ticket *model.Tickets) (*uuid.UUID, *mo
 		return nil, kts_errors.KTS_CONFLICT
 	}
 
-	return ticket.ID, nil
+	return &ticket.ID, nil
 }
 
-func (tr *TicketRepository) ValidateTicket(id *uuid.UUID) *models.KTSError {
+func (tr *TicketRepository) ValidateTicket(id *myid.UUID) *models.KTSError {
 	// Create the query
 	stmt := table.Tickets.UPDATE(
 		table.Tickets.Validated,
 	).SET(
 		true,
 	).WHERE(
-		table.Tickets.ID.EQ(utils.MysqlUuid(id)),
+		table.Tickets.ID.EQ(utils.MysqlUuid(*id)),
 	)
 
 	// Execute the query

@@ -6,13 +6,13 @@ import (
 	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 
 	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/gen/KinoTicketSystem/model"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/managers"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/myid"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/samples"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
 )
@@ -23,7 +23,7 @@ func TestGetActorById(t *testing.T) {
 
 	actor := *samples.GetSampleActor()
 
-	id := uuid.MustParse(actor.ID.String())
+	id := myid.MustParse(actor.ID.String())
 
 	testCases := []struct {
 		name            string
@@ -34,7 +34,7 @@ func TestGetActorById(t *testing.T) {
 		{
 			name: "Select actor by id",
 			setExpectations: func(mock sqlmock.Sqlmock) {
-				mock.ExpectQuery(query).WithArgs(utils.EqUUID(&id)).
+				mock.ExpectQuery(query).WithArgs(utils.EqUUID(id)).
 					WillReturnRows(sqlmock.NewRows([]string{"actors.id", "actors.name", "actors.birthdate", "actors.description", "actor_pictures.id", "actor_pictures.actor_id", "actor_pictures.pic_url", "movies.id", "movies.title", "movies.description", "movies.banner_pic_url", "movies.cover_pic_url", "movies.trailer_url", "movies.rating", "movies.release_date", "movies.time_in_min", "movies.fsk"}).
 						AddRow(actor.ID, actor.Name, actor.Birthdate, actor.Description, actor.Pictures[0].ID, actor.Pictures[0].ActorID, actor.Pictures[0].PicURL, actor.Movies[0].ID, actor.Movies[0].Title, actor.Movies[0].Description, actor.Movies[0].BannerPicURL, actor.Movies[0].CoverPicURL, actor.Movies[0].TrailerURL, actor.Movies[0].Rating, actor.Movies[0].ReleaseDate, actor.Movies[0].TimeInMin, actor.Movies[0].Fsk).
 						AddRow(actor.ID, actor.Name, actor.Birthdate, actor.Description, actor.Pictures[1].ID, actor.Pictures[1].ActorID, actor.Pictures[1].PicURL, actor.Movies[0].ID, actor.Movies[0].Title, actor.Movies[0].Description, actor.Movies[0].BannerPicURL, actor.Movies[0].CoverPicURL, actor.Movies[0].TrailerURL, actor.Movies[0].Rating, actor.Movies[0].ReleaseDate, actor.Movies[0].TimeInMin, actor.Movies[0].Fsk).
@@ -49,7 +49,7 @@ func TestGetActorById(t *testing.T) {
 		{
 			name: "Select actor by id - no actor found",
 			setExpectations: func(mock sqlmock.Sqlmock) {
-				mock.ExpectQuery(query).WithArgs(utils.EqUUID(&id)).
+				mock.ExpectQuery(query).WithArgs(utils.EqUUID(id)).
 					WillReturnRows(sqlmock.NewRows([]string{"actors.id", "actors.name", "actors.birthdate", "actors.description", "actor_pictures.id", "actor_pictures.actor_id", "actor_pictures.pic_url", "movies.id", "movies.title", "movies.description", "movies.banner_pic_url", "movies.cover_pic_url", "movies.trailer_url", "movies.rating", "movies.release_date", "movies.time_in_min", "movies.fsk"}))
 			},
 			expectedActor: nil,
@@ -257,7 +257,7 @@ func TestCreateActorPicture(t *testing.T) {
 	picUrl := "pic.jpg"
 
 	ActorPicture := &model.ActorPictures{
-		ActorID: utils.NewUUID(),
+		ActorID: myid.New(),
 		PicURL:  &picUrl,
 	}
 

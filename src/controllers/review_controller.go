@@ -4,13 +4,13 @@ import (
 	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/gen/KinoTicketSystem/model"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/myid"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/repositories"
-	"github.com/google/uuid"
 )
 
 type ReviewControllerI interface {
-	CreateReview(reviewData models.CreateReviewRequest, userId *uuid.UUID) (*model.Reviews, string, *models.KTSError)
-	DeleteReview(id *uuid.UUID, userId *uuid.UUID) *models.KTSError
+	CreateReview(reviewData models.CreateReviewRequest, userId *myid.UUID) (*model.Reviews, string, *models.KTSError)
+	DeleteReview(id *myid.UUID, userId *myid.UUID) *models.KTSError
 }
 
 type ReviewController struct {
@@ -18,26 +18,26 @@ type ReviewController struct {
 	UserRepo   repositories.UserRepositoryI
 }
 
-func (rc ReviewController) CreateReview(reviewData models.CreateReviewRequest, userId *uuid.UUID) (*model.Reviews, string, *models.KTSError) {
+func (rc ReviewController) CreateReview(reviewData models.CreateReviewRequest, userId *myid.UUID) (*model.Reviews, string, *models.KTSError) {
 	user, kts_err := rc.UserRepo.GetUserById(userId)
 	if kts_err != nil {
 		return nil, "", kts_err
 	}
 
-	id := uuid.New()
-	movieId, err := uuid.Parse(reviewData.MovieID)
+	id := myid.New()
+	movieId, err := myid.Parse(reviewData.MovieID)
 	if err != nil {
 		return nil, "", kts_errors.KTS_BAD_REQUEST
 	}
 
 	review := model.Reviews{
-		ID:        &id,
+		ID:        id,
 		Rating:    reviewData.Rating,
 		Comment:   reviewData.Comment,
 		Datetime:  reviewData.Datetime,
 		IsSpoiler: &reviewData.IsSpoiler,
-		MovieID:   &movieId,
-		UserID:    userId,
+		MovieID:   movieId,
+		UserID:    *userId,
 	}
 
 	kts_error := rc.ReviewRepo.CreateReview(review)
@@ -48,12 +48,12 @@ func (rc ReviewController) CreateReview(reviewData models.CreateReviewRequest, u
 	return &review, *user.Username, nil
 }
 
-func (rc ReviewController) DeleteReview(id *uuid.UUID, userId *uuid.UUID) *models.KTSError {
+func (rc ReviewController) DeleteReview(id *myid.UUID, userId *myid.UUID) *models.KTSError {
 	review, err := rc.ReviewRepo.GetReviewById(id)
 	if err != nil {
 		return err
 	}
-	if *review.UserID != *userId {
+	if review.UserID != *userId {
 		return kts_errors.KTS_FORBIDDEN
 	}
 	kts_error := rc.ReviewRepo.DeleteReview(id)

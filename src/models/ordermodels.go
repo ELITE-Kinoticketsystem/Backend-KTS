@@ -2,16 +2,16 @@ package models
 
 import (
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/gen/KinoTicketSystem/model"
-	"github.com/google/uuid"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/myid"
 )
 
 type CreateOrderDTO struct {
 	EventSeatPriceCategories []struct {
-		EventSeatId     *uuid.UUID
-		PriceCategoryId *uuid.UUID
+		EventSeatId     *myid.UUID
+		PriceCategoryId *myid.UUID
 	}
 
-	PaymentMethodID *uuid.UUID
+	PaymentMethodID *myid.UUID
 }
 
 type GetOrderDTO struct {

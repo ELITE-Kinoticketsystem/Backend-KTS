@@ -11,9 +11,9 @@ import (
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/handlers"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/mocks"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/myid"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/samples"
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
 )
@@ -180,7 +180,7 @@ func TestCreateCinemaHall(t *testing.T) {
 }
 
 func TestGetCinemaHallsForTheatre(t *testing.T) {
-	theatreId := uuid.New()
+	theatreId := myid.New()
 	sampleCinemaHalls := samples.GetSampleCinemaHalls()
 
 	testCases := []struct {

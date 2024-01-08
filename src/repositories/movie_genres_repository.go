@@ -5,16 +5,16 @@ import (
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/gen/KinoTicketSystem/table"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/managers"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/myid"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
-	"github.com/google/uuid"
 )
 
 type MovieGenreRepositoryI interface {
 	// Combine Movie and Genre
-	AddMovieGenre(movieId *uuid.UUID, genreId *uuid.UUID) *models.KTSError
-	RemoveMovieGenre(movieId *uuid.UUID, genreId *uuid.UUID) *models.KTSError
-	RemoveAllGenreCombinationWithMovie(movieId *uuid.UUID) *models.KTSError
-	RemoveAllMovieCombinationWithGenre(genreId *uuid.UUID) *models.KTSError
+	AddMovieGenre(movieId *myid.UUID, genreId *myid.UUID) *models.KTSError
+	RemoveMovieGenre(movieId *myid.UUID, genreId *myid.UUID) *models.KTSError
+	RemoveAllGenreCombinationWithMovie(movieId *myid.UUID) *models.KTSError
+	RemoveAllMovieCombinationWithGenre(genreId *myid.UUID) *models.KTSError
 }
 
 type MovieGenreRepository struct {
@@ -22,10 +22,10 @@ type MovieGenreRepository struct {
 }
 
 // Combine Movie and Genre
-func (mgr *MovieGenreRepository) AddMovieGenre(movieId *uuid.UUID, genreId *uuid.UUID) *models.KTSError {
+func (mgr *MovieGenreRepository) AddMovieGenre(movieId *myid.UUID, genreId *myid.UUID) *models.KTSError {
 	// Create the insert statement
 	insertQuery := table.MovieGenres.INSERT(table.MovieGenres.MovieID, table.MovieGenres.GenreID).
-		VALUES(utils.MysqlUuid(movieId), utils.MysqlUuid(genreId))
+		VALUES(utils.MysqlUuid(*movieId), utils.MysqlUuid(*genreId))
 
 	// Execute the query
 	rows, err := insertQuery.Exec(mgr.DatabaseManager.GetDatabaseConnection())
@@ -45,11 +45,11 @@ func (mgr *MovieGenreRepository) AddMovieGenre(movieId *uuid.UUID, genreId *uuid
 	return nil
 }
 
-func (mgr *MovieGenreRepository) RemoveMovieGenre(movieId *uuid.UUID, genreId *uuid.UUID) *models.KTSError {
+func (mgr *MovieGenreRepository) RemoveMovieGenre(movieId *myid.UUID, genreId *myid.UUID) *models.KTSError {
 
 	deleteQuery := table.MovieGenres.DELETE().WHERE(
-		table.MovieGenres.MovieID.EQ(utils.MysqlUuid(movieId)).AND(
-			table.MovieGenres.GenreID.EQ(utils.MysqlUuid(genreId)),
+		table.MovieGenres.MovieID.EQ(utils.MysqlUuid(*movieId)).AND(
+			table.MovieGenres.GenreID.EQ(utils.MysqlUuid(*genreId)),
 		),
 	)
 
@@ -71,9 +71,9 @@ func (mgr *MovieGenreRepository) RemoveMovieGenre(movieId *uuid.UUID, genreId *u
 	return nil
 }
 
-func (mgr *MovieGenreRepository) RemoveAllGenreCombinationWithMovie(movieId *uuid.UUID) *models.KTSError {
+func (mgr *MovieGenreRepository) RemoveAllGenreCombinationWithMovie(movieId *myid.UUID) *models.KTSError {
 	deleteQuery := table.MovieGenres.DELETE().WHERE(
-		table.MovieGenres.MovieID.EQ(utils.MysqlUuid(movieId)),
+		table.MovieGenres.MovieID.EQ(utils.MysqlUuid(*movieId)),
 	)
 
 	// Execute the query
@@ -86,9 +86,9 @@ func (mgr *MovieGenreRepository) RemoveAllGenreCombinationWithMovie(movieId *uui
 
 }
 
-func (mgr *MovieGenreRepository) RemoveAllMovieCombinationWithGenre(genreId *uuid.UUID) *models.KTSError {
+func (mgr *MovieGenreRepository) RemoveAllMovieCombinationWithGenre(genreId *myid.UUID) *models.KTSError {
 	deleteQuery := table.MovieGenres.DELETE().WHERE(
-		table.MovieGenres.GenreID.EQ(utils.MysqlUuid(genreId)),
+		table.MovieGenres.GenreID.EQ(utils.MysqlUuid(*genreId)),
 	)
 
 	// Execute the query

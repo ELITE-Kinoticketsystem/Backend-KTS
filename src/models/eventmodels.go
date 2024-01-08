@@ -2,13 +2,13 @@ package models
 
 import (
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/gen/KinoTicketSystem/model"
-	"github.com/google/uuid"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/myid"
 )
 
 type CreateEvtDTO struct {
 	model.Events
 
-	Movies []*uuid.UUID
+	Movies []*myid.UUID
 
 	EventSeatCategories []model.EventSeatCategories
 }

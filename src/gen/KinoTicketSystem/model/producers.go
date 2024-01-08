@@ -8,12 +8,12 @@
 package model
 
 import (
-	"github.com/google/uuid"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/myid"
 	"time"
 )
 
 type Producers struct {
-	ID          *uuid.UUID `sql:"primary_key"`
+	ID          myid.UUID `sql:"primary_key"`
 	Name        string
 	Birthdate   time.Time
 	Description string

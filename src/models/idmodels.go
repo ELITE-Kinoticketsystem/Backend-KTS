@@ -1,7 +1,7 @@
 package models
 
-import "github.com/google/uuid"
+import "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/myid"
 
 type IdResponse struct {
-	Id *uuid.UUID `json:"id"`
+	Id *myid.UUID `json:"id"`
 }

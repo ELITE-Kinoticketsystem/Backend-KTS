@@ -6,21 +6,20 @@ import (
 
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/gen/KinoTicketSystem/model"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
-	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
-	"github.com/google/uuid"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/myid"
 )
 
 func GetSampleMovies() *[]model.Movies {
 	modelMovies := []model.Movies{}
-	uuid1 := uuid.New()
-	uuid2 := uuid.New()
+	uuid1 := myid.New()
+	uuid2 := myid.New()
 	banner := ""
 	cover := ""
 	trailer := ""
 	rating := 5.0
 
 	modelMovies = append(modelMovies, model.Movies{
-		ID:           &uuid1,
+		ID:           uuid1,
 		Title:        "Test Movie 1",
 		Description:  "Test Description 1",
 		BannerPicURL: &banner,
@@ -33,7 +32,7 @@ func GetSampleMovies() *[]model.Movies {
 	})
 
 	modelMovies = append(modelMovies, model.Movies{
-		ID:           &uuid2,
+		ID:           uuid2,
 		Title:        "Test Movie 2",
 		Description:  "Test Description 2",
 		BannerPicURL: &banner,
@@ -50,7 +49,7 @@ func GetSampleMovies() *[]model.Movies {
 
 func GetSampleMovieById() *model.Movies {
 	modelMovies := model.Movies{}
-	uuid1, err := uuid.Parse("6ba7b826-9dad-11d1-80b4-00c04fd430c0")
+	uuid1, err := myid.Parse("6ba7b826-9dad-11d1-80b4-00c04fd430c0")
 	if err != nil {
 		log.Print("GetSampleMovieById: Parsing UUID does not work")
 	}
@@ -60,7 +59,7 @@ func GetSampleMovieById() *model.Movies {
 	rating := 5.0
 
 	modelMovies = model.Movies{
-		ID:           &uuid1,
+		ID:           uuid1,
 		Title:        "Test Movie 1",
 		Description:  "Test Description 1",
 		BannerPicURL: &banner,
@@ -77,16 +76,16 @@ func GetSampleMovieById() *model.Movies {
 
 func GetSampleGenres() *[]model.Genres {
 	modelGenres := []model.Genres{}
-	uuid1 := uuid.New()
-	uuid2 := uuid.New()
+	uuid1 := myid.New()
+	uuid2 := myid.New()
 
 	modelGenres = append(modelGenres, model.Genres{
-		ID:        &uuid1,
+		ID:        uuid1,
 		GenreName: "Action",
 	})
 
 	modelGenres = append(modelGenres, model.Genres{
-		ID:        &uuid2,
+		ID:        uuid2,
 		GenreName: "Drama",
 	})
 
@@ -95,10 +94,10 @@ func GetSampleGenres() *[]model.Genres {
 
 func GetSampleGenre() *model.Genres {
 	modelGenres := model.Genres{}
-	uuid1 := uuid.MustParse("6ba7b820-9dad-11d1-80b4-00c04fd430c4")
+	uuid1 := myid.MustParse("6ba7b820-9dad-11d1-80b4-00c04fd430c4")
 
 	modelGenres = model.Genres{
-		ID:        &uuid1,
+		ID:        uuid1,
 		GenreName: "Action",
 	}
 
@@ -108,9 +107,9 @@ func GetSampleGenre() *model.Genres {
 func GetSampleMovieByIdWithGenre() *models.MovieWithGenres {
 	movieWithGenre := models.MovieWithGenres{}
 
-	uuid1 := uuid.MustParse("6ba7b827-9dad-11d1-80b4-00c04fd430c1")
-	uuid2 := uuid.MustParse("6ba7b820-9dad-11d1-80b4-00c04fd430c4")
-	uuid3 := uuid.MustParse("6ba7b821-9dad-11d1-80b4-00c04fd430c5")
+	uuid1 := myid.MustParse("6ba7b827-9dad-11d1-80b4-00c04fd430c1")
+	uuid2 := myid.MustParse("6ba7b820-9dad-11d1-80b4-00c04fd430c4")
+	uuid3 := myid.MustParse("6ba7b821-9dad-11d1-80b4-00c04fd430c5")
 
 	banner := ""
 	cover := ""
@@ -119,7 +118,7 @@ func GetSampleMovieByIdWithGenre() *models.MovieWithGenres {
 
 	movieWithGenre = models.MovieWithGenres{
 		Movies: model.Movies{
-			ID:           &uuid1,
+			ID:           uuid1,
 			Title:        "Test Movie 1",
 			Description:  "Test Description 1",
 			BannerPicURL: &banner,
@@ -135,13 +134,13 @@ func GetSampleMovieByIdWithGenre() *models.MovieWithGenres {
 		}{
 			{
 				model.Genres{
-					ID:        &uuid2,
+					ID:        uuid2,
 					GenreName: "Action",
 				},
 			},
 			{
 				model.Genres{
-					ID:        &uuid3,
+					ID:        uuid3,
 					GenreName: "Drama",
 				},
 			},
@@ -155,9 +154,9 @@ func GetSampleMovieByIdWithGenre() *models.MovieWithGenres {
 func GetSampleGenreByNameWithMovies() *models.GenreWithMovies {
 	genreByNameWithMovies := models.GenreWithMovies{}
 
-	uuid1 := uuid.MustParse("6ba7b820-9dad-11d1-80b4-00c04fd430c4")
-	uuid2 := uuid.MustParse("6ba7b827-9dad-11d1-80b4-00c04fd430c1")
-	uuid3 := uuid.MustParse("6ba7b828-9dad-11d1-80b4-00c04fd430c2")
+	uuid1 := myid.MustParse("6ba7b820-9dad-11d1-80b4-00c04fd430c4")
+	uuid2 := myid.MustParse("6ba7b827-9dad-11d1-80b4-00c04fd430c1")
+	uuid3 := myid.MustParse("6ba7b828-9dad-11d1-80b4-00c04fd430c2")
 	banner := ""
 	cover := ""
 	trailer := ""
@@ -165,7 +164,7 @@ func GetSampleGenreByNameWithMovies() *models.GenreWithMovies {
 
 	genreByNameWithMovies = models.GenreWithMovies{
 		Genres: model.Genres{
-			ID:        &uuid1,
+			ID:        uuid1,
 			GenreName: "Action",
 		},
 		Movies: []struct {
@@ -173,7 +172,7 @@ func GetSampleGenreByNameWithMovies() *models.GenreWithMovies {
 		}{
 			{
 				model.Movies{
-					ID:           &uuid2,
+					ID:           uuid2,
 					Title:        "Test Movie 1",
 					Description:  "Test Description 1",
 					BannerPicURL: &banner,
@@ -187,7 +186,7 @@ func GetSampleGenreByNameWithMovies() *models.GenreWithMovies {
 			},
 			{
 				model.Movies{
-					ID:           &uuid3,
+					ID:           uuid3,
 					Title:        "Test Movie 2",
 					Description:  "Test Description 2",
 					BannerPicURL: &banner,
@@ -208,12 +207,12 @@ func GetSampleGenreByNameWithMovies() *models.GenreWithMovies {
 func GetSampleGenresWithMovies() *[]models.GenreWithMovies {
 	genresWithMovies := []models.GenreWithMovies{}
 
-	uuid1 := uuid.MustParse("6ba7b820-9dad-11d1-80b4-00c04fd430c4")
-	uuid2 := uuid.MustParse("6ba7b827-9dad-11d1-80b4-00c04fd430c1")
-	uuid3 := uuid.MustParse("6ba7b828-9dad-11d1-80b4-00c04fd430c2")
-	uuid4 := uuid.MustParse("6ba7b821-9dad-11d1-80b4-00c04fd430c5")
-	uuid5 := uuid.MustParse("6ba7b829-9dad-11d1-80b4-00c04fd430c3")
-	uuid6 := uuid.MustParse("6ba7b82a-9dad-11d1-80b4-00c04fd430c4")
+	uuid1 := myid.MustParse("6ba7b820-9dad-11d1-80b4-00c04fd430c4")
+	uuid2 := myid.MustParse("6ba7b827-9dad-11d1-80b4-00c04fd430c1")
+	uuid3 := myid.MustParse("6ba7b828-9dad-11d1-80b4-00c04fd430c2")
+	uuid4 := myid.MustParse("6ba7b821-9dad-11d1-80b4-00c04fd430c5")
+	uuid5 := myid.MustParse("6ba7b829-9dad-11d1-80b4-00c04fd430c3")
+	uuid6 := myid.MustParse("6ba7b82a-9dad-11d1-80b4-00c04fd430c4")
 	banner := ""
 	cover := ""
 	trailer := ""
@@ -221,7 +220,7 @@ func GetSampleGenresWithMovies() *[]models.GenreWithMovies {
 
 	genresWithMovies = append(genresWithMovies, models.GenreWithMovies{
 		Genres: model.Genres{
-			ID:        &uuid1,
+			ID:        uuid1,
 			GenreName: "Action",
 		},
 		Movies: []struct {
@@ -229,7 +228,7 @@ func GetSampleGenresWithMovies() *[]models.GenreWithMovies {
 		}{
 			{
 				model.Movies{
-					ID:           &uuid2,
+					ID:           uuid2,
 					Title:        "Test Movie 1",
 					Description:  "Test Description 1",
 					BannerPicURL: &banner,
@@ -243,7 +242,7 @@ func GetSampleGenresWithMovies() *[]models.GenreWithMovies {
 			},
 			{
 				model.Movies{
-					ID:           &uuid3,
+					ID:           uuid3,
 					Title:        "Test Movie 2",
 					Description:  "Test Description 2",
 					BannerPicURL: &banner,
@@ -260,7 +259,7 @@ func GetSampleGenresWithMovies() *[]models.GenreWithMovies {
 
 	genresWithMovies = append(genresWithMovies, models.GenreWithMovies{
 		Genres: model.Genres{
-			ID:        &uuid4,
+			ID:        uuid4,
 			GenreName: "Drama",
 		},
 		Movies: []struct {
@@ -268,7 +267,7 @@ func GetSampleGenresWithMovies() *[]models.GenreWithMovies {
 		}{
 			{
 				model.Movies{
-					ID:           &uuid5,
+					ID:           uuid5,
 					Title:        "Test Movie 3",
 					Description:  "Test Description 3",
 					BannerPicURL: &banner,
@@ -282,7 +281,7 @@ func GetSampleGenresWithMovies() *[]models.GenreWithMovies {
 			},
 			{
 				model.Movies{
-					ID:           &uuid6,
+					ID:           uuid6,
 					Title:        "Test Movie 4",
 					Description:  "Test Description 4",
 					BannerPicURL: &banner,
@@ -303,10 +302,10 @@ func GetSampleGenresWithMovies() *[]models.GenreWithMovies {
 func GetSampleMoviesWithGenres() *[]models.MovieWithGenres {
 	movieWithGenres := []models.MovieWithGenres{}
 
-	uuid1 := uuid.MustParse("6ba7b820-9dad-11d1-80b4-00c04fd430c4")
-	uuid2 := uuid.MustParse("6ba7b827-9dad-11d1-80b4-00c04fd430c1")
-	uuid3 := uuid.MustParse("6ba7b828-9dad-11d1-80b4-00c04fd430c2")
-	uuid4 := uuid.MustParse("6ba7b821-9dad-11d1-80b4-00c04fd430c5")
+	uuid1 := myid.MustParse("6ba7b820-9dad-11d1-80b4-00c04fd430c4")
+	uuid2 := myid.MustParse("6ba7b827-9dad-11d1-80b4-00c04fd430c1")
+	uuid3 := myid.MustParse("6ba7b828-9dad-11d1-80b4-00c04fd430c2")
+	uuid4 := myid.MustParse("6ba7b821-9dad-11d1-80b4-00c04fd430c5")
 	banner := ""
 	cover := ""
 	trailer := ""
@@ -314,7 +313,7 @@ func GetSampleMoviesWithGenres() *[]models.MovieWithGenres {
 
 	movieWithGenres = append(movieWithGenres, models.MovieWithGenres{
 		Movies: model.Movies{
-			ID:           &uuid1,
+			ID:           uuid1,
 			Title:        "Test Movie 1",
 			Description:  "Test Description 1",
 			BannerPicURL: &banner,
@@ -330,13 +329,13 @@ func GetSampleMoviesWithGenres() *[]models.MovieWithGenres {
 		}{
 			{
 				model.Genres{
-					ID:        &uuid2,
+					ID:        uuid2,
 					GenreName: "Action",
 				},
 			},
 			{
 				model.Genres{
-					ID:        &uuid3,
+					ID:        uuid3,
 					GenreName: "Drama",
 				},
 			},
@@ -345,7 +344,7 @@ func GetSampleMoviesWithGenres() *[]models.MovieWithGenres {
 
 	movieWithGenres = append(movieWithGenres, models.MovieWithGenres{
 		Movies: model.Movies{
-			ID:           &uuid4,
+			ID:           uuid4,
 			Title:        "Test Movie 2",
 			Description:  "Test Description 2",
 			BannerPicURL: &banner,
@@ -361,7 +360,7 @@ func GetSampleMoviesWithGenres() *[]models.MovieWithGenres {
 		}{
 			{
 				model.Genres{
-					ID:        &uuid3,
+					ID:        uuid3,
 					GenreName: "Drama",
 				},
 			},
@@ -374,8 +373,8 @@ func GetSampleMoviesWithGenres() *[]models.MovieWithGenres {
 func GetSampleMovieByIdWithEverything() *models.MovieWithEverything {
 	movieWithEverything := models.MovieWithEverything{}
 
-	// uuid1 := uuid.MustParse("6ba7b820-9dad-11d1-80b4-00c04fd430c4")
-	movieId := utils.NewUUID()
+	// uuid1 := myid.MustParse("6ba7b820-9dad-11d1-80b4-00c04fd430c4")
+	movieId := myid.NewUUID()
 
 	banner := ""
 	cover := ""
@@ -385,7 +384,7 @@ func GetSampleMovieByIdWithEverything() *models.MovieWithEverything {
 
 	movieWithEverything = models.MovieWithEverything{
 		Movies: model.Movies{
-			ID:           movieId,
+			ID:           *movieId,
 			Title:        "Test Movie 1",
 			Description:  "Test Description 1",
 			BannerPicURL: &banner,
@@ -401,7 +400,7 @@ func GetSampleMovieByIdWithEverything() *models.MovieWithEverything {
 		}{
 			{
 				model.Genres{
-					ID:        utils.NewUUID(),
+					ID:        myid.New(),
 					GenreName: "Action",
 				},
 			},
@@ -411,7 +410,7 @@ func GetSampleMovieByIdWithEverything() *models.MovieWithEverything {
 		}{
 			{
 				model.Actors{
-					ID:          utils.NewUUID(),
+					ID:          myid.New(),
 					Name:        "MaxActor Mustermann",
 					Birthdate:   time.Now(),
 					Description: "This is a description",
@@ -423,7 +422,7 @@ func GetSampleMovieByIdWithEverything() *models.MovieWithEverything {
 		}{
 			{
 				model.Producers{
-					ID:          utils.NewUUID(),
+					ID:          myid.New(),
 					Name:        "MaxProducer Mustermann",
 					Birthdate:   time.Now(),
 					Description: "This is a description",
@@ -437,13 +436,13 @@ func GetSampleMovieByIdWithEverything() *models.MovieWithEverything {
 		}{
 			{
 				Review: model.Reviews{
-					ID:        utils.NewUUID(),
+					ID:        myid.New(),
 					Rating:    4.0,
 					Comment:   "This is a comment",
 					Datetime:  time.Now(),
 					IsSpoiler: &isSpoiler,
-					UserID:    utils.NewUUID(),
-					MovieID:   movieId,
+					UserID:    myid.New(),
+					MovieID:   *movieId,
 				},
 				Username: "Max Mustermann",
 			},
@@ -456,10 +455,10 @@ func GetSampleMovieByIdWithEverything() *models.MovieWithEverything {
 func GetSampleMovieDTOCreate() *models.MovieDTOCreate {
 	movieDTO := models.MovieDTOCreate{}
 
-	uuid1 := uuid.MustParse("6ba7b820-9dad-11d1-80b4-00c04fd430c4")
-	uuid2 := uuid.MustParse("6ba7b827-9dad-11d1-80b4-00c04fd430c1")
-	uuid5 := uuid.MustParse("6ba7b829-9dad-11d1-80b4-00c04fd430c3")
-	uuid7 := uuid.MustParse("6ba7b82b-9dad-11d1-80b4-00c04fd430c5")
+	uuid1 := myid.MustParse("6ba7b820-9dad-11d1-80b4-00c04fd430c4")
+	uuid2 := myid.MustParse("6ba7b827-9dad-11d1-80b4-00c04fd430c1")
+	uuid5 := myid.MustParse("6ba7b829-9dad-11d1-80b4-00c04fd430c3")
+	uuid7 := myid.MustParse("6ba7b82b-9dad-11d1-80b4-00c04fd430c5")
 
 	banner := ""
 	cover := ""
@@ -468,7 +467,7 @@ func GetSampleMovieDTOCreate() *models.MovieDTOCreate {
 
 	movieDTO = models.MovieDTOCreate{
 		Movies: model.Movies{
-			ID:           &uuid1,
+			ID:           uuid1,
 			Title:        "Test Movie 1",
 			Description:  "Test Description 1",
 			BannerPicURL: &banner,
@@ -480,21 +479,21 @@ func GetSampleMovieDTOCreate() *models.MovieDTOCreate {
 			Fsk:          18,
 		},
 		GenresID: []struct {
-			ID *uuid.UUID
+			ID *myid.UUID
 		}{
 			{
 				ID: &uuid2,
 			},
 		},
 		ActorsID: []struct {
-			ID *uuid.UUID
+			ID *myid.UUID
 		}{
 			{
 				ID: &uuid5,
 			},
 		},
 		ProducersID: []struct {
-			ID *uuid.UUID
+			ID *myid.UUID
 		}{
 			{
 				ID: &uuid7,

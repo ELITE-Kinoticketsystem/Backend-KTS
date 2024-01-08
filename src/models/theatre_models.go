@@ -1,6 +1,6 @@
 package models
 
-import "github.com/google/uuid"
+import "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/myid"
 
 type CreateTheatreRequest struct {
 	Name    string
@@ -22,5 +22,5 @@ type CreateCinemaHallRequest struct {
 		Type     string
 		Category string
 	}
-	TheatreId *uuid.UUID
+	TheatreId *myid.UUID
 }

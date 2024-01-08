@@ -13,7 +13,7 @@ import (
 
 	model "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/gen/KinoTicketSystem/model"
 	models "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
-	uuid "github.com/google/uuid"
+	myid "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/myid"
 	gomock "go.uber.org/mock/gomock"
 )
 
@@ -41,7 +41,7 @@ func (m *MockReviewControllerI) EXPECT() *MockReviewControllerIMockRecorder {
 }
 
 // CreateReview mocks base method.
-func (m *MockReviewControllerI) CreateReview(reviewData models.CreateReviewRequest, userId *uuid.UUID) (*model.Reviews, string, *models.KTSError) {
+func (m *MockReviewControllerI) CreateReview(reviewData models.CreateReviewRequest, userId *myid.UUID) (*model.Reviews, string, *models.KTSError) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateReview", reviewData, userId)
 	ret0, _ := ret[0].(*model.Reviews)
@@ -57,7 +57,7 @@ func (mr *MockReviewControllerIMockRecorder) CreateReview(reviewData, userId any
 }
 
 // DeleteReview mocks base method.
-func (m *MockReviewControllerI) DeleteReview(id, userId *uuid.UUID) *models.KTSError {
+func (m *MockReviewControllerI) DeleteReview(id, userId *myid.UUID) *models.KTSError {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DeleteReview", id, userId)
 	ret0, _ := ret[0].(*models.KTSError)

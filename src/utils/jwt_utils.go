@@ -5,9 +5,9 @@ import (
 	"os"
 	"time"
 
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/myid"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/google/uuid"
 )
 
 var key = os.Getenv("JWT_SECRET")
@@ -18,7 +18,7 @@ const refreshTokenLifeSpan = 3 * 24 * 60 * 60 // 3 days
 const leeway = 5 * 60                         // 5 minutes
 const issuer = "KTS"
 
-func GenerateJWT(userId *uuid.UUID) (string, string, error) {
+func GenerateJWT(userId *myid.UUID) (string, string, error) {
 	now := time.Now()
 
 	claims := &jwt.MapClaims{
@@ -51,7 +51,7 @@ func GenerateJWT(userId *uuid.UUID) (string, string, error) {
 	return signedToken, signedRefreshToken, err
 }
 
-func ValidateToken(tokenString string) (*uuid.UUID, error) {
+func ValidateToken(tokenString string) (*myid.UUID, error) {
 	validMethodsOption := jwt.WithValidMethods([]string{jwt.SigningMethodHS256.Alg()})
 	leewayOption := jwt.WithLeeway(time.Duration(leeway) * time.Second)
 	issuerOption := jwt.WithIssuer(issuer)
@@ -72,7 +72,7 @@ func ValidateToken(tokenString string) (*uuid.UUID, error) {
 		return nil, jwt.ErrTokenUnverifiable
 	}
 
-	userId, err := uuid.Parse(claims["sub"].(string))
+	userId, err := myid.Parse(claims["sub"].(string))
 	if err != nil {
 		return nil, err
 	}
@@ -102,9 +102,9 @@ func SetJWTCookies(c *gin.Context, token string, refreshToken string, expired bo
 
 	// for development
 	http.SetCookie(c.Writer, &http.Cookie{
-		Name:     "token",
-		Value:    token,
-		Path:     "/",
+		Name:  "token",
+		Value: token,
+		Path:  "/",
 		/* Domain */
 		MaxAge:   lifespan,
 		Secure:   true,
@@ -113,9 +113,9 @@ func SetJWTCookies(c *gin.Context, token string, refreshToken string, expired bo
 	})
 
 	http.SetCookie(c.Writer, &http.Cookie{
-		Name:     "refreshToken",
-		Value:    refreshToken,
-		Path:     "/",
+		Name:  "refreshToken",
+		Value: refreshToken,
+		Path:  "/",
 		/* Domain */
 		MaxAge:   refreshLifespan,
 		Secure:   true,

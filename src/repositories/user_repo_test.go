@@ -107,7 +107,7 @@ func TestGetUserById(t *testing.T) {
 
 			// WHEN
 			// call GetUserByUsername with username
-			user, kts_err := userRepo.GetUserById(id)
+			user, kts_err := userRepo.GetUserById(&id)
 
 			// THEN
 			// check expected error, user and expectations

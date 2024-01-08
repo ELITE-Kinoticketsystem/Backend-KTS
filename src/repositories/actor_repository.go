@@ -6,26 +6,26 @@ import (
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/gen/KinoTicketSystem/table"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/managers"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/myid"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
 
 	"github.com/go-jet/jet/v2/mysql"
-	"github.com/google/uuid"
 )
 
 type ActorRepoI interface {
-	GetActorById(actorId *uuid.UUID) (*models.ActorDTO, *models.KTSError)
+	GetActorById(actorId *myid.UUID) (*models.ActorDTO, *models.KTSError)
 	GetActors() (*[]models.GetActorsDTO, *models.KTSError)
-	CreateActor(actor *model.Actors) (*uuid.UUID, *models.KTSError)
+	CreateActor(actor *model.Actors) (*myid.UUID, *models.KTSError)
 
 	// Actor pictures
-	CreateActorPicture(actorPicture *model.ActorPictures) (*uuid.UUID, *models.KTSError)
+	CreateActorPicture(actorPicture *model.ActorPictures) (*myid.UUID, *models.KTSError)
 }
 
 type ActorRepository struct {
 	DatabaseManager *managers.DatabaseManager
 }
 
-func (ar *ActorRepository) GetActorById(actorId *uuid.UUID) (*models.ActorDTO, *models.KTSError) {
+func (ar *ActorRepository) GetActorById(actorId *myid.UUID) (*models.ActorDTO, *models.KTSError) {
 	var actor models.ActorDTO
 
 	stmt := mysql.SELECT(
@@ -40,7 +40,7 @@ func (ar *ActorRepository) GetActorById(actorId *uuid.UUID) (*models.ActorDTO, *
 				LEFT_JOIN(table.Movies, table.Movies.ID.EQ(table.MovieActors.MovieID)),
 		).
 		WHERE(
-			table.Actors.ID.EQ(utils.MysqlUuid(actorId)),
+			table.Actors.ID.EQ(utils.MysqlUuid(*actorId)),
 		)
 
 	err := stmt.Query(ar.DatabaseManager.GetDatabaseConnection(), &actor)
@@ -77,8 +77,8 @@ func (ar *ActorRepository) GetActors() (*[]models.GetActorsDTO, *models.KTSError
 	return &actors, nil
 }
 
-func (ar *ActorRepository) CreateActor(actor *model.Actors) (*uuid.UUID, *models.KTSError) {
-	actor.ID = utils.NewUUID()
+func (ar *ActorRepository) CreateActor(actor *model.Actors) (*myid.UUID, *models.KTSError) {
+	actor.ID = myid.New()
 
 	insertStmt := table.Actors.INSERT(table.Actors.AllColumns).VALUES(
 		utils.MysqlUuid(actor.ID),
@@ -103,11 +103,11 @@ func (ar *ActorRepository) CreateActor(actor *model.Actors) (*uuid.UUID, *models
 		return nil, kts_errors.KTS_INTERNAL_ERROR
 	}
 
-	return actor.ID, nil
+	return &actor.ID, nil
 }
 
-func (ar *ActorRepository) CreateActorPicture(actorPicture *model.ActorPictures) (*uuid.UUID, *models.KTSError) {
-	actorPicture.ID = utils.NewUUID()
+func (ar *ActorRepository) CreateActorPicture(actorPicture *model.ActorPictures) (*myid.UUID, *models.KTSError) {
+	actorPicture.ID = myid.New()
 
 	insertStmt := table.ActorPictures.INSERT(table.ActorPictures.AllColumns).VALUES(
 		utils.MysqlUuid(actorPicture.ID),
@@ -131,5 +131,5 @@ func (ar *ActorRepository) CreateActorPicture(actorPicture *model.ActorPictures)
 		return nil, kts_errors.KTS_INTERNAL_ERROR
 	}
 
-	return actorPicture.ID, nil
+	return &actorPicture.ID, nil
 }

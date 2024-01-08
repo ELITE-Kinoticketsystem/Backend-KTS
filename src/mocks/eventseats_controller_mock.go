@@ -13,7 +13,7 @@ import (
 	time "time"
 
 	models "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
-	uuid "github.com/google/uuid"
+	myid "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/myid"
 	gomock "go.uber.org/mock/gomock"
 )
 
@@ -41,7 +41,7 @@ func (m *MockEventSeatControllerI) EXPECT() *MockEventSeatControllerIMockRecorde
 }
 
 // AreUserSeatsNextToEachOther mocks base method.
-func (m *MockEventSeatControllerI) AreUserSeatsNextToEachOther(eventId, userId, eventSeatId *uuid.UUID) (bool, *models.KTSError) {
+func (m *MockEventSeatControllerI) AreUserSeatsNextToEachOther(eventId, userId, eventSeatId *myid.UUID) (bool, *models.KTSError) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "AreUserSeatsNextToEachOther", eventId, userId, eventSeatId)
 	ret0, _ := ret[0].(bool)
@@ -56,7 +56,7 @@ func (mr *MockEventSeatControllerIMockRecorder) AreUserSeatsNextToEachOther(even
 }
 
 // BlockEventSeat mocks base method.
-func (m *MockEventSeatControllerI) BlockEventSeat(eventId, eventSeatId, userId *uuid.UUID) (*time.Time, *models.KTSError) {
+func (m *MockEventSeatControllerI) BlockEventSeat(eventId, eventSeatId, userId *myid.UUID) (*time.Time, *models.KTSError) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "BlockEventSeat", eventId, eventSeatId, userId)
 	ret0, _ := ret[0].(*time.Time)
@@ -71,7 +71,7 @@ func (mr *MockEventSeatControllerIMockRecorder) BlockEventSeat(eventId, eventSea
 }
 
 // GetEventSeats mocks base method.
-func (m *MockEventSeatControllerI) GetEventSeats(eventId, userId *uuid.UUID) (*[][]models.GetSeatsForSeatSelectorDTO, *[]models.GetSeatsForSeatSelectorDTO, *time.Time, *models.KTSError) {
+func (m *MockEventSeatControllerI) GetEventSeats(eventId, userId *myid.UUID) (*[][]models.GetSeatsForSeatSelectorDTO, *[]models.GetSeatsForSeatSelectorDTO, *time.Time, *models.KTSError) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetEventSeats", eventId, userId)
 	ret0, _ := ret[0].(*[][]models.GetSeatsForSeatSelectorDTO)
@@ -88,7 +88,7 @@ func (mr *MockEventSeatControllerIMockRecorder) GetEventSeats(eventId, userId an
 }
 
 // GetSelectedSeats mocks base method.
-func (m *MockEventSeatControllerI) GetSelectedSeats(eventId, userId *uuid.UUID) (*[]models.GetSlectedSeatsDTO, *models.KTSError) {
+func (m *MockEventSeatControllerI) GetSelectedSeats(eventId, userId *myid.UUID) (*[]models.GetSlectedSeatsDTO, *models.KTSError) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetSelectedSeats", eventId, userId)
 	ret0, _ := ret[0].(*[]models.GetSlectedSeatsDTO)
@@ -103,7 +103,7 @@ func (mr *MockEventSeatControllerIMockRecorder) GetSelectedSeats(eventId, userId
 }
 
 // UnblockAllEventSeats mocks base method.
-func (m *MockEventSeatControllerI) UnblockAllEventSeats(eventId, userId *uuid.UUID) *models.KTSError {
+func (m *MockEventSeatControllerI) UnblockAllEventSeats(eventId, userId *myid.UUID) *models.KTSError {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UnblockAllEventSeats", eventId, userId)
 	ret0, _ := ret[0].(*models.KTSError)
@@ -117,7 +117,7 @@ func (mr *MockEventSeatControllerIMockRecorder) UnblockAllEventSeats(eventId, us
 }
 
 // UnblockEventSeat mocks base method.
-func (m *MockEventSeatControllerI) UnblockEventSeat(eventId, eventSeatId, userId *uuid.UUID) (*time.Time, *models.KTSError) {
+func (m *MockEventSeatControllerI) UnblockEventSeat(eventId, eventSeatId, userId *myid.UUID) (*time.Time, *models.KTSError) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UnblockEventSeat", eventId, eventSeatId, userId)
 	ret0, _ := ret[0].(*time.Time)

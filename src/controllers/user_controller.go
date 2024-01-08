@@ -4,9 +4,9 @@ import (
 	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/gen/KinoTicketSystem/model"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/myid"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/repositories"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
-	"github.com/google/uuid"
 )
 
 type UserControllerI interface {
@@ -21,7 +21,7 @@ type UserController struct {
 }
 
 func (uc *UserController) RegisterUser(registrationData models.RegistrationRequest) (*models.LoginResponse, *models.KTSError) {
-	userId := uuid.New()
+	userId := myid.New()
 
 	hash, err := utils.HashPassword(registrationData.Password)
 	if err != nil {
@@ -34,7 +34,7 @@ func (uc *UserController) RegisterUser(registrationData models.RegistrationReque
 	}
 
 	user := model.Users{
-		ID:        &userId,
+		ID:        userId,
 		Username:  &registrationData.Username,
 		Email:     registrationData.Email,
 		Password:  string(hash),
@@ -47,7 +47,7 @@ func (uc *UserController) RegisterUser(registrationData models.RegistrationReque
 		return nil, kts_err
 	}
 
-	token, refreshToken, err := utils.GenerateJWT(user.ID)
+	token, refreshToken, err := utils.GenerateJWT(&user.ID)
 	if err != nil {
 		return nil, kts_errors.KTS_UPSTREAM_ERROR
 	}
@@ -73,7 +73,7 @@ func (uc *UserController) LoginUser(loginData models.LoginRequest) (*models.Logi
 	}
 
 	// generate JWT token
-	token, refreshToken, err := utils.GenerateJWT(user.ID)
+	token, refreshToken, err := utils.GenerateJWT(&user.ID)
 	if err != nil {
 		return nil, kts_errors.KTS_UPSTREAM_ERROR
 	}

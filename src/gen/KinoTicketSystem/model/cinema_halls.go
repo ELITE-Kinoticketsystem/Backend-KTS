@@ -8,12 +8,12 @@
 package model
 
 import (
-	"github.com/google/uuid"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/myid"
 )
 
 type CinemaHalls struct {
-	ID        *uuid.UUID `sql:"primary_key"`
+	ID        myid.UUID `sql:"primary_key"`
 	Name      string
 	Capacity  int32
-	TheatreID *uuid.UUID
+	TheatreID myid.UUID
 }

@@ -3,8 +3,8 @@ package samples
 import (
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/gen/KinoTicketSystem/model"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/myid"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
-	"github.com/google/uuid"
 )
 
 const (
@@ -18,9 +18,9 @@ const (
 )
 
 func GetSampleAddress() model.Addresses {
-	id := uuid.MustParse(addressId)
+	id := myid.MustParse(addressId)
 	return model.Addresses{
-		ID:       &id,
+		ID:       id,
 		Street:   "Street",
 		StreetNr: "StreetNr",
 		Zipcode:  "Zipcode",
@@ -32,29 +32,29 @@ func GetSampleAddress() model.Addresses {
 func GetSampleTheatres() []model.Theatres {
 	return []model.Theatres{
 		{
-			ID:        utils.NewUUID(),
+			ID:        myid.New(),
 			Name:      "Theatre1",
 			LogoURL:   utils.GetStringPointer("LogoUr1"),
-			AddressID: utils.NewUUID(),
+			AddressID: myid.New(),
 		},
 		{
-			ID:        utils.NewUUID(),
+			ID:        myid.New(),
 			Name:      "Theatre2",
 			LogoURL:   utils.GetStringPointer("LogoUrl2"),
-			AddressID: utils.NewUUID(),
+			AddressID: myid.New(),
 		},
 	}
 }
 
 func GetSampleTheatre() model.Theatres {
-	id := uuid.MustParse(theatreId)
-	addressId := uuid.MustParse(addressId)
+	id := myid.MustParse(theatreId)
+	addressId := myid.MustParse(addressId)
 	logoUrl := "LogoURL"
 	return model.Theatres{
-		ID:        &id,
+		ID:        id,
 		Name:      "Theatre",
 		LogoURL:   &logoUrl,
-		AddressID: &addressId,
+		AddressID: addressId,
 	}
 }
 
@@ -81,7 +81,7 @@ func GetSampleTheatreCreate() models.CreateTheatreRequest {
 }
 
 func GetSampleCreateCinemaHallRequest() models.CreateCinemaHallRequest {
-	theatreId := uuid.MustParse(theatreId)
+	theatreId := myid.MustParse(theatreId)
 	return models.CreateCinemaHallRequest{
 		HallName: "HallName",
 		Seats: [][]struct {
@@ -2215,28 +2215,28 @@ func GetSampleCreateCinemaHallRequestInvalidDoubleSeats() models.CreateCinemaHal
 }
 
 func GetSampleCinemaHall() model.CinemaHalls {
-	id := uuid.MustParse(cinemaHallId)
-	theatreId := uuid.MustParse(theatreId)
+	id := myid.MustParse(cinemaHallId)
+	theatreId := myid.MustParse(theatreId)
 	return model.CinemaHalls{
-		ID:        &id,
+		ID:        id,
 		Name:      "HallName",
 		Capacity:  23 * 14,
-		TheatreID: &theatreId,
+		TheatreID: theatreId,
 	}
 }
 
 func GetSampleCinemaHalls() []model.CinemaHalls {
-	theatreId := uuid.MustParse(theatreId)
+	theatreId := myid.MustParse(theatreId)
 	return []model.CinemaHalls{
 		{
-			ID:        utils.NewUUID(),
-			TheatreID: &theatreId,
+			ID:        myid.New(),
+			TheatreID: theatreId,
 			Name:      "Hall 1",
 			Capacity:  100,
 		},
 		{
-			ID:        utils.NewUUID(),
-			TheatreID: &theatreId,
+			ID:        myid.New(),
+			TheatreID: theatreId,
 			Name:      "Hall 2",
 			Capacity:  200,
 		},
@@ -2244,33 +2244,33 @@ func GetSampleCinemaHalls() []model.CinemaHalls {
 }
 
 func GetSampleSeat() model.Seats {
-	id := uuid.MustParse(seatId)
-	cinemaHallId := uuid.MustParse(cinemaHallId)
-	seatCategoryId := uuid.MustParse(seatCategoryId1)
+	id := myid.MustParse(seatId)
+	cinemaHallId := myid.MustParse(cinemaHallId)
+	seatCategoryId := myid.MustParse(seatCategoryId1)
 	return model.Seats{
-		ID:             &id,
+		ID:             id,
 		ColumnNr:       0,
 		RowNr:          0,
-		CinemaHallID:   &cinemaHallId,
-		SeatCategoryID: &seatCategoryId,
+		CinemaHallID:   cinemaHallId,
+		SeatCategoryID: seatCategoryId,
 	}
 }
 
 func GetSampleSeatCategories() []model.SeatCategories {
-	seatCategoryId1 := uuid.MustParse(seatCategoryId1)
-	seatCategoryId2 := uuid.MustParse(seatCategoryId2)
-	seatCategoryId3 := uuid.MustParse(seatCategoryId3)
+	seatCategoryId1 := myid.MustParse(seatCategoryId1)
+	seatCategoryId2 := myid.MustParse(seatCategoryId2)
+	seatCategoryId3 := myid.MustParse(seatCategoryId3)
 	return []model.SeatCategories{
 		{
-			ID:           &seatCategoryId1,
+			ID:           seatCategoryId1,
 			CategoryName: "regular",
 		},
 		{
-			ID:           &seatCategoryId2,
+			ID:           seatCategoryId2,
 			CategoryName: "loge",
 		},
 		{
-			ID:           &seatCategoryId3,
+			ID:           seatCategoryId3,
 			CategoryName: "vip",
 		},
 	}

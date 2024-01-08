@@ -13,7 +13,7 @@ import (
 
 	model "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/gen/KinoTicketSystem/model"
 	models "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
-	uuid "github.com/google/uuid"
+	myid "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/myid"
 	gomock "go.uber.org/mock/gomock"
 )
 
@@ -41,10 +41,10 @@ func (m *MockGenreControllerI) EXPECT() *MockGenreControllerIMockRecorder {
 }
 
 // CreateGenre mocks base method.
-func (m *MockGenreControllerI) CreateGenre(name *string) (*uuid.UUID, *models.KTSError) {
+func (m *MockGenreControllerI) CreateGenre(name *string) (*myid.UUID, *models.KTSError) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateGenre", name)
-	ret0, _ := ret[0].(*uuid.UUID)
+	ret0, _ := ret[0].(*myid.UUID)
 	ret1, _ := ret[1].(*models.KTSError)
 	return ret0, ret1
 }
@@ -56,7 +56,7 @@ func (mr *MockGenreControllerIMockRecorder) CreateGenre(name any) *gomock.Call {
 }
 
 // DeleteGenre mocks base method.
-func (m *MockGenreControllerI) DeleteGenre(genre_id *uuid.UUID) *models.KTSError {
+func (m *MockGenreControllerI) DeleteGenre(genre_id *myid.UUID) *models.KTSError {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DeleteGenre", genre_id)
 	ret0, _ := ret[0].(*models.KTSError)

@@ -9,9 +9,9 @@ import (
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/gen/KinoTicketSystem/model"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/managers"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/myid"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/samples"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
-	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -30,13 +30,13 @@ func TestCreateReview(t *testing.T) {
 					"INSERT INTO `KinoTicketSystem`.reviews (id, rating, comment, datetime, is_spoiler, user_id, movie_id)\n"+
 						"VALUES (?, ?, ?, ?, ?, ?, ?);",
 				).WithArgs(
-					utils.EqUUID(review.ID),
+					review.ID,
 					review.Rating,
 					review.Comment,
 					review.Datetime,
 					review.IsSpoiler,
-					utils.EqUUID(review.UserID),
-					utils.EqUUID(review.MovieID),
+					review.UserID,
+					review.MovieID,
 				).WillReturnResult(
 					sqlmock.NewResult(1, 1),
 				)
@@ -51,13 +51,13 @@ func TestCreateReview(t *testing.T) {
 					"INSERT INTO `KinoTicketSystem`.reviews (id, rating, comment, datetime, is_spoiler, user_id, movie_id)\n"+
 						"VALUES (?, ?, ?, ?, ?, ?, ?);",
 				).WithArgs(
-					utils.EqUUID(review.ID),
+					review.ID,
 					review.Rating,
 					review.Comment,
 					review.Datetime,
 					review.IsSpoiler,
-					utils.EqUUID(review.UserID),
-					utils.EqUUID(review.MovieID),
+					review.UserID,
+					review.MovieID,
 				).WillReturnError(
 					sqlmock.ErrCancelled,
 				)
@@ -72,13 +72,13 @@ func TestCreateReview(t *testing.T) {
 					"INSERT INTO `KinoTicketSystem`.reviews (id, rating, comment, datetime, is_spoiler, user_id, movie_id)\n"+
 						"VALUES (?, ?, ?, ?, ?, ?, ?);",
 				).WithArgs(
-					utils.EqUUID(review.ID),
+					review.ID,
 					review.Rating,
 					review.Comment,
 					review.Datetime,
 					review.IsSpoiler,
-					utils.EqUUID(review.UserID),
-					utils.EqUUID(review.MovieID),
+					review.UserID,
+					review.MovieID,
 				).WillReturnResult(
 					sqlmock.NewErrorResult(sqlmock.ErrCancelled),
 				)
@@ -93,13 +93,13 @@ func TestCreateReview(t *testing.T) {
 					"INSERT INTO `KinoTicketSystem`.reviews (id, rating, comment, datetime, is_spoiler, user_id, movie_id)\n"+
 						"VALUES (?, ?, ?, ?, ?, ?, ?);",
 				).WithArgs(
-					utils.EqUUID(review.ID),
+					review.ID,
 					review.Rating,
 					review.Comment,
 					review.Datetime,
 					review.IsSpoiler,
-					utils.EqUUID(review.UserID),
-					utils.EqUUID(review.MovieID),
+					review.UserID,
+					review.MovieID,
 				).WillReturnResult(
 					sqlmock.NewResult(0, 0),
 				)
@@ -152,19 +152,19 @@ func TestGetReview(t *testing.T) {
 		"WHERE reviews.id = ?;"
 	testCases := []struct {
 		name            string
-		id              uuid.UUID
-		setExpectations func(mock sqlmock.Sqlmock, id uuid.UUID)
+		id              myid.UUID
+		setExpectations func(mock sqlmock.Sqlmock, id myid.UUID)
 		expectedReview  *model.Reviews
 		expectedError   *models.KTSError
 	}{
 		{
 			name: "Success",
-			id:   uuid.New(),
-			setExpectations: func(mock sqlmock.Sqlmock, id uuid.UUID) {
+			id:   myid.New(),
+			setExpectations: func(mock sqlmock.Sqlmock, id myid.UUID) {
 				mock.ExpectQuery(
 					query,
 				).WithArgs(
-					utils.EqUUID(&id),
+					utils.EqUUID(id),
 				).WillReturnRows(
 					sqlmock.NewRows([]string{"reviews.id", "reviews.rating", "reviews.comment", "reviews.datetime", "reviews.is_spoiler", "reviews.user_id", "reviews.movie_id"}).
 						AddRow(
@@ -183,12 +183,12 @@ func TestGetReview(t *testing.T) {
 		},
 		{
 			name: "Internal error",
-			id:   uuid.New(),
-			setExpectations: func(mock sqlmock.Sqlmock, id uuid.UUID) {
+			id:   myid.New(),
+			setExpectations: func(mock sqlmock.Sqlmock, id myid.UUID) {
 				mock.ExpectQuery(
 					query,
 				).WithArgs(
-					utils.EqUUID(&id),
+					utils.EqUUID(id),
 				).WillReturnError(
 					sqlmock.ErrCancelled,
 				)
@@ -198,12 +198,12 @@ func TestGetReview(t *testing.T) {
 		},
 		{
 			name: "Not found",
-			id:   uuid.New(),
-			setExpectations: func(mock sqlmock.Sqlmock, id uuid.UUID) {
+			id:   myid.New(),
+			setExpectations: func(mock sqlmock.Sqlmock, id myid.UUID) {
 				mock.ExpectQuery(
 					query,
 				).WithArgs(
-					utils.EqUUID(&id),
+					utils.EqUUID(id),
 				).WillReturnError(
 					sql.ErrNoRows,
 				)
@@ -249,19 +249,19 @@ func TestGetReview(t *testing.T) {
 func TestDeleteReview(t *testing.T) {
 	testCases := []struct {
 		name            string
-		id              uuid.UUID
-		setExpectations func(mock sqlmock.Sqlmock, id uuid.UUID)
+		id              myid.UUID
+		setExpectations func(mock sqlmock.Sqlmock, id myid.UUID)
 		expectedError   *models.KTSError
 	}{
 		{
 			name: "Success",
-			id:   uuid.MustParse("123e4567-e89b-12d3-a456-426614174000"),
-			setExpectations: func(mock sqlmock.Sqlmock, id uuid.UUID) {
+			id:   myid.MustParse("123e4567-e89b-12d3-a456-426614174000"),
+			setExpectations: func(mock sqlmock.Sqlmock, id myid.UUID) {
 				mock.ExpectExec(
 					"DELETE FROM `KinoTicketSystem`.reviews\n" +
 						"WHERE reviews.id = ?;",
 				).WithArgs(
-					utils.EqUUID(&id),
+					utils.EqUUID(id),
 				).WillReturnResult(
 					sqlmock.NewResult(1, 1),
 				)
@@ -270,13 +270,13 @@ func TestDeleteReview(t *testing.T) {
 		},
 		{
 			name: "Delete internal error",
-			id:   uuid.MustParse("123e4567-e89b-12d3-a456-426614174000"),
-			setExpectations: func(mock sqlmock.Sqlmock, id uuid.UUID) {
+			id:   myid.MustParse("123e4567-e89b-12d3-a456-426614174000"),
+			setExpectations: func(mock sqlmock.Sqlmock, id myid.UUID) {
 				mock.ExpectExec(
 					"DELETE FROM `KinoTicketSystem`.reviews\n" +
 						"WHERE reviews.id = ?;",
 				).WithArgs(
-					utils.EqUUID(&id),
+					utils.EqUUID(id),
 				).WillReturnError(
 					sqlmock.ErrCancelled,
 				)
@@ -285,13 +285,13 @@ func TestDeleteReview(t *testing.T) {
 		},
 		{
 			name: "Rows affected internal error",
-			id:   uuid.MustParse("123e4567-e89b-12d3-a456-426614174000"),
-			setExpectations: func(mock sqlmock.Sqlmock, id uuid.UUID) {
+			id:   myid.MustParse("123e4567-e89b-12d3-a456-426614174000"),
+			setExpectations: func(mock sqlmock.Sqlmock, id myid.UUID) {
 				mock.ExpectExec(
 					"DELETE FROM `KinoTicketSystem`.reviews\n" +
 						"WHERE reviews.id = ?;",
 				).WithArgs(
-					utils.EqUUID(&id),
+					utils.EqUUID(id),
 				).WillReturnResult(
 					sqlmock.NewErrorResult(sqlmock.ErrCancelled),
 				)
@@ -300,13 +300,13 @@ func TestDeleteReview(t *testing.T) {
 		},
 		{
 			name: "No rows affected",
-			id:   uuid.MustParse("123e4567-e89b-12d3-a456-426614174000"),
-			setExpectations: func(mock sqlmock.Sqlmock, id uuid.UUID) {
+			id:   myid.MustParse("123e4567-e89b-12d3-a456-426614174000"),
+			setExpectations: func(mock sqlmock.Sqlmock, id myid.UUID) {
 				mock.ExpectExec(
 					"DELETE FROM `KinoTicketSystem`.reviews\n" +
 						"WHERE reviews.id = ?;",
 				).WithArgs(
-					utils.EqUUID(&id),
+					utils.EqUUID(id),
 				).WillReturnResult(
 					sqlmock.NewResult(0, 0),
 				)
@@ -349,19 +349,19 @@ func TestDeleteReview(t *testing.T) {
 func TestDeleteReviewForMovie(t *testing.T) {
 	testCases := []struct {
 		name            string
-		movieId         uuid.UUID
-		setExpectations func(mock sqlmock.Sqlmock, movieId uuid.UUID)
+		movieId         myid.UUID
+		setExpectations func(mock sqlmock.Sqlmock, movieId myid.UUID)
 		expectedError   *models.KTSError
 	}{
 		{
 			name:    "Success",
-			movieId: uuid.MustParse("123e4567-e89b-12d3-a456-426614174000"),
-			setExpectations: func(mock sqlmock.Sqlmock, movieId uuid.UUID) {
+			movieId: myid.MustParse("123e4567-e89b-12d3-a456-426614174000"),
+			setExpectations: func(mock sqlmock.Sqlmock, movieId myid.UUID) {
 				mock.ExpectExec(
 					"DELETE FROM `KinoTicketSystem`.reviews\n" +
 						"WHERE reviews.movie_id = ?;",
 				).WithArgs(
-					utils.EqUUID(&movieId),
+					utils.EqUUID(movieId),
 				).WillReturnResult(
 					sqlmock.NewResult(1, 1),
 				)
@@ -370,13 +370,13 @@ func TestDeleteReviewForMovie(t *testing.T) {
 		},
 		{
 			name:    "Delete internal error",
-			movieId: uuid.MustParse("123e4567-e89b-12d3-a456-426614174000"),
-			setExpectations: func(mock sqlmock.Sqlmock, movieId uuid.UUID) {
+			movieId: myid.MustParse("123e4567-e89b-12d3-a456-426614174000"),
+			setExpectations: func(mock sqlmock.Sqlmock, movieId myid.UUID) {
 				mock.ExpectExec(
 					"DELETE FROM `KinoTicketSystem`.reviews\n" +
 						"WHERE reviews.movie_id = ?;",
 				).WithArgs(
-					utils.EqUUID(&movieId),
+					utils.EqUUID(movieId),
 				).WillReturnError(
 					sqlmock.ErrCancelled,
 				)

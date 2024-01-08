@@ -8,15 +8,15 @@ import (
 
 	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/mocks"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/myid"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/samples"
-	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
 )
 
 func TestGetEventByIdHandler(t *testing.T) {
-	eventId := utils.NewUUID()
+	eventId := myid.NewUUID()
 	event := samples.GetGetSpecialEventsDTO(eventId)
 
 	eventJson, _ := json.Marshal(event)
@@ -89,8 +89,8 @@ func TestGetEventByIdHandler(t *testing.T) {
 	}
 }
 func TestGetEventsForMovieHandler(t *testing.T) {
-	movieId := utils.NewUUID()
-	theatreId := utils.NewUUID()
+	movieId := myid.NewUUID()
+	theatreId := myid.NewUUID()
 
 	events := samples.GetModelEvents()
 

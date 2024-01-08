@@ -3,7 +3,6 @@ package controllers
 import (
 	"testing"
 
-	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
 
@@ -11,16 +10,16 @@ import (
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/gen/KinoTicketSystem/model"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/mocks"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
-	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/myid"
 )
 
 func TestGetActorByID(t *testing.T) {
 
-	id := utils.NewUUID()
+	id := myid.NewUUID()
 
 	testCases := []struct {
 		name             string
-		actorId          *uuid.UUID
+		actorId          *myid.UUID
 		expectedActorDTO *models.ActorDTO
 		expectedError    *models.KTSError
 	}{
@@ -29,7 +28,7 @@ func TestGetActorByID(t *testing.T) {
 			actorId: id,
 			expectedActorDTO: &models.ActorDTO{
 				Actors: model.Actors{
-					ID:          id,
+					ID:          *id,
 					Name:        "Test Actor",
 					Description: "Test Description",
 				},
@@ -81,7 +80,7 @@ func TestGetActors(t *testing.T) {
 			expectedActorsDTO: &[]models.GetActorsDTO{
 				{
 					Actors: model.Actors{
-						ID:          utils.NewUUID(),
+						ID:          *myid.NewUUID(),
 						Name:        "Test Actor",
 						Description: "Test Description",
 					},
@@ -122,19 +121,19 @@ func TestGetActors(t *testing.T) {
 
 func TestCreateActor(t *testing.T) {
 
-	id := utils.NewUUID()
+	id := myid.NewUUID()
 
 	testCases := []struct {
 		name          string
 		actorDto      *models.CreateActorDTO
-		expectedActor *uuid.UUID
+		expectedActor *myid.UUID
 		expectedError *models.KTSError
 	}{
 		{
 			name: "Create actor",
 			actorDto: &models.CreateActorDTO{
 				Actors: model.Actors{
-					ID:          id,
+					ID:          *id,
 					Name:        "Test Actor",
 					Description: "Test Description",
 				},

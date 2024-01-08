@@ -9,12 +9,12 @@ import (
 
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/handlers"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/myid"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/samples"
 
 	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
 
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/mocks"
-	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
@@ -41,7 +41,7 @@ func TestGetTicketByIdHandler(t *testing.T) {
 		},
 		{
 			name:          "Internal error",
-			paramTicketId: utils.NewUUID().String(),
+			paramTicketId: myid.NewUUID().String(),
 			setExpectations: func(mockController *mocks.MockTicketControllerI, ticketId string) {
 				mockController.EXPECT().GetTicketById(gomock.Any()).Return(nil, kts_errors.KTS_INTERNAL_ERROR)
 			},
@@ -50,7 +50,7 @@ func TestGetTicketByIdHandler(t *testing.T) {
 		},
 		{
 			name:          "Ticket not found",
-			paramTicketId: utils.NewUUID().String(),
+			paramTicketId: myid.NewUUID().String(),
 			setExpectations: func(mockController *mocks.MockTicketControllerI, ticketId string) {
 				mockController.EXPECT().GetTicketById(gomock.Any()).Return(nil, kts_errors.KTS_NOT_FOUND)
 			},
@@ -59,7 +59,7 @@ func TestGetTicketByIdHandler(t *testing.T) {
 		},
 		{
 			name:          "Ticket found",
-			paramTicketId: utils.NewUUID().String(),
+			paramTicketId: myid.NewUUID().String(),
 			setExpectations: func(mockController *mocks.MockTicketControllerI, ticketId string) {
 				mockController.EXPECT().GetTicketById(gomock.Any()).Return(sampleTicket, nil)
 			},
@@ -107,7 +107,7 @@ func TestValidateTicketHandler(t *testing.T) {
 	}{
 		{
 			name:          "Success",
-			paramTicketId: utils.NewUUID().String(),
+			paramTicketId: myid.NewUUID().String(),
 			setExpectations: func(mockController *mocks.MockTicketControllerI, ticketId string) {
 				mockController.EXPECT().ValidateTicket(gomock.Any()).Return(nil)
 			},
@@ -116,7 +116,7 @@ func TestValidateTicketHandler(t *testing.T) {
 		},
 		{
 			name:          "Internal error",
-			paramTicketId: utils.NewUUID().String(),
+			paramTicketId: myid.NewUUID().String(),
 			setExpectations: func(mockController *mocks.MockTicketControllerI, ticketId string) {
 				mockController.EXPECT().ValidateTicket(gomock.Any()).Return(kts_errors.KTS_INTERNAL_ERROR)
 			},
@@ -125,7 +125,7 @@ func TestValidateTicketHandler(t *testing.T) {
 		},
 		{
 			name:          "Ticket CONFLICT",
-			paramTicketId: utils.NewUUID().String(),
+			paramTicketId: myid.NewUUID().String(),
 			setExpectations: func(mockController *mocks.MockTicketControllerI, ticketId string) {
 				mockController.EXPECT().ValidateTicket(gomock.Any()).Return(kts_errors.KTS_CONFLICT)
 			},

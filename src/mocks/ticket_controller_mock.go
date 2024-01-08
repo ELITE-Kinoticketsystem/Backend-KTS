@@ -12,7 +12,7 @@ import (
 	reflect "reflect"
 
 	models "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
-	uuid "github.com/google/uuid"
+	myid "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/myid"
 	gomock "go.uber.org/mock/gomock"
 )
 
@@ -40,7 +40,7 @@ func (m *MockTicketControllerI) EXPECT() *MockTicketControllerIMockRecorder {
 }
 
 // GetTicketById mocks base method.
-func (m *MockTicketControllerI) GetTicketById(id *uuid.UUID) (*models.TicketDTO, *models.KTSError) {
+func (m *MockTicketControllerI) GetTicketById(id *myid.UUID) (*models.TicketDTO, *models.KTSError) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetTicketById", id)
 	ret0, _ := ret[0].(*models.TicketDTO)
@@ -55,7 +55,7 @@ func (mr *MockTicketControllerIMockRecorder) GetTicketById(id any) *gomock.Call 
 }
 
 // ValidateTicket mocks base method.
-func (m *MockTicketControllerI) ValidateTicket(id *uuid.UUID) *models.KTSError {
+func (m *MockTicketControllerI) ValidateTicket(id *myid.UUID) *models.KTSError {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ValidateTicket", id)
 	ret0, _ := ret[0].(*models.KTSError)

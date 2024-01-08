@@ -8,15 +8,15 @@ import (
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/gen/KinoTicketSystem/table"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/managers"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/myid"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
-	"github.com/google/uuid"
 )
 
 type ReviewRepositoryI interface {
 	CreateReview(review model.Reviews) *models.KTSError
-	GetReviewById(id *uuid.UUID) (*model.Reviews, *models.KTSError)
-	DeleteReview(id *uuid.UUID) *models.KTSError
-	DeleteReviewForMovie(movieId *uuid.UUID) *models.KTSError
+	GetReviewById(id *myid.UUID) (*model.Reviews, *models.KTSError)
+	DeleteReview(id *myid.UUID) *models.KTSError
+	DeleteReviewForMovie(movieId *myid.UUID) *models.KTSError
 }
 
 type ReviewRepository struct {
@@ -33,13 +33,13 @@ func (rr *ReviewRepository) CreateReview(review model.Reviews) *models.KTSError 
 		table.Reviews.UserID,
 		table.Reviews.MovieID,
 	).VALUES(
-		utils.MysqlUuid(review.ID),
+		review.ID,
 		review.Rating,
 		review.Comment,
 		review.Datetime,
 		review.IsSpoiler != nil && *review.IsSpoiler,
-		utils.MysqlUuid(review.UserID),
-		utils.MysqlUuid(review.MovieID),
+		review.UserID,
+		review.MovieID,
 	)
 
 	result, err := stmt.Exec(rr.DatabaseManager.GetDatabaseConnection())
@@ -56,7 +56,7 @@ func (rr *ReviewRepository) CreateReview(review model.Reviews) *models.KTSError 
 	return nil
 }
 
-func (rr *ReviewRepository) GetReviewById(id *uuid.UUID) (*model.Reviews, *models.KTSError) {
+func (rr *ReviewRepository) GetReviewById(id *myid.UUID) (*model.Reviews, *models.KTSError) {
 	var review model.Reviews
 	stmt := table.Reviews.SELECT(
 		table.Reviews.ID,
@@ -67,7 +67,7 @@ func (rr *ReviewRepository) GetReviewById(id *uuid.UUID) (*model.Reviews, *model
 		table.Reviews.UserID,
 		table.Reviews.MovieID,
 	).WHERE(
-		table.Reviews.ID.EQ(utils.MysqlUuid(id)),
+		table.Reviews.ID.EQ(utils.MysqlUuid(*id)),
 	)
 
 	err := stmt.Query(rr.DatabaseManager.GetDatabaseConnection(), &review)
@@ -81,8 +81,8 @@ func (rr *ReviewRepository) GetReviewById(id *uuid.UUID) (*model.Reviews, *model
 	return &review, nil
 }
 
-func (rr *ReviewRepository) DeleteReview(id *uuid.UUID) *models.KTSError {
-	stmt := table.Reviews.DELETE().WHERE(table.Reviews.ID.EQ(utils.MysqlUuid(id)))
+func (rr *ReviewRepository) DeleteReview(id *myid.UUID) *models.KTSError {
+	stmt := table.Reviews.DELETE().WHERE(table.Reviews.ID.EQ(utils.MysqlUuid(*id)))
 	result, err := stmt.Exec(rr.DatabaseManager.GetDatabaseConnection())
 	if err != nil {
 		return kts_errors.KTS_INTERNAL_ERROR
@@ -98,8 +98,8 @@ func (rr *ReviewRepository) DeleteReview(id *uuid.UUID) *models.KTSError {
 	return nil
 }
 
-func (rr *ReviewRepository) DeleteReviewForMovie(movieId *uuid.UUID) *models.KTSError {
-	stmt := table.Reviews.DELETE().WHERE(table.Reviews.MovieID.EQ(utils.MysqlUuid(movieId)))
+func (rr *ReviewRepository) DeleteReviewForMovie(movieId *myid.UUID) *models.KTSError {
+	stmt := table.Reviews.DELETE().WHERE(table.Reviews.MovieID.EQ(utils.MysqlUuid(*movieId)))
 	log.Print(stmt.DebugSql())
 	_, err := stmt.Exec(rr.DatabaseManager.GetDatabaseConnection())
 	if err != nil {

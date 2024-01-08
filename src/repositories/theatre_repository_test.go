@@ -10,6 +10,7 @@ import (
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/gen/KinoTicketSystem/model"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/managers"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/myid"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/samples"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
 	"github.com/stretchr/testify/assert"
@@ -27,10 +28,10 @@ func TestCreateTheatre(t *testing.T) {
 			data: samples.GetSampleTheatre(),
 			setExpectations: func(mock sqlmock.Sqlmock, theatre *model.Theatres) {
 				mock.ExpectExec("INSERT INTO `KinoTicketSystem`.theatres").WithArgs(
-					utils.EqUUID(theatre.ID),
+					theatre.ID,
 					theatre.Name,
 					*theatre.LogoURL,
-					utils.EqUUID(theatre.AddressID),
+					theatre.AddressID,
 				).WillReturnResult(sqlmock.NewResult(1, 1))
 			},
 			expectedError: nil,
@@ -40,10 +41,10 @@ func TestCreateTheatre(t *testing.T) {
 			data: samples.GetSampleTheatre(),
 			setExpectations: func(mock sqlmock.Sqlmock, theatre *model.Theatres) {
 				mock.ExpectExec("INSERT INTO `KinoTicketSystem`.theatres").WithArgs(
-					utils.EqUUID(theatre.ID),
+					theatre.ID,
 					theatre.Name,
 					*theatre.LogoURL,
-					utils.EqUUID(theatre.AddressID),
+					theatre.AddressID,
 				).WillReturnError(sql.ErrConnDone)
 			},
 			expectedError: kts_errors.KTS_INTERNAL_ERROR,
@@ -95,10 +96,10 @@ func TestCreateCinemaHall(t *testing.T) {
 				mock.ExpectExec(
 					"INSERT INTO `KinoTicketSystem`.cinema_halls",
 				).WithArgs(
-					utils.EqUUID(cinemaHall.ID),
+					cinemaHall.ID,
 					cinemaHall.Name,
 					cinemaHall.Capacity,
-					utils.EqUUID(cinemaHall.TheatreID),
+					cinemaHall.TheatreID,
 				).WillReturnResult(sqlmock.NewResult(1, 1))
 			},
 			expectedError: nil,
@@ -110,10 +111,10 @@ func TestCreateCinemaHall(t *testing.T) {
 				mock.ExpectExec(
 					"INSERT INTO `KinoTicketSystem`.cinema_halls",
 				).WithArgs(
-					utils.EqUUID(cinemaHall.ID),
+					cinemaHall.ID,
 					cinemaHall.Name,
 					cinemaHall.Capacity,
-					utils.EqUUID(cinemaHall.TheatreID),
+					cinemaHall.TheatreID,
 				).WillReturnError(sql.ErrConnDone)
 			},
 			expectedError: kts_errors.KTS_INTERNAL_ERROR,
@@ -201,7 +202,7 @@ func TestGetCinemaHallsForTheatre(t *testing.T) {
 				)
 			},
 			expectedCinemaHalls: nil,
-			expectedError: 	 kts_errors.KTS_NOT_FOUND,
+			expectedError:       kts_errors.KTS_NOT_FOUND,
 		},
 	}
 
@@ -221,7 +222,7 @@ func TestGetCinemaHallsForTheatre(t *testing.T) {
 
 			tc.setExpectations(mock)
 
-			cinemaHalls, ktsErr := theatreRepo.GetCinemaHallsForTheatre(theatreId)
+			cinemaHalls, ktsErr := theatreRepo.GetCinemaHallsForTheatre(&theatreId)
 
 			if err := mock.ExpectationsWereMet(); err != nil {
 				t.Errorf("There were unfulfilled expectations: %s", err)
@@ -247,13 +248,13 @@ func TestCreateSeat(t *testing.T) {
 				mock.ExpectExec(
 					"INSERT INTO `KinoTicketSystem`.seats",
 				).WithArgs(
-					utils.EqUUID(seat.ID),
+					seat.ID,
 					seat.RowNr,
 					seat.ColumnNr,
 					seat.VisibleRowNr,
 					seat.VisibleColumnNr,
-					utils.EqUUID(seat.SeatCategoryID),
-					utils.EqUUID(seat.CinemaHallID),
+					seat.SeatCategoryID,
+					seat.CinemaHallID,
 					seat.Type,
 				).WillReturnResult(sqlmock.NewResult(1, 1))
 			},
@@ -271,8 +272,8 @@ func TestCreateSeat(t *testing.T) {
 					seat.ColumnNr,
 					seat.VisibleRowNr,
 					seat.VisibleColumnNr,
-					utils.EqUUID(seat.SeatCategoryID),
-					utils.EqUUID(seat.CinemaHallID),
+					seat.SeatCategoryID,
+					seat.CinemaHallID,
 					seat.Type,
 				).WillReturnError(sql.ErrConnDone)
 			},
@@ -381,22 +382,22 @@ func TestGetSeatCategories(t *testing.T) {
 }
 
 func TestGetSeatsForCinemaHall(t *testing.T) {
-	cinemaHallID := utils.NewUUID()
+	cinemaHallID := myid.NewUUID()
 
 	expectedSeats := []model.Seats{
 		{
-			ID:             utils.NewUUID(),
-			CinemaHallID:   cinemaHallID,
+			ID:             myid.New(),
+			CinemaHallID:   *cinemaHallID,
 			ColumnNr:       1,
 			RowNr:          1,
-			SeatCategoryID: utils.NewUUID(),
+			SeatCategoryID: myid.New(),
 		},
 		{
-			ID:             utils.NewUUID(),
-			CinemaHallID:   cinemaHallID,
+			ID:             myid.New(),
+			CinemaHallID:   *cinemaHallID,
 			ColumnNr:       2,
 			RowNr:          1,
-			SeatCategoryID: utils.NewUUID(),
+			SeatCategoryID: myid.New(),
 		},
 	}
 

@@ -8,10 +8,10 @@
 package model
 
 import (
-	"github.com/google/uuid"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/myid"
 )
 
 type Genres struct {
-	ID        *uuid.UUID `sql:"primary_key"`
+	ID        myid.UUID `sql:"primary_key"`
 	GenreName string
 }

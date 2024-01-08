@@ -13,7 +13,7 @@ import (
 
 	model "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/gen/KinoTicketSystem/model"
 	models "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
-	uuid "github.com/google/uuid"
+	myid "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/myid"
 	gomock "go.uber.org/mock/gomock"
 )
 
@@ -41,10 +41,10 @@ func (m *MockOrderRepoI) EXPECT() *MockOrderRepoIMockRecorder {
 }
 
 // CreateOrder mocks base method.
-func (m *MockOrderRepoI) CreateOrder(order *model.Orders) (*uuid.UUID, *models.KTSError) {
+func (m *MockOrderRepoI) CreateOrder(order *model.Orders) (*myid.UUID, *models.KTSError) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateOrder", order)
-	ret0, _ := ret[0].(*uuid.UUID)
+	ret0, _ := ret[0].(*myid.UUID)
 	ret1, _ := ret[1].(*models.KTSError)
 	return ret0, ret1
 }
@@ -56,7 +56,7 @@ func (mr *MockOrderRepoIMockRecorder) CreateOrder(order any) *gomock.Call {
 }
 
 // GetOrderById mocks base method.
-func (m *MockOrderRepoI) GetOrderById(orderId, userId *uuid.UUID) (*models.GetOrderDTO, *models.KTSError) {
+func (m *MockOrderRepoI) GetOrderById(orderId, userId *myid.UUID) (*models.GetOrderDTO, *models.KTSError) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetOrderById", orderId, userId)
 	ret0, _ := ret[0].(*models.GetOrderDTO)
@@ -71,7 +71,7 @@ func (mr *MockOrderRepoIMockRecorder) GetOrderById(orderId, userId any) *gomock.
 }
 
 // GetOrders mocks base method.
-func (m *MockOrderRepoI) GetOrders(userId *uuid.UUID) (*[]models.GetOrderDTO, *models.KTSError) {
+func (m *MockOrderRepoI) GetOrders(userId *myid.UUID) (*[]models.GetOrderDTO, *models.KTSError) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetOrders", userId)
 	ret0, _ := ret[0].(*[]models.GetOrderDTO)

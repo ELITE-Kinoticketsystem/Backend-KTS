@@ -5,14 +5,14 @@ import (
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/gen/KinoTicketSystem/table"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/managers"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/myid"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
-	"github.com/google/uuid"
 )
 
 type MovieActorRepositoryI interface {
-	AddMovieActor(movieId *uuid.UUID, actorId *uuid.UUID) *models.KTSError
-	RemoveMovieActor(movieId *uuid.UUID, actorId *uuid.UUID) *models.KTSError
-	RemoveAllActorCombinationWithMovie(movieId *uuid.UUID) *models.KTSError
+	AddMovieActor(movieId *myid.UUID, actorId *myid.UUID) *models.KTSError
+	RemoveMovieActor(movieId *myid.UUID, actorId *myid.UUID) *models.KTSError
+	RemoveAllActorCombinationWithMovie(movieId *myid.UUID) *models.KTSError
 }
 
 type MovieActorRepository struct {
@@ -20,12 +20,12 @@ type MovieActorRepository struct {
 }
 
 // Combine Movie and Genre
-func (mar *MovieActorRepository) AddMovieActor(movieId *uuid.UUID, actorId *uuid.UUID) *models.KTSError {
+func (mar *MovieActorRepository) AddMovieActor(movieId *myid.UUID, actorId *myid.UUID) *models.KTSError {
 	// Create the insert statement
 	insertQuery := table.MovieActors.INSERT(table.MovieActors.MovieID, table.MovieActors.ActorID).
 		VALUES(
-			utils.MysqlUuid(movieId),
-			utils.MysqlUuid(actorId),
+			utils.MysqlUuid(*movieId),
+			utils.MysqlUuid(*actorId),
 		)
 
 	// Execute the query
@@ -46,11 +46,11 @@ func (mar *MovieActorRepository) AddMovieActor(movieId *uuid.UUID, actorId *uuid
 	return nil
 }
 
-func (mar *MovieActorRepository) RemoveMovieActor(movieId *uuid.UUID, actorId *uuid.UUID) *models.KTSError {
+func (mar *MovieActorRepository) RemoveMovieActor(movieId *myid.UUID, actorId *myid.UUID) *models.KTSError {
 
 	deleteQuery := table.MovieGenres.DELETE().WHERE(
-		table.MovieActors.MovieID.EQ(utils.MysqlUuid(movieId)).AND(
-			table.MovieActors.ActorID.EQ(utils.MysqlUuid(actorId)),
+		table.MovieActors.MovieID.EQ(utils.MysqlUuid(*movieId)).AND(
+			table.MovieActors.ActorID.EQ(utils.MysqlUuid(*actorId)),
 		),
 	)
 
@@ -72,9 +72,9 @@ func (mar *MovieActorRepository) RemoveMovieActor(movieId *uuid.UUID, actorId *u
 	return nil
 }
 
-func (mar *MovieActorRepository) RemoveAllActorCombinationWithMovie(movieId *uuid.UUID) *models.KTSError {
+func (mar *MovieActorRepository) RemoveAllActorCombinationWithMovie(movieId *myid.UUID) *models.KTSError {
 	deleteQuery := table.MovieActors.DELETE().WHERE(
-		table.MovieActors.MovieID.EQ(utils.MysqlUuid(movieId)),
+		table.MovieActors.MovieID.EQ(utils.MysqlUuid(*movieId)),
 	)
 
 	// Execute the query

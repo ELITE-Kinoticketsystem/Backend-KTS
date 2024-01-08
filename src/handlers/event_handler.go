@@ -6,9 +6,9 @@ import (
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/controllers"
 	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/myid"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 )
 
 // @Summary Create event
@@ -17,7 +17,7 @@ import (
 // @Accept  json
 // @Produce  json
 // @Param event body models.CreateEvtDTO true "Event data"
-// @Success 200 {array} uuid.UUID
+// @Success 200 {array} myid.UUID
 // @Failure 500 {object} string
 // @Failure 400 {object} models.KTSErrorMessage
 // @Router /events [post]
@@ -50,12 +50,12 @@ func CreateEventHandler(eventController controllers.EventControllerI) gin.Handle
 // @Router /movies/{id}/events [get]
 func GetEventsForMovieHandler(eventController controllers.EventControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		movieId, err := uuid.Parse(c.Param("id"))
+		movieId, err := myid.Parse(c.Param("id"))
 		if err != nil {
 			utils.HandleErrorAndAbort(c, kts_errors.KTS_BAD_REQUEST)
 			return
 		}
-		theatreId, err := uuid.Parse(c.Param("theatreId"))
+		theatreId, err := myid.Parse(c.Param("theatreId"))
 		if err != nil {
 			utils.HandleErrorAndAbort(c, kts_errors.KTS_BAD_REQUEST)
 			return
@@ -102,7 +102,7 @@ func GetSpecialEventsHandler(eventController controllers.EventControllerI) gin.H
 // @Router /events/{eventId} [get]
 func GetEventByIdHandler(eventController controllers.EventControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		id, err := uuid.Parse(c.Param("eventId"))
+		id, err := myid.Parse(c.Param("eventId"))
 		if err != nil {
 			utils.HandleErrorAndAbort(c, kts_errors.KTS_BAD_REQUEST)
 			return
