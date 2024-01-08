@@ -96,7 +96,7 @@ func CheckEmailHandler(userCtrl controllers.UserControllerI) gin.HandlerFunc {
 			return
 		}
 		if utils.ContainsEmptyString(requestData.Email) {
-			utils.HandleErrorAndAbort(c, kts_errors.KTS_BAD_REQUEST)
+			utils.HandleErrorAndAbort(c, kts_errors.KTS_BAD_REQUEST.WithDetails("Email is empty"))
 			return
 		}
 
