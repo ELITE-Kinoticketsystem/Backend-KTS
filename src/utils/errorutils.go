@@ -8,6 +8,6 @@ import (
 )
 
 func HandleErrorAndAbort(c *gin.Context, err *models.KTSError) {
-	log.Printf("Error while handling request: %v", *err)
-	c.AbortWithStatusJSON(err.Status, err.KTSErrorMessage)
+	log.Printf("Error while handling request: %d %v %v", err.Status, err.ErrorMessage, err.Details)
+	c.AbortWithStatusJSON(err.Status, err)
 }

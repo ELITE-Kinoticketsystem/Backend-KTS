@@ -6,5 +6,13 @@ type KTSErrorMessage struct {
 
 type KTSError struct {
 	KTSErrorMessage
-	Status int
+	Status  int   `json:"-"`
+	Details string `json:"details,omitempty"`
+}
+
+func (err *KTSError) WithDetails(details string) *KTSError {
+	newErr := new(KTSError)
+	*newErr = *err
+	newErr.Details = details
+	return newErr
 }
