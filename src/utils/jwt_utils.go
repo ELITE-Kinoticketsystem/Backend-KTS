@@ -12,6 +12,7 @@ import (
 
 var key = os.Getenv("JWT_SECRET")
 
+const expiredLifespan = -1
 const tokenLifespan = 45 * 60                 // 45 minutes
 const refreshTokenLifeSpan = 3 * 24 * 60 * 60 // 3 days
 const leeway = 5 * 60                         // 5 minutes
@@ -88,14 +89,24 @@ func RefreshTokens(refreshToken string) (string, string, error) {
 	return GenerateJWT(userId)
 }
 
-func SetJWTCookies(c *gin.Context, token string, refreshToken string) {
+func SetJWTCookies(c *gin.Context, token string, refreshToken string, expired bool) {
+	var lifespan int
+	var refreshLifespan int
+	if expired {
+		lifespan = expiredLifespan
+		refreshLifespan = expiredLifespan	
+	} else {
+		lifespan = tokenLifespan
+		refreshLifespan = refreshTokenLifeSpan
+	}
+
 	// for development
 	http.SetCookie(c.Writer, &http.Cookie{
 		Name:     "token",
 		Value:    token,
 		Path:     "/",
 		/* Domain */
-		MaxAge:   tokenLifespan,
+		MaxAge:   lifespan,
 		Secure:   true,
 		HttpOnly: true,
 		SameSite: http.SameSiteNoneMode,
@@ -106,13 +117,13 @@ func SetJWTCookies(c *gin.Context, token string, refreshToken string) {
 		Value:    refreshToken,
 		Path:     "/",
 		/* Domain */
-		MaxAge:   refreshTokenLifeSpan,
+		MaxAge:   refreshLifespan,
 		Secure:   true,
 		HttpOnly: true,
 		SameSite: http.SameSiteNoneMode,
 	})
 
 	// for production
-	c.SetCookie("token", token, tokenLifespan, "/", "cinemika.westeurope.cloudapp.azure.com", true, true)
-	c.SetCookie("refreshToken", refreshToken, refreshTokenLifeSpan, "/", "cinemika.westeurope.cloudapp.azure.com", true, true)
+	c.SetCookie("token", token, lifespan, "/", "cinemika.westeurope.cloudapp.azure.com", true, true)
+	c.SetCookie("refreshToken", refreshToken, refreshLifespan, "/", "cinemika.westeurope.cloudapp.azure.com", true, true)
 }
