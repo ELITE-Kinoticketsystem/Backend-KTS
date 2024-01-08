@@ -59,7 +59,7 @@ func TestEventController_CreateEvent(t *testing.T) {
 						SeatCategoryID: eventRequest.EventSeatCategories[0].SeatCategoryID,
 					},
 				}, nil)
-				mockEventRepo.EXPECT().CreateEventSeat(gomock.Any()).Return(nil)
+				mockEventRepo.EXPECT().CreateEventSeats(gomock.Any()).Return(nil)
 			},
 			expectedError:   nil,
 			expectedEventId: &eventRequest.Events.ID,
@@ -122,7 +122,7 @@ func TestEventController_CreateEvent(t *testing.T) {
 						SeatCategoryID: eventRequest.EventSeatCategories[0].SeatCategoryID,
 					},
 				}, nil)
-				mockEventRepo.EXPECT().CreateEventSeat(gomock.Any()).Return(kts_errors.KTS_INTERNAL_ERROR)
+				mockEventRepo.EXPECT().CreateEventSeats(gomock.Any()).Return(kts_errors.KTS_INTERNAL_ERROR)
 			},
 			expectedError:   kts_errors.KTS_INTERNAL_ERROR,
 			expectedEventId: nil,

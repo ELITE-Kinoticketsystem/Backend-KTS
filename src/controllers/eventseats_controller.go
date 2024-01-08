@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"slices"
 	"time"
 
@@ -35,23 +34,19 @@ func (esc *EventSeatController) GetEventSeats(eventId *myid.UUID, userId *myid.U
 	seatRows := make(map[int32][]models.GetSeatsForSeatSelectorDTO)
 	currentUserSeats := []models.GetSeatsForSeatSelectorDTO{}
 	var blockedUntil *time.Time
-	fmt.Printf("ps: %p %v\n", &((*seats)[0].EventSeat.ID), ((*seats)[0].EventSeat.ID))
-	fmt.Printf("ps: %p %v\n", &((*seats)[1].EventSeat.ID), ((*seats)[1].EventSeat.ID))
-	fmt.Printf("ps: %p %v\n", &((*seats)[2].EventSeat.ID), ((*seats)[2].EventSeat.ID))
 
 	for _, seat := range *seats {
+		localSeat := seat
 		currentSeat := models.GetSeatsForSeatSelectorDTO{
-			// ID:             &seat.EventSeat.ID,
-			RowNr:          seat.Seat.RowNr,
-			ColumnNr:       seat.Seat.ColumnNr,
-			Available:      (seat.EventSeat.BlockedUntil == nil || seat.EventSeat.BlockedUntil.Before(time.Now()) || seat.EventSeat.UserID == nil) && !seat.EventSeat.Booked,
-			BlockedByOther: (seat.EventSeat.BlockedUntil != nil && (seat.EventSeat.BlockedUntil.After(time.Now()) && (seat.EventSeat.UserID != nil && *seat.EventSeat.UserID != *userId))) || seat.EventSeat.Booked,
-			Category:       seat.SeatCategory.CategoryName,
-			Type:           seat.Seat.Type,
-			Price:          seat.EventSeatCategory.Price,
+			ID:             &localSeat.EventSeat.ID,
+			RowNr:          localSeat.Seat.RowNr,
+			ColumnNr:       localSeat.Seat.ColumnNr,
+			Available:      (localSeat.EventSeat.BlockedUntil == nil || localSeat.EventSeat.BlockedUntil.Before(time.Now()) || localSeat.EventSeat.UserID == nil) && !localSeat.EventSeat.Booked,
+			BlockedByOther: (localSeat.EventSeat.BlockedUntil != nil && (localSeat.EventSeat.BlockedUntil.After(time.Now()) && (localSeat.EventSeat.UserID != nil && *localSeat.EventSeat.UserID != *userId))) || localSeat.EventSeat.Booked,
+			Category:       localSeat.SeatCategory.CategoryName,
+			Type:           localSeat.Seat.Type,
+			Price:          localSeat.EventSeatCategory.Price,
 		}
-		currentSeat.ID = &(seat.EventSeat.ID)
-		fmt.Printf("s: %p\n", &seat.EventSeat.ID)
 
 		if seat.EventSeat.UserID != nil && *seat.EventSeat.UserID == *userId && !seat.EventSeat.Booked && seat.EventSeat.BlockedUntil != nil && seat.EventSeat.BlockedUntil.After(time.Now()) {
 			currentUserSeats = append(currentUserSeats, currentSeat)
@@ -62,9 +57,6 @@ func (esc *EventSeatController) GetEventSeats(eventId *myid.UUID, userId *myid.U
 
 		seatRow := seatRows[currentSeat.RowNr]
 		seatRows[currentSeat.RowNr] = append(seatRow, currentSeat)
-		for i := range seatRows[0] {
-			fmt.Printf("%d: %p\n", i, seatRows[0][i].ID)
-		}
 	}
 
 	return seatMapToSlice(seatRows), &currentUserSeats, blockedUntil, nil
