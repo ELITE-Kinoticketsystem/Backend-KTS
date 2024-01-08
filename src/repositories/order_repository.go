@@ -74,7 +74,7 @@ func (or *OrderRepository) GetOrderById(orderId *uuid.UUID, userId *uuid.UUID) (
 			LEFT_JOIN(table.EventMovies, table.EventMovies.EventID.EQ(table.Events.ID)).
 			LEFT_JOIN(table.Movies, table.Movies.ID.EQ(table.EventMovies.MovieID)),
 		).
-		WHERE(table.Orders.UserID.EQ(utils.MysqlUuid(userId)).AND(table.Orders.UserID.EQ(utils.MysqlUuid(userId))))
+		WHERE(table.Orders.ID.EQ(utils.MysqlUuid(orderId)).AND(table.Orders.UserID.EQ(utils.MysqlUuid(userId))))
 
 	err := stmt.Query(or.DatabaseManager.GetDatabaseConnection(), &order)
 
