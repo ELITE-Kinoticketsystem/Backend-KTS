@@ -304,8 +304,9 @@ func TestCheckEmail(t *testing.T) {
 			name:            "Malformatted data",
 			body:            map[string]string{},
 			setExpectations: func(mockController *mocks.MockUserControllerI) {},
-			expectedResponseBody: gin.H{
-				"errorMessage": "BAD_REQUEST",
+			expectedResponseBody: models.KTSError{
+				KTSErrorMessage: models.KTSErrorMessage{ErrorMessage: "BAD_REQUEST"},
+				Details:         "Email is empty",
 			},
 			expectedStatus: http.StatusBadRequest,
 		},
@@ -313,8 +314,9 @@ func TestCheckEmail(t *testing.T) {
 			name:            "No data",
 			body:            nil,
 			setExpectations: func(mockController *mocks.MockUserControllerI) {},
-			expectedResponseBody: gin.H{
-				"errorMessage": "BAD_REQUEST",
+			expectedResponseBody: models.KTSError{
+				KTSErrorMessage: models.KTSErrorMessage{ErrorMessage: "BAD_REQUEST"},
+				Details:         "Email is empty",
 			},
 			expectedStatus: http.StatusBadRequest,
 		},
