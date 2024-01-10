@@ -201,7 +201,7 @@ func TestGetCinemaHallsForTheatre(t *testing.T) {
 				)
 			},
 			expectedCinemaHalls: nil,
-			expectedError: 	 kts_errors.KTS_NOT_FOUND,
+			expectedError:       kts_errors.KTS_NOT_FOUND,
 		},
 	}
 
@@ -470,26 +470,31 @@ func TestGetSeatsForCinemaHall(t *testing.T) {
 }
 
 func TestGetTheatres(t *testing.T) {
-	theatres := samples.GetSampleTheatres()
-	query := "SELECT .* FROM `KinoTicketSystem`.theatres"
+	theatresWithAddress := samples.GetSampleTheatres()
+	query := "SELECT theatres.id AS \"theatres.id\", theatres.name AS \"theatres.name\", theatres.logo_url AS \"theatres.logo_url\", addresses.id AS \"addresses.id\", addresses.street AS \"addresses.street\", addresses.street_nr AS \"addresses.street_nr\", addresses.zipcode AS \"addresses.zipcode\", addresses.city AS \"addresses.city\", addresses.country AS \"addresses.country\" FROM `KinoTicketSystem`.theatres INNER JOIN `KinoTicketSystem`.addresses ON (addresses.id = theatres.address_id);"
 	testCases := []struct {
 		name             string
-		data             []model.Theatres
-		setExpectations  func(mock sqlmock.Sqlmock, theatres []model.Theatres)
-		expectedTheatres *[]model.Theatres
+		setExpectations  func(mock sqlmock.Sqlmock)
+		expectedTheatres *[]models.GetTheatreWithAddress
 		expectedError    *models.KTSError
 	}{
 		{
 			name: "Success",
-			setExpectations: func(mock sqlmock.Sqlmock, theatres []model.Theatres) {
-				mock.ExpectQuery(query).WillReturnRows(sqlmock.NewRows([]string{"theatres.id", "theatres.name", "theatres.logo_url", "theatres.address_id"}).AddRow(theatres[0].ID, theatres[0].Name, theatres[0].LogoURL, theatres[0].AddressID).AddRow(theatres[1].ID, theatres[1].Name, theatres[1].LogoURL, theatres[1].AddressID))
+			setExpectations: func(mock sqlmock.Sqlmock) {
+				mock.ExpectQuery(query).WillReturnRows(sqlmock.NewRows(
+					[]string{"theatres.id", "theatres.name", "theatres.logo_url", "addresses.id", "addresses.street", "addresses.street_nr", "addresses.zipcode", "addresses.city", "addresses.country"},
+				).AddRow(
+					theatresWithAddress[0].ID, theatresWithAddress[0].Name, theatresWithAddress[0].LogoUrl, theatresWithAddress[0].Address.ID, theatresWithAddress[0].Address.Street, theatresWithAddress[0].Address.StreetNr, theatresWithAddress[0].Address.Zipcode, theatresWithAddress[0].Address.City, theatresWithAddress[0].Address.Country,
+				).AddRow(
+					theatresWithAddress[1].ID, theatresWithAddress[1].Name, theatresWithAddress[1].LogoUrl, theatresWithAddress[1].Address.ID, theatresWithAddress[1].Address.Street, theatresWithAddress[1].Address.StreetNr, theatresWithAddress[1].Address.Zipcode, theatresWithAddress[1].Address.City, theatresWithAddress[1].Address.Country,
+				))
 			},
-			expectedTheatres: &theatres,
+			expectedTheatres: &theatresWithAddress,
 			expectedError:    nil,
 		},
 		{
 			name: "Internal error",
-			setExpectations: func(mock sqlmock.Sqlmock, theatres []model.Theatres) {
+			setExpectations: func(mock sqlmock.Sqlmock) {
 				mock.ExpectQuery(query).WillReturnError(sql.ErrConnDone)
 			},
 			expectedTheatres: nil,
@@ -500,10 +505,11 @@ func TestGetTheatres(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// GIVEN
-			db, mock, err := sqlmock.New()
+			db, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
 			if err != nil {
 				t.Fatalf("error while setting up mock database: %s", err)
 			}
+
 			theatreRepo := TheatreRepository{
 				DatabaseManager: &managers.DatabaseManager{
 					Connection: db,
@@ -511,7 +517,7 @@ func TestGetTheatres(t *testing.T) {
 			}
 
 			// define expectations
-			tc.setExpectations(mock, theatres)
+			tc.setExpectations(mock)
 
 			// WHEN
 			theatres, kts_err := theatreRepo.GetTheatres()
