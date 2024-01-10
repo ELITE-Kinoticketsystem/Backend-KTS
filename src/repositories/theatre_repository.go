@@ -15,7 +15,7 @@ import (
 
 type TheaterRepoI interface {
 	CreateTheatre(theatre model.Theatres) *models.KTSError
-	GetTheatres() (*[]model.Theatres, *models.KTSError)
+	GetTheatres() (*[]models.GetTheatreWithAddress, *models.KTSError)
 	CreateCinemaHall(cinemaHall model.CinemaHalls) *models.KTSError
 	GetCinemaHallsForTheatre(theatreId *uuid.UUID) (*[]model.CinemaHalls, *models.KTSError)
 	CreateSeat(seat model.Seats) *models.KTSError
@@ -48,20 +48,26 @@ func (tr *TheatreRepository) CreateTheatre(theatre model.Theatres) *models.KTSEr
 	return nil
 }
 
-func (tr *TheatreRepository) GetTheatres() (*[]model.Theatres, *models.KTSError) {
-	var theatres []model.Theatres
+func (tr *TheatreRepository) GetTheatres() (*[]models.GetTheatreWithAddress, *models.KTSError) {
+	var theatresWithAddress []models.GetTheatreWithAddress
 	stmt := mysql.SELECT(
-		table.Theatres.AllColumns,
-	).FROM(table.Theatres)
+		table.Theatres.ID,
+		table.Theatres.Name,
+		table.Theatres.LogoURL,
+		table.Addresses.AllColumns,
+	).FROM(
+		table.Theatres.
+			INNER_JOIN(table.Addresses, table.Addresses.ID.EQ(table.Theatres.AddressID)),
+	)
 
-	err := stmt.Query(tr.DatabaseManager.GetDatabaseConnection(), &theatres)
+	err := stmt.Query(tr.DatabaseManager.GetDatabaseConnection(), &theatresWithAddress)
 
 	if err != nil {
 		log.Println(err)
 		return nil, kts_errors.KTS_INTERNAL_ERROR
 	}
 
-	return &theatres, nil
+	return &theatresWithAddress, nil
 }
 
 func (tr *TheatreRepository) CreateCinemaHall(cinemaHall model.CinemaHalls) *models.KTSError {

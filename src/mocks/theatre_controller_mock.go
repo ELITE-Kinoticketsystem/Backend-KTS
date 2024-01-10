@@ -84,10 +84,10 @@ func (mr *MockTheatreControllerIMockRecorder) GetCinemaHallsForTheatre(arg0 any)
 }
 
 // GetTheatres mocks base method.
-func (m *MockTheatreControllerI) GetTheatres() (*[]model.Theatres, *models.KTSError) {
+func (m *MockTheatreControllerI) GetTheatres() (*[]models.GetTheatreWithAddress, *models.KTSError) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetTheatres")
-	ret0, _ := ret[0].(*[]model.Theatres)
+	ret0, _ := ret[0].(*[]models.GetTheatreWithAddress)
 	ret1, _ := ret[1].(*models.KTSError)
 	return ret0, ret1
 }

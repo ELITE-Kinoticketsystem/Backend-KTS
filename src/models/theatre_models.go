@@ -1,6 +1,9 @@
 package models
 
-import "github.com/google/uuid"
+import (
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/gen/KinoTicketSystem/model"
+	"github.com/google/uuid"
+)
 
 type CreateTheatreRequest struct {
 	Name    string
@@ -23,4 +26,11 @@ type CreateCinemaHallRequest struct {
 		Category string
 	}
 	TheatreId *uuid.UUID
+}
+
+type GetTheatreWithAddress struct {
+	ID      *uuid.UUID `sql:"primary_key" alias:"theatres.id"`
+	Name    string     `alias:"theatres.name"`
+	LogoUrl *string    `alias:"theatres.logo_url"`
+	Address model.Addresses
 }

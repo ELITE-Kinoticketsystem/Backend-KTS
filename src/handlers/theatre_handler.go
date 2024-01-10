@@ -39,6 +39,15 @@ func CreateTheatre(theatreCtrl controllers.TheatreControllerI) gin.HandlerFunc {
 	}
 }
 
+// @Summary Get theatres
+// @Description Get theatres
+// @Tags Theatres
+// @Accept  json
+// @Produce  json
+// @Param theatre body models.GetTheatreWithAddress true "Theatre data with addresses"
+// @Success 200
+// @Failure 400 {object} models.KTSErrorMessage
+// @Router /theatres [get]
 func GetTheatres(theatreCtrl controllers.TheatreControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		theatres, kts_err := theatreCtrl.GetTheatres()
