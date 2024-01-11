@@ -1,6 +1,7 @@
 package repositories
 
 import (
+	"database/sql"
 	"log"
 
 	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
@@ -14,21 +15,22 @@ import (
 )
 
 type TheaterRepoI interface {
-	CreateTheatre(theatre model.Theatres) *models.KTSError
+	CreateTheatre(tx *sql.Tx, theatre model.Theatres) *models.KTSError
 	GetTheatres() (*[]models.GetTheatreWithAddress, *models.KTSError)
 	CreateCinemaHall(cinemaHall model.CinemaHalls) *models.KTSError
 	GetCinemaHallsForTheatre(theatreId *uuid.UUID) (*[]model.CinemaHalls, *models.KTSError)
 	CreateSeat(seat model.Seats) *models.KTSError
 	GetSeatCategories() ([]model.SeatCategories, *models.KTSError)
 	GetSeatsForCinemaHall(cinemaHallId *uuid.UUID) ([]model.Seats, *models.KTSError)
-	CreateAddress(address model.Addresses) *models.KTSError
+	CreateAddress(tx *sql.Tx, address model.Addresses) *models.KTSError
+	managers.DatabaseManagerI
 }
 
 type TheatreRepository struct {
-	DatabaseManager managers.DatabaseManagerI
+	managers.DatabaseManagerI
 }
 
-func (tr *TheatreRepository) CreateTheatre(theatre model.Theatres) *models.KTSError {
+func (tr *TheatreRepository) CreateTheatre(tx *sql.Tx, theatre model.Theatres) *models.KTSError {
 	stmt := table.Theatres.INSERT(
 		table.Theatres.ID,
 		table.Theatres.Name,
@@ -41,7 +43,7 @@ func (tr *TheatreRepository) CreateTheatre(theatre model.Theatres) *models.KTSEr
 		utils.MysqlUuid(theatre.AddressID),
 	)
 
-	_, err := stmt.Exec(tr.DatabaseManager.GetDatabaseConnection())
+	_, err := stmt.Exec(tx)
 	if err != nil {
 		return kts_errors.KTS_INTERNAL_ERROR
 	}
@@ -60,7 +62,7 @@ func (tr *TheatreRepository) GetTheatres() (*[]models.GetTheatreWithAddress, *mo
 			INNER_JOIN(table.Addresses, table.Addresses.ID.EQ(table.Theatres.AddressID)),
 	)
 
-	err := stmt.Query(tr.DatabaseManager.GetDatabaseConnection(), &theatresWithAddress)
+	err := stmt.Query(tr.GetDatabaseConnection(), &theatresWithAddress)
 
 	if err != nil {
 		log.Println(err)
@@ -83,7 +85,7 @@ func (tr *TheatreRepository) CreateCinemaHall(cinemaHall model.CinemaHalls) *mod
 		utils.MysqlUuid(cinemaHall.TheatreID),
 	)
 
-	_, err := stmt.Exec(tr.DatabaseManager.GetDatabaseConnection())
+	_, err := stmt.Exec(tr.GetDatabaseConnection())
 	if err != nil {
 		return kts_errors.KTS_INTERNAL_ERROR
 	}
@@ -104,7 +106,7 @@ func (tr *TheatreRepository) GetCinemaHallsForTheatre(theatreId *uuid.UUID) (*[]
 		table.CinemaHalls.TheatreID.EQ(utils.MysqlUuid(theatreId)),
 	)
 
-	err := stmt.Query(tr.DatabaseManager.GetDatabaseConnection(), &cinemaHalls)
+	err := stmt.Query(tr.GetDatabaseConnection(), &cinemaHalls)
 	if err != nil {
 		return nil, kts_errors.KTS_INTERNAL_ERROR
 	}
@@ -136,7 +138,7 @@ func (tr *TheatreRepository) CreateSeat(seat model.Seats) *models.KTSError {
 		seat.Type,
 	)
 
-	_, err := stmt.Exec(tr.DatabaseManager.GetDatabaseConnection())
+	_, err := stmt.Exec(tr.GetDatabaseConnection())
 	if err != nil {
 		return kts_errors.KTS_INTERNAL_ERROR
 	}
@@ -154,7 +156,7 @@ func (tr *TheatreRepository) GetSeatCategories() ([]model.SeatCategories, *model
 		table.SeatCategories,
 	)
 
-	err := stmt.Query(tr.DatabaseManager.GetDatabaseConnection(), &seatCategories)
+	err := stmt.Query(tr.GetDatabaseConnection(), &seatCategories)
 	if err != nil {
 		if err.Error() == "jet: sql: no rows in result set" {
 			return nil, kts_errors.KTS_NOT_FOUND
@@ -180,7 +182,7 @@ func (tr *TheatreRepository) GetSeatsForCinemaHall(cinemaHallId *uuid.UUID) ([]m
 	).WHERE(
 		table.Seats.CinemaHallID.EQ(utils.MysqlUuid(cinemaHallId)),
 	)
-	err := stmt.Query(tr.DatabaseManager.GetDatabaseConnection(), &seats)
+	err := stmt.Query(tr.GetDatabaseConnection(), &seats)
 
 	if err != nil {
 		if err.Error() == "jet: sql: no rows in result set" {
@@ -192,7 +194,7 @@ func (tr *TheatreRepository) GetSeatsForCinemaHall(cinemaHallId *uuid.UUID) ([]m
 	return seats, nil
 }
 
-func (tr *TheatreRepository) CreateAddress(address model.Addresses) *models.KTSError {
+func (tr *TheatreRepository) CreateAddress(tx *sql.Tx, address model.Addresses) *models.KTSError {
 	insertStmt := table.Addresses.INSERT(
 		table.Addresses.ID,
 		table.Addresses.Street,
@@ -208,7 +210,7 @@ func (tr *TheatreRepository) CreateAddress(address model.Addresses) *models.KTSE
 		address.City,
 		address.Country,
 	)
-	_, err := insertStmt.Exec(tr.DatabaseManager.GetDatabaseConnection())
+	_, err := insertStmt.Exec(tx)
 	if err != nil {
 		return kts_errors.KTS_INTERNAL_ERROR
 	}

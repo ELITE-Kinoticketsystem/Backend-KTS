@@ -9,6 +9,7 @@
 package mocks
 
 import (
+	sql "database/sql"
 	reflect "reflect"
 
 	model "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/gen/KinoTicketSystem/model"
@@ -41,17 +42,17 @@ func (m *MockTheaterRepoI) EXPECT() *MockTheaterRepoIMockRecorder {
 }
 
 // CreateAddress mocks base method.
-func (m *MockTheaterRepoI) CreateAddress(address model.Addresses) *models.KTSError {
+func (m *MockTheaterRepoI) CreateAddress(tx *sql.Tx, address model.Addresses) *models.KTSError {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreateAddress", address)
+	ret := m.ctrl.Call(m, "CreateAddress", tx, address)
 	ret0, _ := ret[0].(*models.KTSError)
 	return ret0
 }
 
 // CreateAddress indicates an expected call of CreateAddress.
-func (mr *MockTheaterRepoIMockRecorder) CreateAddress(address any) *gomock.Call {
+func (mr *MockTheaterRepoIMockRecorder) CreateAddress(tx, address any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateAddress", reflect.TypeOf((*MockTheaterRepoI)(nil).CreateAddress), address)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateAddress", reflect.TypeOf((*MockTheaterRepoI)(nil).CreateAddress), tx, address)
 }
 
 // CreateCinemaHall mocks base method.
@@ -83,17 +84,17 @@ func (mr *MockTheaterRepoIMockRecorder) CreateSeat(seat any) *gomock.Call {
 }
 
 // CreateTheatre mocks base method.
-func (m *MockTheaterRepoI) CreateTheatre(theatre model.Theatres) *models.KTSError {
+func (m *MockTheaterRepoI) CreateTheatre(tx *sql.Tx, theatre model.Theatres) *models.KTSError {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreateTheatre", theatre)
+	ret := m.ctrl.Call(m, "CreateTheatre", tx, theatre)
 	ret0, _ := ret[0].(*models.KTSError)
 	return ret0
 }
 
 // CreateTheatre indicates an expected call of CreateTheatre.
-func (mr *MockTheaterRepoIMockRecorder) CreateTheatre(theatre any) *gomock.Call {
+func (mr *MockTheaterRepoIMockRecorder) CreateTheatre(tx, theatre any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateTheatre", reflect.TypeOf((*MockTheaterRepoI)(nil).CreateTheatre), theatre)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateTheatre", reflect.TypeOf((*MockTheaterRepoI)(nil).CreateTheatre), tx, theatre)
 }
 
 // GetCinemaHallsForTheatre mocks base method.
@@ -109,6 +110,20 @@ func (m *MockTheaterRepoI) GetCinemaHallsForTheatre(theatreId *uuid.UUID) (*[]mo
 func (mr *MockTheaterRepoIMockRecorder) GetCinemaHallsForTheatre(theatreId any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCinemaHallsForTheatre", reflect.TypeOf((*MockTheaterRepoI)(nil).GetCinemaHallsForTheatre), theatreId)
+}
+
+// GetDatabaseConnection mocks base method.
+func (m *MockTheaterRepoI) GetDatabaseConnection() *sql.DB {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetDatabaseConnection")
+	ret0, _ := ret[0].(*sql.DB)
+	return ret0
+}
+
+// GetDatabaseConnection indicates an expected call of GetDatabaseConnection.
+func (mr *MockTheaterRepoIMockRecorder) GetDatabaseConnection() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDatabaseConnection", reflect.TypeOf((*MockTheaterRepoI)(nil).GetDatabaseConnection))
 }
 
 // GetSeatCategories mocks base method.
@@ -154,4 +169,19 @@ func (m *MockTheaterRepoI) GetTheatres() (*[]models.GetTheatreWithAddress, *mode
 func (mr *MockTheaterRepoIMockRecorder) GetTheatres() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetTheatres", reflect.TypeOf((*MockTheaterRepoI)(nil).GetTheatres))
+}
+
+// NewTransaction mocks base method.
+func (m *MockTheaterRepoI) NewTransaction() (*sql.Tx, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "NewTransaction")
+	ret0, _ := ret[0].(*sql.Tx)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// NewTransaction indicates an expected call of NewTransaction.
+func (mr *MockTheaterRepoIMockRecorder) NewTransaction() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "NewTransaction", reflect.TypeOf((*MockTheaterRepoI)(nil).NewTransaction))
 }
