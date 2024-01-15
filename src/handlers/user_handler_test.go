@@ -243,6 +243,30 @@ func TestLoginUser(t *testing.T) {
 		})
 	}
 }
+
+func TestLogoutUser(t *testing.T) {
+	expectedStatus := http.StatusOK
+	expectedResponseBody := ""
+	expectedCookieHeader := "token=; Path=/; Max-Age=0; HttpOnly; Secure; SameSite=None"
+
+	// GIVEN
+	// create mock context
+	w := httptest.NewRecorder()
+	gin.SetMode(gin.TestMode)
+	c, _ := gin.CreateTestContext(w)
+
+	// WHEN
+	// call LogoutUserHandler with mock context
+	LogoutUserHandler(c)
+
+	// THEN
+	// check the HTTP status code, body and cookie
+	assert.Equal(t, expectedStatus, w.Code, "wrong HTTP status code")
+	assert.Equal(t, expectedResponseBody, w.Body.String(), "wrong response body")
+	assert.Equal(t, expectedCookieHeader, w.Header().Get("Set-Cookie"), "wrong cookie")
+
+}
+
 func TestCheckEmail(t *testing.T) {
 	email := "collin.forslund@gmail.com"
 	testCases := []struct {
@@ -280,8 +304,9 @@ func TestCheckEmail(t *testing.T) {
 			name:            "Malformatted data",
 			body:            map[string]string{},
 			setExpectations: func(mockController *mocks.MockUserControllerI) {},
-			expectedResponseBody: gin.H{
-				"errorMessage": "BAD_REQUEST",
+			expectedResponseBody: models.KTSError{
+				KTSErrorMessage: models.KTSErrorMessage{ErrorMessage: "BAD_REQUEST"},
+				Details:         "Email is empty",
 			},
 			expectedStatus: http.StatusBadRequest,
 		},
@@ -289,8 +314,9 @@ func TestCheckEmail(t *testing.T) {
 			name:            "No data",
 			body:            nil,
 			setExpectations: func(mockController *mocks.MockUserControllerI) {},
-			expectedResponseBody: gin.H{
-				"errorMessage": "BAD_REQUEST",
+			expectedResponseBody: models.KTSError{
+				KTSErrorMessage: models.KTSErrorMessage{ErrorMessage: "BAD_REQUEST"},
+				Details:         "Email is empty",
 			},
 			expectedStatus: http.StatusBadRequest,
 		},

@@ -1,15 +1,12 @@
 package repositories
 
 import (
-	"log"
-
 	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/gen/KinoTicketSystem/model"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/gen/KinoTicketSystem/table"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/managers"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
-	"github.com/go-jet/jet/v2/mysql"
 	"github.com/google/uuid"
 )
 
@@ -19,6 +16,7 @@ type ReviewRepositoryI interface {
 	DeleteReview(id *uuid.UUID) *models.KTSError
 
 	GetRatingForMovie(movieId *uuid.UUID) (*models.NewRating, *models.KTSError)
+	DeleteReviewForMovie(movieId *uuid.UUID) *models.KTSError
 }
 
 type ReviewRepository struct {
@@ -116,4 +114,15 @@ func (rr *ReviewRepository) GetRatingForMovie(movieId *uuid.UUID) (*models.NewRa
 	log.Print(rating.Rating)
 
 	return &rating, nil
+}
+
+func (rr *ReviewRepository) DeleteReviewForMovie(movieId *uuid.UUID) *models.KTSError {
+	stmt := table.Reviews.DELETE().WHERE(table.Reviews.MovieID.EQ(utils.MysqlUuid(movieId)))
+	log.Print(stmt.DebugSql())
+	_, err := stmt.Exec(rr.DatabaseManager.GetDatabaseConnection())
+	if err != nil {
+		return kts_errors.KTS_INTERNAL_ERROR
+	}
+
+	return nil
 }

@@ -38,7 +38,7 @@ func RegisterUserHandler(userCtrl controllers.UserControllerI) gin.HandlerFunc {
 			return
 		}
 
-		utils.SetJWTCookies(c, loginResponse.Token, loginResponse.RefreshToken)
+		utils.SetJWTCookies(c, loginResponse.Token, loginResponse.RefreshToken, false)
 		c.JSON(http.StatusCreated, loginResponse.User)
 	}
 }
@@ -69,9 +69,14 @@ func LoginUserHandler(userCtrl controllers.UserControllerI) gin.HandlerFunc {
 			return
 		}
 
-		utils.SetJWTCookies(c, loginResponse.Token, loginResponse.RefreshToken)
+		utils.SetJWTCookies(c, loginResponse.Token, loginResponse.RefreshToken, false)
 		c.JSON(http.StatusOK, loginResponse.User)
 	}
+}
+
+func LogoutUserHandler(c *gin.Context) {
+	utils.SetJWTCookies(c, "", "", true)
+	c.Status(http.StatusOK)
 }
 
 // @Summary Check email
@@ -91,7 +96,7 @@ func CheckEmailHandler(userCtrl controllers.UserControllerI) gin.HandlerFunc {
 			return
 		}
 		if utils.ContainsEmptyString(requestData.Email) {
-			utils.HandleErrorAndAbort(c, kts_errors.KTS_BAD_REQUEST)
+			utils.HandleErrorAndAbort(c, kts_errors.KTS_BAD_REQUEST.WithDetails("Email is empty"))
 			return
 		}
 

@@ -36,7 +36,7 @@ func JwtAuthMiddleware() gin.HandlerFunc {
 				utils.HandleErrorAndAbort(c, kts_errors.KTS_UNAUTHORIZED)
 				return
 			}
-			utils.SetJWTCookies(c, token, refreshToken)
+			utils.SetJWTCookies(c, token, refreshToken, false)
 		}
 
 		userId, err := utils.ValidateToken(token)

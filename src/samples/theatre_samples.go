@@ -29,19 +29,33 @@ func GetSampleAddress() model.Addresses {
 	}
 }
 
-func GetSampleTheatres() []model.Theatres {
-	return []model.Theatres{
+func GetSampleTheatres() []models.GetTheatreWithAddress {
+	return []models.GetTheatreWithAddress{
 		{
-			ID:        utils.NewUUID(),
-			Name:      "Theatre1",
-			LogoURL:   utils.GetStringPointer("LogoUr1"),
-			AddressID: utils.NewUUID(),
+			ID:      utils.NewUUID(),
+			Name:    "Theatre1",
+			LogoUrl: utils.GetStringPointer("LogoUr1"),
+			Address: model.Addresses{
+				ID:       utils.NewUUID(),
+				Street:   "Street1",
+				StreetNr: "StreetNr1",
+				Zipcode:  "26382",
+				City:     "City1",
+				Country:  "Country1",
+			},
 		},
 		{
-			ID:        utils.NewUUID(),
-			Name:      "Theatre2",
-			LogoURL:   utils.GetStringPointer("LogoUrl2"),
-			AddressID: utils.NewUUID(),
+			ID:      utils.NewUUID(),
+			Name:    "Theatre2",
+			LogoUrl: utils.GetStringPointer("LogoUrl2"),
+			Address: model.Addresses{
+				ID:       utils.NewUUID(),
+				Street:   "Street2",
+				StreetNr: "StreetNr2",
+				Zipcode:  "26382",
+				City:     "City2",
+				Country:  "Country2",
+			},
 		},
 	}
 }

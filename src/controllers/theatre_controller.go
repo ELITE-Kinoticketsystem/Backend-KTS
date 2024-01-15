@@ -10,7 +10,7 @@ import (
 
 type TheatreControllerI interface {
 	CreateTheatre(*models.CreateTheatreRequest) *models.KTSError
-	GetTheatres() (*[]model.Theatres, *models.KTSError)
+	GetTheatres() (*[]models.GetTheatreWithAddress, *models.KTSError)
 	CreateCinemaHall(*models.CreateCinemaHallRequest) *models.KTSError
 	GetCinemaHallsForTheatre(*uuid.UUID) (*[]model.CinemaHalls, *models.KTSError)
 }
@@ -50,7 +50,7 @@ func (tc *TheatreController) CreateTheatre(theatreData *models.CreateTheatreRequ
 	return nil
 }
 
-func (tc *TheatreController) GetTheatres() (*[]model.Theatres, *models.KTSError){
+func (tc *TheatreController) GetTheatres() (*[]models.GetTheatreWithAddress, *models.KTSError) {
 	return tc.TheatreRepo.GetTheatres()
 }
 

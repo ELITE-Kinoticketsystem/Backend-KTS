@@ -101,6 +101,10 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 		DatabaseManager: databaseManager,
 	}
 
+	userMovieRepo := &repositories.UserMovieRepository{
+		DatabaseManager: databaseManager,
+	}
+
 	// Create controllers
 	controller := Controllers{
 		UserController: &controllers.UserController{
@@ -111,9 +115,12 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 			MovieGenreRepo:    movieGenreRepo,
 			MovieActorRepo:    movieActorRepo,
 			MovieProducerRepo: movieProducerRepo,
+			ReviewRepo:        reviewsRepo,
+			UserMovieRepo:     userMovieRepo,
 		},
 		GenreController: &controllers.GenreController{
-			GenreRepo: genreRepo,
+			GenreRepo:      genreRepo,
+			MovieGenreRepo: movieGenreRepo,
 		},
 		ActorController: &controllers.ActorController{
 			ActorRepo: actorRepo,
@@ -151,6 +158,7 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 
 	publicRoutes.Handle(http.MethodPost, "/auth/register", handlers.RegisterUserHandler(controller.UserController))
 	publicRoutes.Handle(http.MethodPost, "/auth/login", handlers.LoginUserHandler(controller.UserController))
+	publicRoutes.Handle(http.MethodPost, "/auth/logout", handlers.LogoutUserHandler)
 	publicRoutes.Handle(http.MethodPost, "/auth/check-email", handlers.CheckEmailHandler(controller.UserController))
 	publicRoutes.Handle(http.MethodPost, "/auth/check-username", handlers.CheckUsernameHandler(controller.UserController))
 	publicRoutes.Handle(http.MethodGet, "/auth/logged-in", handlers.LoggedInHandler)
@@ -171,7 +179,7 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 	publicRoutes.Handle(http.MethodGet, "/genres", handlers.GetGenres(controller.GenreController))
 	publicRoutes.Handle(http.MethodGet, "/genres/:name", handlers.GetGenreByName(controller.GenreController))
 	publicRoutes.Handle(http.MethodGet, "/genres/movies", handlers.GetGenresWithMovies(controller.GenreController))
-	publicRoutes.Handle(http.MethodPost, "/genres", handlers.CreateGenre(controller.GenreController))
+	publicRoutes.Handle(http.MethodPost, "/genres/:name", handlers.CreateGenre(controller.GenreController))
 	publicRoutes.Handle(http.MethodPut, "/genres", handlers.UpdateGenre(controller.GenreController))
 	publicRoutes.Handle(http.MethodDelete, "/genres/:id", handlers.DeleteGenre(controller.GenreController))
 

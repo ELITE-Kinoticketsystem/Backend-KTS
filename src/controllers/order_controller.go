@@ -40,7 +40,11 @@ func (oc *OrderController) CreateOrder(createOrderDTO models.CreateOrderDTO, eve
 	adultPriceCategory := getPriceCategoryByName(*priceCategories, utils.ADULT)
 	orderId := utils.NewUUID()
 
-	tickets, totalPrice := createTicketsAndCalculateTotalPrice(selectedSeats, createOrderDTO, priceCategories, adultPriceCategory, orderId)
+	tickets, totalPrice, kts_err := createTicketsAndCalculateTotalPrice(selectedSeats, createOrderDTO, priceCategories, adultPriceCategory, orderId)
+
+	if kts_err != nil {
+		return nil, kts_err
+	}
 
 	order := model.Orders{
 		ID:              orderId,
@@ -81,7 +85,7 @@ func (oc *OrderController) GetOrders(userId *uuid.UUID) (*[]models.GetOrderDTO, 
 	return oc.OrderRepo.GetOrders(userId)
 }
 
-func createTicketsAndCalculateTotalPrice(slectedSeats *[]models.GetSlectedSeatsDTO, createOrderDTO models.CreateOrderDTO, priceCategories *[]model.PriceCategories, adultPriceCategory *model.PriceCategories, orderId *uuid.UUID) ([]model.Tickets, int32) {
+func createTicketsAndCalculateTotalPrice(slectedSeats *[]models.GetSlectedSeatsDTO, createOrderDTO models.CreateOrderDTO, priceCategories *[]model.PriceCategories, adultPriceCategory *model.PriceCategories, orderId *uuid.UUID) ([]model.Tickets, int32, *models.KTSError) {
 	tickets := make([]model.Tickets, len(*slectedSeats))
 
 	totalPrice := int32(0)
@@ -91,7 +95,10 @@ func createTicketsAndCalculateTotalPrice(slectedSeats *[]models.GetSlectedSeatsD
 		var priceCategory *model.PriceCategories
 
 		for _, seatPriceCategory := range createOrderDTO.EventSeatPriceCategories {
-			if seat.EventSeat.ID == seatPriceCategory.EventSeatId {
+			if seat.EventSeat.ID == nil {
+				return nil, 0, kts_errors.KTS_BAD_REQUEST
+			}
+			if *seat.EventSeat.ID == *seatPriceCategory.EventSeatId {
 				priceCategory = getPriceCategoryById(*priceCategories, seatPriceCategory.PriceCategoryId)
 				break
 			}
@@ -114,7 +121,7 @@ func createTicketsAndCalculateTotalPrice(slectedSeats *[]models.GetSlectedSeatsD
 			Validated:       false,
 		}
 	}
-	return tickets, totalPrice
+	return tickets, totalPrice, nil
 }
 
 func getPriceCategoryByName(priceCategories []model.PriceCategories, name utils.PriceCategories) *model.PriceCategories {
@@ -128,7 +135,7 @@ func getPriceCategoryByName(priceCategories []model.PriceCategories, name utils.
 
 func getPriceCategoryById(priceCategories []model.PriceCategories, id *uuid.UUID) *model.PriceCategories {
 	for _, priceCategory := range priceCategories {
-		if priceCategory.ID == id {
+		if *priceCategory.ID == *id {
 			return &priceCategory
 		}
 	}
