@@ -17,6 +17,7 @@ type ReviewController struct {
 	ReviewRepo repositories.ReviewRepositoryI
 	UserRepo   repositories.UserRepositoryI
 	MovieRepo  repositories.MovieRepositoryI
+	MovieRepo  repositories.MovieRepositoryI
 }
 
 func (rc ReviewController) CreateReview(reviewData models.CreateReviewRequest, userId *uuid.UUID) (*model.Reviews, string, *models.KTSError) {
