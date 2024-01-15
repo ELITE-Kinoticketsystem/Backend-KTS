@@ -47,11 +47,14 @@ func (rc ReviewController) CreateReview(reviewData models.CreateReviewRequest, u
 	}
 
 	// TODO Calc new Rating for Movie
-	rating, kts_err := rc.ReviewRepo.GetRatingForMovie(&movieId)
+	ratings, kts_err := rc.ReviewRepo.GetRatingForMovie(&movieId)
 	if kts_err != nil {
 		return nil, "", kts_err
 	}
-	kts_err = rc.MovieRepo.UpdateRating(&movieId, rating.Rating)
+
+	newMovieRating := ratings.Rating / float64(ratings.TotalRatings)
+
+	kts_err = rc.MovieRepo.UpdateRating(&movieId, newMovieRating)
 	if kts_err != nil {
 		return nil, "", kts_err
 	}

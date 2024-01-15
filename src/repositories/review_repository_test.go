@@ -349,7 +349,7 @@ func TestDeleteReview(t *testing.T) {
 func TestGetRatingForMovie(t *testing.T) {
 	movieRating := samples.GetSampleNewRating()
 
-	query := "SELECT SUM(reviews.rating) FROM `KinoTicketSystem`.reviews WHERE reviews.movie_id = ?;"
+	query := "SELECT SUM(reviews.rating), COUNT(reviews.rating) FROM `KinoTicketSystem`.reviews WHERE reviews.movie_id = ?;"
 
 	testCases := []struct {
 		name            string
@@ -364,9 +364,9 @@ func TestGetRatingForMovie(t *testing.T) {
 			setExpectations: func(mock sqlmock.Sqlmock, movieId *uuid.UUID) {
 				mock.ExpectQuery(query).WithArgs(utils.EqUUID(movieId)).WillReturnRows(
 					sqlmock.NewRows(
-						[]string{"SUM(reviews.rating)"},
+						[]string{"SUM(reviews.rating)", "COUNT(reviews.rating)"},
 					).AddRow(
-						movieRating.Rating,
+						movieRating.Rating, movieRating.TotalRatings,
 					),
 				)
 			},

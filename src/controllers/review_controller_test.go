@@ -18,7 +18,8 @@ import (
 
 func TestCreateReview(t *testing.T) {
 	newRating := &models.NewRating{
-		Rating: 3.6,
+		TotalRatings: 1,
+		Rating:       3.6,
 	}
 	review := samples.GetSampleReview()
 	user := samples.GetSampleUser()

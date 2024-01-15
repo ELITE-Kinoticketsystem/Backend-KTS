@@ -1,5 +1,6 @@
 package models
 
 type NewRating struct {
-	Rating float64 `alias:"SUM(reviews.rating)"`
+	TotalRatings int64   `alias:"COUNT(reviews.rating)"`
+	Rating       float64 `alias:"SUM(reviews.rating)"`
 }

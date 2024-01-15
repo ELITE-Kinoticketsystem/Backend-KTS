@@ -105,6 +105,7 @@ func (rr *ReviewRepository) GetRatingForMovie(movieId *uuid.UUID) (*models.NewRa
 	var rating models.NewRating
 	stmt := table.Reviews.SELECT(
 		mysql.SUM(table.Reviews.Rating),
+		mysql.COUNT(table.Reviews.Rating),
 	).WHERE(
 		table.Reviews.MovieID.EQ(utils.MysqlUuid(movieId)),
 	)
