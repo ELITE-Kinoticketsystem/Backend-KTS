@@ -16,6 +16,7 @@ type ReviewControllerI interface {
 type ReviewController struct {
 	ReviewRepo repositories.ReviewRepositoryI
 	UserRepo   repositories.UserRepositoryI
+	MovieRepo  repositories.MovieRepositoryI
 }
 
 func (rc ReviewController) CreateReview(reviewData models.CreateReviewRequest, userId *uuid.UUID) (*model.Reviews, string, *models.KTSError) {
@@ -43,6 +44,16 @@ func (rc ReviewController) CreateReview(reviewData models.CreateReviewRequest, u
 	kts_error := rc.ReviewRepo.CreateReview(review)
 	if kts_error != nil {
 		return nil, "", kts_error
+	}
+
+	// TODO Calc new Rating for Movie
+	rating, kts_err := rc.ReviewRepo.GetRatingForMovie(&movieId)
+	if kts_err != nil {
+		return nil, "", kts_err
+	}
+	kts_err = rc.MovieRepo.UpdateRating(&movieId, rating.Rating)
+	if kts_err != nil {
+		return nil, "", kts_err
 	}
 
 	return &review, *user.Username, nil

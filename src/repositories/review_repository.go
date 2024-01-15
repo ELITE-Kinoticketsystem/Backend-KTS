@@ -9,6 +9,7 @@ import (
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/managers"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
+	"github.com/go-jet/jet/v2/mysql"
 	"github.com/google/uuid"
 )
 
@@ -16,6 +17,8 @@ type ReviewRepositoryI interface {
 	CreateReview(review model.Reviews) *models.KTSError
 	GetReviewById(id *uuid.UUID) (*model.Reviews, *models.KTSError)
 	DeleteReview(id *uuid.UUID) *models.KTSError
+
+	GetRatingForMovie(movieId *uuid.UUID) (*models.NewRating, *models.KTSError)
 	DeleteReviewForMovie(movieId *uuid.UUID) *models.KTSError
 }
 
@@ -96,6 +99,24 @@ func (rr *ReviewRepository) DeleteReview(id *uuid.UUID) *models.KTSError {
 	}
 
 	return nil
+}
+
+func (rr *ReviewRepository) GetRatingForMovie(movieId *uuid.UUID) (*models.NewRating, *models.KTSError) {
+	var rating models.NewRating
+	stmt := table.Reviews.SELECT(
+		mysql.SUM(table.Reviews.Rating),
+	).WHERE(
+		table.Reviews.MovieID.EQ(utils.MysqlUuid(movieId)),
+	)
+
+	err := stmt.Query(rr.DatabaseManager.GetDatabaseConnection(), &rating)
+	if err != nil {
+		return nil, kts_errors.KTS_INTERNAL_ERROR
+	}
+
+	log.Print(rating.Rating)
+
+	return &rating, nil
 }
 
 func (rr *ReviewRepository) DeleteReviewForMovie(movieId *uuid.UUID) *models.KTSError {

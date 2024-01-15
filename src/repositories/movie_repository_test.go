@@ -576,3 +576,63 @@ func TestGetMovieById(t *testing.T) {
 		})
 	}
 }
+
+func TestUpdateRating(t *testing.T) {
+	rating := 3.4
+	movieId := utils.NewUUID()
+
+	query := "UPDATE `KinoTicketSystem`.movies SET rating = ? WHERE movies.id = ?;"
+
+	testCases := []struct {
+		name            string
+		setExpectations func(mock sqlmock.Sqlmock, id *uuid.UUID, rating float64)
+		expectedError   *models.KTSError
+	}{
+		{
+			name: "Empty result",
+			setExpectations: func(mock sqlmock.Sqlmock, id *uuid.UUID, rating float64) {
+				mock.ExpectExec(query).WithArgs(rating, utils.EqUUID(id)).WillReturnError(sqlmock.ErrCancelled)
+			},
+			expectedError: kts_errors.KTS_INTERNAL_ERROR,
+		},
+		{
+			name: "Update Rating",
+			setExpectations: func(mock sqlmock.Sqlmock, id *uuid.UUID, rating float64) {
+				mock.ExpectExec(query).WithArgs(rating, utils.EqUUID(id)).WillReturnResult(sqlmock.NewResult(1, 1))
+			},
+			expectedError: nil,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			// Create a new mock database connection
+			db, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
+			if err != nil {
+				t.Fatalf("Failed to create mock database connection: %v", err)
+			}
+			defer db.Close()
+
+			// Create a new instance of the MovieRepository with the mock database connection
+			movieRepo := MovieRepository{
+				DatabaseManager: &managers.DatabaseManager{
+					Connection: db,
+				},
+			}
+
+			tc.setExpectations(mock, movieId, rating)
+
+			// Call the method under test
+			kts_err := movieRepo.UpdateRating(movieId, rating)
+
+			// Verify the results
+			assert.Equal(t, tc.expectedError, kts_err)
+
+			// Verify that all expectations were met
+			if err = mock.ExpectationsWereMet(); err != nil {
+				t.Errorf("There were unfulfilled expectations: %s", err)
+			}
+
+		})
+	}
+}

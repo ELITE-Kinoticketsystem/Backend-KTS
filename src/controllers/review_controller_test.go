@@ -17,13 +17,16 @@ import (
 )
 
 func TestCreateReview(t *testing.T) {
-	user := samples.GetSampleUser()
+	newRating := &models.NewRating{
+		Rating: 3.6,
+	}
 	review := samples.GetSampleReview()
+	user := samples.GetSampleUser()
 	userId := user.ID
 	testCases := []struct {
 		name             string
 		reviewData       models.CreateReviewRequest
-		setExpectations  func(userRepo mocks.MockUserRepositoryI, reviewRepo mocks.MockReviewRepositoryI, reviewData models.CreateReviewRequest)
+		setExpectations  func(userRepo mocks.MockUserRepositoryI, reviewRepo mocks.MockReviewRepositoryI, movieRepo mocks.MockMovieRepositoryI, reviewData models.CreateReviewRequest)
 		expectedReview   *model.Reviews
 		expectedUsername string
 		expectedError    *models.KTSError
@@ -31,7 +34,7 @@ func TestCreateReview(t *testing.T) {
 		{
 			name:       "User Internal error",
 			reviewData: samples.GetSampleReviewRequest(),
-			setExpectations: func(userRepo mocks.MockUserRepositoryI, reviewRepo mocks.MockReviewRepositoryI, reviewData models.CreateReviewRequest) {
+			setExpectations: func(userRepo mocks.MockUserRepositoryI, reviewRepo mocks.MockReviewRepositoryI, movieRepo mocks.MockMovieRepositoryI, reviewData models.CreateReviewRequest) {
 				userRepo.EXPECT().GetUserById(userId).Return(nil, kts_errors.KTS_INTERNAL_ERROR)
 			},
 			expectedReview:   nil,
@@ -41,7 +44,7 @@ func TestCreateReview(t *testing.T) {
 		{
 			name:       "Create Internal error",
 			reviewData: samples.GetSampleReviewRequest(),
-			setExpectations: func(userRepo mocks.MockUserRepositoryI, reviewRepo mocks.MockReviewRepositoryI, reviewData models.CreateReviewRequest) {
+			setExpectations: func(userRepo mocks.MockUserRepositoryI, reviewRepo mocks.MockReviewRepositoryI, movieRepo mocks.MockMovieRepositoryI, reviewData models.CreateReviewRequest) {
 				movieId := uuid.MustParse(reviewData.MovieID)
 				review := model.Reviews{
 					Rating:    reviewData.Rating,
@@ -68,7 +71,7 @@ func TestCreateReview(t *testing.T) {
 				MovieID:   "invalid id",
 				/* UserID */
 			},
-			setExpectations: func(userRepo mocks.MockUserRepositoryI, reviewRepo mocks.MockReviewRepositoryI, reviewData models.CreateReviewRequest) {
+			setExpectations: func(userRepo mocks.MockUserRepositoryI, reviewRepo mocks.MockReviewRepositoryI, movieRepo mocks.MockMovieRepositoryI, reviewData models.CreateReviewRequest) {
 				userRepo.EXPECT().GetUserById(userId).Return(&user, nil)
 			},
 			expectedReview:   nil,
@@ -76,9 +79,9 @@ func TestCreateReview(t *testing.T) {
 			expectedError:    kts_errors.KTS_BAD_REQUEST,
 		},
 		{
-			name:       "Success",
+			name:       "GetRatingFromMovies Failed",
 			reviewData: samples.GetSampleReviewRequest(),
-			setExpectations: func(userRepo mocks.MockUserRepositoryI, reviewRepo mocks.MockReviewRepositoryI, reviewData models.CreateReviewRequest) {
+			setExpectations: func(userRepo mocks.MockUserRepositoryI, reviewRepo mocks.MockReviewRepositoryI, movieRepo mocks.MockMovieRepositoryI, reviewData models.CreateReviewRequest) {
 				movieId := uuid.MustParse(reviewData.MovieID)
 				review := model.Reviews{
 					Rating:    reviewData.Rating,
@@ -90,6 +93,51 @@ func TestCreateReview(t *testing.T) {
 				}
 				userRepo.EXPECT().GetUserById(userId).Return(&user, nil)
 				reviewRepo.EXPECT().CreateReview(utils.EqExceptUUIDs(review)).Return(nil)
+				reviewRepo.EXPECT().GetRatingForMovie(&movieId).Return(nil, kts_errors.KTS_INTERNAL_ERROR)
+			},
+			expectedReview:   nil,
+			expectedUsername: "",
+			expectedError:    kts_errors.KTS_INTERNAL_ERROR,
+		},
+		{
+			name:       "UpdateRating Failed",
+			reviewData: samples.GetSampleReviewRequest(),
+			setExpectations: func(userRepo mocks.MockUserRepositoryI, reviewRepo mocks.MockReviewRepositoryI, movieRepo mocks.MockMovieRepositoryI, reviewData models.CreateReviewRequest) {
+				movieId := uuid.MustParse(reviewData.MovieID)
+				review := model.Reviews{
+					Rating:    reviewData.Rating,
+					Comment:   reviewData.Comment,
+					Datetime:  reviewData.Datetime,
+					IsSpoiler: &reviewData.IsSpoiler,
+					MovieID:   &movieId,
+					/* UserID */
+				}
+				userRepo.EXPECT().GetUserById(userId).Return(&user, nil)
+				reviewRepo.EXPECT().CreateReview(utils.EqExceptUUIDs(review)).Return(nil)
+				reviewRepo.EXPECT().GetRatingForMovie(&movieId).Return(newRating, nil)
+				movieRepo.EXPECT().UpdateRating(&movieId, newRating.Rating).Return(kts_errors.KTS_INTERNAL_ERROR)
+			},
+			expectedReview:   nil,
+			expectedUsername: "",
+			expectedError:    kts_errors.KTS_INTERNAL_ERROR,
+		},
+		{
+			name:       "Success",
+			reviewData: samples.GetSampleReviewRequest(),
+			setExpectations: func(userRepo mocks.MockUserRepositoryI, reviewRepo mocks.MockReviewRepositoryI, movieRepo mocks.MockMovieRepositoryI, reviewData models.CreateReviewRequest) {
+				movieId := uuid.MustParse(reviewData.MovieID)
+				review := model.Reviews{
+					Rating:    reviewData.Rating,
+					Comment:   reviewData.Comment,
+					Datetime:  reviewData.Datetime,
+					IsSpoiler: &reviewData.IsSpoiler,
+					MovieID:   &movieId,
+					/* UserID */
+				}
+				userRepo.EXPECT().GetUserById(userId).Return(&user, nil)
+				reviewRepo.EXPECT().CreateReview(utils.EqExceptUUIDs(review)).Return(nil)
+				reviewRepo.EXPECT().GetRatingForMovie(&movieId).Return(newRating, nil)
+				movieRepo.EXPECT().UpdateRating(&movieId, newRating.Rating).Return(nil)
 			},
 			expectedReview:   &review,
 			expectedUsername: *user.Username,
@@ -104,13 +152,15 @@ func TestCreateReview(t *testing.T) {
 			defer mockCtrl.Finish()
 			reviewRepoMock := mocks.NewMockReviewRepositoryI(mockCtrl)
 			userRepoMock := mocks.NewMockUserRepositoryI(mockCtrl)
+			movieRepoMock := mocks.NewMockMovieRepositoryI(mockCtrl)
 			reviewController := ReviewController{
 				ReviewRepo: reviewRepoMock,
 				UserRepo:   userRepoMock,
+				MovieRepo:  movieRepoMock,
 			}
 
 			// define expectations
-			tc.setExpectations(*userRepoMock, *reviewRepoMock, tc.reviewData)
+			tc.setExpectations(*userRepoMock, *reviewRepoMock, *movieRepoMock, tc.reviewData)
 
 			// WHEN
 			// call CreateReview with review data

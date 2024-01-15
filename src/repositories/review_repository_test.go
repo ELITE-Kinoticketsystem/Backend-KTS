@@ -346,6 +346,80 @@ func TestDeleteReview(t *testing.T) {
 	}
 }
 
+func TestGetRatingForMovie(t *testing.T) {
+	movieRating := samples.GetSampleNewRating()
+
+	query := "SELECT SUM(reviews.rating) FROM `KinoTicketSystem`.reviews WHERE reviews.movie_id = ?;"
+
+	testCases := []struct {
+		name            string
+		movieId         *uuid.UUID
+		setExpectations func(mock sqlmock.Sqlmock, movieId *uuid.UUID)
+		expectedRating  *models.NewRating
+		expectedError   *models.KTSError
+	}{
+		{
+			name:    "Success",
+			movieId: utils.NewUUID(),
+			setExpectations: func(mock sqlmock.Sqlmock, movieId *uuid.UUID) {
+				mock.ExpectQuery(query).WithArgs(utils.EqUUID(movieId)).WillReturnRows(
+					sqlmock.NewRows(
+						[]string{"SUM(reviews.rating)"},
+					).AddRow(
+						movieRating.Rating,
+					),
+				)
+			},
+			expectedRating: &movieRating,
+			expectedError:  nil,
+		},
+		{
+			name:    "Internal error",
+			movieId: utils.NewUUID(),
+			setExpectations: func(mock sqlmock.Sqlmock, movieId *uuid.UUID) {
+				mock.ExpectQuery(query).WithArgs(
+					utils.EqUUID(movieId),
+				).WillReturnError(
+					sqlmock.ErrCancelled,
+				)
+			},
+			expectedRating: nil,
+			expectedError:  kts_errors.KTS_INTERNAL_ERROR,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			// GIVEN
+			// create mock db manager
+			db, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
+			if err != nil {
+				t.Fatalf("error while setting up mock database: %s", err)
+			}
+			reviewRepo := ReviewRepository{
+				DatabaseManager: &managers.DatabaseManager{
+					Connection: db,
+				},
+			}
+
+			// define expectations
+			tc.setExpectations(mock, tc.movieId)
+
+			// WHEN
+			// call DeleteReview with id
+			rating, kts_err := reviewRepo.GetRatingForMovie(tc.movieId)
+
+			// THEN
+			// check expected error and expectations
+			assert.Equal(t, tc.expectedRating, rating)
+			assert.Equal(t, tc.expectedError, kts_err)
+			if err = mock.ExpectationsWereMet(); err != nil {
+				t.Errorf("There were unfulfilled expectations: %s", err)
+			}
+		})
+	}
+}
+
 func TestDeleteReviewForMovie(t *testing.T) {
 	testCases := []struct {
 		name            string
