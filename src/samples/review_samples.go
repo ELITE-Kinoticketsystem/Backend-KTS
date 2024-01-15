@@ -34,3 +34,10 @@ func GetSampleReview() model.Reviews {
 		UserID:    &userId,
 	}
 }
+
+func GetSampleNewRating() models.NewRating {
+	
+	return models.NewRating{
+		Rating: 3.4,
+	}
+}

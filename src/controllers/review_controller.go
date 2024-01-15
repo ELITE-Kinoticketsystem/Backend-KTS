@@ -51,7 +51,7 @@ func (rc ReviewController) CreateReview(reviewData models.CreateReviewRequest, u
 	if kts_err != nil {
 		return nil, "", kts_err
 	}
-	kts_err = rc.MovieRepo.UpdateRating(&movieId, rating)
+	kts_err = rc.MovieRepo.UpdateRating(&movieId, rating.Rating)
 	if kts_err != nil {
 		return nil, "", kts_err
 	}

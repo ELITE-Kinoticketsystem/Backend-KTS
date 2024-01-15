@@ -144,7 +144,7 @@ func (mr *MockMovieRepositoryIMockRecorder) UpdateMovie(movie any) *gomock.Call 
 }
 
 // UpdateRating mocks base method.
-func (m *MockMovieRepositoryI) UpdateRating(movieId *uuid.UUID, rating *float64) *models.KTSError {
+func (m *MockMovieRepositoryI) UpdateRating(movieId *uuid.UUID, rating float64) *models.KTSError {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UpdateRating", movieId, rating)
 	ret0, _ := ret[0].(*models.KTSError)

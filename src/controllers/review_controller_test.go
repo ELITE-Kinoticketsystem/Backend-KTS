@@ -17,9 +17,11 @@ import (
 )
 
 func TestCreateReview(t *testing.T) {
-	newRating := 5.0
-	user := samples.GetSampleUser()
+	newRating := &models.NewRating{
+		Rating: 3.6,
+	}
 	review := samples.GetSampleReview()
+	user := samples.GetSampleUser()
 	userId := user.ID
 	testCases := []struct {
 		name             string
@@ -77,6 +79,49 @@ func TestCreateReview(t *testing.T) {
 			expectedError:    kts_errors.KTS_BAD_REQUEST,
 		},
 		{
+			name:       "GetRatingFromMovies Failed",
+			reviewData: samples.GetSampleReviewRequest(),
+			setExpectations: func(userRepo mocks.MockUserRepositoryI, reviewRepo mocks.MockReviewRepositoryI, movieRepo mocks.MockMovieRepositoryI, reviewData models.CreateReviewRequest) {
+				movieId := uuid.MustParse(reviewData.MovieID)
+				review := model.Reviews{
+					Rating:    reviewData.Rating,
+					Comment:   reviewData.Comment,
+					Datetime:  reviewData.Datetime,
+					IsSpoiler: &reviewData.IsSpoiler,
+					MovieID:   &movieId,
+					/* UserID */
+				}
+				userRepo.EXPECT().GetUserById(userId).Return(&user, nil)
+				reviewRepo.EXPECT().CreateReview(utils.EqExceptUUIDs(review)).Return(nil)
+				reviewRepo.EXPECT().GetRatingForMovie(&movieId).Return(nil, kts_errors.KTS_INTERNAL_ERROR)
+			},
+			expectedReview:   nil,
+			expectedUsername: "",
+			expectedError:    kts_errors.KTS_INTERNAL_ERROR,
+		},
+		{
+			name:       "UpdateRating Failed",
+			reviewData: samples.GetSampleReviewRequest(),
+			setExpectations: func(userRepo mocks.MockUserRepositoryI, reviewRepo mocks.MockReviewRepositoryI, movieRepo mocks.MockMovieRepositoryI, reviewData models.CreateReviewRequest) {
+				movieId := uuid.MustParse(reviewData.MovieID)
+				review := model.Reviews{
+					Rating:    reviewData.Rating,
+					Comment:   reviewData.Comment,
+					Datetime:  reviewData.Datetime,
+					IsSpoiler: &reviewData.IsSpoiler,
+					MovieID:   &movieId,
+					/* UserID */
+				}
+				userRepo.EXPECT().GetUserById(userId).Return(&user, nil)
+				reviewRepo.EXPECT().CreateReview(utils.EqExceptUUIDs(review)).Return(nil)
+				reviewRepo.EXPECT().GetRatingForMovie(&movieId).Return(newRating, nil)
+				movieRepo.EXPECT().UpdateRating(&movieId, newRating.Rating).Return(kts_errors.KTS_INTERNAL_ERROR)
+			},
+			expectedReview:   nil,
+			expectedUsername: "",
+			expectedError:    kts_errors.KTS_INTERNAL_ERROR,
+		},
+		{
 			name:       "Success",
 			reviewData: samples.GetSampleReviewRequest(),
 			setExpectations: func(userRepo mocks.MockUserRepositoryI, reviewRepo mocks.MockReviewRepositoryI, movieRepo mocks.MockMovieRepositoryI, reviewData models.CreateReviewRequest) {
@@ -91,8 +136,8 @@ func TestCreateReview(t *testing.T) {
 				}
 				userRepo.EXPECT().GetUserById(userId).Return(&user, nil)
 				reviewRepo.EXPECT().CreateReview(utils.EqExceptUUIDs(review)).Return(nil)
-				reviewRepo.EXPECT().GetRatingForMovie(&movieId).Return(&newRating, nil)
-				movieRepo.EXPECT().UpdateRating(&movieId, &newRating).Return(nil)
+				reviewRepo.EXPECT().GetRatingForMovie(&movieId).Return(newRating, nil)
+				movieRepo.EXPECT().UpdateRating(&movieId, newRating.Rating).Return(nil)
 			},
 			expectedReview:   &review,
 			expectedUsername: *user.Username,

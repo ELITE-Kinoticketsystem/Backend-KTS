@@ -69,10 +69,10 @@ func (mr *MockReviewRepositoryIMockRecorder) DeleteReview(id any) *gomock.Call {
 }
 
 // GetRatingForMovie mocks base method.
-func (m *MockReviewRepositoryI) GetRatingForMovie(movieId *uuid.UUID) (*float64, *models.KTSError) {
+func (m *MockReviewRepositoryI) GetRatingForMovie(movieId *uuid.UUID) (*models.NewRating, *models.KTSError) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetRatingForMovie", movieId)
-	ret0, _ := ret[0].(*float64)
+	ret0, _ := ret[0].(*models.NewRating)
 	ret1, _ := ret[1].(*models.KTSError)
 	return ret0, ret1
 }

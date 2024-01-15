@@ -1,6 +1,8 @@
 package repositories
 
 import (
+	"log"
+
 	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/gen/KinoTicketSystem/table"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
@@ -21,7 +23,7 @@ type MovieRepositoryI interface {
 	CreateMovie(movie *model.Movies) (*uuid.UUID, *models.KTSError)
 	UpdateMovie(movie *model.Movies) *models.KTSError
 	DeleteMovie(movieId *uuid.UUID) *models.KTSError
-	UpdateRating(movieId *uuid.UUID, rating *float64) *models.KTSError
+	UpdateRating(movieId *uuid.UUID, rating float64) *models.KTSError
 
 	// All Movies with all Genres - Grouped by Movie
 	GetMoviesWithGenres() (*[]models.MovieWithGenres, *models.KTSError)
@@ -248,28 +250,23 @@ func (mr *MovieRepository) GetMovieById(movieId *uuid.UUID) (*models.MovieWithEv
 	return &movie, nil
 }
 
-func (mr *MovieRepository) UpdateRating(movieId *uuid.UUID, rating *float64) *models.KTSError {
+func (mr *MovieRepository) UpdateRating(movieId *uuid.UUID, rating float64) *models.KTSError {
 	// Create the update statement
-	updateQuery := table.Movies.UPDATE().
+	updateQuery := table.Movies.UPDATE(
+		table.Movies.Rating,
+	).
 		SET(
-			table.Movies.Rating.SET(mysql.Float(*rating)),
+			table.Movies.Rating.SET(mysql.Float(rating)),
 		).WHERE(
 		table.Movies.ID.EQ(utils.MysqlUuid(movieId)),
 	)
 
+	log.Print(updateQuery.DebugSql())
+
 	// Execute the query
-	rows, err := updateQuery.Exec(mr.DatabaseManager.GetDatabaseConnection())
+	_, err := updateQuery.Exec(mr.DatabaseManager.GetDatabaseConnection())
 	if err != nil {
 		return kts_errors.KTS_INTERNAL_ERROR
-	}
-
-	rowsAff, err := rows.RowsAffected()
-	if err != nil {
-		return kts_errors.KTS_INTERNAL_ERROR
-	}
-
-	if rowsAff == 0 {
-		return kts_errors.KTS_NOT_FOUND
 	}
 
 	return nil

@@ -347,14 +347,15 @@ func TestDeleteReview(t *testing.T) {
 }
 
 func TestGetRatingForMovie(t *testing.T) {
+	movieRating := samples.GetSampleNewRating()
 
-	query := ""
+	query := "SELECT SUM(reviews.rating) FROM `KinoTicketSystem`.reviews WHERE reviews.movie_id = ?;"
 
 	testCases := []struct {
 		name            string
 		movieId         *uuid.UUID
 		setExpectations func(mock sqlmock.Sqlmock, movieId *uuid.UUID)
-		expectedRating  float64
+		expectedRating  *models.NewRating
 		expectedError   *models.KTSError
 	}{
 		{
@@ -362,39 +363,29 @@ func TestGetRatingForMovie(t *testing.T) {
 			movieId: utils.NewUUID(),
 			setExpectations: func(mock sqlmock.Sqlmock, movieId *uuid.UUID) {
 				mock.ExpectQuery(query).WithArgs(utils.EqUUID(movieId)).WillReturnRows(
-					sqlmock.NewRows([]string{"rating"}).
-						AddRow(3.5),
+					sqlmock.NewRows(
+						[]string{"SUM(reviews.rating)"},
+					).AddRow(
+						movieRating.Rating,
+					),
 				)
 			},
-			expectedRating: 3.5,
+			expectedRating: &movieRating,
 			expectedError:  nil,
 		},
-		// {
-		// 	name:    "Internal error",
-		// 	movieId: utils.NewUUID(),
-		// 	setExpectations: func(mock sqlmock.Sqlmock, movieId *uuid.UUID) {
-		// 		mock.ExpectQuery(query).WithArgs(
-		// 			utils.EqUUID(movieId),
-		// 		).WillReturnError(
-		// 			sqlmock.ErrCancelled,
-		// 		)
-		// 	},
-		// 	expectedRating: 0,
-		// 	expectedError:  kts_errors.KTS_INTERNAL_ERROR,
-		// },
-		// {
-		// 	name:    "Not found",
-		// 	movieId: utils.NewUUID(),
-		// 	setExpectations: func(mock sqlmock.Sqlmock, movieId *uuid.UUID) {
-		// 		mock.ExpectQuery(query).WithArgs(
-		// 			utils.EqUUID(movieId),
-		// 		).WillReturnError(
-		// 			sql.ErrNoRows,
-		// 		)
-		// 	},
-		// 	expectedRating: 0,
-		// 	expectedError:  kts_errors.KTS_NOT_FOUND,
-		// },
+		{
+			name:    "Internal error",
+			movieId: utils.NewUUID(),
+			setExpectations: func(mock sqlmock.Sqlmock, movieId *uuid.UUID) {
+				mock.ExpectQuery(query).WithArgs(
+					utils.EqUUID(movieId),
+				).WillReturnError(
+					sqlmock.ErrCancelled,
+				)
+			},
+			expectedRating: nil,
+			expectedError:  kts_errors.KTS_INTERNAL_ERROR,
+		},
 	}
 
 	for _, tc := range testCases {
