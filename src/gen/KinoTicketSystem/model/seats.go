@@ -12,12 +12,12 @@ import (
 )
 
 type Seats struct {
-	ID              *uuid.UUID `sql:"primary_key"`
-	RowNr           int32
-	ColumnNr        int32
-	VisibleRowNr    int32
-	VisibleColumnNr int32
-	SeatCategoryID  *uuid.UUID
-	CinemaHallID    *uuid.UUID
-	Type            string
+	ID             *uuid.UUID `sql:"primary_key"`
+	Y              int32
+	X              int32
+	RowNr          int32
+	ColumnNr       int32
+	SeatCategoryID *uuid.UUID
+	CinemaHallID   *uuid.UUID
+	Type           string
 }

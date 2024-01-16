@@ -2263,8 +2263,10 @@ func GetSampleSeat() model.Seats {
 	seatCategoryId := uuid.MustParse(seatCategoryId1)
 	return model.Seats{
 		ID:             &id,
-		ColumnNr:       0,
-		RowNr:          0,
+		X:              1,
+		Y:              1,
+		ColumnNr:       1,
+		RowNr:          1,
 		CinemaHallID:   &cinemaHallId,
 		SeatCategoryID: &seatCategoryId,
 	}

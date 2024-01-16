@@ -17,14 +17,14 @@ type seatsTable struct {
 	mysql.Table
 
 	// Columns
-	ID              mysql.ColumnString
-	RowNr           mysql.ColumnInteger
-	ColumnNr        mysql.ColumnInteger
-	VisibleRowNr    mysql.ColumnInteger
-	VisibleColumnNr mysql.ColumnInteger
-	SeatCategoryID  mysql.ColumnString
-	CinemaHallID    mysql.ColumnString
-	Type            mysql.ColumnString
+	ID             mysql.ColumnString
+	Y              mysql.ColumnInteger
+	X              mysql.ColumnInteger
+	RowNr          mysql.ColumnInteger
+	ColumnNr       mysql.ColumnInteger
+	SeatCategoryID mysql.ColumnString
+	CinemaHallID   mysql.ColumnString
+	Type           mysql.ColumnString
 
 	AllColumns     mysql.ColumnList
 	MutableColumns mysql.ColumnList
@@ -65,30 +65,30 @@ func newSeatsTable(schemaName, tableName, alias string) *SeatsTable {
 
 func newSeatsTableImpl(schemaName, tableName, alias string) seatsTable {
 	var (
-		IDColumn              = mysql.StringColumn("id")
-		RowNrColumn           = mysql.IntegerColumn("row_nr")
-		ColumnNrColumn        = mysql.IntegerColumn("column_nr")
-		VisibleRowNrColumn    = mysql.IntegerColumn("visible_row_nr")
-		VisibleColumnNrColumn = mysql.IntegerColumn("visible_column_nr")
-		SeatCategoryIDColumn  = mysql.StringColumn("seat_category_id")
-		CinemaHallIDColumn    = mysql.StringColumn("cinema_hall_id")
-		TypeColumn            = mysql.StringColumn("type")
-		allColumns            = mysql.ColumnList{IDColumn, RowNrColumn, ColumnNrColumn, VisibleRowNrColumn, VisibleColumnNrColumn, SeatCategoryIDColumn, CinemaHallIDColumn, TypeColumn}
-		mutableColumns        = mysql.ColumnList{RowNrColumn, ColumnNrColumn, VisibleRowNrColumn, VisibleColumnNrColumn, SeatCategoryIDColumn, CinemaHallIDColumn, TypeColumn}
+		IDColumn             = mysql.StringColumn("id")
+		YColumn              = mysql.IntegerColumn("y")
+		XColumn              = mysql.IntegerColumn("x")
+		RowNrColumn          = mysql.IntegerColumn("row_nr")
+		ColumnNrColumn       = mysql.IntegerColumn("column_nr")
+		SeatCategoryIDColumn = mysql.StringColumn("seat_category_id")
+		CinemaHallIDColumn   = mysql.StringColumn("cinema_hall_id")
+		TypeColumn           = mysql.StringColumn("type")
+		allColumns           = mysql.ColumnList{IDColumn, YColumn, XColumn, RowNrColumn, ColumnNrColumn, SeatCategoryIDColumn, CinemaHallIDColumn, TypeColumn}
+		mutableColumns       = mysql.ColumnList{YColumn, XColumn, RowNrColumn, ColumnNrColumn, SeatCategoryIDColumn, CinemaHallIDColumn, TypeColumn}
 	)
 
 	return seatsTable{
 		Table: mysql.NewTable(schemaName, tableName, alias, allColumns...),
 
 		//Columns
-		ID:              IDColumn,
-		RowNr:           RowNrColumn,
-		ColumnNr:        ColumnNrColumn,
-		VisibleRowNr:    VisibleRowNrColumn,
-		VisibleColumnNr: VisibleColumnNrColumn,
-		SeatCategoryID:  SeatCategoryIDColumn,
-		CinemaHallID:    CinemaHallIDColumn,
-		Type:            TypeColumn,
+		ID:             IDColumn,
+		Y:              YColumn,
+		X:              XColumn,
+		RowNr:          RowNrColumn,
+		ColumnNr:       ColumnNrColumn,
+		SeatCategoryID: SeatCategoryIDColumn,
+		CinemaHallID:   CinemaHallIDColumn,
+		Type:           TypeColumn,
 
 		AllColumns:     allColumns,
 		MutableColumns: mutableColumns,

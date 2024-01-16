@@ -21,6 +21,8 @@ type cinemaHallsTable struct {
 	Name      mysql.ColumnString
 	Capacity  mysql.ColumnInteger
 	TheatreID mysql.ColumnString
+	Width     mysql.ColumnInteger
+	Height    mysql.ColumnInteger
 
 	AllColumns     mysql.ColumnList
 	MutableColumns mysql.ColumnList
@@ -65,8 +67,10 @@ func newCinemaHallsTableImpl(schemaName, tableName, alias string) cinemaHallsTab
 		NameColumn      = mysql.StringColumn("name")
 		CapacityColumn  = mysql.IntegerColumn("capacity")
 		TheatreIDColumn = mysql.StringColumn("theatre_id")
-		allColumns      = mysql.ColumnList{IDColumn, NameColumn, CapacityColumn, TheatreIDColumn}
-		mutableColumns  = mysql.ColumnList{NameColumn, CapacityColumn, TheatreIDColumn}
+		WidthColumn     = mysql.IntegerColumn("width")
+		HeightColumn    = mysql.IntegerColumn("height")
+		allColumns      = mysql.ColumnList{IDColumn, NameColumn, CapacityColumn, TheatreIDColumn, WidthColumn, HeightColumn}
+		mutableColumns  = mysql.ColumnList{NameColumn, CapacityColumn, TheatreIDColumn, WidthColumn, HeightColumn}
 	)
 
 	return cinemaHallsTable{
@@ -77,6 +81,8 @@ func newCinemaHallsTableImpl(schemaName, tableName, alias string) cinemaHallsTab
 		Name:      NameColumn,
 		Capacity:  CapacityColumn,
 		TheatreID: TheatreIDColumn,
+		Width:     WidthColumn,
+		Height:    HeightColumn,
 
 		AllColumns:     allColumns,
 		MutableColumns: mutableColumns,

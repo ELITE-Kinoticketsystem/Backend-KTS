@@ -16,4 +16,6 @@ type CinemaHalls struct {
 	Name      string
 	Capacity  int32
 	TheatreID *uuid.UUID
+	Width     int32
+	Height    int32
 }
