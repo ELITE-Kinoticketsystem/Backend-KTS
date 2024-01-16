@@ -107,7 +107,12 @@ func (or *OrderRepository) GetOrders(userId *uuid.UUID) (*[]models.GetOrderDTO, 
 			LEFT_JOIN(table.EventMovies, table.EventMovies.EventID.EQ(table.Events.ID)).
 			LEFT_JOIN(table.Movies, table.Movies.ID.EQ(table.EventMovies.MovieID)),
 		).
-		WHERE(table.Orders.UserID.EQ(utils.MysqlUuid(userId)))
+		WHERE(table.Orders.UserID.EQ(utils.MysqlUuid(userId))).
+		ORDER_BY(
+			table.Events.Start.DESC(),
+			table.Seats.RowNr.ASC(),
+			table.Seats.ColumnNr.ASC(),
+		)
 
 	err := stmt.Query(or.DatabaseManager.GetDatabaseConnection(), orders)
 
