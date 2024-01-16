@@ -1,7 +1,7 @@
 package repositories
 
 import (
-	"log"
+
 
 	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/gen/KinoTicketSystem/model"
@@ -115,14 +115,12 @@ func (rr *ReviewRepository) GetRatingForMovie(movieId *uuid.UUID) (*models.NewRa
 		return nil, kts_errors.KTS_INTERNAL_ERROR
 	}
 
-	log.Print(rating.Rating)
-
 	return &rating, nil
 }
 
 func (rr *ReviewRepository) DeleteReviewForMovie(movieId *uuid.UUID) *models.KTSError {
 	stmt := table.Reviews.DELETE().WHERE(table.Reviews.MovieID.EQ(utils.MysqlUuid(movieId)))
-	log.Print(stmt.DebugSql())
+	
 	_, err := stmt.Exec(rr.DatabaseManager.GetDatabaseConnection())
 	if err != nil {
 		return kts_errors.KTS_INTERNAL_ERROR
