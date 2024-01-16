@@ -383,6 +383,8 @@ func GetSampleMovieByIdWithEverything() *models.MovieWithEverything {
 	rating := 5.0
 	isSpoiler := false
 
+	actor1PictureUrls := ""
+
 	movieWithEverything = models.MovieWithEverything{
 		Movies: model.Movies{
 			ID:           movieId,
@@ -408,6 +410,7 @@ func GetSampleMovieByIdWithEverything() *models.MovieWithEverything {
 		},
 		Actors: []struct {
 			model.Actors
+			ActorPictureUrls *string `alias:"actor_pictures.pic_url"`
 		}{
 			{
 				model.Actors{
@@ -416,6 +419,7 @@ func GetSampleMovieByIdWithEverything() *models.MovieWithEverything {
 					Birthdate:   time.Now(),
 					Description: "This is a description",
 				},
+				&actor1PictureUrls,
 			},
 		},
 		Producers: []struct {

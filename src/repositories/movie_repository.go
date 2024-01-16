@@ -221,6 +221,7 @@ func (mr *MovieRepository) GetMovieById(movieId *uuid.UUID) (*models.MovieWithEv
 		table.Movies.AllColumns,
 		table.Genres.AllColumns,
 		table.Actors.AllColumns,
+		table.ActorPictures.PicURL,
 		table.Producers.AllColumns,
 		table.Reviews.AllColumns,
 		table.Users.Username,
@@ -230,6 +231,7 @@ func (mr *MovieRepository) GetMovieById(movieId *uuid.UUID) (*models.MovieWithEv
 			LEFT_JOIN(table.Genres, table.Genres.ID.EQ(table.MovieGenres.GenreID)).
 			LEFT_JOIN(table.MovieActors, table.MovieActors.MovieID.EQ(table.Movies.ID)).
 			LEFT_JOIN(table.Actors, table.Actors.ID.EQ(table.MovieActors.ActorID)).
+			LEFT_JOIN(table.ActorPictures, table.ActorPictures.ActorID.EQ(table.Actors.ID)).
 			LEFT_JOIN(table.MovieProducers, table.MovieProducers.MovieID.EQ(table.Movies.ID)).
 			LEFT_JOIN(table.Producers, table.Producers.ID.EQ(table.MovieProducers.ProducerID)).
 			LEFT_JOIN(table.Reviews, table.Reviews.MovieID.EQ(table.Movies.ID)).
@@ -237,6 +239,8 @@ func (mr *MovieRepository) GetMovieById(movieId *uuid.UUID) (*models.MovieWithEv
 	).WHERE(
 		table.Movies.ID.EQ(utils.MysqlUuid(movieId)),
 	)
+
+	log.Print(stmt.DebugSql())
 
 	// Execute the query
 	err := stmt.Query(mr.DatabaseManager.GetDatabaseConnection(), &movie)
