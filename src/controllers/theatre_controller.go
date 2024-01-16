@@ -30,9 +30,15 @@ func (tc *TheatreController) CreateTheatre(theatreData *models.CreateTheatreRequ
 		Country:  theatreData.Address.Country,
 	}
 
-	err := tc.TheatreRepo.CreateAddress(address)
+	tx, err := tc.TheatreRepo.NewTransaction()
 	if err != nil {
 		return kts_errors.KTS_INTERNAL_ERROR
+	}
+	defer tx.Rollback()
+
+	kts_err := tc.TheatreRepo.CreateAddress(tx, address)
+	if kts_err != nil {
+		return kts_err
 	}
 
 	theatreId := uuid.New()
@@ -42,8 +48,13 @@ func (tc *TheatreController) CreateTheatre(theatreData *models.CreateTheatreRequ
 		LogoURL:   &theatreData.LogoUrl,
 		AddressID: &addressId,
 	}
-	err = tc.TheatreRepo.CreateTheatre(theatre)
-	if err != nil {
+	kts_err = tc.TheatreRepo.CreateTheatre(tx, theatre)
+	if kts_err != nil {
+		return kts_err
+	}
+
+	
+	if err = tx.Commit(); err != nil {
 		return kts_errors.KTS_INTERNAL_ERROR
 	}
 

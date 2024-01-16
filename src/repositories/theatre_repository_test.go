@@ -59,17 +59,19 @@ func TestCreateTheatre(t *testing.T) {
 				t.Fatalf("error while setting up mock database: %s", err)
 			}
 			theatreRepo := TheatreRepository{
-				DatabaseManager: &managers.DatabaseManager{
+				DatabaseManagerI: &managers.DatabaseManager{
 					Connection: db,
 				},
 			}
+			mock.ExpectBegin()
+			tx, _ := db.Begin()
 
 			// define expectations
 			tc.setExpectations(mock, &tc.data)
 
 			// WHEN
 			// call CreateTheatre with theatre data
-			kts_err := theatreRepo.CreateTheatre(tc.data)
+			kts_err := theatreRepo.CreateTheatre(tx, tc.data)
 
 			// THEN
 			// check expected error
@@ -129,7 +131,7 @@ func TestCreateCinemaHall(t *testing.T) {
 				t.Fatalf("error while setting up mock database: %s", err)
 			}
 			theatreRepo := TheatreRepository{
-				DatabaseManager: &managers.DatabaseManager{
+				DatabaseManagerI: &managers.DatabaseManager{
 					Connection: db,
 				},
 			}
@@ -214,7 +216,7 @@ func TestGetCinemaHallsForTheatre(t *testing.T) {
 			defer db.Close()
 
 			theatreRepo := &TheatreRepository{
-				DatabaseManager: &managers.DatabaseManager{
+				DatabaseManagerI: &managers.DatabaseManager{
 					Connection: db,
 				},
 			}
@@ -289,7 +291,7 @@ func TestCreateSeat(t *testing.T) {
 				t.Fatalf("error while setting up mock database: %s", err)
 			}
 			theatreRepo := TheatreRepository{
-				DatabaseManager: &managers.DatabaseManager{
+				DatabaseManagerI: &managers.DatabaseManager{
 					Connection: db,
 				},
 			}
@@ -362,7 +364,7 @@ func TestGetSeatCategories(t *testing.T) {
 			defer db.Close()
 
 			theatreRepo := &TheatreRepository{
-				DatabaseManager: &managers.DatabaseManager{
+				DatabaseManagerI: &managers.DatabaseManager{
 					Connection: db,
 				},
 			}
@@ -445,7 +447,7 @@ func TestGetSeatsForCinemaHall(t *testing.T) {
 			defer db.Close()
 
 			theatreRepo := &TheatreRepository{
-				DatabaseManager: &managers.DatabaseManager{
+				DatabaseManagerI: &managers.DatabaseManager{
 					Connection: db,
 				},
 			}
@@ -511,7 +513,7 @@ func TestGetTheatres(t *testing.T) {
 			}
 
 			theatreRepo := TheatreRepository{
-				DatabaseManager: &managers.DatabaseManager{
+				DatabaseManagerI: &managers.DatabaseManager{
 					Connection: db,
 				},
 			}

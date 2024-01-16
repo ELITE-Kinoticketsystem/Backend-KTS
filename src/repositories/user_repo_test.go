@@ -308,14 +308,14 @@ func TestCheckIfUsernameExists(t *testing.T) {
 			username: "Collinho el niño",
 			setExpectations: func(mock sqlmock.Sqlmock, username string) {
 				mock.ExpectQuery(
-					"SELECT COUNT(users.id)\n" +
+					"SELECT COUNT(*) AS \"CountQueryResult.Count\"\n" +
 						"FROM `KinoTicketSystem`.users\n" +
 						"WHERE users.username = ?;",
 				).WithArgs(
 					username,
 				).WillReturnRows(
 					sqlmock.NewRows([]string{
-						"COUNT(users.id)",
+						"CountQueryResult.Count",
 					}).AddRow(
 						1,
 					),
@@ -328,14 +328,14 @@ func TestCheckIfUsernameExists(t *testing.T) {
 			username: "Collinho el niño",
 			setExpectations: func(mock sqlmock.Sqlmock, username string) {
 				mock.ExpectQuery(
-					"SELECT COUNT(users.id)\n" +
+					"SELECT COUNT(*) AS \"CountQueryResult.Count\"\n" +
 						"FROM `KinoTicketSystem`.users\n" +
 						"WHERE users.username = ?;",
 				).WithArgs(
 					username,
 				).WillReturnRows(
 					sqlmock.NewRows([]string{
-						"COUNT(users.id)",
+						"CountQueryResult.Count",
 					}).AddRow(
 						0,
 					),
@@ -348,7 +348,7 @@ func TestCheckIfUsernameExists(t *testing.T) {
 			username: "Collinho el niño",
 			setExpectations: func(mock sqlmock.Sqlmock, username string) {
 				mock.ExpectQuery(
-					"SELECT COUNT(users.id)\n" +
+					"SELECT COUNT(*) AS \"CountQueryResult.Count\"\n" +
 						"FROM `KinoTicketSystem`.users\n" +
 						"WHERE users.username = ?;",
 				).WithArgs(
@@ -405,14 +405,14 @@ func TestCheckIfEmailExists(t *testing.T) {
 			email: "collin.forslund@gmail.com",
 			setExpectations: func(mock sqlmock.Sqlmock, email string) {
 				mock.ExpectQuery(
-					"SELECT COUNT(users.id)\n" +
+					"SELECT COUNT(*) AS \"CountQueryResult.Count\"\n" +
 						"FROM `KinoTicketSystem`.users\n" +
 						"WHERE users.email = ?;",
 				).WithArgs(
 					email,
 				).WillReturnRows(
 					sqlmock.NewRows([]string{
-						"COUNT(users.email)",
+						"CountQueryResult.Count",
 					}).AddRow(
 						1,
 					),
@@ -425,14 +425,14 @@ func TestCheckIfEmailExists(t *testing.T) {
 			email: "collin.forslund@gmail.com",
 			setExpectations: func(mock sqlmock.Sqlmock, email string) {
 				mock.ExpectQuery(
-					"SELECT COUNT(users.id)\n" +
+					"SELECT COUNT(*) AS \"CountQueryResult.Count\"\n" +
 						"FROM `KinoTicketSystem`.users\n" +
 						"WHERE users.email = ?;",
 				).WithArgs(
 					email,
 				).WillReturnRows(
 					sqlmock.NewRows([]string{
-						"COUNT(users.email)",
+						"CountQueryResult.Count",
 					}).AddRow(
 						0,
 					),
@@ -445,7 +445,7 @@ func TestCheckIfEmailExists(t *testing.T) {
 			email: "collin.forslund@gmail.com",
 			setExpectations: func(mock sqlmock.Sqlmock, email string) {
 				mock.ExpectQuery(
-					"SELECT COUNT(users.id)\n" +
+					"SELECT COUNT(*) AS \"CountQueryResult.Count\"\n" +
 						"FROM `KinoTicketSystem`.users\n" +
 						"WHERE users.email = ?;",
 				).WithArgs(

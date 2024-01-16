@@ -62,3 +62,22 @@ func ExcecuteInsertStatement(stmt mysql.InsertStatement, dbConnection *sql.DB) *
 
 	return nil
 }
+
+func CountStatement(table mysql.Table, where mysql.BoolExpression, conn *sql.DB) (int, *models.KTSError) {
+	var result CountQueryResult
+	stmt := mysql.SELECT(
+		mysql.COUNT(mysql.STAR).AS("CountQueryResult.Count"),
+	).FROM(
+		table,
+	).WHERE(where)
+
+	err := stmt.Query(conn, &result)
+	if err != nil {
+		return 0, kts_errors.KTS_INTERNAL_ERROR
+	}
+	return result.Count, nil
+}
+
+type CountQueryResult struct {
+	Count int
+}

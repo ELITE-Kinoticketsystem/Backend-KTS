@@ -1,7 +1,6 @@
 package repositories
 
 import (
-	"database/sql"
 	"fmt"
 
 	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
@@ -65,23 +64,14 @@ func (ur *UserRepository) GetUserByUsername(username string) (*model.Users, *mod
 	).WHERE(
 		table.Users.Username.EQ(mysql.String(username)),
 	)
-
-	query, args := stmt.Sql()
-	err := ur.DatabaseManager.ExecuteQueryRow(query, args...).Scan(
-		&user.ID,
-		&user.Username,
-		&user.Email,
-		&user.Password,
-		&user.Firstname,
-		&user.Lastname,
-	)
-
+	err := stmt.Query(ur.DatabaseManager.GetDatabaseConnection(), &user)
 	if err != nil {
-		if err == sql.ErrNoRows {
+		if err.Error() == "jet: sql: no rows in result set" {
 			return nil, kts_errors.KTS_USER_NOT_FOUND
 		}
 		return nil, kts_errors.KTS_INTERNAL_ERROR
 	}
+
 	return &user, nil
 }
 
@@ -112,42 +102,22 @@ func (ur *UserRepository) CreateUser(user model.Users) *models.KTSError {
 }
 
 func (ur *UserRepository) CheckIfUsernameExists(username string) *models.KTSError {
-	stmt := mysql.SELECT(
-		mysql.COUNT(table.Users.ID),
-	).FROM(
-		table.Users,
-	).WHERE(
-		table.Users.Username.EQ(mysql.String(username)),
-	)
-
-	query, args := stmt.Sql()
-	exists, err := ur.DatabaseManager.CheckIfExists(query, args...)
-
+	count, err := utils.CountStatement(table.Users, table.Users.Username.EQ(mysql.String(username)), ur.DatabaseManager.GetDatabaseConnection())
 	if err != nil {
 		return kts_errors.KTS_INTERNAL_ERROR
 	}
-	if exists {
+	if count > 0 {
 		return kts_errors.KTS_USERNAME_EXISTS
 	}
 	return nil
 }
 
 func (ur *UserRepository) CheckIfEmailExists(email string) *models.KTSError {
-	stmt := mysql.SELECT(
-		mysql.COUNT(table.Users.ID),
-	).FROM(
-		table.Users,
-	).WHERE(
-		table.Users.Email.EQ(mysql.String(email)),
-	)
-
-	query, args := stmt.Sql()
-	exists, err := ur.DatabaseManager.CheckIfExists(query, args...)
-
+	count, err := utils.CountStatement(table.Users, table.Users.Email.EQ(mysql.String(email)), ur.DatabaseManager.GetDatabaseConnection())
 	if err != nil {
 		return kts_errors.KTS_INTERNAL_ERROR
 	}
-	if exists {
+	if count > 0 {
 		return kts_errors.KTS_EMAIL_EXISTS
 	}
 	return nil

@@ -94,7 +94,7 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 		DatabaseManager: databaseManager,
 	}
 	theatreRepo := &repositories.TheatreRepository{
-		DatabaseManager: databaseManager,
+		DatabaseManagerI: databaseManager,
 	}
 
 	ticketRepo := &repositories.TicketRepository{
