@@ -1,8 +1,10 @@
 package controllers
 
 import (
+	"database/sql"
 	"testing"
 
+	"github.com/DATA-DOG/go-sqlmock"
 	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/gen/KinoTicketSystem/model"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/mocks"
@@ -269,14 +271,14 @@ func TestCreateMovie(t *testing.T) {
 	testCases := []struct {
 		name             string
 		movieDTOModel    *models.MovieDTOCreate
-		setExpectations  func(mockMovieRepo mocks.MockMovieRepositoryI, mockMovieGenreRepo mocks.MockMovieGenreRepositoryI, mockMovieActorRepo mocks.MockMovieActorRepositoryI, mockMovieProducerRepo mocks.MockMovieProducerRepositoryI, movie *models.MovieDTOCreate)
+		setExpectations  func(mockMovieRepo mocks.MockMovieRepositoryI, mockMovieGenreRepo mocks.MockMovieGenreRepositoryI, mockMovieActorRepo mocks.MockMovieActorRepositoryI, mockMovieProducerRepo mocks.MockMovieProducerRepositoryI, movie *models.MovieDTOCreate, db *sql.DB, dbMock sqlmock.Sqlmock)
 		expectedMoviesId bool
 		expectedError    *models.KTSError
 	}{
 		{ // Done
 			name:          "Bad Request",
 			movieDTOModel: &models.MovieDTOCreate{},
-			setExpectations: func(mockMovieRepo mocks.MockMovieRepositoryI, mockMovieGenreRepo mocks.MockMovieGenreRepositoryI, mockMovieActorRepo mocks.MockMovieActorRepositoryI, mockMovieProducerRepo mocks.MockMovieProducerRepositoryI, movie *models.MovieDTOCreate) {
+			setExpectations: func(mockMovieRepo mocks.MockMovieRepositoryI, mockMovieGenreRepo mocks.MockMovieGenreRepositoryI, mockMovieActorRepo mocks.MockMovieActorRepositoryI, mockMovieProducerRepo mocks.MockMovieProducerRepositoryI, movie *models.MovieDTOCreate, db *sql.DB, dbMock sqlmock.Sqlmock) {
 
 			},
 			expectedMoviesId: false,
@@ -287,8 +289,11 @@ func TestCreateMovie(t *testing.T) {
 			movieDTOModel: &models.MovieDTOCreate{
 				Movies: sampleMovie.Movies,
 			},
-			setExpectations: func(mockMovieRepo mocks.MockMovieRepositoryI, mockMovieGenreRepo mocks.MockMovieGenreRepositoryI, mockMovieActorRepo mocks.MockMovieActorRepositoryI, mockMovieProducerRepo mocks.MockMovieProducerRepositoryI, movie *models.MovieDTOCreate) {
-				mockMovieRepo.EXPECT().CreateMovie(&movie.Movies).Return(nil, kts_errors.KTS_INTERNAL_ERROR)
+			setExpectations: func(mockMovieRepo mocks.MockMovieRepositoryI, mockMovieGenreRepo mocks.MockMovieGenreRepositoryI, mockMovieActorRepo mocks.MockMovieActorRepositoryI, mockMovieProducerRepo mocks.MockMovieProducerRepositoryI, movie *models.MovieDTOCreate, db *sql.DB, dbMock sqlmock.Sqlmock) {
+				dbMock.ExpectBegin()
+				tx, _ := db.Begin()
+				mockMovieRepo.EXPECT().NewTransaction().Return(tx, nil)
+				mockMovieRepo.EXPECT().CreateMovie(tx, &movie.Movies).Return(nil, kts_errors.KTS_INTERNAL_ERROR)
 			},
 			expectedMoviesId: false,
 			expectedError:    kts_errors.KTS_INTERNAL_ERROR,
@@ -300,9 +305,12 @@ func TestCreateMovie(t *testing.T) {
 
 				GenresID: sampleMovie.GenresID,
 			},
-			setExpectations: func(mockMovieRepo mocks.MockMovieRepositoryI, mockMovieGenreRepo mocks.MockMovieGenreRepositoryI, mockMovieActorRepo mocks.MockMovieActorRepositoryI, mockMovieProducerRepo mocks.MockMovieProducerRepositoryI, movie *models.MovieDTOCreate) {
-				mockMovieRepo.EXPECT().CreateMovie(&movie.Movies).Return(sampleMovie.ID, nil)
-				mockMovieGenreRepo.EXPECT().AddMovieGenre(sampleMovie.ID, gomock.Any()).Return(kts_errors.KTS_INTERNAL_ERROR)
+			setExpectations: func(mockMovieRepo mocks.MockMovieRepositoryI, mockMovieGenreRepo mocks.MockMovieGenreRepositoryI, mockMovieActorRepo mocks.MockMovieActorRepositoryI, mockMovieProducerRepo mocks.MockMovieProducerRepositoryI, movie *models.MovieDTOCreate, db *sql.DB, dbMock sqlmock.Sqlmock) {
+				dbMock.ExpectBegin()
+				tx, _ := db.Begin()
+				mockMovieRepo.EXPECT().NewTransaction().Return(tx, nil)
+				mockMovieRepo.EXPECT().CreateMovie(tx, &movie.Movies).Return(sampleMovie.ID, nil)
+				mockMovieGenreRepo.EXPECT().AddMovieGenre(tx, sampleMovie.ID, gomock.Any()).Return(kts_errors.KTS_INTERNAL_ERROR)
 			},
 			expectedMoviesId: false,
 			expectedError:    kts_errors.KTS_INTERNAL_ERROR,
@@ -315,10 +323,13 @@ func TestCreateMovie(t *testing.T) {
 				GenresID: sampleMovie.GenresID,
 				ActorsID: sampleMovie.ActorsID,
 			},
-			setExpectations: func(mockMovieRepo mocks.MockMovieRepositoryI, mockMovieGenreRepo mocks.MockMovieGenreRepositoryI, mockMovieActorRepo mocks.MockMovieActorRepositoryI, mockMovieProducerRepo mocks.MockMovieProducerRepositoryI, movie *models.MovieDTOCreate) {
-				mockMovieRepo.EXPECT().CreateMovie(&movie.Movies).Return(sampleMovie.ID, nil)
-				mockMovieGenreRepo.EXPECT().AddMovieGenre(sampleMovie.ID, gomock.Any()).Return(nil)
-				mockMovieActorRepo.EXPECT().AddMovieActor(sampleMovie.ID, gomock.Any()).Return(kts_errors.KTS_INTERNAL_ERROR)
+			setExpectations: func(mockMovieRepo mocks.MockMovieRepositoryI, mockMovieGenreRepo mocks.MockMovieGenreRepositoryI, mockMovieActorRepo mocks.MockMovieActorRepositoryI, mockMovieProducerRepo mocks.MockMovieProducerRepositoryI, movie *models.MovieDTOCreate, db *sql.DB, dbMock sqlmock.Sqlmock) {
+				dbMock.ExpectBegin()
+				tx, _ := db.Begin()
+				mockMovieRepo.EXPECT().NewTransaction().Return(tx, nil)
+				mockMovieRepo.EXPECT().CreateMovie(tx, &movie.Movies).Return(sampleMovie.ID, nil)
+				mockMovieGenreRepo.EXPECT().AddMovieGenre(tx, sampleMovie.ID, gomock.Any()).Return(nil)
+				mockMovieActorRepo.EXPECT().AddMovieActor(tx, sampleMovie.ID, gomock.Any()).Return(kts_errors.KTS_INTERNAL_ERROR)
 			},
 			expectedMoviesId: false,
 			expectedError:    kts_errors.KTS_INTERNAL_ERROR,
@@ -332,11 +343,14 @@ func TestCreateMovie(t *testing.T) {
 				ActorsID:    sampleMovie.ActorsID,
 				ProducersID: sampleMovie.ProducersID,
 			},
-			setExpectations: func(mockMovieRepo mocks.MockMovieRepositoryI, mockMovieGenreRepo mocks.MockMovieGenreRepositoryI, mockMovieActorRepo mocks.MockMovieActorRepositoryI, mockMovieProducerRepo mocks.MockMovieProducerRepositoryI, movie *models.MovieDTOCreate) {
-				mockMovieRepo.EXPECT().CreateMovie(&movie.Movies).Return(sampleMovie.ID, nil)
-				mockMovieGenreRepo.EXPECT().AddMovieGenre(sampleMovie.ID, gomock.Any()).Return(nil)
-				mockMovieActorRepo.EXPECT().AddMovieActor(sampleMovie.ID, gomock.Any()).Return(nil)
-				mockMovieProducerRepo.EXPECT().AddMovieProducer(sampleMovie.ID, gomock.Any()).Return(kts_errors.KTS_INTERNAL_ERROR)
+			setExpectations: func(mockMovieRepo mocks.MockMovieRepositoryI, mockMovieGenreRepo mocks.MockMovieGenreRepositoryI, mockMovieActorRepo mocks.MockMovieActorRepositoryI, mockMovieProducerRepo mocks.MockMovieProducerRepositoryI, movie *models.MovieDTOCreate, db *sql.DB, dbMock sqlmock.Sqlmock) {
+				dbMock.ExpectBegin()
+				tx, _ := db.Begin()
+				mockMovieRepo.EXPECT().NewTransaction().Return(tx, nil)
+				mockMovieRepo.EXPECT().CreateMovie(tx, &movie.Movies).Return(sampleMovie.ID, nil)
+				mockMovieGenreRepo.EXPECT().AddMovieGenre(tx, sampleMovie.ID, gomock.Any()).Return(nil)
+				mockMovieActorRepo.EXPECT().AddMovieActor(tx, sampleMovie.ID, gomock.Any()).Return(nil)
+				mockMovieProducerRepo.EXPECT().AddMovieProducer(tx, sampleMovie.ID, gomock.Any()).Return(kts_errors.KTS_INTERNAL_ERROR)
 			},
 			expectedMoviesId: false,
 			expectedError:    kts_errors.KTS_INTERNAL_ERROR,
@@ -350,11 +364,14 @@ func TestCreateMovie(t *testing.T) {
 				ActorsID:    sampleMovie.ActorsID,
 				ProducersID: sampleMovie.ProducersID,
 			},
-			setExpectations: func(mockMovieRepo mocks.MockMovieRepositoryI, mockMovieGenreRepo mocks.MockMovieGenreRepositoryI, mockMovieActorRepo mocks.MockMovieActorRepositoryI, mockMovieProducerRepo mocks.MockMovieProducerRepositoryI, movie *models.MovieDTOCreate) {
-				mockMovieRepo.EXPECT().CreateMovie(&movie.Movies).Return(sampleMovie.ID, nil)
-				mockMovieGenreRepo.EXPECT().AddMovieGenre(sampleMovie.ID, gomock.Any()).Return(nil)
-				mockMovieActorRepo.EXPECT().AddMovieActor(sampleMovie.ID, gomock.Any()).Return(nil)
-				mockMovieProducerRepo.EXPECT().AddMovieProducer(sampleMovie.ID, gomock.Any()).Return(nil)
+			setExpectations: func(mockMovieRepo mocks.MockMovieRepositoryI, mockMovieGenreRepo mocks.MockMovieGenreRepositoryI, mockMovieActorRepo mocks.MockMovieActorRepositoryI, mockMovieProducerRepo mocks.MockMovieProducerRepositoryI, movie *models.MovieDTOCreate, db *sql.DB, dbMock sqlmock.Sqlmock) {
+				dbMock.ExpectBegin()
+				tx, _ := db.Begin()
+				mockMovieRepo.EXPECT().NewTransaction().Return(tx, nil)
+				mockMovieRepo.EXPECT().CreateMovie(tx, &movie.Movies).Return(sampleMovie.ID, nil)
+				mockMovieGenreRepo.EXPECT().AddMovieGenre(tx, sampleMovie.ID, gomock.Any()).Return(nil)
+				mockMovieActorRepo.EXPECT().AddMovieActor(tx, sampleMovie.ID, gomock.Any()).Return(nil)
+				mockMovieProducerRepo.EXPECT().AddMovieProducer(tx, sampleMovie.ID, gomock.Any()).Return(nil)
 			},
 			expectedMoviesId: true,
 			expectedError:    nil,
@@ -379,8 +396,13 @@ func TestCreateMovie(t *testing.T) {
 				MovieProducerRepo: producerRepoMock,
 			}
 
+			db, mock, err := sqlmock.New()
+			if err != nil {
+				t.Fatalf("error while setting up mock database: %s", err)
+			}
+
 			// define expectations
-			tc.setExpectations(*movieRepoMock, *genreRepoMock, *actorRepoMock, *producerRepoMock, tc.movieDTOModel)
+			tc.setExpectations(*movieRepoMock, *genreRepoMock, *actorRepoMock, *producerRepoMock, tc.movieDTOModel, db, mock)
 
 			// WHEN
 			// call RegisterUser with registrationData
@@ -391,6 +413,10 @@ func TestCreateMovie(t *testing.T) {
 
 			if tc.expectedMoviesId && movieId == nil {
 				t.Error("Expected genre ID, got nil")
+			}
+
+			if err = mock.ExpectationsWereMet(); err != nil {
+				t.Errorf("There were unfulfilled expectations: %s", err)
 			}
 		})
 	}

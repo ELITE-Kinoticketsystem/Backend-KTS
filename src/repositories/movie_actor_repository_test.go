@@ -68,15 +68,17 @@ func TestAddMovieActor(t *testing.T) {
 
 			// Create a new instance of the movieActorRepository with the mock database connection
 			movieActorRepo := MovieActorRepository{
-				DatabaseManager: &managers.DatabaseManager{
+				DatabaseManagerI: &managers.DatabaseManager{
 					Connection: db,
 				},
 			}
+			mock.ExpectBegin()
+			tx, _ := db.Begin()
 
 			tc.setExpectations(mock, &uuid1, &uuid2)
 
 			// Call the method under test
-			kts_err := movieActorRepo.AddMovieActor(&uuid1, &uuid2)
+			kts_err := movieActorRepo.AddMovieActor(tx, &uuid1, &uuid2)
 
 			// Verify
 			assert.Equal(t, tc.expectedError, kts_err)
@@ -147,7 +149,7 @@ func TestRemoveMovieActor(t *testing.T) {
 
 			// Create a new instance of the MovieRepository with the mock database connection
 			movieActorRepo := MovieActorRepository{
-				DatabaseManager: &managers.DatabaseManager{
+				DatabaseManagerI: &managers.DatabaseManager{
 					Connection: db,
 				},
 			}
@@ -207,7 +209,7 @@ func TestRemoveAllActorCombinationWithMovie(t *testing.T) {
 
 			// Create a new instance of the MovieRepository with the mock database connection
 			movieActorRepo := MovieActorRepository{
-				DatabaseManager: &managers.DatabaseManager{
+				DatabaseManagerI: &managers.DatabaseManager{
 					Connection: db,
 				},
 			}

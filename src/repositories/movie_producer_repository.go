@@ -1,6 +1,8 @@
 package repositories
 
 import (
+	"database/sql"
+
 	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/gen/KinoTicketSystem/table"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/managers"
@@ -11,24 +13,24 @@ import (
 
 type MovieProducerRepositoryI interface {
 	// Combine Movie and Actor
-	AddMovieProducer(movieId *uuid.UUID, producerId *uuid.UUID) *models.KTSError
+	AddMovieProducer(tx *sql.Tx, movieId *uuid.UUID, producerId *uuid.UUID) *models.KTSError
 	RemoveMovieProducer(movieId *uuid.UUID, producerId *uuid.UUID) *models.KTSError
 	RemoveAllProducerCombinationWithMovie(movieId *uuid.UUID) *models.KTSError
 }
 
 type MovieProducerRepository struct {
-	DatabaseManager managers.DatabaseManagerI
+	managers.DatabaseManagerI
 }
 
 // Combine Movie and Genre
-func (pr *MovieProducerRepository) AddMovieProducer(movieId *uuid.UUID, producerId *uuid.UUID) *models.KTSError {
+func (pr *MovieProducerRepository) AddMovieProducer(tx *sql.Tx, movieId *uuid.UUID, producerId *uuid.UUID) *models.KTSError {
 
 	// Create the insert statement
 	insertQuery := table.MovieProducers.INSERT(table.MovieProducers.MovieID, table.MovieProducers.ProducerID).
 		VALUES(utils.MysqlUuid(movieId), utils.MysqlUuid(producerId))
 
 	// Execute the query
-	rows, err := insertQuery.Exec(pr.DatabaseManager.GetDatabaseConnection())
+	rows, err := insertQuery.Exec(tx)
 	if err != nil {
 		return kts_errors.KTS_INTERNAL_ERROR
 	}
@@ -54,7 +56,7 @@ func (pr *MovieProducerRepository) RemoveMovieProducer(movieId *uuid.UUID, produ
 	)
 
 	// Execute the query
-	rows, err := deleteQuery.Exec(pr.DatabaseManager.GetDatabaseConnection())
+	rows, err := deleteQuery.Exec(pr.GetDatabaseConnection())
 	if err != nil {
 		return kts_errors.KTS_INTERNAL_ERROR
 	}
@@ -77,12 +79,10 @@ func (pr *MovieProducerRepository) RemoveAllProducerCombinationWithMovie(movieId
 	)
 
 	// Execute the query
-	_, err := deleteQuery.Exec(pr.DatabaseManager.GetDatabaseConnection())
+	_, err := deleteQuery.Exec(pr.GetDatabaseConnection())
 	if err != nil {
 		return kts_errors.KTS_INTERNAL_ERROR
 	}
-
-
 
 	return nil
 }

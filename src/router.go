@@ -51,7 +51,7 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 	}
 
 	movieRepo := &repositories.MovieRepository{
-		DatabaseManager: databaseManager,
+		DatabaseManagerI: databaseManager,
 	}
 
 	genreRepo := &repositories.GenreRepository{
@@ -59,15 +59,15 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 	}
 
 	movieGenreRepo := &repositories.MovieGenreRepository{
-		DatabaseManager: databaseManager,
+		DatabaseManagerI: databaseManager,
 	}
 
 	movieActorRepo := &repositories.MovieActorRepository{
-		DatabaseManager: databaseManager,
+		DatabaseManagerI: databaseManager,
 	}
 
 	movieProducerRepo := &repositories.MovieProducerRepository{
-		DatabaseManager: databaseManager,
+		DatabaseManagerI: databaseManager,
 	}
 
 	actorRepo := &repositories.ActorRepository{
