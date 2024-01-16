@@ -12,7 +12,7 @@ import (
 )
 
 type EventSeatControllerI interface {
-	GetEventSeats(eventId *uuid.UUID, userId *uuid.UUID) (*[][]models.GetSeatsForSeatSelectorDTO, *[]models.GetSeatsForSeatSelectorDTO, *time.Time, *models.KTSError)
+	GetEventSeats(eventId *uuid.UUID, userId *uuid.UUID) (*[]models.GetSeatsForSeatSelectorDTO, *[]models.GetSeatsForSeatSelectorDTO, *time.Time, *models.KTSError)
 	BlockEventSeat(eventId *uuid.UUID, eventSeatId *uuid.UUID, userId *uuid.UUID) (*time.Time, *models.KTSError)
 	AreUserSeatsNextToEachOther(eventId *uuid.UUID, userId *uuid.UUID, eventSeatId *uuid.UUID) (bool, *models.KTSError)
 	UnblockEventSeat(eventId *uuid.UUID, eventSeatId *uuid.UUID, userId *uuid.UUID) (*time.Time, *models.KTSError)
@@ -24,16 +24,17 @@ type EventSeatController struct {
 	EventSeatRepo repositories.EventSeatRepoI
 }
 
-func (esc *EventSeatController) GetEventSeats(eventId *uuid.UUID, userId *uuid.UUID) (*[][]models.GetSeatsForSeatSelectorDTO, *[]models.GetSeatsForSeatSelectorDTO, *time.Time, *models.KTSError) {
+func (esc *EventSeatController) GetEventSeats(eventId *uuid.UUID, userId *uuid.UUID) (*[]models.GetSeatsForSeatSelectorDTO, *[]models.GetSeatsForSeatSelectorDTO, *time.Time, *models.KTSError) {
 	seats, kts_err := esc.EventSeatRepo.GetEventSeats(eventId)
 
 	if kts_err != nil {
 		return nil, nil, nil, kts_err
 	}
 
-	seatRows := make(map[int32][]models.GetSeatsForSeatSelectorDTO)
 	currentUserSeats := []models.GetSeatsForSeatSelectorDTO{}
 	var blockedUntil *time.Time
+
+	event_seats := []models.GetSeatsForSeatSelectorDTO{}
 
 	for _, seat := range *seats {
 		currentSeat := models.GetSeatsForSeatSelectorDTO{
@@ -53,12 +54,10 @@ func (esc *EventSeatController) GetEventSeats(eventId *uuid.UUID, userId *uuid.U
 				blockedUntil = seat.EventSeat.BlockedUntil
 			}
 		}
-
-		seatRow := seatRows[currentSeat.RowNr]
-		seatRows[currentSeat.RowNr] = append(seatRow, currentSeat)
+		event_seats = append(event_seats, currentSeat)
 	}
 
-	return seatMapToSlice(seatRows), &currentUserSeats, blockedUntil, nil
+	return &event_seats, &currentUserSeats, blockedUntil, nil
 }
 
 func (esc *EventSeatController) BlockEventSeat(eventId *uuid.UUID, eventSeatId *uuid.UUID, userId *uuid.UUID) (*time.Time, *models.KTSError) {
@@ -230,20 +229,4 @@ func (esc *EventSeatController) AreUserSeatsNextToEachOther(eventId *uuid.UUID, 
 
 func (esc *EventSeatController) GetSelectedSeats(eventId *uuid.UUID, userId *uuid.UUID) (*[]models.GetSlectedSeatsDTO, *models.KTSError) {
 	return esc.EventSeatRepo.GetSelectedSeats(eventId, userId)
-}
-
-func seatMapToSlice(seatMap map[int32][]models.GetSeatsForSeatSelectorDTO) *[][]models.GetSeatsForSeatSelectorDTO {
-	seatSlice := make([][]models.GetSeatsForSeatSelectorDTO, len(seatMap))
-
-	for _, seatRow := range seatMap {
-		// sort seatrow by columnNr
-		slices.SortFunc(seatRow, func(a, b models.GetSeatsForSeatSelectorDTO) int {
-			return (int)(a.ColumnNr - b.ColumnNr)
-		})
-
-		row := seatRow[0].RowNr
-		seatSlice[row] = seatRow
-	}
-
-	return &seatSlice
 }

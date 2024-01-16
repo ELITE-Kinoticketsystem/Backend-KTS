@@ -19,9 +19,11 @@ type CreateTheatreRequest struct {
 
 type CreateCinemaHallRequest struct {
 	HallName string
-	Seats    [][]struct {
-		RowNr    int
-		ColumnNr int
+	Width    int
+	Height   int
+	Seats    []struct {
+		X        int
+		Y        int
 		Type     string
 		Category string
 	}

@@ -53,7 +53,6 @@ func (tc *TheatreController) CreateTheatre(theatreData *models.CreateTheatreRequ
 		return kts_err
 	}
 
-	
 	if err = tx.Commit(); err != nil {
 		return kts_errors.KTS_INTERNAL_ERROR
 	}
@@ -75,6 +74,8 @@ func (tc *TheatreController) CreateCinemaHall(cinemaHallData *models.CreateCinem
 	cinemaHall := model.CinemaHalls{
 		ID:        &cinemaHallId,
 		Name:      cinemaHallData.HallName,
+		Width:     int32(cinemaHallData.Width),
+		Height:    int32(cinemaHallData.Height),
 		Capacity:  computeCapacity(cinemaHallData),
 		TheatreID: cinemaHallData.TheatreId,
 	}
@@ -91,70 +92,89 @@ func (tc *TheatreController) CreateCinemaHall(cinemaHallData *models.CreateCinem
 
 	seatCategoriesMap := seatCategoriesToMap(seatCategories)
 
-	visible_row := 1
-	for _, row := range cinemaHallData.Seats {
-		visible_column := 1
-		emtpy_seats := 0
-		for _, seat := range row {
-			if seat.Type == "empty" {
-				emtpy_seats++
-				visible_column--
-			}
-			seatId := uuid.New()
-			seatCategoryId, ok := seatCategoriesMap[seat.Category]
-			if !ok {
-				return kts_errors.KTS_BAD_REQUEST
-			}
-			seat := model.Seats{
-				ID:              &seatId,
-				RowNr:           int32(seat.RowNr),
-				ColumnNr:        int32(seat.ColumnNr),
-				// VisibleRowNr:    int32(visible_row),
-				// VisibleColumnNr: int32(visible_column),
-				SeatCategoryID:  &seatCategoryId,
-				CinemaHallID:    &cinemaHallId,
-				Type:            seat.Type,
-			}
-			kts_err = tc.TheatreRepo.CreateSeat(seat)
-			if kts_err != nil {
-				return kts_err
-			}
-			visible_column++
+	row_nr := 1
+	column_nr := 1
+	for i, seat := range cinemaHallData.Seats {
+		seatId := uuid.New()
+		seatCategoryId, ok := seatCategoriesMap[seat.Category]
+		if !ok {
+			return kts_errors.KTS_BAD_REQUEST
 		}
-		if emtpy_seats == len(row) {
-			continue
+		seat := model.Seats{
+			ID:             &seatId,
+			RowNr:          int32(row_nr),
+			ColumnNr:       int32(column_nr),
+			X:              int32(seat.X),
+			Y:              int32(seat.Y),
+			SeatCategoryID: &seatCategoryId,
+			CinemaHallID:   &cinemaHallId,
+			Type:           seat.Type,
 		}
-		visible_row++
+		kts_err = tc.TheatreRepo.CreateSeat(seat)
+		if kts_err != nil {
+			return kts_err
+		}
+		if i > 0 && seat.Y != int32(cinemaHallData.Seats[i-1].Y) {
+			row_nr++
+			column_nr = 1
+		} else {
+			column_nr++
+		}
 	}
-
 	return nil
 }
 
 func isHallValid(hall *models.CreateCinemaHallRequest) bool {
-	for i, row := range hall.Seats {
+	// valid width and height
+	if hall.Width <= 0 || hall.Height <= 0 {
+		return false
+	}
 
-		// check if hall is rectangular
-		if i > 0 && len(row) != len(hall.Seats[i-1]) {
+	// hall not empty
+	if len(hall.Seats) == 0 {
+		return false
+	}
+
+	currentRow := 0
+	for i, seat := range hall.Seats {
+		// valid coordinates
+		if !(0 <= seat.X && seat.X < hall.Width && 0 <= seat.Y && seat.Y < hall.Height) {
 			return false
 		}
 
-		// check for valid double seats
-		for j, seat := range row {
-			if j < len(row)-1 && seat.Type == "double" && row[j+1].Type != "emptyDouble" {
+		// seats ascending inside row
+		if i > 0 && seat.X < hall.Seats[i-1].X && seat.Y == hall.Seats[i-1].Y {
+			return false
+		}
+
+		// rows in order
+		if seat.Y < currentRow {
+			return false
+		} else if seat.Y > currentRow {
+			currentRow = seat.Y
+		}
+
+		// double seats need to span two spaces
+		if seat.Type == "double" {
+			if i < len(hall.Seats)-1 && seat.Y == hall.Seats[i+1].Y && seat.X+1 == hall.Seats[i+1].X {
+				return false
+			}
+			if seat.X == hall.Width-1 {
 				return false
 			}
 		}
 	}
+
 	return true
 }
 
 func computeCapacity(hall *models.CreateCinemaHallRequest) int32 {
 	capacity := int32(0)
-	for _, row := range hall.Seats {
-		for _, seat := range row {
-			if seat.Type != "empty" {
-				capacity++
-			}
+	for _, seat := range hall.Seats {
+		if seat.Type == "double" {
+			capacity += 2
+		} else {
+			capacity += 1
 		}
 	}
 	return capacity

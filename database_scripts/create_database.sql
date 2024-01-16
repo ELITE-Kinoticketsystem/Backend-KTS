@@ -176,6 +176,8 @@ CREATE TABLE cinema_halls
      id         BINARY(16) DEFAULT (Uuid_to_bin(Uuid(), 1)),
      name       VARCHAR(50) NOT NULL,
      capacity   INT NOT NULL,
+     width      INT NOT NULL,
+     height     INT NOT NULL, 
      theatre_id BINARY(16) NOT NULL,
      PRIMARY KEY (id),
      FOREIGN KEY (theatre_id) REFERENCES theatres(id)
@@ -190,11 +192,11 @@ CREATE TABLE seat_categories
 
 CREATE TABLE seats
   (
-     id               BINARY(16) DEFAULT (Uuid_to_bin(Uuid(), 1)),
+     id                BINARY(16) DEFAULT (Uuid_to_bin(Uuid(), 1)),
      row_nr            INT NOT NULL,
      column_nr         INT NOT NULL,
-     visible_row_nr    INT NOT NULL,
-     visible_column_nr INT NOT NULL,
+     x                 INT NOT NULL,
+     y                 INT NOT NULL,
      type              VARCHAR(15) DEFAULT "regular" NOT NULL,
      seat_category_id  BINARY(16) NOT NULL,
      cinema_hall_id    BINARY(16) NOT NULL,

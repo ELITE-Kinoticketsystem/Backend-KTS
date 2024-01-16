@@ -172,7 +172,7 @@ func (esr *EventSeatRepository) GetSelectedSeats(eventId *uuid.UUID, userId *uui
 		LEFT_JOIN(table.Theatres, table.Theatres.ID.EQ(table.CinemaHalls.TheatreID)),
 	).
 		WHERE(table.EventSeats.EventID.EQ(utils.MysqlUuid(eventId)).AND(table.EventSeats.Booked.IS_FALSE()).AND(table.EventSeats.BlockedUntil.GT(mysql.CURRENT_TIMESTAMP()).AND(table.EventSeats.UserID.EQ(utils.MysqlUuid(userId))))).
-		ORDER_BY(table.Seats.ColumnNr.ASC(), table.Seats.RowNr.ASC())
+		ORDER_BY(table.Seats.RowNr.ASC(), table.Seats.ColumnNr.ASC())
 
 	log.Println(stmt.DebugSql())
 
