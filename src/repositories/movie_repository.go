@@ -1,8 +1,6 @@
 package repositories
 
 import (
-	"log"
-
 	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/gen/KinoTicketSystem/table"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
@@ -240,8 +238,6 @@ func (mr *MovieRepository) GetMovieById(movieId *uuid.UUID) (*models.MovieWithEv
 		table.Movies.ID.EQ(utils.MysqlUuid(movieId)),
 	)
 
-	log.Print(stmt.DebugSql())
-
 	// Execute the query
 	err := stmt.Query(mr.DatabaseManager.GetDatabaseConnection(), &movie)
 	if err != nil {
@@ -264,8 +260,6 @@ func (mr *MovieRepository) UpdateRating(movieId *uuid.UUID, rating float64) *mod
 		).WHERE(
 		table.Movies.ID.EQ(utils.MysqlUuid(movieId)),
 	)
-
-	log.Print(updateQuery.DebugSql())
 
 	// Execute the query
 	_, err := updateQuery.Exec(mr.DatabaseManager.GetDatabaseConnection())
