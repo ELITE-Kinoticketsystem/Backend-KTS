@@ -275,6 +275,14 @@ func TestCreateMovie(t *testing.T) {
 		expectedMoviesId bool
 		expectedError    *models.KTSError
 	}{
+		{
+			name:          "CreateTransaction internal error",
+			movieDTOModel: sampleMovie,
+			setExpectations: func(mockMovieRepo mocks.MockMovieRepositoryI, mockMovieGenreRepo mocks.MockMovieGenreRepositoryI, mockMovieActorRepo mocks.MockMovieActorRepositoryI, mockMovieProducerRepo mocks.MockMovieProducerRepositoryI, movie *models.MovieDTOCreate, db *sql.DB, dbMock sqlmock.Sqlmock) {
+				mockMovieRepo.EXPECT().NewTransaction().Return(nil, sql.ErrTxDone)
+			},
+			expectedError: kts_errors.KTS_INTERNAL_ERROR,
+		},
 		{ // Done
 			name:          "Bad Request",
 			movieDTOModel: &models.MovieDTOCreate{},
@@ -372,6 +380,29 @@ func TestCreateMovie(t *testing.T) {
 				mockMovieGenreRepo.EXPECT().AddMovieGenre(tx, sampleMovie.ID, gomock.Any()).Return(nil)
 				mockMovieActorRepo.EXPECT().AddMovieActor(tx, sampleMovie.ID, gomock.Any()).Return(nil)
 				mockMovieProducerRepo.EXPECT().AddMovieProducer(tx, sampleMovie.ID, gomock.Any()).Return(nil)
+				dbMock.ExpectCommit().WillReturnError(sql.ErrTxDone)
+			},
+			expectedMoviesId: false,
+			expectedError:    kts_errors.KTS_INTERNAL_ERROR,
+		},
+		{
+			name: "Movie successfuly created",
+			movieDTOModel: &models.MovieDTOCreate{
+				Movies: sampleMovie.Movies,
+
+				GenresID:    sampleMovie.GenresID,
+				ActorsID:    sampleMovie.ActorsID,
+				ProducersID: sampleMovie.ProducersID,
+			},
+			setExpectations: func(mockMovieRepo mocks.MockMovieRepositoryI, mockMovieGenreRepo mocks.MockMovieGenreRepositoryI, mockMovieActorRepo mocks.MockMovieActorRepositoryI, mockMovieProducerRepo mocks.MockMovieProducerRepositoryI, movie *models.MovieDTOCreate, db *sql.DB, dbMock sqlmock.Sqlmock) {
+				dbMock.ExpectBegin()
+				tx, _ := db.Begin()
+				mockMovieRepo.EXPECT().NewTransaction().Return(tx, nil)
+				mockMovieRepo.EXPECT().CreateMovie(tx, &movie.Movies).Return(sampleMovie.ID, nil)
+				mockMovieGenreRepo.EXPECT().AddMovieGenre(tx, sampleMovie.ID, gomock.Any()).Return(nil)
+				mockMovieActorRepo.EXPECT().AddMovieActor(tx, sampleMovie.ID, gomock.Any()).Return(nil)
+				mockMovieProducerRepo.EXPECT().AddMovieProducer(tx, sampleMovie.ID, gomock.Any()).Return(nil)
+				dbMock.ExpectCommit()
 			},
 			expectedMoviesId: true,
 			expectedError:    nil,

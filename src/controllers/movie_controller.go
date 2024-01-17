@@ -66,10 +66,10 @@ func (mc *MovieController) CreateMovie(movie *models.MovieDTOCreate) (*uuid.UUID
 	defer tx.Rollback()
 
 	// Movie
-	movieId, kts_errors := mc.MovieRepo.CreateMovie(tx, &movie.Movies)
-	if kts_errors != nil {
+	movieId, kts_error := mc.MovieRepo.CreateMovie(tx, &movie.Movies)
+	if kts_error != nil {
 		log.Print("Movie was not created")
-		return nil, kts_errors
+		return nil, kts_error
 	}
 
 	// Add genre to movie
@@ -106,9 +106,8 @@ func (mc *MovieController) CreateMovie(movie *models.MovieDTOCreate) (*uuid.UUID
 		}
 	}
 
-	
 	if err = tx.Commit(); err != nil {
-		//return nil, kts_errors.KTS_INTERNAL_ERROR
+		return nil, kts_errors.KTS_INTERNAL_ERROR
 	}
 
 	log.Print("Movie was created")
