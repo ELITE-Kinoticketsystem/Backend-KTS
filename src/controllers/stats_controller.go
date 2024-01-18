@@ -22,10 +22,7 @@ func (sc *StatsController) GetOrdersForStats() (*[]models.GetOrderDTO, *models.K
 
 func (sc *StatsController) GetTotalVisits(startTime time.Time, endTime time.Time, in string) (*models.StatsVisitsTwoArrays, *models.KTSError) {
 
-	visitsTwoArrays, kts_err := GenerateStatsArray(startTime, endTime, in)
-	if kts_err != nil {
-		return nil, kts_err
-	}
+	visitsTwoArrays := GenerateStatsArray(startTime, endTime, in)
 
 	vists, err := sc.StatsRepo.GetTotalVisits(startTime, endTime, in)
 	if err != nil {
@@ -64,14 +61,14 @@ func (sc *StatsController) GetTotalVisits(startTime time.Time, endTime time.Time
 	return visitsTwoArrays, nil
 }
 
-func GenerateStatsArray(startDate, endDate time.Time, filterBy string) (*models.StatsVisitsTwoArrays, *models.KTSError) {
+func GenerateStatsArray(startDate, endDate time.Time, filterBy string) *models.StatsVisitsTwoArrays {
 	var statsArray models.StatsVisitsTwoArrays
 
 	// Initialize the start and end date based on the filter
 	switch filterBy {
 	case "day":
 		startDate = time.Date(startDate.Year(), startDate.Month(), startDate.Day(), 0, 0, 0, 0, time.UTC)
-		endDate = time.Date(endDate.Year(), endDate.Month(), endDate.Day(), 0, 0, 0, 0, time.UTC)
+		endDate = time.Date(endDate.Year(), endDate.Month(), endDate.Day()+1, 0, 0, 0, 0, time.UTC)
 	case "month":
 		startDate = time.Date(startDate.Year(), startDate.Month(), 1, 0, 0, 0, 0, time.UTC)
 		endDate = time.Date(endDate.Year(), endDate.Month()+1, 1, 0, 0, 0, 0, time.UTC)
@@ -97,5 +94,5 @@ func GenerateStatsArray(startDate, endDate time.Time, filterBy string) (*models.
 		}
 	}
 
-	return &statsArray, nil
+	return &statsArray
 }
