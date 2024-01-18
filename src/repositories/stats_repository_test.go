@@ -79,9 +79,9 @@ func TestGetOrdersForStats(t *testing.T) {
 
 func TestGetTotalVisits(t *testing.T) {
 
-	days := samples.GetSampleDayVisitsStats()
-	months := samples.GetSampleMonthVisitsStats()
-	years := samples.GetSampleYearVisitsStats()
+	days := *samples.GetSampleDayVisitsStats()
+	months := *samples.GetSampleMonthVisitsStats()
+	years := *samples.GetSampleYearVisitsStats()
 	startTime, _ := time.Parse("2006-01-01", "2019-01-01")
 	endTime, _ := time.Parse("2006-01-01", "2024-01-01")
 
