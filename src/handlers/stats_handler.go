@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/controllers"
@@ -13,6 +14,7 @@ import (
 func GetTotalVisitsHandler(statsCtrl controllers.StatsControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		filterBy := c.Param("filterBy")
+		filterBy = strings.ToLower(filterBy)
 		startTime, err := time.Parse("2006-01-02", c.Param("from"))
 		if err != nil {
 			utils.HandleErrorAndAbort(c, kts_errors.KTS_BAD_REQUEST)
@@ -21,6 +23,16 @@ func GetTotalVisitsHandler(statsCtrl controllers.StatsControllerI) gin.HandlerFu
 
 		endTime, err := time.Parse("2006-01-02", c.Param("til"))
 		if err != nil {
+			utils.HandleErrorAndAbort(c, kts_errors.KTS_BAD_REQUEST)
+			return
+		}
+
+		if startTime.After(endTime) {
+			utils.HandleErrorAndAbort(c, kts_errors.KTS_BAD_REQUEST)
+			return
+		}
+
+		if filterBy != "day" && filterBy != "month" && filterBy != "year" {
 			utils.HandleErrorAndAbort(c, kts_errors.KTS_BAD_REQUEST)
 			return
 		}

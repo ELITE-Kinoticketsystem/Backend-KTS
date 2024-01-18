@@ -25,3 +25,4 @@
 ~/go/bin/mockgen -source=./src/repositories/eventseat_repository.go -destination=./src/mocks/eventseat_repository_mock.go -package=mocks
 ~/go/bin/mockgen -source=./src/repositories/review_repository.go -destination=./src/mocks/review_repository_mock.go -package=mocks
 ~/go/bin/mockgen -source=./src/repositories/user_movies_repository.go -destination=./src/mocks/user_movies_repository_mock.go -package=mocks
+~/go/bin/mockgen -source=./src/repositories/stats_repository.go -destination=./src/mocks/stats_repository_mock.go -package=mocks
