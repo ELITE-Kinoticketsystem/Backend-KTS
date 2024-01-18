@@ -11,6 +11,18 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// @Summary Get Total Visits
+// @Description Get Total Visits
+// @Tags Stats
+// @Accept  json
+// @Produce  json
+// @Param filterBy path string true "Filter By"
+// @Param from path string true "From"
+// @Param til path string true "Til"
+// @Success 200 {object} models.StatsVisitsTwoArrays
+// @Failure 400 {object} models.KTSErrorMessage
+// @Failure 500 {object} models.KTSErrorMessage
+// @Router /stats/visits/{filterBy}/{from}/{til} [get]
 func GetTotalVisitsHandler(statsCtrl controllers.StatsControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		filterBy := c.Param("filterBy")
@@ -47,6 +59,19 @@ func GetTotalVisitsHandler(statsCtrl controllers.StatsControllerI) gin.HandlerFu
 	}
 }
 
+// @Summary Get Total Visits For Theatre
+// @Description Get Total Visits For Theatre
+// @Tags Stats
+// @Accept  json
+// @Produce  json
+// @Param filterBy path string true "Filter By"
+// @Param from path string true "From"
+// @Param til path string true "Til"
+// @Param theatreName path string true "Theatre Name"
+// @Success 200 {object} models.StatsVisitsTwoArrays
+// @Failure 400 {object} models.KTSErrorMessage
+// @Failure 500 {object} models.KTSErrorMessage
+// @Router /stats/visits/{filterBy}/{from}/{til}/{theatreName} [get]
 func GetTotalVisitsForTheatreHandler(statsCtrl controllers.StatsControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		filterBy := c.Param("filterBy")
@@ -89,6 +114,14 @@ func GetTotalVisitsForTheatreHandler(statsCtrl controllers.StatsControllerI) gin
 	}
 }
 
+// @Summary Get All Orders
+// @Description Get All Orders
+// @Tags Stats
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} models.StatsVisitsTwoArrays
+// @Failure 500 {object} models.KTSErrorMessage
+// @Router /stats/orders/ [get]
 func GetOrdersForStatsHandler(statsCtrl controllers.StatsControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		orders, kts_err := statsCtrl.GetOrdersForStats()
