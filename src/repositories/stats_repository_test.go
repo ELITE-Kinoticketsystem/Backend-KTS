@@ -216,3 +216,148 @@ func TestGetTotalVisits(t *testing.T) {
 	}
 
 }
+
+func TestGetTotalVisitsForTheatre(t *testing.T) {
+
+	days := *samples.GetSampleDayVisitsStats()
+	months := *samples.GetSampleMonthVisitsStats()
+	years := *samples.GetSampleYearVisitsStats()
+	startTime, _ := time.Parse("2006-01-01", "2019-01-01")
+	endTime, _ := time.Parse("2006-01-01", "2024-01-01")
+
+	testCases := []struct {
+		name            string
+		start           time.Time
+		end             time.Time
+		in              string
+		theatreName     string
+		setExpectations func(mock sqlmock.Sqlmock, startTime time.Time, endTime time.Time, in string, theatreName string)
+		expectedStats   *[]models.StatsVisits
+		expectedError   *models.KTSError
+	}{
+		{
+			name:        "Get COUNT(tickets.id), MIN(events.end), SUM(orders.totalprice) in Days",
+			start:       startTime,
+			end:         endTime,
+			in:          "DAY",
+			theatreName: "Theatre1",
+			setExpectations: func(mock sqlmock.Sqlmock, startTime time.Time, endTime time.Time, in string, theatreName string) {
+				mock.ExpectQuery(
+					"SELECT COUNT(tickets.id), MIN(events.end), SUM(orders.totalprice) FROM `KinoTicketSystem`.tickets LEFT JOIN `KinoTicketSystem`.orders ON (orders.id = tickets.order_id) LEFT JOIN `KinoTicketSystem`.event_seats ON (event_seats.id = tickets.event_seat_id) LEFT JOIN `KinoTicketSystem`.events ON (events.id = event_seats.event_id) LEFT JOIN `KinoTicketSystem`.cinema_halls ON (cinema_halls.id = events.cinema_hall_id) LEFT JOIN `KinoTicketSystem`.theatres ON (theatres.id = cinema_halls.theatre_id) WHERE (events.end BETWEEN CAST(? AS DATETIME) AND CAST(? AS DATETIME)) AND (theatres.name = ?) GROUP BY DAY(events.end) ORDER BY MIN(events.end);",
+				).WithArgs(startTime, endTime, theatreName).WillReturnRows(
+					sqlmock.NewRows(
+						[]string{
+							"COUNT(tickets.id)", "MIN(events.end)", "SUM(orders.totalprice)",
+						},
+					).
+						AddRow(
+							days[0].Count, days[0].Date, days[0].Revenue,
+						).
+						AddRow(
+							days[1].Count, days[1].Date, days[1].Revenue,
+						),
+				)
+			},
+			expectedStats: &days,
+			expectedError: nil,
+		},
+		{
+			name:        "Get COUNT(tickets.id), MIN(events.end), SUM(orders.totalprice) in Months",
+			start:       startTime,
+			end:         endTime,
+			in:          "MONTH",
+			theatreName: "Theatre1",
+			setExpectations: func(mock sqlmock.Sqlmock, startTime time.Time, endTime time.Time, in string, theatreName string) {
+				mock.ExpectQuery(
+					"SELECT COUNT(tickets.id), MIN(events.end), SUM(orders.totalprice) FROM `KinoTicketSystem`.tickets LEFT JOIN `KinoTicketSystem`.orders ON (orders.id = tickets.order_id) LEFT JOIN `KinoTicketSystem`.event_seats ON (event_seats.id = tickets.event_seat_id) LEFT JOIN `KinoTicketSystem`.events ON (events.id = event_seats.event_id) LEFT JOIN `KinoTicketSystem`.cinema_halls ON (cinema_halls.id = events.cinema_hall_id) LEFT JOIN `KinoTicketSystem`.theatres ON (theatres.id = cinema_halls.theatre_id) WHERE (events.end BETWEEN CAST(? AS DATETIME) AND CAST(? AS DATETIME)) AND (theatres.name = ?) GROUP BY MONTH(events.end) ORDER BY MIN(events.end);",
+				).WithArgs(startTime, endTime, theatreName).WillReturnRows(
+					sqlmock.NewRows(
+						[]string{
+							"COUNT(tickets.id)", "MIN(events.end)", "SUM(orders.totalprice)",
+						},
+					).
+						AddRow(
+							months[0].Count, months[0].Date, months[0].Revenue,
+						).
+						AddRow(
+							months[1].Count, months[1].Date, months[1].Revenue,
+						),
+				)
+			},
+			expectedStats: &months,
+			expectedError: nil,
+		},
+		{
+			name:        "Get COUNT(tickets.id), MIN(events.end), SUM(orders.totalprice) in Years",
+			start:       startTime,
+			end:         endTime,
+			in:          "YEAR",
+			theatreName: "Theatre1",
+			setExpectations: func(mock sqlmock.Sqlmock, startTime time.Time, endTime time.Time, in string, theatreName string) {
+				mock.ExpectQuery(
+					"SELECT COUNT(tickets.id), MIN(events.end), SUM(orders.totalprice) FROM `KinoTicketSystem`.tickets LEFT JOIN `KinoTicketSystem`.orders ON (orders.id = tickets.order_id) LEFT JOIN `KinoTicketSystem`.event_seats ON (event_seats.id = tickets.event_seat_id) LEFT JOIN `KinoTicketSystem`.events ON (events.id = event_seats.event_id) LEFT JOIN `KinoTicketSystem`.cinema_halls ON (cinema_halls.id = events.cinema_hall_id) LEFT JOIN `KinoTicketSystem`.theatres ON (theatres.id = cinema_halls.theatre_id) WHERE (events.end BETWEEN CAST(? AS DATETIME) AND CAST(? AS DATETIME)) AND (theatres.name = ?) GROUP BY YEAR(events.end) ORDER BY MIN(events.end);",
+				).WithArgs(startTime, endTime, theatreName).WillReturnRows(
+					sqlmock.NewRows(
+						[]string{
+							"COUNT(tickets.id)", "MIN(events.end)", "SUM(orders.totalprice)",
+						},
+					).
+						AddRow(
+							years[0].Count, years[0].Date, years[0].Revenue,
+						).
+						AddRow(
+							years[1].Count, years[1].Date, years[1].Revenue,
+						),
+				)
+			},
+			expectedStats: &years,
+			expectedError: nil,
+		},
+		{
+			name:        "Get COUNT(tickets.id), MIN(events.end), SUM(orders.totalprice) in Days - Error",
+			start:       startTime,
+			end:         endTime,
+			in:          "DAY",
+			theatreName: "Theatre1",
+			setExpectations: func(mock sqlmock.Sqlmock, startTime time.Time, endTime time.Time, in string, theatreName string) {
+				mock.ExpectQuery(
+					"SELECT COUNT(tickets.id), MIN(events.end), SUM(orders.totalprice) FROM `KinoTicketSystem`.tickets LEFT JOIN `KinoTicketSystem`.orders ON (orders.id = tickets.order_id) LEFT JOIN `KinoTicketSystem`.event_seats ON (event_seats.id = tickets.event_seat_id) LEFT JOIN `KinoTicketSystem`.events ON (events.id = event_seats.event_id) LEFT JOIN `KinoTicketSystem`.cinema_halls ON (cinema_halls.id = events.cinema_hall_id) LEFT JOIN `KinoTicketSystem`.theatres ON (theatres.id = cinema_halls.theatre_id) WHERE (events.end BETWEEN CAST(? AS DATETIME) AND CAST(? AS DATETIME)) AND (theatres.name = ?) GROUP BY DAY(events.end) ORDER BY MIN(events.end);",
+				).WithArgs(startTime, endTime, theatreName).WillReturnError(sqlmock.ErrCancelled)
+			},
+			expectedStats: nil,
+			expectedError: kts_errors.KTS_INTERNAL_ERROR,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			db, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
+			if err != nil {
+				t.Fatalf("Failed to create mock database connection: %v", err)
+			}
+			defer db.Close()
+
+			statsRepo := &StatsRepository{
+				DatabaseManager: &managers.DatabaseManager{
+					Connection: db,
+				},
+			}
+
+			tc.setExpectations(mock, tc.start, tc.end, tc.in, tc.theatreName)
+
+			totalVisits, kts_err := statsRepo.GetTotalVisitsForTheatre(tc.start, tc.end, tc.in, tc.theatreName)
+
+			if kts_err != tc.expectedError {
+				t.Errorf("Unexpected error: %v", kts_err)
+			}
+
+			assert.Equal(t, tc.expectedStats, totalVisits)
+
+			if err := mock.ExpectationsWereMet(); err != nil {
+				t.Errorf("There were unfulfilled expectations: %s", err)
+			}
+
+		})
+	}
+
+}

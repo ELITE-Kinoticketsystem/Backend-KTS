@@ -10,6 +10,7 @@ import (
 type StatsControllerI interface {
 	GetOrdersForStats() (*[]models.GetOrderDTO, *models.KTSError)
 	GetTotalVisits(startTime time.Time, endTime time.Time, in string) (*models.StatsVisitsTwoArrays, *models.KTSError)
+	GetTotalVisitsForTheatre(startTime time.Time, endTime time.Time, in string, theatreName string) (*models.StatsVisitsTwoArrays, *models.KTSError)
 }
 
 type StatsController struct {
@@ -95,4 +96,45 @@ func GenerateStatsArray(startDate, endDate time.Time, filterBy string) *models.S
 	}
 
 	return &statsArray
+}
+
+func (sc *StatsController) GetTotalVisitsForTheatre(startTime time.Time, endTime time.Time, in string, theatreName string) (*models.StatsVisitsTwoArrays, *models.KTSError) {
+
+	visitsTwoArrays := GenerateStatsArray(startTime, endTime, in)
+
+	vists, err := sc.StatsRepo.GetTotalVisitsForTheatre(startTime, endTime, in, theatreName)
+	if err != nil {
+		return nil, err
+	}
+
+	// Loop through all dates
+	for i := 0; i < len(visitsTwoArrays.Count); i++ {
+
+		// Loop through all visits
+		for _, visit := range *vists {
+
+			// Depending on what the user wants to filter by, check if the dates are equal
+			switch in {
+			case "day":
+				if visitsTwoArrays.Date[i].Equal(visit.Date.Truncate(24 * time.Hour)) {
+					visitsTwoArrays.Count[i] = visit.Count
+					visitsTwoArrays.Revenue[i] = visit.Revenue
+				}
+			case "month":
+				if visitsTwoArrays.Date[i].Month() == visit.Date.Month() &&
+					visitsTwoArrays.Date[i].Year() == visit.Date.Year() {
+					visitsTwoArrays.Count[i] = visit.Count
+					visitsTwoArrays.Revenue[i] = visit.Revenue
+				}
+			case "year":
+				if visitsTwoArrays.Date[i].Year() == visit.Date.Year() {
+					visitsTwoArrays.Count[i] = visit.Count
+					visitsTwoArrays.Revenue[i] = visit.Revenue
+				}
+			}
+		}
+
+	}
+
+	return visitsTwoArrays, nil
 }

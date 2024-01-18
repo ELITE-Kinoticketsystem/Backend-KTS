@@ -7,7 +7,6 @@ import (
 )
 
 func GetSampleDayVisitsStats() *[]models.StatsVisits {
-
 	day1 := time.Date(2024, 1, 2, 0, 0, 0, 0, time.UTC)
 	day2 := time.Date(2024, 1, 3, 0, 0, 0, 0, time.UTC)
 
@@ -23,7 +22,6 @@ func GetSampleDayVisitsStats() *[]models.StatsVisits {
 			Revenue: 25,
 		},
 	}
-
 }
 
 func GetSampleMonthVisitsStats() *[]models.StatsVisits {
@@ -42,7 +40,6 @@ func GetSampleMonthVisitsStats() *[]models.StatsVisits {
 			Revenue: 5,
 		},
 	}
-
 }
 
 func GetSampleYearVisitsStats() *[]models.StatsVisits {
@@ -61,7 +58,6 @@ func GetSampleYearVisitsStats() *[]models.StatsVisits {
 			Revenue: 25,
 		},
 	}
-
 }
 
 func GetSampleDayVisitsStatsTwoArrays() *models.StatsVisitsTwoArrays {

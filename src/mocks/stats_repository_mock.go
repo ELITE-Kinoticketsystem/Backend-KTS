@@ -68,3 +68,18 @@ func (mr *MockStatsRepositoryIMockRecorder) GetTotalVisits(startTime, endTime, i
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetTotalVisits", reflect.TypeOf((*MockStatsRepositoryI)(nil).GetTotalVisits), startTime, endTime, in)
 }
+
+// GetTotalVisitsForTheatre mocks base method.
+func (m *MockStatsRepositoryI) GetTotalVisitsForTheatre(startTime, endTime time.Time, in, theatreName string) (*[]models.StatsVisits, *models.KTSError) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetTotalVisitsForTheatre", startTime, endTime, in, theatreName)
+	ret0, _ := ret[0].(*[]models.StatsVisits)
+	ret1, _ := ret[1].(*models.KTSError)
+	return ret0, ret1
+}
+
+// GetTotalVisitsForTheatre indicates an expected call of GetTotalVisitsForTheatre.
+func (mr *MockStatsRepositoryIMockRecorder) GetTotalVisitsForTheatre(startTime, endTime, in, theatreName any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetTotalVisitsForTheatre", reflect.TypeOf((*MockStatsRepositoryI)(nil).GetTotalVisitsForTheatre), startTime, endTime, in, theatreName)
+}
