@@ -101,11 +101,11 @@ func TestGetTotalVisits(t *testing.T) {
 			in:    "DAY",
 			setExpectations: func(mock sqlmock.Sqlmock, startTime time.Time, endTime time.Time, in string) {
 				mock.ExpectQuery(
-					"SELECT COUNT(orders.id), MIN(events.end) FROM `KinoTicketSystem`.orders LEFT JOIN `KinoTicketSystem`.tickets ON (tickets.order_id = orders.id) LEFT JOIN `KinoTicketSystem`.event_seats ON (event_seats.id = tickets.event_seat_id) LEFT JOIN `KinoTicketSystem`.events ON (events.id = event_seats.event_id) WHERE events.end BETWEEN CAST(? AS DATETIME) AND CAST(? AS DATETIME) GROUP BY DAY(events.end) ORDER BY MIN(events.end);",
+					"SELECT COUNT(tickets.id), MIN(events.end) FROM `KinoTicketSystem`.tickets LEFT JOIN `KinoTicketSystem`.event_seats ON (event_seats.id = tickets.event_seat_id) LEFT JOIN `KinoTicketSystem`.events ON (events.id = event_seats.event_id) WHERE events.end BETWEEN CAST(? AS DATETIME) AND CAST(? AS DATETIME) GROUP BY DAY(events.end) ORDER BY MIN(events.end);",
 				).WithArgs(sqlmock.AnyArg(), sqlmock.AnyArg()).WillReturnRows(
 					sqlmock.NewRows(
 						[]string{
-							"COUNT(orders.id)", "MIN(events.end)",
+							"COUNT(tickets.id)", "MIN(events.end)",
 						},
 					).
 						AddRow(
@@ -126,11 +126,11 @@ func TestGetTotalVisits(t *testing.T) {
 			in:    "MONTH",
 			setExpectations: func(mock sqlmock.Sqlmock, startTime time.Time, endTime time.Time, in string) {
 				mock.ExpectQuery(
-					"SELECT COUNT(orders.id), MIN(events.end) FROM `KinoTicketSystem`.orders LEFT JOIN `KinoTicketSystem`.tickets ON (tickets.order_id = orders.id) LEFT JOIN `KinoTicketSystem`.event_seats ON (event_seats.id = tickets.event_seat_id) LEFT JOIN `KinoTicketSystem`.events ON (events.id = event_seats.event_id) WHERE events.end BETWEEN CAST(? AS DATETIME) AND CAST(? AS DATETIME) GROUP BY MONTH(events.end) ORDER BY MIN(events.end);",
+					"SELECT COUNT(tickets.id), MIN(events.end) FROM `KinoTicketSystem`.tickets LEFT JOIN `KinoTicketSystem`.event_seats ON (event_seats.id = tickets.event_seat_id) LEFT JOIN `KinoTicketSystem`.events ON (events.id = event_seats.event_id) WHERE events.end BETWEEN CAST(? AS DATETIME) AND CAST(? AS DATETIME) GROUP BY MONTH(events.end) ORDER BY MIN(events.end);",
 				).WithArgs(sqlmock.AnyArg(), sqlmock.AnyArg()).WillReturnRows(
 					sqlmock.NewRows(
 						[]string{
-							"COUNT(orders.id)", "MIN(events.end)",
+							"COUNT(tickets.id)", "MIN(events.end)",
 						},
 					).
 						AddRow(
@@ -151,11 +151,11 @@ func TestGetTotalVisits(t *testing.T) {
 			in:    "YEAR",
 			setExpectations: func(mock sqlmock.Sqlmock, startTime time.Time, endTime time.Time, in string) {
 				mock.ExpectQuery(
-					"SELECT COUNT(orders.id), MIN(events.end) FROM `KinoTicketSystem`.orders LEFT JOIN `KinoTicketSystem`.tickets ON (tickets.order_id = orders.id) LEFT JOIN `KinoTicketSystem`.event_seats ON (event_seats.id = tickets.event_seat_id) LEFT JOIN `KinoTicketSystem`.events ON (events.id = event_seats.event_id) WHERE events.end BETWEEN CAST(? AS DATETIME) AND CAST(? AS DATETIME) GROUP BY YEAR(events.end) ORDER BY MIN(events.end);",
+					"SELECT COUNT(tickets.id), MIN(events.end) FROM `KinoTicketSystem`.tickets LEFT JOIN `KinoTicketSystem`.event_seats ON (event_seats.id = tickets.event_seat_id) LEFT JOIN `KinoTicketSystem`.events ON (events.id = event_seats.event_id) WHERE events.end BETWEEN CAST(? AS DATETIME) AND CAST(? AS DATETIME) GROUP BY YEAR(events.end) ORDER BY MIN(events.end);",
 				).WithArgs(sqlmock.AnyArg(), sqlmock.AnyArg()).WillReturnRows(
 					sqlmock.NewRows(
 						[]string{
-							"COUNT(orders.id)", "MIN(events.end)",
+							"COUNT(tickets.id)", "MIN(events.end)",
 						},
 					).
 						AddRow(
@@ -176,7 +176,7 @@ func TestGetTotalVisits(t *testing.T) {
 			in:    "DAY",
 			setExpectations: func(mock sqlmock.Sqlmock, startTime time.Time, endTime time.Time, in string) {
 				mock.ExpectQuery(
-					"SELECT COUNT(orders.id), MIN(events.end) FROM `KinoTicketSystem`.orders LEFT JOIN `KinoTicketSystem`.tickets ON (tickets.order_id = orders.id) LEFT JOIN `KinoTicketSystem`.event_seats ON (event_seats.id = tickets.event_seat_id) LEFT JOIN `KinoTicketSystem`.events ON (events.id = event_seats.event_id) WHERE events.end BETWEEN CAST(? AS DATETIME) AND CAST(? AS DATETIME) GROUP BY DAY(events.end) ORDER BY MIN(events.end);",
+					"SELECT COUNT(tickets.id), MIN(events.end) FROM `KinoTicketSystem`.tickets LEFT JOIN `KinoTicketSystem`.event_seats ON (event_seats.id = tickets.event_seat_id) LEFT JOIN `KinoTicketSystem`.events ON (events.id = event_seats.event_id) WHERE events.end BETWEEN CAST(? AS DATETIME) AND CAST(? AS DATETIME) GROUP BY DAY(events.end) ORDER BY MIN(events.end);",
 				).WithArgs().WillReturnError(sqlmock.ErrCancelled)
 			},
 			expectedStats: nil,

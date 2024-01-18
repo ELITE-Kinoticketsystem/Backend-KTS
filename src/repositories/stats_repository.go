@@ -1,6 +1,7 @@
 package repositories
 
 import (
+	"log"
 	"time"
 
 	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
@@ -63,11 +64,12 @@ func (sr *StatsRepository) GetTotalVisits(startTime time.Time, endTime time.Time
 	filter := in + "(events.end)"
 
 	stmt := mysql.SELECT(
-		mysql.COUNT(table.Orders.ID),
+		mysql.COUNT(table.Tickets.ID),
 		mysql.Raw("MIN(events.end)"),
+		mysql.SUM(table.Orders.Totalprice),
 	).FROM(
-		table.Orders.
-			LEFT_JOIN(table.Tickets, table.Tickets.OrderID.EQ(table.Orders.ID)).
+		table.Tickets.
+			LEFT_JOIN(table.Orders, table.Orders.ID.EQ(table.Tickets.OrderID)).
 			LEFT_JOIN(table.EventSeats, table.EventSeats.ID.EQ(table.Tickets.EventSeatID)).
 			LEFT_JOIN(table.Events, table.Events.ID.EQ(table.EventSeats.EventID)),
 	).WHERE(
@@ -77,6 +79,8 @@ func (sr *StatsRepository) GetTotalVisits(startTime time.Time, endTime time.Time
 	).ORDER_BY(
 		mysql.Raw("MIN(events.end)"),
 	)
+
+	log.Print(stmt.DebugSql())
 
 	err := stmt.Query(sr.DatabaseManager.GetDatabaseConnection(), &visits)
 
