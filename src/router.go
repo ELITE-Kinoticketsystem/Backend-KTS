@@ -41,6 +41,7 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 	// Create api groups, with special middleware
 	publicRoutes := router.Group("/")
 	securedRoutes := router.Group("/", middlewares.JwtAuthMiddleware())
+	adminRoutes := router.Group("/", middlewares.JwtAuthMiddleware(), middlewares.AdminMiddleware())
 
 	// Create managers and repositories
 	databaseManager := &managers.DatabaseManager{
@@ -180,29 +181,29 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 	publicRoutes.Handle(http.MethodGet, "/movies/:id", handlers.GetMovieById(controller.MovieController))
 
 	// securedRoutes.Handle(http.MethodPost, "/movies", handlers.CreateMovie(controller.MovieController))
-	publicRoutes.Handle(http.MethodPost, "/movie", handlers.CreateMovie(controller.MovieController))
-	publicRoutes.Handle(http.MethodPut, "/movies/", handlers.UpdateMovie(controller.MovieController))
-	publicRoutes.Handle(http.MethodDelete, "/movies/:movieId", handlers.DeleteMovie(controller.MovieController))
+	adminRoutes.Handle(http.MethodPost, "/movie", handlers.CreateMovie(controller.MovieController))
+	adminRoutes.Handle(http.MethodPut, "/movies/", handlers.UpdateMovie(controller.MovieController))
+	adminRoutes.Handle(http.MethodDelete, "/movies/:movieId", handlers.DeleteMovie(controller.MovieController))
 
 	// Genre
 	publicRoutes.Handle(http.MethodGet, "/genres", handlers.GetGenres(controller.GenreController))
 	publicRoutes.Handle(http.MethodGet, "/genres/:name", handlers.GetGenreByName(controller.GenreController))
 	publicRoutes.Handle(http.MethodGet, "/genres/movies", handlers.GetGenresWithMovies(controller.GenreController))
-	publicRoutes.Handle(http.MethodPost, "/genres/:name", handlers.CreateGenre(controller.GenreController))
-	publicRoutes.Handle(http.MethodPut, "/genres", handlers.UpdateGenre(controller.GenreController))
-	publicRoutes.Handle(http.MethodDelete, "/genres/:id", handlers.DeleteGenre(controller.GenreController))
+	adminRoutes.Handle(http.MethodPost, "/genres/:name", handlers.CreateGenre(controller.GenreController))
+	adminRoutes.Handle(http.MethodPut, "/genres", handlers.UpdateGenre(controller.GenreController))
+	adminRoutes.Handle(http.MethodDelete, "/genres/:id", handlers.DeleteGenre(controller.GenreController))
 
 	// Actors
 	publicRoutes.Handle(http.MethodGet, "/actors/:id", handlers.GetActorByIdHandler(controller.ActorController))
 	publicRoutes.Handle(http.MethodGet, "/actors", handlers.GetActorsHandler(controller.ActorController))
-	securedRoutes.Handle(http.MethodPost, "/actors", handlers.CreateActorHandler(controller.ActorController))
+	adminRoutes.Handle(http.MethodPost, "/actors", handlers.CreateActorHandler(controller.ActorController))
 
 	// Price Categories
 	publicRoutes.Handle(http.MethodGet, "/price-categories/:id", handlers.GetPriceCategoryByIdHandler(controller.PriceCategoriesController))
 	publicRoutes.Handle(http.MethodGet, "/price-categories", handlers.GetPriceCategoriesHandler(controller.PriceCategoriesController))
-	securedRoutes.Handle(http.MethodPost, "/price-categories", handlers.CreatePriceCategoryHandler(controller.PriceCategoriesController))
-	securedRoutes.Handle(http.MethodPut, "/price-categories/", handlers.UpdatePriceCategoryHandler(controller.PriceCategoriesController))
-	securedRoutes.Handle(http.MethodDelete, "/price-categories/:id", handlers.DeletePriceCategoryHandler(controller.PriceCategoriesController))
+	adminRoutes.Handle(http.MethodPost, "/price-categories", handlers.CreatePriceCategoryHandler(controller.PriceCategoriesController))
+	adminRoutes.Handle(http.MethodPut, "/price-categories/", handlers.UpdatePriceCategoryHandler(controller.PriceCategoriesController))
+	adminRoutes.Handle(http.MethodDelete, "/price-categories/:id", handlers.DeletePriceCategoryHandler(controller.PriceCategoriesController))
 
 	// event seats
 	securedRoutes.Handle(http.MethodGet, "/events/:eventId/seats", handlers.GetEventSeatsHandler(controller.EventSeatController))
@@ -212,7 +213,7 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 	securedRoutes.Handle(http.MethodGet, "/events/:eventId/user-seats", handlers.GetSelectedSeatsHandler(controller.EventSeatController))
 
 	// events
-	publicRoutes.Handle(http.MethodPost, "/events", handlers.CreateEventHandler(controller.EventController))
+	adminRoutes.Handle(http.MethodPost, "/events", handlers.CreateEventHandler(controller.EventController))
 	publicRoutes.Handle(http.MethodGet, "/movies/:id/events/:theatreId", handlers.GetEventsForMovieHandler(controller.EventController))
 	publicRoutes.Handle(http.MethodGet, "/events/special", handlers.GetSpecialEventsHandler(controller.EventController))
 	publicRoutes.Handle(http.MethodGet, "/events/:eventId", handlers.GetEventByIdHandler(controller.EventController))
@@ -226,16 +227,16 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 	securedRoutes.Handle(http.MethodPost, "/events/:eventId/book", handlers.CreateOrderHandler(controller.OrderController, false))
 
 	// tickets
-	publicRoutes.Handle(http.MethodGet, "/tickets/:ticketId", handlers.GetTicketByIdHandler(controller.TicketController))
-	publicRoutes.Handle(http.MethodPatch, "/tickets/:ticketId", handlers.ValidateTicketHandler(controller.TicketController))
+	adminRoutes.Handle(http.MethodGet, "/tickets/:ticketId", handlers.GetTicketByIdHandler(controller.TicketController))
+	adminRoutes.Handle(http.MethodPatch, "/tickets/:ticketId", handlers.ValidateTicketHandler(controller.TicketController))
 
 	// theatres
-	securedRoutes.Handle(http.MethodPost, "/theatres", handlers.CreateTheatre(controller.TheatreController))
+	adminRoutes.Handle(http.MethodPost, "/theatres", handlers.CreateTheatre(controller.TheatreController))
 	publicRoutes.Handle(http.MethodGet, "/theatres", handlers.GetTheatres(controller.TheatreController))
 	publicRoutes.Handle(http.MethodGet, "/theatres/:theatreId/cinema-halls", handlers.GetCinemaHallsForTheatreHandler(controller.TheatreController))
 
 	// cinema halls
-	publicRoutes.Handle(http.MethodPost, "/cinema-halls", handlers.CreateCinemaHallHandler(controller.TheatreController))
+	adminRoutes.Handle(http.MethodPost, "/cinema-halls", handlers.CreateCinemaHallHandler(controller.TheatreController))
 
 	// orders
 	securedRoutes.Handle(http.MethodGet, "/orders/:orderId", handlers.GetOrderByIdHandler(controller.OrderController))
@@ -243,11 +244,11 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 
 	// Ticket
 	router.Handle(http.MethodGet, "/ticket/:ticketId", handlers.GetTicketByIdHandler(controller.TicketController))
-	router.Handle(http.MethodPut, "/ticket/:ticketId", handlers.ValidateTicketHandler(controller.TicketController))
+	adminRoutes.Handle(http.MethodPut, "/ticket/:ticketId", handlers.ValidateTicketHandler(controller.TicketController))
 
 	// stats
-	publicRoutes.Handle(http.MethodGet, "/stats/visits/:filterBy/:from/:til", handlers.GetTotalVisitsHandler(controller.StatsController))
-	publicRoutes.Handle(http.MethodGet, "/stats/orders", handlers.GetOrdersForStatsHandler(controller.StatsController))
+	adminRoutes.Handle(http.MethodGet, "/stats/visits/:filterBy/:from/:til", handlers.GetTotalVisitsHandler(controller.StatsController))
+	adminRoutes.Handle(http.MethodGet, "/stats/orders", handlers.GetOrdersForStatsHandler(controller.StatsController))
 
 	// swagger
 	docs.SwaggerInfo.Title = "Kino-Ticket-System API"
