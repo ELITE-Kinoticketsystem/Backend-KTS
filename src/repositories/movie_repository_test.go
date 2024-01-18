@@ -73,7 +73,7 @@ func TestGetMovies(t *testing.T) {
 
 			// Create a new instance of the MovieRepository with the mock database connection
 			movieRepo := MovieRepository{
-				DatabaseManager: &managers.DatabaseManager{
+				DatabaseManagerI: &managers.DatabaseManager{
 					Connection: db,
 				},
 			}
@@ -154,7 +154,7 @@ func TestGetMovieByName(t *testing.T) {
 
 			// Create a new instance of the MovieRepository with the mock database connection
 			movieRepo := MovieRepository{
-				DatabaseManager: &managers.DatabaseManager{
+				DatabaseManagerI: &managers.DatabaseManager{
 					Connection: db,
 				},
 			}
@@ -235,15 +235,17 @@ func TestCreateMovie(t *testing.T) {
 
 			// Create a new instance of the MovieRepository with the mock database connection
 			movieRepo := MovieRepository{
-				DatabaseManager: &managers.DatabaseManager{
+				DatabaseManagerI: &managers.DatabaseManager{
 					Connection: db,
 				},
 			}
+			mock.ExpectBegin()
+			tx, _ := db.Begin()
 
 			tc.setExpectations(mock, sampleMovie)
 
 			// Call the method under test
-			movieId, kts_err := movieRepo.CreateMovie(sampleMovie)
+			movieId, kts_err := movieRepo.CreateMovie(tx, sampleMovie)
 
 			// Verify
 			assert.Equal(t, tc.expectedError, kts_err)
@@ -314,7 +316,7 @@ func TestUpdateMovie(t *testing.T) {
 
 			// Create a new instance of the MovieRepository with the mock database connection
 			movieRepo := MovieRepository{
-				DatabaseManager: &managers.DatabaseManager{
+				DatabaseManagerI: &managers.DatabaseManager{
 					Connection: db,
 				},
 			}
@@ -390,7 +392,7 @@ func TestDeleteMovie(t *testing.T) {
 
 			// Create a new instance of the MovieRepository with the mock database connection
 			movieRepo := MovieRepository{
-				DatabaseManager: &managers.DatabaseManager{
+				DatabaseManagerI: &managers.DatabaseManager{
 					Connection: db,
 				},
 			}
@@ -473,7 +475,7 @@ func TestGetMoviesWithGenres(t *testing.T) {
 
 			// Create a new instance of the MovieRepository with the mock database connection
 			movieRepo := MovieRepository{
-				DatabaseManager: &managers.DatabaseManager{
+				DatabaseManagerI: &managers.DatabaseManager{
 					Connection: db,
 				},
 			}
@@ -554,7 +556,7 @@ func TestGetMovieById(t *testing.T) {
 
 			// Create a new instance of the MovieRepository with the mock database connection
 			movieRepo := MovieRepository{
-				DatabaseManager: &managers.DatabaseManager{
+				DatabaseManagerI: &managers.DatabaseManager{
 					Connection: db,
 				},
 			}
@@ -615,7 +617,7 @@ func TestUpdateRating(t *testing.T) {
 
 			// Create a new instance of the MovieRepository with the mock database connection
 			movieRepo := MovieRepository{
-				DatabaseManager: &managers.DatabaseManager{
+				DatabaseManagerI: &managers.DatabaseManager{
 					Connection: db,
 				},
 			}

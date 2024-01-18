@@ -9,6 +9,7 @@
 package mocks
 
 import (
+	sql "database/sql"
 	reflect "reflect"
 
 	models "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
@@ -40,17 +41,17 @@ func (m *MockMovieActorRepositoryI) EXPECT() *MockMovieActorRepositoryIMockRecor
 }
 
 // AddMovieActor mocks base method.
-func (m *MockMovieActorRepositoryI) AddMovieActor(movieId, actorId *uuid.UUID) *models.KTSError {
+func (m *MockMovieActorRepositoryI) AddMovieActor(tx *sql.Tx, movieId, actorId *uuid.UUID) *models.KTSError {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "AddMovieActor", movieId, actorId)
+	ret := m.ctrl.Call(m, "AddMovieActor", tx, movieId, actorId)
 	ret0, _ := ret[0].(*models.KTSError)
 	return ret0
 }
 
 // AddMovieActor indicates an expected call of AddMovieActor.
-func (mr *MockMovieActorRepositoryIMockRecorder) AddMovieActor(movieId, actorId any) *gomock.Call {
+func (mr *MockMovieActorRepositoryIMockRecorder) AddMovieActor(tx, movieId, actorId any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddMovieActor", reflect.TypeOf((*MockMovieActorRepositoryI)(nil).AddMovieActor), movieId, actorId)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddMovieActor", reflect.TypeOf((*MockMovieActorRepositoryI)(nil).AddMovieActor), tx, movieId, actorId)
 }
 
 // RemoveAllActorCombinationWithMovie mocks base method.

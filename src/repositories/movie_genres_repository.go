@@ -1,6 +1,8 @@
 package repositories
 
 import (
+	"database/sql"
+
 	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/gen/KinoTicketSystem/table"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/managers"
@@ -11,24 +13,24 @@ import (
 
 type MovieGenreRepositoryI interface {
 	// Combine Movie and Genre
-	AddMovieGenre(movieId *uuid.UUID, genreId *uuid.UUID) *models.KTSError
+	AddMovieGenre(tx *sql.Tx, movieId *uuid.UUID, genreId *uuid.UUID) *models.KTSError
 	RemoveMovieGenre(movieId *uuid.UUID, genreId *uuid.UUID) *models.KTSError
 	RemoveAllGenreCombinationWithMovie(movieId *uuid.UUID) *models.KTSError
 	RemoveAllMovieCombinationWithGenre(genreId *uuid.UUID) *models.KTSError
 }
 
 type MovieGenreRepository struct {
-	DatabaseManager managers.DatabaseManagerI
+	managers.DatabaseManagerI
 }
 
 // Combine Movie and Genre
-func (mgr *MovieGenreRepository) AddMovieGenre(movieId *uuid.UUID, genreId *uuid.UUID) *models.KTSError {
+func (mgr *MovieGenreRepository) AddMovieGenre(tx *sql.Tx, movieId *uuid.UUID, genreId *uuid.UUID) *models.KTSError {
 	// Create the insert statement
 	insertQuery := table.MovieGenres.INSERT(table.MovieGenres.MovieID, table.MovieGenres.GenreID).
 		VALUES(utils.MysqlUuid(movieId), utils.MysqlUuid(genreId))
 
 	// Execute the query
-	rows, err := insertQuery.Exec(mgr.DatabaseManager.GetDatabaseConnection())
+	rows, err := insertQuery.Exec(tx)
 	if err != nil {
 		return kts_errors.KTS_INTERNAL_ERROR
 	}
@@ -54,7 +56,7 @@ func (mgr *MovieGenreRepository) RemoveMovieGenre(movieId *uuid.UUID, genreId *u
 	)
 
 	// Execute the query
-	rows, err := deleteQuery.Exec(mgr.DatabaseManager.GetDatabaseConnection())
+	rows, err := deleteQuery.Exec(mgr.GetDatabaseConnection())
 	if err != nil {
 		return kts_errors.KTS_INTERNAL_ERROR
 	}
@@ -77,7 +79,7 @@ func (mgr *MovieGenreRepository) RemoveAllGenreCombinationWithMovie(movieId *uui
 	)
 
 	// Execute the query
-	_, err := deleteQuery.Exec(mgr.DatabaseManager.GetDatabaseConnection())
+	_, err := deleteQuery.Exec(mgr.GetDatabaseConnection())
 	if err != nil {
 		return kts_errors.KTS_INTERNAL_ERROR
 	}
@@ -92,7 +94,7 @@ func (mgr *MovieGenreRepository) RemoveAllMovieCombinationWithGenre(genreId *uui
 	)
 
 	// Execute the query
-	_, err := deleteQuery.Exec(mgr.DatabaseManager.GetDatabaseConnection())
+	_, err := deleteQuery.Exec(mgr.GetDatabaseConnection())
 	if err != nil {
 		return kts_errors.KTS_INTERNAL_ERROR
 	}
