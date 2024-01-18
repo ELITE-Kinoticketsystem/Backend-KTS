@@ -14,6 +14,7 @@ import (
 type StatsRepositoryI interface {
 	GetOrdersForStats() (*[]models.GetOrderDTO, *models.KTSError)
 	GetTotalVisits(startTime time.Time, endTime time.Time, in string) (*[]models.StatsVisits, *models.KTSError)
+	GetTotalVisitsForTheatre(startTime time.Time, endTime time.Time, in string, theatreName string) (*[]models.StatsVisits, *models.KTSError)
 }
 
 type StatsRepository struct {
@@ -73,6 +74,42 @@ func (sr *StatsRepository) GetTotalVisits(startTime time.Time, endTime time.Time
 			LEFT_JOIN(table.Events, table.Events.ID.EQ(table.EventSeats.EventID)),
 	).WHERE(
 		table.Events.End.BETWEEN(utils.GetDateTime(startTime), utils.GetDateTime(endTime)),
+	).GROUP_BY(
+		mysql.Raw(filter),
+	).ORDER_BY(
+		mysql.Raw("MIN(events.end)"),
+	)
+
+	err := stmt.Query(sr.DatabaseManager.GetDatabaseConnection(), &visits)
+
+	if err != nil {
+		return nil, kts_errors.KTS_INTERNAL_ERROR
+	}
+
+	return &visits, nil
+}
+
+func (sr *StatsRepository) GetTotalVisitsForTheatre(startTime time.Time, endTime time.Time, in string, theatreName string) (*[]models.StatsVisits, *models.KTSError) {
+	visits := []models.StatsVisits{}
+
+	filter := in + "(events.end)"
+
+	stmt := mysql.SELECT(
+		mysql.COUNT(table.Tickets.ID),
+		mysql.Raw("MIN(events.end)"),
+		mysql.SUM(table.Orders.Totalprice),
+	).FROM(
+		table.Tickets.
+			LEFT_JOIN(table.Orders, table.Orders.ID.EQ(table.Tickets.OrderID)).
+			LEFT_JOIN(table.EventSeats, table.EventSeats.ID.EQ(table.Tickets.EventSeatID)).
+			LEFT_JOIN(table.Events, table.Events.ID.EQ(table.EventSeats.EventID)).
+			LEFT_JOIN(table.CinemaHalls, table.CinemaHalls.ID.EQ(table.Events.CinemaHallID)).
+			LEFT_JOIN(table.Theatres, table.Theatres.ID.EQ(table.CinemaHalls.TheatreID)),
+	).WHERE(
+		table.Events.End.BETWEEN(utils.GetDateTime(startTime), utils.GetDateTime(endTime)).
+			AND(
+				table.Theatres.Name.EQ(utils.MySqlString(theatreName)),
+			),
 	).GROUP_BY(
 		mysql.Raw(filter),
 	).ORDER_BY(

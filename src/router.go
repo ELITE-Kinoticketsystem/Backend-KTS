@@ -247,8 +247,9 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 	adminRoutes.Handle(http.MethodPut, "/ticket/:ticketId", handlers.ValidateTicketHandler(controller.TicketController))
 
 	// stats
-	adminRoutes.Handle(http.MethodGet, "/stats/visits/:filterBy/:from/:til", handlers.GetTotalVisitsHandler(controller.StatsController))
-	adminRoutes.Handle(http.MethodGet, "/stats/orders", handlers.GetOrdersForStatsHandler(controller.StatsController))
+	publicRoutes.Handle(http.MethodGet, "/stats/visits/:filterBy/:from/:til", handlers.GetTotalVisitsHandler(controller.StatsController))
+	publicRoutes.Handle(http.MethodGet, "/stats/visits/:filterBy/:from/:til/:theatreName", handlers.GetTotalVisitsForTheatreHandler(controller.StatsController))
+	publicRoutes.Handle(http.MethodGet, "/stats/orders", handlers.GetOrdersForStatsHandler(controller.StatsController))
 
 	// swagger
 	docs.SwaggerInfo.Title = "Kino-Ticket-System API"
