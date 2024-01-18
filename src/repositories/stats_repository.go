@@ -1,7 +1,6 @@
 package repositories
 
 import (
-	"log"
 	"time"
 
 	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
@@ -52,7 +51,6 @@ func (sr *StatsRepository) GetOrdersForStats() (*[]models.GetOrderDTO, *models.K
 	err := stmt.Query(sr.DatabaseManager.GetDatabaseConnection(), orders)
 
 	if err != nil {
-		log.Println(err)
 		return nil, kts_errors.KTS_INTERNAL_ERROR
 	}
 
@@ -66,7 +64,6 @@ func (sr *StatsRepository) GetTotalVisits(startTime time.Time, endTime time.Time
 
 	stmt := mysql.SELECT(
 		mysql.COUNT(table.Orders.ID),
-		mysql.Raw(filter).AS("Duration"),
 		mysql.Raw("MIN(events.end)"),
 	).FROM(
 		table.Orders.
@@ -81,16 +78,11 @@ func (sr *StatsRepository) GetTotalVisits(startTime time.Time, endTime time.Time
 		mysql.Raw("MIN(events.end)"),
 	)
 
-	log.Print(stmt.DebugSql())
-
 	err := stmt.Query(sr.DatabaseManager.GetDatabaseConnection(), &visits)
 
 	if err != nil {
-		log.Println(err)
 		return nil, kts_errors.KTS_INTERNAL_ERROR
 	}
-
-	log.Print(visits)
 
 	return &visits, nil
 }
