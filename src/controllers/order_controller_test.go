@@ -8,6 +8,7 @@ import (
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/samples"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
 )
@@ -129,6 +130,94 @@ func TestOrderController_CreateOrder(t *testing.T) {
 				assert.Nil(t, orderId)
 			}
 			assert.Equal(t, tc.expectedErr, err)
+		})
+	}
+}
+
+func TestGetOrderById(t *testing.T) {
+	testCases := []struct {
+		name            string
+		orderId         *uuid.UUID
+		userId          *uuid.UUID
+		setExpectations func(mockRepo mocks.MockOrderRepoI, orderId *uuid.UUID, userId *uuid.UUID)
+		expectedOrder   *models.GetOrderDTO
+		expectedError   *models.KTSError
+	}{
+		{
+			name:    "Failed",
+			orderId: utils.NewUUID(),
+			userId:  utils.NewUUID(),
+			setExpectations: func(mockRepo mocks.MockOrderRepoI, orderId *uuid.UUID, userId *uuid.UUID) {
+				mockRepo.EXPECT().GetOrderById(orderId, userId).Return(nil, kts_errors.KTS_NOT_FOUND)
+			},
+			expectedOrder: nil,
+			expectedError: kts_errors.KTS_NOT_FOUND,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			// GIVEN
+			// create mock user repo
+			mockCtrl := gomock.NewController(t)
+			defer mockCtrl.Finish()
+			orderRepo := mocks.NewMockOrderRepoI(mockCtrl)
+			orderController := OrderController{
+				OrderRepo: orderRepo,
+			}
+
+			// define expectations
+			tc.setExpectations(*orderRepo, tc.orderId, tc.userId)
+
+			// WHEN
+			order, kts_err := orderController.GetOrderById(tc.orderId, tc.userId)
+
+			// THEN
+			assert.Equal(t, tc.expectedError, kts_err)
+			assert.Equal(t, tc.expectedOrder, order)
+		})
+	}
+}
+
+func TestGetOrders(t *testing.T) {
+	testCases := []struct {
+		name            string
+		userId          *uuid.UUID
+		setExpectations func(mockRepo mocks.MockOrderRepoI, userId *uuid.UUID)
+		expectedOrders  *[]models.GetOrderDTO
+		expectedError   *models.KTSError
+	}{
+		{
+			name:   "Failed",
+			userId: utils.NewUUID(),
+			setExpectations: func(mockRepo mocks.MockOrderRepoI, userId *uuid.UUID) {
+				mockRepo.EXPECT().GetOrders(userId).Return(nil, kts_errors.KTS_NOT_FOUND)
+			},
+			expectedOrders: nil,
+			expectedError:  kts_errors.KTS_NOT_FOUND,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			// GIVEN
+			// create mock user repo
+			mockCtrl := gomock.NewController(t)
+			defer mockCtrl.Finish()
+			orderRepo := mocks.NewMockOrderRepoI(mockCtrl)
+			orderController := OrderController{
+				OrderRepo: orderRepo,
+			}
+
+			// define expectations
+			tc.setExpectations(*orderRepo, tc.userId)
+
+			// WHEN
+			order, kts_err := orderController.GetOrders(tc.userId)
+
+			// THEN
+			assert.Equal(t, tc.expectedError, kts_err)
+			assert.Equal(t, tc.expectedOrders, order)
 		})
 	}
 }

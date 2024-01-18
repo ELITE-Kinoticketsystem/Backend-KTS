@@ -27,23 +27,23 @@ func (oc *OrderController) CreateOrder(createOrderDTO models.CreateOrderDTO, eve
 		return nil, kts_errors.KTS_BAD_REQUEST
 	}
 
-	selectedSeats, kts_err := oc.EventSeatRepo.GetSelectedSeats(eventId, userId)
-	if kts_err != nil {
-		return nil, kts_err
+	selectedSeats, kts_err_selectedSeats := oc.EventSeatRepo.GetSelectedSeats(eventId, userId)
+	if kts_err_selectedSeats != nil {
+		return nil, kts_err_selectedSeats
 	}
 
-	priceCategories, kts_err := oc.PriceCategoryRepo.GetPriceCategories()
-	if kts_err != nil {
-		return nil, kts_err
+	priceCategories, kts_err_price_categories := oc.PriceCategoryRepo.GetPriceCategories()
+	if kts_err_price_categories != nil {
+		return nil, kts_err_price_categories
 	}
 
 	adultPriceCategory := getPriceCategoryByName(*priceCategories, utils.ADULT)
 	orderId := utils.NewUUID()
 
-	tickets, totalPrice, kts_err := createTicketsAndCalculateTotalPrice(selectedSeats, createOrderDTO, priceCategories, adultPriceCategory, orderId)
+	tickets, totalPrice, kts_err_create_ticket_and_calc := createTicketsAndCalculateTotalPrice(selectedSeats, createOrderDTO, priceCategories, adultPriceCategory, orderId)
 
-	if kts_err != nil {
-		return nil, kts_err
+	if kts_err_create_ticket_and_calc != nil {
+		return nil, kts_err_create_ticket_and_calc
 	}
 
 	order := model.Orders{
@@ -54,23 +54,23 @@ func (oc *OrderController) CreateOrder(createOrderDTO models.CreateOrderDTO, eve
 		Totalprice:      totalPrice,
 	}
 
-	_, kts_err = oc.OrderRepo.CreateOrder(&order)
-	if kts_err != nil {
-		return nil, kts_err
+	_, kts_err_create_order := oc.OrderRepo.CreateOrder(&order)
+	if kts_err_create_order != nil {
+		return nil, kts_err_create_order
 	}
 
 	for _, ticket := range tickets {
-		_, err := oc.TicketRepo.CreateTicket(&ticket)
-		if err != nil {
-			return nil, err
+		_, err_create_ticket := oc.TicketRepo.CreateTicket(&ticket)
+		if err_create_ticket != nil {
+			return nil, err_create_ticket
 		}
 	}
 
 	for _, seat := range *selectedSeats {
 		seat.EventSeat.Booked = true
-		err := oc.EventSeatRepo.UpdateEventSeat(&seat.EventSeat)
-		if err != nil {
-			return nil, err
+		err_update_eventseat := oc.EventSeatRepo.UpdateEventSeat(&seat.EventSeat)
+		if err_update_eventseat != nil {
+			return nil, err_update_eventseat
 		}
 	}
 
