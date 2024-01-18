@@ -69,15 +69,17 @@ func TestAddMovieGenre(t *testing.T) {
 
 			// Create a new instance of the MovieGenreRepository with the mock database connection
 			movieGenreRepo := MovieGenreRepository{
-				DatabaseManager: &managers.DatabaseManager{
+				DatabaseManagerI: &managers.DatabaseManager{
 					Connection: db,
 				},
 			}
+			mock.ExpectBegin()
+			tx, _ := db.Begin()
 
 			tc.setExpectations(mock, &uuid1, &uuid2)
 
 			// Call the method under test
-			kts_err := movieGenreRepo.AddMovieGenre(&uuid1, &uuid2)
+			kts_err := movieGenreRepo.AddMovieGenre(tx, &uuid1, &uuid2)
 
 			// Verify
 			assert.Equal(t, tc.expectedError, kts_err)
@@ -148,7 +150,7 @@ func TestRemoveMovieGenre(t *testing.T) {
 
 			// Create a new instance of the MovieRepository with the mock database connection
 			movieGenreRepo := MovieGenreRepository{
-				DatabaseManager: &managers.DatabaseManager{
+				DatabaseManagerI: &managers.DatabaseManager{
 					Connection: db,
 				},
 			}
@@ -208,7 +210,7 @@ func TestRemoveAllGenreCombinationWithMovie(t *testing.T) {
 
 			// Create a new instance of the MovieRepository with the mock database connection
 			movieGenreRepo := MovieGenreRepository{
-				DatabaseManager: &managers.DatabaseManager{
+				DatabaseManagerI: &managers.DatabaseManager{
 					Connection: db,
 				},
 			}
@@ -268,7 +270,7 @@ func TestRemoveAllMovieCombinationWithGenre(t *testing.T) {
 
 			// Create a new instance of the MovieRepository with the mock database connection
 			movieGenreRepo := MovieGenreRepository{
-				DatabaseManager: &managers.DatabaseManager{
+				DatabaseManagerI: &managers.DatabaseManager{
 					Connection: db,
 				},
 			}

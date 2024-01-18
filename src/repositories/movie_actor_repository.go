@@ -1,6 +1,8 @@
 package repositories
 
 import (
+	"database/sql"
+
 	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/gen/KinoTicketSystem/table"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/managers"
@@ -10,17 +12,17 @@ import (
 )
 
 type MovieActorRepositoryI interface {
-	AddMovieActor(movieId *uuid.UUID, actorId *uuid.UUID) *models.KTSError
+	AddMovieActor(tx *sql.Tx, movieId *uuid.UUID, actorId *uuid.UUID) *models.KTSError
 	RemoveMovieActor(movieId *uuid.UUID, actorId *uuid.UUID) *models.KTSError
 	RemoveAllActorCombinationWithMovie(movieId *uuid.UUID) *models.KTSError
 }
 
 type MovieActorRepository struct {
-	DatabaseManager managers.DatabaseManagerI
+	managers.DatabaseManagerI
 }
 
 // Combine Movie and Genre
-func (mar *MovieActorRepository) AddMovieActor(movieId *uuid.UUID, actorId *uuid.UUID) *models.KTSError {
+func (mar *MovieActorRepository) AddMovieActor(tx *sql.Tx, movieId *uuid.UUID, actorId *uuid.UUID) *models.KTSError {
 	// Create the insert statement
 	insertQuery := table.MovieActors.INSERT(table.MovieActors.MovieID, table.MovieActors.ActorID).
 		VALUES(
@@ -29,7 +31,7 @@ func (mar *MovieActorRepository) AddMovieActor(movieId *uuid.UUID, actorId *uuid
 		)
 
 	// Execute the query
-	rows, err := insertQuery.Exec(mar.DatabaseManager.GetDatabaseConnection())
+	rows, err := insertQuery.Exec(tx)
 	if err != nil {
 		return kts_errors.KTS_INTERNAL_ERROR
 	}
@@ -55,7 +57,7 @@ func (mar *MovieActorRepository) RemoveMovieActor(movieId *uuid.UUID, actorId *u
 	)
 
 	// Execute the query
-	rows, err := deleteQuery.Exec(mar.DatabaseManager.GetDatabaseConnection())
+	rows, err := deleteQuery.Exec(mar.GetDatabaseConnection())
 	if err != nil {
 		return kts_errors.KTS_INTERNAL_ERROR
 	}
@@ -78,7 +80,7 @@ func (mar *MovieActorRepository) RemoveAllActorCombinationWithMovie(movieId *uui
 	)
 
 	// Execute the query
-	_, err := deleteQuery.Exec(mar.DatabaseManager.GetDatabaseConnection())
+	_, err := deleteQuery.Exec(mar.GetDatabaseConnection())
 	if err != nil {
 		return kts_errors.KTS_INTERNAL_ERROR
 	}

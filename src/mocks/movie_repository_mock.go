@@ -9,6 +9,7 @@
 package mocks
 
 import (
+	sql "database/sql"
 	reflect "reflect"
 
 	model "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/gen/KinoTicketSystem/model"
@@ -41,18 +42,18 @@ func (m *MockMovieRepositoryI) EXPECT() *MockMovieRepositoryIMockRecorder {
 }
 
 // CreateMovie mocks base method.
-func (m *MockMovieRepositoryI) CreateMovie(movie *model.Movies) (*uuid.UUID, *models.KTSError) {
+func (m *MockMovieRepositoryI) CreateMovie(tx *sql.Tx, movie *model.Movies) (*uuid.UUID, *models.KTSError) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreateMovie", movie)
+	ret := m.ctrl.Call(m, "CreateMovie", tx, movie)
 	ret0, _ := ret[0].(*uuid.UUID)
 	ret1, _ := ret[1].(*models.KTSError)
 	return ret0, ret1
 }
 
 // CreateMovie indicates an expected call of CreateMovie.
-func (mr *MockMovieRepositoryIMockRecorder) CreateMovie(movie any) *gomock.Call {
+func (mr *MockMovieRepositoryIMockRecorder) CreateMovie(tx, movie any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateMovie", reflect.TypeOf((*MockMovieRepositoryI)(nil).CreateMovie), movie)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateMovie", reflect.TypeOf((*MockMovieRepositoryI)(nil).CreateMovie), tx, movie)
 }
 
 // DeleteMovie mocks base method.
@@ -67,6 +68,20 @@ func (m *MockMovieRepositoryI) DeleteMovie(movieId *uuid.UUID) *models.KTSError 
 func (mr *MockMovieRepositoryIMockRecorder) DeleteMovie(movieId any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteMovie", reflect.TypeOf((*MockMovieRepositoryI)(nil).DeleteMovie), movieId)
+}
+
+// GetDatabaseConnection mocks base method.
+func (m *MockMovieRepositoryI) GetDatabaseConnection() *sql.DB {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetDatabaseConnection")
+	ret0, _ := ret[0].(*sql.DB)
+	return ret0
+}
+
+// GetDatabaseConnection indicates an expected call of GetDatabaseConnection.
+func (mr *MockMovieRepositoryIMockRecorder) GetDatabaseConnection() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDatabaseConnection", reflect.TypeOf((*MockMovieRepositoryI)(nil).GetDatabaseConnection))
 }
 
 // GetMovieById mocks base method.
@@ -127,6 +142,21 @@ func (m *MockMovieRepositoryI) GetMoviesWithGenres() (*[]models.MovieWithGenres,
 func (mr *MockMovieRepositoryIMockRecorder) GetMoviesWithGenres() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetMoviesWithGenres", reflect.TypeOf((*MockMovieRepositoryI)(nil).GetMoviesWithGenres))
+}
+
+// NewTransaction mocks base method.
+func (m *MockMovieRepositoryI) NewTransaction() (*sql.Tx, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "NewTransaction")
+	ret0, _ := ret[0].(*sql.Tx)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// NewTransaction indicates an expected call of NewTransaction.
+func (mr *MockMovieRepositoryIMockRecorder) NewTransaction() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "NewTransaction", reflect.TypeOf((*MockMovieRepositoryI)(nil).NewTransaction))
 }
 
 // UpdateMovie mocks base method.

@@ -1,6 +1,8 @@
 package repositories
 
 import (
+	"database/sql"
+
 	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/gen/KinoTicketSystem/table"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
@@ -18,17 +20,18 @@ type MovieRepositoryI interface {
 	GetMovies() (*[]model.Movies, *models.KTSError)
 	GetMovieById(movieId *uuid.UUID) (*models.MovieWithEverything, *models.KTSError)
 	GetMovieByName(movieName *string) (*model.Movies, *models.KTSError)
-	CreateMovie(movie *model.Movies) (*uuid.UUID, *models.KTSError)
+	CreateMovie(tx *sql.Tx, movie *model.Movies) (*uuid.UUID, *models.KTSError)
 	UpdateMovie(movie *model.Movies) *models.KTSError
 	DeleteMovie(movieId *uuid.UUID) *models.KTSError
 	UpdateRating(movieId *uuid.UUID, rating float64) *models.KTSError
 
 	// All Movies with all Genres - Grouped by Movie
 	GetMoviesWithGenres() (*[]models.MovieWithGenres, *models.KTSError)
+	managers.DatabaseManagerI
 }
 
 type MovieRepository struct {
-	DatabaseManager managers.DatabaseManagerI
+	managers.DatabaseManagerI
 }
 
 // Movie
@@ -43,7 +46,7 @@ func (mr *MovieRepository) GetMovies() (*[]model.Movies, *models.KTSError) {
 	)
 
 	// Execute the query
-	err := stmt.Query(mr.DatabaseManager.GetDatabaseConnection(), &movies)
+	err := stmt.Query(mr.GetDatabaseConnection(), &movies)
 	if err != nil {
 		return nil, kts_errors.KTS_INTERNAL_ERROR
 	}
@@ -69,7 +72,7 @@ func (mr *MovieRepository) GetMovieByName(movieName *string) (*model.Movies, *mo
 	)
 
 	// Execute the query
-	err := stmt.Query(mr.DatabaseManager.GetDatabaseConnection(), &movie)
+	err := stmt.Query(mr.GetDatabaseConnection(), &movie)
 	if err != nil {
 		if err.Error() == "qrm: no rows in result set" {
 			return nil, kts_errors.KTS_NOT_FOUND
@@ -80,7 +83,7 @@ func (mr *MovieRepository) GetMovieByName(movieName *string) (*model.Movies, *mo
 	return &movie, nil
 }
 
-func (mr *MovieRepository) CreateMovie(movie *model.Movies) (*uuid.UUID, *models.KTSError) {
+func (mr *MovieRepository) CreateMovie(tx *sql.Tx, movie *model.Movies) (*uuid.UUID, *models.KTSError) {
 	newId := uuid.New()
 	movie.ID = &newId
 
@@ -110,7 +113,7 @@ func (mr *MovieRepository) CreateMovie(movie *model.Movies) (*uuid.UUID, *models
 	)
 
 	// Execute the query
-	rows, err := insertQuery.Exec(mr.DatabaseManager.GetDatabaseConnection())
+	rows, err := insertQuery.Exec(tx)
 	if err != nil {
 		return nil, kts_errors.KTS_INTERNAL_ERROR
 	}
@@ -145,7 +148,7 @@ func (mr *MovieRepository) UpdateMovie(movie *model.Movies) *models.KTSError {
 	)
 
 	// Execute the query
-	rows, err := updateQuery.Exec(mr.DatabaseManager.GetDatabaseConnection())
+	rows, err := updateQuery.Exec(mr.GetDatabaseConnection())
 	if err != nil {
 		return kts_errors.KTS_INTERNAL_ERROR
 	}
@@ -167,7 +170,7 @@ func (mr *MovieRepository) DeleteMovie(movieId *uuid.UUID) *models.KTSError {
 	deleteQuery := table.Movies.DELETE().WHERE(table.Movies.ID.EQ(utils.MysqlUuid(movieId)))
 
 	// Execute the query
-	rows, err := deleteQuery.Exec(mr.DatabaseManager.GetDatabaseConnection())
+	rows, err := deleteQuery.Exec(mr.GetDatabaseConnection())
 	if err != nil {
 		return kts_errors.KTS_INTERNAL_ERROR
 	}
@@ -199,7 +202,7 @@ func (mr *MovieRepository) GetMoviesWithGenres() (*[]models.MovieWithGenres, *mo
 	)
 
 	// Execute the query
-	err := stmt.Query(mr.DatabaseManager.GetDatabaseConnection(), &moviesWithGenres)
+	err := stmt.Query(mr.GetDatabaseConnection(), &moviesWithGenres)
 	if err != nil {
 		return nil, kts_errors.KTS_INTERNAL_ERROR
 	}
@@ -239,7 +242,7 @@ func (mr *MovieRepository) GetMovieById(movieId *uuid.UUID) (*models.MovieWithEv
 	)
 
 	// Execute the query
-	err := stmt.Query(mr.DatabaseManager.GetDatabaseConnection(), &movie)
+	err := stmt.Query(mr.GetDatabaseConnection(), &movie)
 	if err != nil {
 		if err.Error() == "qrm: no rows in result set" {
 			return nil, kts_errors.KTS_NOT_FOUND
@@ -262,7 +265,7 @@ func (mr *MovieRepository) UpdateRating(movieId *uuid.UUID, rating float64) *mod
 	)
 
 	// Execute the query
-	_, err := updateQuery.Exec(mr.DatabaseManager.GetDatabaseConnection())
+	_, err := updateQuery.Exec(mr.GetDatabaseConnection())
 	if err != nil {
 		return kts_errors.KTS_INTERNAL_ERROR
 	}

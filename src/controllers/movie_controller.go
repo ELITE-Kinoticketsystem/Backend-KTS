@@ -59,17 +59,23 @@ func (mc *MovieController) CreateMovie(movie *models.MovieDTOCreate) (*uuid.UUID
 		return nil, kts_errors.KTS_BAD_REQUEST
 	}
 
+	tx, err := mc.MovieRepo.NewTransaction()
+	if err != nil {
+		return nil, kts_errors.KTS_INTERNAL_ERROR
+	}
+	defer tx.Rollback()
+
 	// Movie
-	movieId, kts_errors := mc.MovieRepo.CreateMovie(&movie.Movies)
-	if kts_errors != nil {
+	movieId, kts_error := mc.MovieRepo.CreateMovie(tx, &movie.Movies)
+	if kts_error != nil {
 		log.Print("Movie was not created")
-		return nil, kts_errors
+		return nil, kts_error
 	}
 
 	// Add genre to movie
 	movieGenres := movie.GenresID
 	for _, movieGenre := range movieGenres {
-		kts_err := mc.MovieGenreRepo.AddMovieGenre(movieId, movieGenre.ID)
+		kts_err := mc.MovieGenreRepo.AddMovieGenre(tx, movieId, movieGenre.ID)
 
 		if kts_err != nil {
 			log.Print("Genre was not added to movie")
@@ -81,7 +87,7 @@ func (mc *MovieController) CreateMovie(movie *models.MovieDTOCreate) (*uuid.UUID
 	movieActors := movie.ActorsID
 	log.Print("MovieActors: ", movieActors)
 	for _, movieActor := range movieActors {
-		kts_err := mc.MovieActorRepo.AddMovieActor(movieId, movieActor.ID)
+		kts_err := mc.MovieActorRepo.AddMovieActor(tx, movieId, movieActor.ID)
 
 		if kts_err != nil {
 			log.Print("Actor was not added to movie")
@@ -92,12 +98,16 @@ func (mc *MovieController) CreateMovie(movie *models.MovieDTOCreate) (*uuid.UUID
 	// Add producers to movie
 	movieProducers := movie.ProducersID
 	for _, movieProducer := range movieProducers {
-		kts_err := mc.MovieProducerRepo.AddMovieProducer(movieId, movieProducer.ID)
+		kts_err := mc.MovieProducerRepo.AddMovieProducer(tx, movieId, movieProducer.ID)
 
 		if kts_err != nil {
 			log.Print("Producer was not added to movie")
 			return nil, kts_err
 		}
+	}
+
+	if err = tx.Commit(); err != nil {
+		return nil, kts_errors.KTS_INTERNAL_ERROR
 	}
 
 	log.Print("Movie was created")
