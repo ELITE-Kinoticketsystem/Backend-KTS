@@ -1,8 +1,6 @@
 package repositories
 
 import (
-	"log"
-
 	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/gen/KinoTicketSystem/model"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/gen/KinoTicketSystem/table"
@@ -32,13 +30,11 @@ func (or *OrderRepository) CreateOrder(order *model.Orders) (*uuid.UUID, *models
 			utils.MysqlUuidOrNil(order.PaymentMethodID),
 			utils.MysqlUuid(order.UserID),
 		)
-	log.Println(insertStmt.DebugSql())
-	rows, err := insertStmt.Exec(or.DatabaseManager.GetDatabaseConnection())
 
-	if err != nil {
+	rows, kts_err := insertStmt.Exec(or.DatabaseManager.GetDatabaseConnection())
+	if kts_err != nil {
 		return nil, kts_errors.KTS_INTERNAL_ERROR
 	}
-
 	affectedRows, err := rows.RowsAffected()
 
 	if err != nil {
@@ -117,7 +113,6 @@ func (or *OrderRepository) GetOrders(userId *uuid.UUID) (*[]models.GetOrderDTO, 
 	err := stmt.Query(or.DatabaseManager.GetDatabaseConnection(), orders)
 
 	if err != nil {
-		log.Println(err)
 		return nil, kts_errors.KTS_INTERNAL_ERROR
 	}
 

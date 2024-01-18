@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"database/sql"
+	"errors"
 	"testing"
 	"time"
 
@@ -200,6 +201,16 @@ func TestCreateActor(t *testing.T) {
 			expectedError: nil,
 		},
 		{
+			name: "Create actor rowsaffected failed",
+			setExpectations: func(mock sqlmock.Sqlmock) {
+				mock.ExpectExec("INSERT INTO `KinoTicketSystem`.actors .*").WithArgs(sqlmock.AnyArg(), actor.Name, actor.Birthdate, actor.Description).WillReturnResult(
+					sqlmock.NewErrorResult(errors.New("rows affected conversion did not work")),
+				)
+			},
+			expectActorId: false,
+			expectedError: kts_errors.KTS_INTERNAL_ERROR,
+		},
+		{
 			name: "Create actor sql error",
 			setExpectations: func(mock sqlmock.Sqlmock) {
 				mock.ExpectExec("INSERT INTO `KinoTicketSystem`.actors .*").WithArgs(sqlmock.AnyArg(), actor.Name, actor.Birthdate, actor.Description).WillReturnError(sql.ErrConnDone)
@@ -287,6 +298,16 @@ func TestCreateActorPicture(t *testing.T) {
 			name: "Create actor picture no rows affected",
 			setExpectations: func(mock sqlmock.Sqlmock) {
 				mock.ExpectExec("INSERT INTO `KinoTicketSystem`.actor_pictures .*").WithArgs(sqlmock.AnyArg(), sqlmock.AnyArg(), picUrl).WillReturnResult(sqlmock.NewResult(1, 0))
+			},
+			expectActorPictureId: false,
+			expectedError:        kts_errors.KTS_INTERNAL_ERROR,
+		},
+		{
+			name: "Create actor picture rowsaffected failed",
+			setExpectations: func(mock sqlmock.Sqlmock) {
+				mock.ExpectExec("INSERT INTO `KinoTicketSystem`.actor_pictures .*").WithArgs(sqlmock.AnyArg(), sqlmock.AnyArg(), picUrl).WillReturnResult(
+					sqlmock.NewErrorResult(errors.New("rows affected conversion did not work")),
+				)
 			},
 			expectActorPictureId: false,
 			expectedError:        kts_errors.KTS_INTERNAL_ERROR,

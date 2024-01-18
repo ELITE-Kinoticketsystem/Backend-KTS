@@ -1,6 +1,7 @@
 package repositories
 
 import (
+	"errors"
 	"testing"
 	"time"
 
@@ -133,7 +134,7 @@ func TestGetEventSeats(t *testing.T) {
 
 			// Create a new instance of the EventSeatRepository with the mock database connection
 			eventSeatRepo := &EventSeatRepository{
-				DatabaseManager: &managers.DatabaseManager{
+				DatabaseManagerI: &managers.DatabaseManager{
 					Connection: db,
 				},
 			}
@@ -200,6 +201,15 @@ func TestBlockEventSeatIfAvailable(t *testing.T) {
 			},
 			expectedError: kts_errors.KTS_INTERNAL_ERROR,
 		},
+		{
+			name: "Block event rowsaffected failed",
+			setExpectations: func(mock sqlmock.Sqlmock) {
+				mock.ExpectExec(query).WithArgs(&blockedUntil, sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg()).WillReturnResult(
+					sqlmock.NewErrorResult(errors.New("rows affected conversion did not work")),
+				)
+			},
+			expectedError: kts_errors.KTS_INTERNAL_ERROR,
+		},
 	}
 
 	for _, tc := range testCases {
@@ -212,7 +222,7 @@ func TestBlockEventSeatIfAvailable(t *testing.T) {
 			defer db.Close()
 
 			eventRepo := &EventSeatRepository{
-				DatabaseManager: &managers.DatabaseManager{
+				DatabaseManagerI: &managers.DatabaseManager{
 					Connection: db,
 				},
 			}
@@ -274,6 +284,16 @@ func TestUpdateBlockedUntilTimeForUserEventSeats(t *testing.T) {
 			expectedError:        kts_errors.KTS_INTERNAL_ERROR,
 			expectedAffectedRows: 0,
 		},
+		{
+			name: "Update blocked rowsaffected failed",
+			setExpectations: func(mock sqlmock.Sqlmock) {
+				mock.ExpectExec(query).WithArgs(blockedUntil, sqlmock.AnyArg(), sqlmock.AnyArg()).WillReturnResult(
+					sqlmock.NewErrorResult(errors.New("rows affected conversion did not work")),
+				)
+			},
+			expectedError:        kts_errors.KTS_INTERNAL_ERROR,
+			expectedAffectedRows: 0,
+		},
 	}
 
 	for _, tc := range testCases {
@@ -286,7 +306,7 @@ func TestUpdateBlockedUntilTimeForUserEventSeats(t *testing.T) {
 			defer db.Close()
 
 			esr := &EventSeatRepository{
-				DatabaseManager: &managers.DatabaseManager{
+				DatabaseManagerI: &managers.DatabaseManager{
 					Connection: db,
 				},
 			}
@@ -347,6 +367,15 @@ func TestUnblockEventSeat(t *testing.T) {
 			},
 			expectedError: kts_errors.KTS_INTERNAL_ERROR,
 		},
+		{
+			name: "Update blocked rowsaffected failed",
+			setExpectations: func(mock sqlmock.Sqlmock) {
+				mock.ExpectExec(query).WithArgs(nil, nil, sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg()).WillReturnResult(
+					sqlmock.NewErrorResult(errors.New("rows affected conversion did not work")),
+				)
+			},
+			expectedError: kts_errors.KTS_INTERNAL_ERROR,
+		},
 	}
 
 	for _, tc := range testCases {
@@ -359,7 +388,7 @@ func TestUnblockEventSeat(t *testing.T) {
 			defer db.Close()
 
 			esr := &EventSeatRepository{
-				DatabaseManager: &managers.DatabaseManager{
+				DatabaseManagerI: &managers.DatabaseManager{
 					Connection: db,
 				},
 			}
@@ -456,7 +485,7 @@ func TestUnblockAllEventSeats(t *testing.T) {
 			defer db.Close()
 
 			esr := &EventSeatRepository{
-				DatabaseManager: &managers.DatabaseManager{
+				DatabaseManagerI: &managers.DatabaseManager{
 					Connection: db,
 				},
 			}
@@ -585,7 +614,7 @@ func TestGetSelectedSeats(t *testing.T) {
 			defer db.Close()
 
 			eventSeatRepo := &EventSeatRepository{
-				DatabaseManager: &managers.DatabaseManager{
+				DatabaseManagerI: &managers.DatabaseManager{
 					Connection: db,
 				},
 			}
@@ -603,6 +632,84 @@ func TestGetSelectedSeats(t *testing.T) {
 			}
 
 			assert.Equal(t, tc.expectedSeats, seats)
+		})
+	}
+}
+
+func TestUpdateEventSeat(t *testing.T) {
+	blockUntil, _ := time.Parse("2006-01-01", "2019-01-01")
+
+	eventSeat := &model.EventSeats{
+		ID:           utils.NewUUID(),
+		Booked:       false,
+		BlockedUntil: &blockUntil,
+		UserID:       utils.NewUUID(),
+		EventID:      utils.NewUUID(),
+		SeatID:       utils.NewUUID(),
+	}
+
+	query := "UPDATE `KinoTicketSystem`.event_seats SET booked = ?, blocked_until = CAST(? AS DATETIME), user_id = ?, seat_id = ?, event_id = ? WHERE event_seats.id = ?;"
+
+	testCases := []struct {
+		name            string
+		setExpectations func(mock sqlmock.Sqlmock, eventSeat *model.EventSeats)
+		expectedError   *models.KTSError
+	}{
+		{
+			name: "Update event seat",
+			setExpectations: func(mock sqlmock.Sqlmock, eventSeat *model.EventSeats) {
+				mock.ExpectExec(query).WithArgs(eventSeat.Booked, eventSeat.BlockedUntil, utils.EqUUID(eventSeat.UserID), utils.EqUUID(eventSeat.SeatID), utils.EqUUID(eventSeat.EventID), utils.EqUUID(eventSeat.ID)).WillReturnResult(sqlmock.NewResult(1, 1))
+			},
+			expectedError: nil,
+		},
+		{
+			name: "Update event seat - no rows affected",
+			setExpectations: func(mock sqlmock.Sqlmock, eventSeat *model.EventSeats) {
+				mock.ExpectExec(query).WithArgs(eventSeat.Booked, eventSeat.BlockedUntil, utils.EqUUID(eventSeat.UserID), utils.EqUUID(eventSeat.SeatID), utils.EqUUID(eventSeat.EventID), utils.EqUUID(eventSeat.ID)).WillReturnResult(sqlmock.NewResult(0, 0))
+			},
+			expectedError: kts_errors.KTS_NOT_FOUND,
+		},
+		{
+			name: "Update event seat - error",
+			setExpectations: func(mock sqlmock.Sqlmock, eventSeat *model.EventSeats) {
+				mock.ExpectExec(query).WithArgs(eventSeat.Booked, eventSeat.BlockedUntil, utils.EqUUID(eventSeat.UserID), utils.EqUUID(eventSeat.SeatID), utils.EqUUID(eventSeat.EventID), utils.EqUUID(eventSeat.ID)).WillReturnError(sqlmock.ErrCancelled)
+			},
+			expectedError: kts_errors.KTS_INTERNAL_ERROR,
+		},
+		{
+			name: "Update event rowsaffected failed",
+			setExpectations: func(mock sqlmock.Sqlmock, eventSeat *model.EventSeats) {
+				mock.ExpectExec(query).WithArgs(eventSeat.Booked, eventSeat.BlockedUntil, utils.EqUUID(eventSeat.UserID), utils.EqUUID(eventSeat.SeatID), utils.EqUUID(eventSeat.EventID), utils.EqUUID(eventSeat.ID)).WillReturnResult(
+					sqlmock.NewErrorResult(errors.New("rows affected conversion did not work")),
+				)
+			},
+			expectedError: kts_errors.KTS_INTERNAL_ERROR,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			db, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
+			if err != nil {
+				t.Fatalf("Failed to create mock database connection: %v", err)
+			}
+			defer db.Close()
+
+			eventSeatRepo := &EventSeatRepository{
+				DatabaseManagerI: &managers.DatabaseManager{
+					Connection: db,
+				},
+			}
+
+			tc.setExpectations(mock, eventSeat)
+
+			kts_err := eventSeatRepo.UpdateEventSeat(eventSeat)
+
+			assert.Equal(t, tc.expectedError, kts_err)
+
+			if err := mock.ExpectationsWereMet(); err != nil {
+				t.Errorf("There were unfulfilled expectations: %s", err)
+			}
 		})
 	}
 }

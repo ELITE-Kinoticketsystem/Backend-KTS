@@ -48,6 +48,16 @@ func TestCreateOrder(t *testing.T) {
 			expectOrderID: false,
 			expectedError: kts_errors.KTS_INTERNAL_ERROR,
 		},
+		{
+			name: "Create order rowsaffected failed",
+			setExpectations: func(mock sqlmock.Sqlmock) {
+				mock.ExpectExec(query).WithArgs(sqlmock.AnyArg(), order.Totalprice, order.IsPaid, sqlmock.AnyArg(), sqlmock.AnyArg()).WillReturnResult(
+					sqlmock.NewErrorResult(errors.New("rows affected conversion did not work")),
+				)
+			},
+			expectOrderID: false,
+			expectedError: kts_errors.KTS_INTERNAL_ERROR,
+		},
 	}
 
 	for _, tc := range testCases {
