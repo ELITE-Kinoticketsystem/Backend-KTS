@@ -24,7 +24,6 @@ func (sc *StatsController) GetOrdersForStats() (*[]models.GetOrderDTO, *models.K
 func (sc *StatsController) GetTotalVisits(startTime time.Time, endTime time.Time, in string) (*models.StatsVisitsTwoArrays, *models.KTSError) {
 
 	visitsTwoArrays := GenerateStatsArray(startTime, endTime, in)
-	visitsTwoArrays := GenerateStatsArray(startTime, endTime, in)
 
 	vists, err := sc.StatsRepo.GetTotalVisits(startTime, endTime, in)
 	if err != nil {
