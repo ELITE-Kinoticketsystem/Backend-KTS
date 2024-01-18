@@ -13,7 +13,7 @@ import (
 
 type StatsRepositoryI interface {
 	GetOrdersForStats() (*[]models.GetOrderDTO, *models.KTSError)
-	GetTotalVisits(startTime time.Time, endTime time.Time, in string) (*[]models.StatsStruct, *models.KTSError)
+	GetTotalVisits(startTime time.Time, endTime time.Time, in string) (*[]models.StatsVisits, *models.KTSError)
 }
 
 type StatsRepository struct {
@@ -57,8 +57,8 @@ func (sr *StatsRepository) GetOrdersForStats() (*[]models.GetOrderDTO, *models.K
 	return orders, nil
 }
 
-func (sr *StatsRepository) GetTotalVisits(startTime time.Time, endTime time.Time, in string) (*[]models.StatsStruct, *models.KTSError) {
-	visits := []models.StatsStruct{}
+func (sr *StatsRepository) GetTotalVisits(startTime time.Time, endTime time.Time, in string) (*[]models.StatsVisits, *models.KTSError) {
+	visits := []models.StatsVisits{}
 
 	filter := in + "(events.end)"
 

@@ -91,7 +91,7 @@ func TestGetTotalVisits(t *testing.T) {
 		end             time.Time
 		in              string
 		setExpectations func(mock sqlmock.Sqlmock, startTime time.Time, endTime time.Time, in string)
-		expectedStats   *[]models.StatsStruct
+		expectedStats   *[]models.StatsVisits
 		expectedError   *models.KTSError
 	}{
 		{
