@@ -81,3 +81,7 @@ func CountStatement(table mysql.Table, where mysql.BoolExpression, conn *sql.DB)
 type CountQueryResult struct {
 	Count int
 }
+
+func GetDateTime(x time.Time) mysql.TimestampExpression {
+	return mysql.DateTimeT(x)
+}

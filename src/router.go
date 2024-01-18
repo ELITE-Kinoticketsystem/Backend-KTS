@@ -29,6 +29,7 @@ type Controllers struct {
 	PriceCategoriesController controllers.PriceCategoryControllerI
 	TicketController          controllers.TicketControllerI
 	TheatreController         controllers.TheatreControllerI
+	StatsController           controllers.StatsControllerI
 }
 
 func createRouter(dbConnection *sql.DB) *gin.Engine {
@@ -105,6 +106,10 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 		DatabaseManager: databaseManager,
 	}
 
+	statsRepo := &repositories.StatsRepository{
+		DatabaseManager: databaseManager,
+	}
+
 	// Create controllers
 	controller := Controllers{
 		UserController: &controllers.UserController{
@@ -151,6 +156,9 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 		},
 		TicketController: &controllers.TicketController{
 			TicketRepo: ticketRepo,
+		},
+		StatsController: &controllers.StatsController{
+			StatsRepo: statsRepo,
 		},
 	}
 
@@ -236,6 +244,10 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 	// Ticket
 	router.Handle(http.MethodGet, "/ticket/:ticketId", handlers.GetTicketByIdHandler(controller.TicketController))
 	router.Handle(http.MethodPut, "/ticket/:ticketId", handlers.ValidateTicketHandler(controller.TicketController))
+
+	// stats
+	publicRoutes.Handle(http.MethodGet, "/stats/visits/:filterBy/:from/:til", handlers.GetTotalVisitsHandler(controller.StatsController))
+	publicRoutes.Handle(http.MethodGet, "/stats/orders", handlers.GetOrdersForStatsHandler(controller.StatsController))
 
 	// swagger
 	docs.SwaggerInfo.Title = "Kino-Ticket-System API"
