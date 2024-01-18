@@ -105,14 +105,14 @@ func TestGetTotalVisits(t *testing.T) {
 				).WithArgs(sqlmock.AnyArg(), sqlmock.AnyArg()).WillReturnRows(
 					sqlmock.NewRows(
 						[]string{
-							"COUNT(tickets.id)", "MIN(events.end)",
+							"COUNT(tickets.id)", "MIN(events.end)", "SUM(orders.totalprice)",
 						},
 					).
 						AddRow(
-							days[0].Count, days[0].Date,
+							days[0].Count, days[0].Date, days[0].Revenue,
 						).
 						AddRow(
-							days[1].Count, days[1].Date,
+							days[1].Count, days[1].Date, days[1].Revenue,
 						),
 				)
 			},
@@ -130,14 +130,14 @@ func TestGetTotalVisits(t *testing.T) {
 				).WithArgs(sqlmock.AnyArg(), sqlmock.AnyArg()).WillReturnRows(
 					sqlmock.NewRows(
 						[]string{
-							"COUNT(tickets.id)", "MIN(events.end)",
+							"COUNT(tickets.id)", "MIN(events.end)", "SUM(orders.totalprice)",
 						},
 					).
 						AddRow(
-							months[0].Count, months[0].Date,
+							months[0].Count, months[0].Date, months[0].Revenue,
 						).
 						AddRow(
-							months[1].Count, months[1].Date,
+							months[1].Count, months[1].Date, months[1].Revenue,
 						),
 				)
 			},
@@ -155,14 +155,14 @@ func TestGetTotalVisits(t *testing.T) {
 				).WithArgs(sqlmock.AnyArg(), sqlmock.AnyArg()).WillReturnRows(
 					sqlmock.NewRows(
 						[]string{
-							"COUNT(tickets.id)", "MIN(events.end)",
+							"COUNT(tickets.id)", "MIN(events.end)", "SUM(orders.totalprice)",
 						},
 					).
 						AddRow(
-							years[0].Count, years[0].Date,
+							years[0].Count, years[0].Date, years[0].Revenue,
 						).
 						AddRow(
-							years[1].Count, years[1].Date,
+							years[1].Count, years[1].Date, years[1].Revenue,
 						),
 				)
 			},
