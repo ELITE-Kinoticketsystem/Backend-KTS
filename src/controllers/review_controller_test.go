@@ -182,29 +182,25 @@ func TestCreateReview(t *testing.T) {
 }
 
 func TestDeleteReview(t *testing.T) {
-	userId := uuid.New()
+	userId := utils.NewUUID()
+	movieId := utils.NewUUID()
+
+	newRating := &models.NewRating{
+		TotalRatings: 1,
+		Rating:       3.6,
+	}
+
 	testCases := []struct {
 		name            string
-		id              uuid.UUID
-		setExpectations func(mockRepo mocks.MockReviewRepositoryI, id uuid.UUID)
+		id              *uuid.UUID
+		setExpectations func(mockRepo mocks.MockReviewRepositoryI, movieRepo mocks.MockMovieRepositoryI, id *uuid.UUID)
 		expectedError   *models.KTSError
 	}{
 		{
-			name: "Success",
-			id:   uuid.New(),
-			setExpectations: func(mockRepo mocks.MockReviewRepositoryI, id uuid.UUID) {
-				mockRepo.EXPECT().GetReviewById(&id).Return(&model.Reviews{
-					UserID: &userId,
-				}, nil)
-				mockRepo.EXPECT().DeleteReview(&id).Return(nil)
-			},
-			expectedError: nil,
-		},
-		{
 			name: "Forbidden",
-			id:   uuid.New(),
-			setExpectations: func(mockRepo mocks.MockReviewRepositoryI, id uuid.UUID) {
-				mockRepo.EXPECT().GetReviewById(&id).Return(&model.Reviews{
+			id:   utils.NewUUID(),
+			setExpectations: func(mockRepo mocks.MockReviewRepositoryI, movieRepo mocks.MockMovieRepositoryI, id *uuid.UUID) {
+				mockRepo.EXPECT().GetReviewById(id).Return(&model.Reviews{
 					UserID: utils.NewUUID(),
 				}, nil)
 			},
@@ -212,41 +208,85 @@ func TestDeleteReview(t *testing.T) {
 		},
 		{
 			name: "Review internal error",
-			id:   uuid.New(),
-			setExpectations: func(mockRepo mocks.MockReviewRepositoryI, id uuid.UUID) {
-				mockRepo.EXPECT().GetReviewById(&id).Return(nil, kts_errors.KTS_INTERNAL_ERROR)
+			id:   utils.NewUUID(),
+			setExpectations: func(mockRepo mocks.MockReviewRepositoryI, movieRepo mocks.MockMovieRepositoryI, id *uuid.UUID) {
+				mockRepo.EXPECT().GetReviewById(id).Return(nil, kts_errors.KTS_INTERNAL_ERROR)
 			},
 			expectedError: kts_errors.KTS_INTERNAL_ERROR,
 		},
 		{
 			name: "Delete internal error",
-			id:   uuid.New(),
-			setExpectations: func(mockRepo mocks.MockReviewRepositoryI, id uuid.UUID) {
-				mockRepo.EXPECT().GetReviewById(&id).Return(&model.Reviews{
-					UserID: &userId,
+			id:   utils.NewUUID(),
+			setExpectations: func(mockRepo mocks.MockReviewRepositoryI, movieRepo mocks.MockMovieRepositoryI, id *uuid.UUID) {
+				mockRepo.EXPECT().GetReviewById(id).Return(&model.Reviews{
+					UserID: userId,
 				}, nil)
-				mockRepo.EXPECT().DeleteReview(&id).Return(kts_errors.KTS_INTERNAL_ERROR)
+				mockRepo.EXPECT().DeleteReview(id).Return(kts_errors.KTS_INTERNAL_ERROR)
 			},
 			expectedError: kts_errors.KTS_INTERNAL_ERROR,
 		},
+		{
+			name: "GetRatingFromMovies Failed",
+			id:   utils.NewUUID(),
+			setExpectations: func(mockRepo mocks.MockReviewRepositoryI, movieRepo mocks.MockMovieRepositoryI, id *uuid.UUID) {
+				mockRepo.EXPECT().GetReviewById(id).Return(&model.Reviews{
+					MovieID: movieId,
+					UserID: userId,
+				}, nil)
+				mockRepo.EXPECT().DeleteReview(id).Return(nil)
+				mockRepo.EXPECT().GetRatingForMovie(movieId).Return(nil, kts_errors.KTS_INTERNAL_ERROR)
+			},
+			expectedError: kts_errors.KTS_INTERNAL_ERROR,
+		},
+		{
+			name: "UpdateRating Failed",
+			id:   utils.NewUUID(),
+			setExpectations: func(mockRepo mocks.MockReviewRepositoryI, movieRepo mocks.MockMovieRepositoryI, id *uuid.UUID) {
+				mockRepo.EXPECT().GetReviewById(id).Return(&model.Reviews{
+					MovieID: movieId,
+					UserID: userId,
+				}, nil)
+				mockRepo.EXPECT().DeleteReview(id).Return(nil)
+				mockRepo.EXPECT().GetRatingForMovie(movieId).Return(newRating, nil)
+				movieRepo.EXPECT().UpdateRating(movieId, newRating.Rating).Return(kts_errors.KTS_INTERNAL_ERROR)
+			},
+			expectedError: kts_errors.KTS_INTERNAL_ERROR,
+		},
+		{
+			name: "Success",
+			id:   utils.NewUUID(),
+			setExpectations: func(mockRepo mocks.MockReviewRepositoryI, movieRepo mocks.MockMovieRepositoryI, id *uuid.UUID) {
+				mockRepo.EXPECT().GetReviewById(id).Return(&model.Reviews{
+					MovieID: movieId,
+					UserID: userId,
+				}, nil)
+				mockRepo.EXPECT().DeleteReview(id).Return(nil)
+				mockRepo.EXPECT().GetRatingForMovie(movieId).Return(newRating, nil)
+				movieRepo.EXPECT().UpdateRating(movieId, newRating.Rating).Return(nil)
+			},
+			expectedError: nil,
+		},
 	}
+
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// GIVEN
 			// create mock review repo
 			mockCtrl := gomock.NewController(t)
 			defer mockCtrl.Finish()
-			mockRepoMock := mocks.NewMockReviewRepositoryI(mockCtrl)
+			reviewRepoMock := mocks.NewMockReviewRepositoryI(mockCtrl)
+			movieRepoMock := mocks.NewMockMovieRepositoryI(mockCtrl)
 			reviewController := ReviewController{
-				ReviewRepo: mockRepoMock,
+				ReviewRepo: reviewRepoMock,
+				MovieRepo:  movieRepoMock,
 			}
 
 			// define expectations
-			tc.setExpectations(*mockRepoMock, tc.id)
+			tc.setExpectations(*reviewRepoMock, *movieRepoMock, tc.id)
 
 			// WHEN
 			// call DeleteReview with review data
-			err := reviewController.DeleteReview(&tc.id, &userId)
+			err := reviewController.DeleteReview(tc.id, userId)
 
 			// THEN
 			// check expected error and id
