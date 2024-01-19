@@ -24,18 +24,18 @@ import (
 func CreateEventHandler(eventController controllers.EventControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var eventData models.CreateEvtDTO
-		if err := c.ShouldBindJSON(&eventData); err != nil {
+		if err := c.ShouldBindJSON(&eventData); utils.ContainsEmptyString(eventData.Events.Title) || err != nil {
 			utils.HandleErrorAndAbort(c, kts_errors.KTS_BAD_REQUEST)
 			return
 		}
 
-		event, err := eventController.CreateEvent(&eventData)
+		eventId, err := eventController.CreateEvent(&eventData)
 		if err != nil {
 			utils.HandleErrorAndAbort(c, err)
 			return
 		}
 
-		c.JSON(http.StatusCreated, event)
+		c.JSON(http.StatusCreated, eventId)
 	}
 }
 
