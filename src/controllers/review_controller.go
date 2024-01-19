@@ -46,17 +46,9 @@ func (rc ReviewController) CreateReview(reviewData models.CreateReviewRequest, u
 		return nil, "", kts_error
 	}
 
-	// TODO Calc new Rating for Movie
-	ratings, kts_err := rc.ReviewRepo.GetRatingForMovie(&movieId)
-	if kts_err != nil {
-		return nil, "", kts_err
-	}
-
-	newMovieRating := ratings.Rating / float64(ratings.TotalRatings)
-
-	kts_err = rc.MovieRepo.UpdateRating(&movieId, newMovieRating)
-	if kts_err != nil {
-		return nil, "", kts_err
+	kts_error_update_rating := updateMovieRating(rc, &movieId)
+	if kts_error_update_rating != nil {
+		return nil, "", kts_error_update_rating
 	}
 
 	return &review, *user.Username, nil
@@ -73,6 +65,27 @@ func (rc ReviewController) DeleteReview(id *uuid.UUID, userId *uuid.UUID) *model
 	kts_error := rc.ReviewRepo.DeleteReview(id)
 	if kts_error != nil {
 		return kts_error
+	}
+
+	kts_error_update_rating := updateMovieRating(rc, review.MovieID)
+	if kts_error_update_rating != nil {
+		return kts_error_update_rating
+	}
+
+	return nil
+}
+
+func updateMovieRating(rc ReviewController, movieId *uuid.UUID) *models.KTSError {
+	ratings, kts_err_get := rc.ReviewRepo.GetRatingForMovie(movieId)
+	if kts_err_get != nil {
+		return kts_err_get
+	}
+
+	newMovieRating := ratings.Rating / float64(ratings.TotalRatings)
+
+	kts_err_update := rc.MovieRepo.UpdateRating(movieId, newMovieRating)
+	if kts_err_update != nil {
+		return kts_err_update
 	}
 
 	return nil
