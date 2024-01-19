@@ -15,6 +15,7 @@ import (
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/mocks"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/samples"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
 )
 
 func TestRegisterUser(t *testing.T) {
@@ -302,7 +303,7 @@ func TestCheckEmail(t *testing.T) {
 		},
 		{
 			name:            "Malformatted data",
-			body:            map[string]string{},
+			body:            "",
 			setExpectations: func(mockController *mocks.MockUserControllerI) {},
 			expectedResponseBody: models.KTSError{
 				KTSErrorMessage: models.KTSErrorMessage{ErrorMessage: "BAD_REQUEST"},
@@ -311,7 +312,7 @@ func TestCheckEmail(t *testing.T) {
 			expectedStatus: http.StatusBadRequest,
 		},
 		{
-			name:            "No data",
+			name:            "No data - Binding failed",
 			body:            nil,
 			setExpectations: func(mockController *mocks.MockUserControllerI) {},
 			expectedResponseBody: models.KTSError{
@@ -395,7 +396,7 @@ func TestCheckUsername(t *testing.T) {
 		},
 		{
 			name:            "Malformatted data",
-			body:            map[string]string{},
+			body:            "",
 			setExpectations: func(mockController *mocks.MockUserControllerI) {},
 			expectedResponseBody: gin.H{
 				"errorMessage": "BAD_REQUEST",
@@ -448,6 +449,121 @@ func TestCheckUsername(t *testing.T) {
 				expectedResponseBody, _ := json.Marshal(tc.expectedResponseBody)
 				assert.Equal(t, bytes.NewBuffer(expectedResponseBody).String(), w.Body.String(), "wrong response body")
 			}
+		})
+	}
+}
+
+func TestTestJwtToken(t *testing.T) {
+
+	testCases := []struct {
+		name           string
+		expectedStatus int
+	}{
+		{
+			name:           "GetJWTToken",
+			expectedStatus: http.StatusOK,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			// GIVEN
+			// create mock context
+			w := httptest.NewRecorder()
+			gin.SetMode(gin.TestMode)
+			c, _ := gin.CreateTestContext(w)
+
+			// create mock request
+			req := httptest.NewRequest("POST", "/auth/register", nil)
+			req.Header.Set("Content-Type", "application/json")
+			c.Request = req
+
+			// define expectations
+
+			// WHEN
+			TestJwtToken(c)
+
+			// THEN
+			// check the HTTP status code
+			assert.Equal(t, tc.expectedStatus, w.Code, "wrong HTTP status code")
+		})
+	}
+}
+
+func TestLoggedInHandler(t *testing.T) {
+	id := utils.NewUUID()
+
+	// token, refreshToken, jwtError := utils.GenerateJWT(id)
+	token, _, jwtError := utils.GenerateJWT(id)
+	if jwtError != nil {
+		t.Error("JWT generation failed")
+	}
+
+	testCases := []struct {
+		name                 string
+		setToken             bool
+		token                string
+		expectedStatus       int
+		expectedResponseBody interface{}
+	}{
+		{
+			name:           "GetJWTToken",
+			setToken:       false,
+			token:          "",
+			expectedStatus: http.StatusOK,
+			expectedResponseBody: models.LoggedInResponse{
+				LoggedIn: false,
+				Id:       nil,
+			},
+		},
+		{
+			name:           "GetJWTToken",
+			setToken:       true,
+			token:          token,
+			expectedStatus: http.StatusOK,
+			expectedResponseBody: models.LoggedInResponse{
+				LoggedIn: true,
+				Id:       id,
+			},
+		},
+		{
+			name:           "GetJWTToken",
+			setToken:       true,
+			token:          "token",
+			expectedStatus: http.StatusOK,
+			expectedResponseBody: models.LoggedInResponse{
+				LoggedIn: false,
+				Id:       nil,
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			// GIVEN
+			// create mock context
+			w := httptest.NewRecorder()
+			gin.SetMode(gin.TestMode)
+			c, _ := gin.CreateTestContext(w)
+
+			// create mock request
+			req := httptest.NewRequest("POST", "/auth/logged-in", nil)
+			req.Header.Set("Content-Type", "application/json")
+			c.Request = req
+
+			if tc.setToken {
+				c.Request.Header.Set("Cookie", "token="+tc.token)
+			}
+
+			// WHEN
+			LoggedInHandler(c)
+
+			// THEN
+			// check the HTTP status code
+			assert.Equal(t, tc.expectedStatus, w.Code, "wrong HTTP status code")
+
+			expectedResponseBody, _ := json.Marshal(tc.expectedResponseBody)
+			assert.Equal(t, bytes.NewBuffer(expectedResponseBody).String(), w.Body.String(), "wrong response body")
 		})
 	}
 }

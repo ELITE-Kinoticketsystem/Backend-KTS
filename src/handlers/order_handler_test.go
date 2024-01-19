@@ -67,11 +67,19 @@ func TestCreateOrderHandler(t *testing.T) {
 			setExpectations: func(mockOrderController *mocks.MockOrderControllerI, eventId string, userId *uuid.UUID) {
 
 			},
-			expectedResponseBody: gin.H{
-				"errorMessage": "BAD_REQUEST",
+			expectedResponseBody: gin.H{"errorMessage": "BAD_REQUEST"},
+			expectedStatus:       http.StatusBadRequest,
+			createOrderDTO:       nil,
+		},
+		{
+			name:         "content user failed",
+			paramEventId: utils.NewUUID().String(),
+			setExpectations: func(mockOrderController *mocks.MockOrderControllerI, eventId string, userId *uuid.UUID) {
+
 			},
-			expectedStatus: http.StatusBadRequest,
-			createOrderDTO: nil,
+			expectedResponseBody: gin.H{"errorMessage": "BAD_REQUEST"},
+			expectedStatus:       http.StatusBadRequest,
+			createOrderDTO:       nil,
 		},
 	}
 
@@ -151,7 +159,7 @@ func TestGetOrderByIdHandler(t *testing.T) {
 			name:         "Bad Request",
 			paramOrderId: "",
 			setExpectations: func(mockOrderController *mocks.MockOrderControllerI, orderId string) {
-				
+
 			},
 			expectedStatus: http.StatusBadRequest,
 			ExpectedBody:   gin.H{"errorMessage": "BAD_REQUEST"},

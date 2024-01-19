@@ -92,10 +92,6 @@ func CheckEmailHandler(userCtrl controllers.UserControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var requestData models.CheckEmailRequest
 		if err := c.ShouldBindJSON(&requestData); err != nil {
-			utils.HandleErrorAndAbort(c, kts_errors.KTS_BAD_REQUEST)
-			return
-		}
-		if utils.ContainsEmptyString(requestData.Email) {
 			utils.HandleErrorAndAbort(c, kts_errors.KTS_BAD_REQUEST.WithDetails("Email is empty"))
 			return
 		}
@@ -123,10 +119,6 @@ func CheckUsernameHandler(userCtrl controllers.UserControllerI) gin.HandlerFunc 
 	return func(c *gin.Context) {
 		var requestData models.CheckUsernameRequest
 		if err := c.ShouldBindJSON(&requestData); err != nil {
-			utils.HandleErrorAndAbort(c, kts_errors.KTS_BAD_REQUEST)
-			return
-		}
-		if utils.ContainsEmptyString(requestData.Username) {
 			utils.HandleErrorAndAbort(c, kts_errors.KTS_BAD_REQUEST)
 			return
 		}

@@ -7,11 +7,11 @@ import (
 
 type CreateOrderDTO struct {
 	EventSeatPriceCategories []struct {
-		EventSeatId     *uuid.UUID
-		PriceCategoryId *uuid.UUID
+		EventSeatId     *uuid.UUID `binding:"required"`
+		PriceCategoryId *uuid.UUID `binding:"required"`
 	}
 
-	PaymentMethodID *uuid.UUID
+	PaymentMethodID *uuid.UUID `binding:"required"`
 }
 
 type GetOrderDTO struct {

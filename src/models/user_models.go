@@ -25,11 +25,11 @@ type LoginResponse struct {
 }
 
 type CheckEmailRequest struct {
-	Email string `json:"email"`
+	Email string `json:"email" binding:"required"`
 }
 
 type CheckUsernameRequest struct {
-	Username string `json:"username"`
+	Username string `json:"username" binding:"required"`
 }
 
 type LoggedInResponse struct {

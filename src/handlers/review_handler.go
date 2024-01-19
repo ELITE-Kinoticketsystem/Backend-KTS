@@ -74,6 +74,6 @@ func DeleteReviewHandler(reviewCtrl controllers.ReviewControllerI) gin.HandlerFu
 			return
 		}
 
-		c.Status(http.StatusOK)
+		c.JSON(http.StatusOK, "")
 	}
 }

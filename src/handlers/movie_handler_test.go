@@ -16,6 +16,7 @@ import (
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/samples"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
 )
@@ -387,6 +388,48 @@ func TestCreateMovieHandler(t *testing.T) {
 				GenresID:    sampleCreateMovie.GenresID,
 				ActorsID:    sampleCreateMovie.ActorsID,
 				ProducersID: sampleCreateMovie.ProducersID,
+			},
+			setExpectations: func(mockController *mocks.MockMovieControllerI, movieData interface{}) {
+
+			},
+			expectedStatus: http.StatusBadRequest,
+			expectedBody:   gin.H{"errorMessage": "BAD_REQUEST"},
+		},
+		{
+			name: "Genre Nil",
+			body: models.MovieDTOCreate{
+				Movies:      sampleCreateMovie.Movies,
+				GenresID:    []struct{ ID *uuid.UUID }{{ID: nil}},
+				ActorsID:    sampleCreateMovie.ActorsID,
+				ProducersID: sampleCreateMovie.ProducersID,
+			},
+			setExpectations: func(mockController *mocks.MockMovieControllerI, movieData interface{}) {
+
+			},
+			expectedStatus: http.StatusBadRequest,
+			expectedBody:   gin.H{"errorMessage": "BAD_REQUEST"},
+		},
+		{
+			name: "Actor Nil",
+			body: models.MovieDTOCreate{
+				Movies:      sampleCreateMovie.Movies,
+				GenresID:    sampleCreateMovie.GenresID,
+				ActorsID:    []struct{ ID *uuid.UUID }{{ID: nil}},
+				ProducersID: sampleCreateMovie.ProducersID,
+			},
+			setExpectations: func(mockController *mocks.MockMovieControllerI, movieData interface{}) {
+
+			},
+			expectedStatus: http.StatusBadRequest,
+			expectedBody:   gin.H{"errorMessage": "BAD_REQUEST"},
+		},
+		{
+			name: "Producer Nil",
+			body: models.MovieDTOCreate{
+				Movies:      sampleCreateMovie.Movies,
+				GenresID:    sampleCreateMovie.GenresID,
+				ActorsID:    sampleCreateMovie.ActorsID,
+				ProducersID: []struct{ ID *uuid.UUID }{{ID: nil}},
 			},
 			setExpectations: func(mockController *mocks.MockMovieControllerI, movieData interface{}) {
 
