@@ -11,8 +11,8 @@ func GetOrder(priceCategories *[]model.PriceCategories, eventSeats *[]models.Get
 
 	return &models.CreateOrderDTO{
 		EventSeatPriceCategories: []struct {
-			EventSeatId     *uuid.UUID
-			PriceCategoryId *uuid.UUID
+			EventSeatId     *uuid.UUID `binding:"required"`
+			PriceCategoryId *uuid.UUID `binding:"required"`
 		}{
 			{
 				EventSeatId:     (*eventSeats)[0].EventSeat.ID,
@@ -30,15 +30,15 @@ func GetOrder(priceCategories *[]model.PriceCategories, eventSeats *[]models.Get
 func GetOrderDTO() *models.CreateOrderDTO {
 	return &models.CreateOrderDTO{
 		EventSeatPriceCategories: []struct {
-			EventSeatId     *uuid.UUID
-			PriceCategoryId *uuid.UUID
+			EventSeatId     *uuid.UUID `binding:"required"`
+			PriceCategoryId *uuid.UUID `binding:"required"`
 		}{
 			{
 				EventSeatId:     utils.NewUUID(),
 				PriceCategoryId: utils.NewUUID(),
 			},
 		},
-		PaymentMethodID: nil,
+		PaymentMethodID: utils.NewUUID(),
 	}
 }
 
