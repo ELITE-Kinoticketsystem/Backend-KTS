@@ -13,3 +13,12 @@ type StatsVisitsTwoArrays struct {
 	Date    []time.Time
 	Revenue []int
 }
+
+type GetEventWithTicketCount struct {
+	EventName   string `alias:"events.title"`
+	TicketCount int    `alias:"COUNT(tickets.id)"`
+}
+
+type GetEventsTitle struct {
+	EventName   string `alias:"events.title"`
+}

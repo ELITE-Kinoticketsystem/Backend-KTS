@@ -236,3 +236,67 @@ func TestGetTotalVisitsForTheatre(t *testing.T) {
 		})
 	}
 }
+
+func TestGetMoviesSortedByTicketAmount(t *testing.T) {
+	allEvents := samples.GetSampleAllEvents()
+	movieEvents := samples.GetSampleEventWithTicketCount()
+	preparedEvents := samples.GetSamplePreparedEvents()
+
+	testCases := []struct {
+		name                     string
+		setExpectations          func(mockRepo mocks.MockStatsRepositoryI)
+		expectedSortedMovieEvent *[]models.GetEventWithTicketCount
+		expectedError            *models.KTSError
+	}{
+		{
+			name: "Success",
+			setExpectations: func(mockRepo mocks.MockStatsRepositoryI) {
+				mockRepo.EXPECT().GetAllEventsTitle().Return(allEvents, nil)
+				mockRepo.EXPECT().GetMoviesSortedByTicketAmount().Return(movieEvents, nil)
+			},
+			expectedSortedMovieEvent: preparedEvents,
+			expectedError:            nil,
+		},
+		{
+			name: "Failed",
+			setExpectations: func(mockRepo mocks.MockStatsRepositoryI) {
+				mockRepo.EXPECT().GetAllEventsTitle().Return(allEvents, nil)
+				mockRepo.EXPECT().GetMoviesSortedByTicketAmount().Return(nil, kts_errors.KTS_INTERNAL_ERROR)
+			},
+			expectedSortedMovieEvent: nil,
+			expectedError:            kts_errors.KTS_INTERNAL_ERROR,
+		},
+		{
+			name: "Failed",
+			setExpectations: func(mockRepo mocks.MockStatsRepositoryI) {
+				mockRepo.EXPECT().GetAllEventsTitle().Return(nil, kts_errors.KTS_INTERNAL_ERROR)
+			},
+			expectedSortedMovieEvent: nil,
+			expectedError:            kts_errors.KTS_INTERNAL_ERROR,
+		},
+	}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			// GIVEN
+			// create mock review repo
+			mockCtrl := gomock.NewController(t)
+			defer mockCtrl.Finish()
+			mockRepoMock := mocks.NewMockStatsRepositoryI(mockCtrl)
+			statsController := StatsController{
+				StatsRepo: mockRepoMock,
+			}
+
+			// define expectations
+			tc.setExpectations(*mockRepoMock)
+
+			// WHEN
+			// call DeleteReview with review data
+			sortedMovieEvent, err := statsController.GetMoviesSortedByTicketAmount()
+
+			// THEN
+			// check expected error and id
+			assert.Equal(t, sortedMovieEvent, tc.expectedSortedMovieEvent)
+			assert.Equal(t, err, tc.expectedError, "wrong error")
+		})
+	}
+}

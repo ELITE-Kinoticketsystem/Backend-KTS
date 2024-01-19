@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"sort"
 	"time"
 
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
@@ -11,6 +12,7 @@ type StatsControllerI interface {
 	GetOrdersForStats() (*[]models.GetOrderDTO, *models.KTSError)
 	GetTotalVisits(startTime time.Time, endTime time.Time, in string) (*models.StatsVisitsTwoArrays, *models.KTSError)
 	GetTotalVisitsForTheatre(startTime time.Time, endTime time.Time, in string, theatreName string) (*models.StatsVisitsTwoArrays, *models.KTSError)
+	GetMoviesSortedByTicketAmount() (*[]models.GetEventWithTicketCount, *models.KTSError)
 }
 
 type StatsController struct {
@@ -137,4 +139,42 @@ func (sc *StatsController) GetTotalVisitsForTheatre(startTime time.Time, endTime
 	}
 
 	return visitsTwoArrays, nil
+}
+
+func (sc *StatsController) GetMoviesSortedByTicketAmount() (*[]models.GetEventWithTicketCount, *models.KTSError) {
+	preparedEvents := []models.GetEventWithTicketCount{}
+
+	allEventsTitle, err_all_events := sc.StatsRepo.GetAllEventsTitle()
+	if err_all_events != nil {
+		return nil, err_all_events
+	}
+
+	allEventsWithTicketCount, err_movie_tickets := sc.StatsRepo.GetMoviesSortedByTicketAmount()
+	if err_movie_tickets != nil {
+		return nil, err_movie_tickets
+	}
+
+	for _, event := range *allEventsTitle {
+		tmp := models.GetEventWithTicketCount{}
+		for _, eventWithTicketCount := range *allEventsWithTicketCount {
+			if event.EventName == eventWithTicketCount.EventName {
+				tmp = eventWithTicketCount
+				break
+			}
+		}
+
+		if (tmp != models.GetEventWithTicketCount{}) {
+			preparedEvents = append(preparedEvents, tmp)
+		} else {
+			preparedEvents = append(preparedEvents, models.GetEventWithTicketCount{EventName: event.EventName, TicketCount: 0})
+		}
+
+	}
+
+	// Sort the events by ticket count
+	sort.Slice(preparedEvents, func(i, j int) bool {
+		return preparedEvents[i].TicketCount > preparedEvents[j].TicketCount
+	})
+
+	return &preparedEvents, nil
 }

@@ -133,3 +133,23 @@ func GetOrdersForStatsHandler(statsCtrl controllers.StatsControllerI) gin.Handle
 		c.JSON(http.StatusOK, orders)
 	}
 }
+
+// @Summary Get Events Sorted By Ticket Amount
+// @Description Get Events Sorted By Ticket Amount
+// @Tags Stats
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} models.GetEventWithTicketCount
+// @Failure 500 {object} models.KTSErrorMessage
+// @Router /stats/movies-sorted-tickets-amount/ [get]
+func GetMoviesSortedByTicketAmountHandler(statsCtrl controllers.StatsControllerI) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		moviesSortedByTicketAmount, kts_err := statsCtrl.GetMoviesSortedByTicketAmount()
+		if kts_err != nil {
+			utils.HandleErrorAndAbort(c, kts_err)
+			return
+		}
+
+		c.JSON(http.StatusOK, moviesSortedByTicketAmount)
+	}
+}

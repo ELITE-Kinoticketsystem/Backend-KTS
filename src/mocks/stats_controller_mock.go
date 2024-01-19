@@ -39,6 +39,21 @@ func (m *MockStatsControllerI) EXPECT() *MockStatsControllerIMockRecorder {
 	return m.recorder
 }
 
+// GetMoviesSortedByTicketAmount mocks base method.
+func (m *MockStatsControllerI) GetMoviesSortedByTicketAmount() (*[]models.GetEventWithTicketCount, *models.KTSError) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetMoviesSortedByTicketAmount")
+	ret0, _ := ret[0].(*[]models.GetEventWithTicketCount)
+	ret1, _ := ret[1].(*models.KTSError)
+	return ret0, ret1
+}
+
+// GetMoviesSortedByTicketAmount indicates an expected call of GetMoviesSortedByTicketAmount.
+func (mr *MockStatsControllerIMockRecorder) GetMoviesSortedByTicketAmount() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetMoviesSortedByTicketAmount", reflect.TypeOf((*MockStatsControllerI)(nil).GetMoviesSortedByTicketAmount))
+}
+
 // GetOrdersForStats mocks base method.
 func (m *MockStatsControllerI) GetOrdersForStats() (*[]models.GetOrderDTO, *models.KTSError) {
 	m.ctrl.T.Helper()

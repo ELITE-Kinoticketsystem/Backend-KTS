@@ -39,6 +39,36 @@ func (m *MockStatsRepositoryI) EXPECT() *MockStatsRepositoryIMockRecorder {
 	return m.recorder
 }
 
+// GetAllEventsTitle mocks base method.
+func (m *MockStatsRepositoryI) GetAllEventsTitle() (*[]models.GetEventsTitle, *models.KTSError) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetAllEventsTitle")
+	ret0, _ := ret[0].(*[]models.GetEventsTitle)
+	ret1, _ := ret[1].(*models.KTSError)
+	return ret0, ret1
+}
+
+// GetAllEventsTitle indicates an expected call of GetAllEventsTitle.
+func (mr *MockStatsRepositoryIMockRecorder) GetAllEventsTitle() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAllEventsTitle", reflect.TypeOf((*MockStatsRepositoryI)(nil).GetAllEventsTitle))
+}
+
+// GetMoviesSortedByTicketAmount mocks base method.
+func (m *MockStatsRepositoryI) GetMoviesSortedByTicketAmount() (*[]models.GetEventWithTicketCount, *models.KTSError) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetMoviesSortedByTicketAmount")
+	ret0, _ := ret[0].(*[]models.GetEventWithTicketCount)
+	ret1, _ := ret[1].(*models.KTSError)
+	return ret0, ret1
+}
+
+// GetMoviesSortedByTicketAmount indicates an expected call of GetMoviesSortedByTicketAmount.
+func (mr *MockStatsRepositoryIMockRecorder) GetMoviesSortedByTicketAmount() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetMoviesSortedByTicketAmount", reflect.TypeOf((*MockStatsRepositoryI)(nil).GetMoviesSortedByTicketAmount))
+}
+
 // GetOrdersForStats mocks base method.
 func (m *MockStatsRepositoryI) GetOrdersForStats() (*[]models.GetOrderDTO, *models.KTSError) {
 	m.ctrl.T.Helper()
