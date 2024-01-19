@@ -95,3 +95,47 @@ func GetSampleYearVisitsStatsTwoArrays() *models.StatsVisitsTwoArrays {
 		Date:    []time.Time{year1, year2, year3},
 	}
 }
+
+func GetSampleEventWithTicketCount() *[]models.GetEventWithTicketCount {
+	return &[]models.GetEventWithTicketCount{
+		{
+			EventName:   "Event1",
+			TicketCount: 2,
+		},
+		{
+			EventName:   "Event2",
+			TicketCount: 5,
+		},
+	}
+}
+
+func GetSampleAllEvents() *[]models.GetEventsTitle {
+	return &[]models.GetEventsTitle{
+		{
+			EventName: "Event1",
+		},
+		{
+			EventName: "Event2",
+		},
+		{
+			EventName: "Event3",
+		},
+	}
+}
+
+func GetSamplePreparedEvents() *[]models.GetEventWithTicketCount {
+	return &[]models.GetEventWithTicketCount{
+		{
+			EventName:   "Event2",
+			TicketCount: 5,
+		},
+		{
+			EventName:   "Event1",
+			TicketCount: 2,
+		},
+		{
+			EventName:   "Event3",
+			TicketCount: 0,
+		},
+	}
+}

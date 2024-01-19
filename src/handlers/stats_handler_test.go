@@ -393,3 +393,59 @@ func TestGetOrdersForStatsHandler(t *testing.T) {
 		})
 	}
 }
+
+
+
+func TestGetMoviesSortedByTicketAmountHandler(t *testing.T) {
+	prepareEvents := samples.GetSamplePreparedEvents()
+
+	testCases := []struct {
+		name            string
+		setExpectations func(mockController *mocks.MockStatsControllerI)
+		expectedStatus  int
+		expectedBody    interface{}
+	}{
+		{
+			name: "Failed",
+			setExpectations: func(mockController *mocks.MockStatsControllerI) {
+				mockController.EXPECT().GetMoviesSortedByTicketAmount().Return(nil, kts_errors.KTS_INTERNAL_ERROR)
+			},
+			expectedStatus: http.StatusInternalServerError,
+			expectedBody:   gin.H{"errorMessage": "INTERNAL_ERROR"},
+		},
+		{
+			name: "Success",
+			setExpectations: func(mockController *mocks.MockStatsControllerI) {
+				mockController.EXPECT().GetMoviesSortedByTicketAmount().Return(prepareEvents, nil)
+			},
+			expectedStatus: http.StatusOK,
+			expectedBody:   prepareEvents,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			// GIVEN
+			w := httptest.NewRecorder()
+			gin.SetMode(gin.TestMode)
+			c, _ := gin.CreateTestContext(w)
+
+			mockCtrl := gomock.NewController(t)
+			defer mockCtrl.Finish()
+			statsController := mocks.NewMockStatsControllerI(mockCtrl)
+
+			req, _ := http.NewRequest("GET", "/stats/movies-sorted-tickets-amount/", nil)
+			c.Request = req
+
+			tc.setExpectations(statsController)
+
+			// WHEN
+			handlers.GetMoviesSortedByTicketAmountHandler(statsController)(c)
+
+			// THEN
+			assert.Equal(t, tc.expectedStatus, w.Code, "wrong HTTP status code")
+			expectedResponseBody, _ := json.Marshal(tc.expectedBody)
+			assert.Equal(t, bytes.NewBuffer(expectedResponseBody).String(), w.Body.String(), "wrong response body")
+		})
+	}
+}

@@ -361,3 +361,150 @@ func TestGetTotalVisitsForTheatre(t *testing.T) {
 	}
 
 }
+
+//
+
+func TestGetMoviesSortedByTicketAmount(t *testing.T) {
+	moviesSortedByTickets := *samples.GetSampleEventWithTicketCount()
+
+	query := "SELECT events.title AS \"events.title\", COUNT(tickets.id) FROM `KinoTicketSystem`.events INNER JOIN `KinoTicketSystem`.event_seats ON (event_seats.event_id = events.id) INNER JOIN `KinoTicketSystem`.tickets ON (tickets.event_seat_id = event_seats.id) GROUP BY events.title ORDER BY COUNT(tickets.id) DESC;"
+
+	testCases := []struct {
+		name                      string
+		setExpectations           func(mock sqlmock.Sqlmock)
+		expectMoviesByTicketCount *[]models.GetEventWithTicketCount
+		expectedError             *models.KTSError
+	}{
+		{
+			name: "Get order",
+			setExpectations: func(mock sqlmock.Sqlmock) {
+				mock.ExpectQuery(query).WithArgs().WillReturnRows(
+					sqlmock.NewRows(
+						[]string{
+							"events.title", "COUNT(tickets.id)",
+						},
+					).
+						AddRow(
+							moviesSortedByTickets[0].EventName, moviesSortedByTickets[0].TicketCount,
+						).
+						AddRow(
+							moviesSortedByTickets[1].EventName, moviesSortedByTickets[1].TicketCount,
+						),
+				)
+			},
+			expectMoviesByTicketCount: &moviesSortedByTickets,
+			expectedError:             nil,
+		},
+		{
+			name: "Get order - error",
+			setExpectations: func(mock sqlmock.Sqlmock) {
+				mock.ExpectQuery(query).WithArgs().WillReturnError(sqlmock.ErrCancelled)
+			},
+			expectMoviesByTicketCount: nil,
+			expectedError:             kts_errors.KTS_INTERNAL_ERROR,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			db, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
+			if err != nil {
+				t.Fatalf("Failed to create mock database connection: %v", err)
+			}
+			defer db.Close()
+
+			statsRepo := &StatsRepository{
+				DatabaseManager: &managers.DatabaseManager{
+					Connection: db,
+				},
+			}
+
+			tc.setExpectations(mock)
+
+			moviesSortedByTicket, kts_err := statsRepo.GetMoviesSortedByTicketAmount()
+
+			assert.Equal(t, tc.expectedError, kts_err)
+			assert.Equal(t, tc.expectMoviesByTicketCount, moviesSortedByTicket)
+
+			if err := mock.ExpectationsWereMet(); err != nil {
+				t.Errorf("There were unfulfilled expectations: %s", err)
+			}
+
+		})
+	}
+
+}
+
+func TestGetAllEventsTitle(t *testing.T) {
+	sampleAllEvents := *samples.GetSampleAllEvents()
+
+	query := "SELECT events.title AS \"events.title\" FROM `KinoTicketSystem`.events GROUP BY events.title;"
+
+	testCases := []struct {
+		name            string
+		setExpectations func(mock sqlmock.Sqlmock)
+		expectAllEvents *[]models.GetEventsTitle
+		expectedError   *models.KTSError
+	}{
+		{
+			name: "Get order",
+			setExpectations: func(mock sqlmock.Sqlmock) {
+				mock.ExpectQuery(query).WithArgs().WillReturnRows(
+					sqlmock.NewRows(
+						[]string{
+							"events.title",
+						},
+					).
+						AddRow(
+							sampleAllEvents[0].EventName,
+						).
+						AddRow(
+							sampleAllEvents[1].EventName,
+						).
+						AddRow(
+							sampleAllEvents[2].EventName,
+						),
+				)
+			},
+			expectAllEvents: &sampleAllEvents,
+			expectedError:   nil,
+		},
+		{
+			name: "Get order - error",
+			setExpectations: func(mock sqlmock.Sqlmock) {
+				mock.ExpectQuery(query).WithArgs().WillReturnError(sqlmock.ErrCancelled)
+			},
+			expectAllEvents: nil,
+			expectedError:   kts_errors.KTS_INTERNAL_ERROR,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			db, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
+			if err != nil {
+				t.Fatalf("Failed to create mock database connection: %v", err)
+			}
+			defer db.Close()
+
+			statsRepo := &StatsRepository{
+				DatabaseManager: &managers.DatabaseManager{
+					Connection: db,
+				},
+			}
+
+			tc.setExpectations(mock)
+
+			allEvents, kts_err := statsRepo.GetAllEventsTitle()
+
+			assert.Equal(t, tc.expectedError, kts_err)
+			assert.Equal(t, tc.expectAllEvents, allEvents)
+
+			if err := mock.ExpectationsWereMet(); err != nil {
+				t.Errorf("There were unfulfilled expectations: %s", err)
+			}
+
+		})
+	}
+
+}

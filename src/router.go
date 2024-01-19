@@ -250,6 +250,7 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 	publicRoutes.Handle(http.MethodGet, "/stats/visits/:filterBy/:from/:til", handlers.GetTotalVisitsHandler(controller.StatsController))
 	publicRoutes.Handle(http.MethodGet, "/stats/visits/:filterBy/:from/:til/:theatreName", handlers.GetTotalVisitsForTheatreHandler(controller.StatsController))
 	publicRoutes.Handle(http.MethodGet, "/stats/orders", handlers.GetOrdersForStatsHandler(controller.StatsController))
+	publicRoutes.Handle(http.MethodGet, "/stats/movies-sorted-tickets-amount/", handlers.GetMoviesSortedByTicketAmountHandler(controller.StatsController))
 
 	// swagger
 	docs.SwaggerInfo.Title = "Kino-Ticket-System API"

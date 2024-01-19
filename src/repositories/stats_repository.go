@@ -15,6 +15,8 @@ type StatsRepositoryI interface {
 	GetOrdersForStats() (*[]models.GetOrderDTO, *models.KTSError)
 	GetTotalVisits(startTime time.Time, endTime time.Time, in string) (*[]models.StatsVisits, *models.KTSError)
 	GetTotalVisitsForTheatre(startTime time.Time, endTime time.Time, in string, theatreName string) (*[]models.StatsVisits, *models.KTSError)
+	GetMoviesSortedByTicketAmount() (*[]models.GetEventWithTicketCount, *models.KTSError)
+	GetAllEventsTitle() (*[]models.GetEventsTitle, *models.KTSError)
 }
 
 type StatsRepository struct {
@@ -123,4 +125,54 @@ func (sr *StatsRepository) GetTotalVisitsForTheatre(startTime time.Time, endTime
 	}
 
 	return &visits, nil
+}
+
+func (sr *StatsRepository) GetMoviesSortedByTicketAmount() (*[]models.GetEventWithTicketCount, *models.KTSError) {
+	eventsWithTickets := &[]models.GetEventWithTicketCount{}
+
+	stmt := mysql.SELECT(
+		table.Events.Title,
+		mysql.COUNT(table.Tickets.ID),
+	).
+		FROM(
+			table.Events.
+				INNER_JOIN(table.EventSeats, table.EventSeats.EventID.EQ(table.Events.ID)).
+				INNER_JOIN(table.Tickets, table.Tickets.EventSeatID.EQ(table.EventSeats.ID)),
+		).
+		GROUP_BY(
+			table.Events.Title,
+		).
+		ORDER_BY(
+			mysql.COUNT(table.Tickets.ID).DESC(),
+		)
+
+	err := stmt.Query(sr.DatabaseManager.GetDatabaseConnection(), eventsWithTickets)
+
+	if err != nil {
+		return nil, kts_errors.KTS_INTERNAL_ERROR
+	}
+
+	return eventsWithTickets, nil
+}
+
+func (sr *StatsRepository) GetAllEventsTitle() (*[]models.GetEventsTitle, *models.KTSError) {
+	eventsTitle := &[]models.GetEventsTitle{}
+
+	stmt := mysql.SELECT(
+		table.Events.Title,
+	).
+		FROM(
+			table.Events,
+		).
+		GROUP_BY(
+			table.Events.Title,
+		)
+
+	err := stmt.Query(sr.DatabaseManager.GetDatabaseConnection(), eventsTitle)
+
+	if err != nil {
+		return nil, kts_errors.KTS_INTERNAL_ERROR
+	}
+
+	return eventsTitle, nil
 }
