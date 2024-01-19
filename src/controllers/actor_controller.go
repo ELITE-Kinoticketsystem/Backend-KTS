@@ -34,7 +34,6 @@ func (ac *ActorController) CreateActor(actorDto *models.CreateActorDTO) (*uuid.U
 	actor := actorDto.Actors
 
 	actorId, kts_err := ac.ActorRepo.CreateActor(&actor)
-
 	if kts_err != nil {
 		return nil, kts_err
 	}
@@ -53,5 +52,4 @@ func (ac *ActorController) CreateActor(actorDto *models.CreateActorDTO) (*uuid.U
 	}
 
 	return actorId, nil
-
 }

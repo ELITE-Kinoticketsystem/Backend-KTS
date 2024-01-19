@@ -72,7 +72,7 @@ func GetActorsHandler(actorController controllers.ActorControllerI) gin.HandlerF
 func CreateActorHandler(actorController controllers.ActorControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var actorDto models.CreateActorDTO
-		if err := c.ShouldBindJSON(&actorDto); err != nil {
+		if err := c.ShouldBindJSON(&actorDto); utils.ContainsEmptyString(actorDto.Actors.Name) || err != nil {
 			utils.HandleErrorAndAbort(c, kts_errors.KTS_BAD_REQUEST)
 			return
 		}

@@ -8,8 +8,10 @@ import (
 	"testing"
 
 	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/gen/KinoTicketSystem/model"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/handlers"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/mocks"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/samples"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
@@ -165,6 +167,20 @@ func TestCreateActorHandler(t *testing.T) {
 			},
 			expectedStatus: http.StatusInternalServerError,
 			expectedBody:   gin.H{"errorMessage": "INTERNAL_ERROR"},
+		},
+		{
+			name: "Bad request",
+			body: &models.ActorDTO{
+				Actors: model.Actors{
+					Name:        "",
+					Description: "Brad Pitt is an actor.",
+				},
+			},
+			setExpectations: func(mockController *mocks.MockActorControllerI, actor interface{}) {
+
+			},
+			expectedStatus: http.StatusBadRequest,
+			expectedBody:   gin.H{"errorMessage": "BAD_REQUEST"},
 		},
 	}
 

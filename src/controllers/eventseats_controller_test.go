@@ -11,6 +11,7 @@ import (
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
 	"github.com/google/uuid"
+	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
 )
 
@@ -256,6 +257,31 @@ func TestEventSeatController_BlockEventSeat(t *testing.T) {
 				mockEventSeatRepo.EXPECT().GetEventSeats(eventId).Return(&eventSeats, nil)
 			},
 			expectedError: kts_errors.KTS_CONFLICT,
+			expectTime:    false,
+		},
+		{
+			name: "Block event seat seats are not next to each other",
+			expectFuncs: func(mockEventSeatRepo *mocks.MockEventSeatRepoI, t *testing.T) {
+				eventSeats := GetEventSeatsDTO(eventId, userId, eventSeatId)
+
+				eventSeats[2].Seat.RowNr = 99
+
+				mockEventSeatRepo.EXPECT().GetEventSeats(eventId).Return(nil, kts_errors.KTS_INTERNAL_ERROR)
+
+			},
+			expectedError: kts_errors.KTS_INTERNAL_ERROR,
+			expectTime:    false,
+		},
+		{
+			name: "Block event seat",
+			expectFuncs: func(mockEventSeatRepo *mocks.MockEventSeatRepoI, t *testing.T) {
+				mockEventSeatRepo.EXPECT().BlockEventSeatIfAvailable(eventId, eventSeatId, userId, gomock.Any()).Return(nil)
+				mockEventSeatRepo.EXPECT().UpdateBlockedUntilTimeForUserEventSeats(eventId, userId, gomock.Any()).Return(int64(1), kts_errors.KTS_INTERNAL_ERROR)
+				eventSeats := GetEventSeatsDTO(eventId, userId, eventSeatId)
+
+				mockEventSeatRepo.EXPECT().GetEventSeats(eventId).Return(&eventSeats, nil)
+			},
+			expectedError: kts_errors.KTS_INTERNAL_ERROR,
 			expectTime:    false,
 		},
 	}
@@ -903,6 +929,58 @@ func TestEventSeatController_UnblockEventSeat(t *testing.T) {
 			expectedError: kts_errors.KTS_INTERNAL_ERROR,
 			expectTime:    false,
 		},
+		{
+			name: "Unblock event seat ",
+			expectFuncs: func(mockEventSeatRepo *mocks.MockEventSeatRepoI, t *testing.T) {
+				currentTime := time.Now()
+				blockedUntil := currentTime.Add(utils.BLOCKED_TICKET_TIME)
+
+				mockEventSeatRepo.EXPECT().GetEventSeats(eventId).Return(&[]models.GetEventSeatsDTO{
+					{
+						EventSeat: model.EventSeats{
+							ID:           eventSeatId,
+							UserID:       userId,
+							Booked:       false,
+							BlockedUntil: &blockedUntil,
+						},
+						Seat: model.Seats{
+							RowNr:    1,
+							ColumnNr: 1,
+						},
+					},
+				}, nil)
+				mockEventSeatRepo.EXPECT().UnblockEventSeat(eventId, eventSeatId, userId).Return(nil)
+				mockEventSeatRepo.EXPECT().UpdateBlockedUntilTimeForUserEventSeats(eventId, userId, gomock.Any()).Return(int64(0), kts_errors.KTS_INTERNAL_ERROR)
+			},
+			expectedError: kts_errors.KTS_INTERNAL_ERROR,
+			expectTime:    false,
+		},
+		{
+			name: "Unblock event seat ",
+			expectFuncs: func(mockEventSeatRepo *mocks.MockEventSeatRepoI, t *testing.T) {
+				currentTime := time.Now()
+				blockedUntil := currentTime.Add(utils.BLOCKED_TICKET_TIME)
+
+				mockEventSeatRepo.EXPECT().GetEventSeats(eventId).Return(&[]models.GetEventSeatsDTO{
+					{
+						EventSeat: model.EventSeats{
+							ID:           eventSeatId,
+							UserID:       userId,
+							Booked:       false,
+							BlockedUntil: &blockedUntil,
+						},
+						Seat: model.Seats{
+							RowNr:    1,
+							ColumnNr: 1,
+						},
+					},
+				}, nil)
+				mockEventSeatRepo.EXPECT().UnblockEventSeat(eventId, eventSeatId, userId).Return(nil)
+				mockEventSeatRepo.EXPECT().UpdateBlockedUntilTimeForUserEventSeats(eventId, userId, gomock.Any()).Return(int64(0), nil)
+			},
+			expectedError: nil,
+			expectTime:    false,
+		},
 	}
 
 	for _, tt := range tests {
@@ -932,6 +1010,95 @@ func TestEventSeatController_UnblockEventSeat(t *testing.T) {
 			} else if !tt.expectTime && blockedUntil != nil {
 				t.Errorf("Expected nil but got blocked until time")
 			}
+		})
+	}
+}
+
+func TestUnblockAllEventSeats(t *testing.T) {
+
+	testCases := []struct {
+		name            string
+		eventId         *uuid.UUID
+		userId          *uuid.UUID
+		setExpectations func(mockRepo mocks.MockEventSeatRepoI, eventId *uuid.UUID, userId *uuid.UUID)
+		expectedError   *models.KTSError
+	}{
+		{
+			name:    "Failed",
+			eventId: utils.NewUUID(),
+			userId:  utils.NewUUID(),
+			setExpectations: func(mockRepo mocks.MockEventSeatRepoI, eventId *uuid.UUID, userId *uuid.UUID) {
+				mockRepo.EXPECT().UnblockAllEventSeats(eventId, userId).Return(kts_errors.KTS_NOT_FOUND)
+			},
+			expectedError: kts_errors.KTS_NOT_FOUND,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			// GIVEN
+			// create mock user repo
+			mockCtrl := gomock.NewController(t)
+			defer mockCtrl.Finish()
+			mockEventSeatRepo := mocks.NewMockEventSeatRepoI(mockCtrl)
+			eventSeatController := EventSeatController{
+				EventSeatRepo: mockEventSeatRepo,
+			}
+
+			// define expectations
+			tc.setExpectations(*mockEventSeatRepo, tc.eventId, tc.userId)
+
+			// WHEN
+			kts_err := eventSeatController.UnblockAllEventSeats(tc.eventId, tc.userId)
+
+			// THEN
+			assert.Equal(t, tc.expectedError, kts_err)
+		})
+	}
+}
+
+func TestGetSelectedSeats(t *testing.T) {
+
+	testCases := []struct {
+		name                 string
+		eventId              *uuid.UUID
+		userId               *uuid.UUID
+		setExpectations      func(mockRepo mocks.MockEventSeatRepoI, eventId *uuid.UUID, userId *uuid.UUID)
+		expectedSlectedSeats *[]models.GetSlectedSeatsDTO
+		expectedError        *models.KTSError
+	}{
+		{
+			name:    "Failed",
+			eventId: utils.NewUUID(),
+			userId:  utils.NewUUID(),
+			setExpectations: func(mockRepo mocks.MockEventSeatRepoI, eventId *uuid.UUID, userId *uuid.UUID) {
+				mockRepo.EXPECT().GetSelectedSeats(eventId, userId).Return(nil, kts_errors.KTS_NOT_FOUND)
+			},
+			expectedSlectedSeats: nil,
+			expectedError: kts_errors.KTS_NOT_FOUND,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			// GIVEN
+			// create mock user repo
+			mockCtrl := gomock.NewController(t)
+			defer mockCtrl.Finish()
+			mockEventSeatRepo := mocks.NewMockEventSeatRepoI(mockCtrl)
+			eventSeatController := EventSeatController{
+				EventSeatRepo: mockEventSeatRepo,
+			}
+
+			// define expectations
+			tc.setExpectations(*mockEventSeatRepo, tc.eventId, tc.userId)
+
+			// WHEN
+			slectedSeats, kts_err := eventSeatController.GetSelectedSeats(tc.eventId, tc.userId)
+
+			// THEN
+			assert.Equal(t, tc.expectedError, kts_err)
+			assert.Equal(t, tc.expectedSlectedSeats, slectedSeats)
 		})
 	}
 }

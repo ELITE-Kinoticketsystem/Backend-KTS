@@ -87,14 +87,13 @@ func (ar *ActorRepository) CreateActor(actor *model.Actors) (*uuid.UUID, *models
 		actor.Description,
 	)
 
-	rows, err := insertStmt.Exec(ar.DatabaseManager.GetDatabaseConnection())
+	rows, kts_err := insertStmt.Exec(ar.DatabaseManager.GetDatabaseConnection())
 
-	if err != nil {
+	if kts_err != nil {
 		return nil, kts_errors.KTS_INTERNAL_ERROR
 	}
 
 	rowsAffected, err := rows.RowsAffected()
-
 	if err != nil {
 		return nil, kts_errors.KTS_INTERNAL_ERROR
 	}
@@ -115,14 +114,12 @@ func (ar *ActorRepository) CreateActorPicture(actorPicture *model.ActorPictures)
 		actorPicture.PicURL,
 	)
 
-	rows, err := insertStmt.Exec(ar.DatabaseManager.GetDatabaseConnection())
-
-	if err != nil {
+	rows, kts_err := insertStmt.Exec(ar.DatabaseManager.GetDatabaseConnection())
+	if kts_err != nil {
 		return nil, kts_errors.KTS_INTERNAL_ERROR
 	}
 
 	rowsAffected, err := rows.RowsAffected()
-
 	if err != nil {
 		return nil, kts_errors.KTS_INTERNAL_ERROR
 	}

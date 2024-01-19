@@ -259,3 +259,61 @@ func TestGetCinemaHallsForTheatre(t *testing.T) {
 		})
 	}
 }
+
+
+
+func TestGetTheatres(t *testing.T) {
+	sampleTheatres := samples.GetSampleTheatres()
+
+
+	testCases := []struct {
+		name            string
+		setExpectations func(mockController *mocks.MockTheatreControllerI)
+		expectedStatus  int
+		expectedBody    interface{}
+	}{
+		{
+			name: "Success",
+			setExpectations: func(mockController *mocks.MockTheatreControllerI) {
+				mockController.EXPECT().GetTheatres().Return(&sampleTheatres, nil)
+			},
+			expectedStatus: http.StatusOK,
+			expectedBody:   &sampleTheatres,
+		},
+		{
+			name: "Internal error",
+			setExpectations: func(mockController *mocks.MockTheatreControllerI) {
+				mockController.EXPECT().GetTheatres().Return(nil, kts_errors.KTS_INTERNAL_ERROR)
+			},
+			expectedStatus: http.StatusInternalServerError,
+			expectedBody:   gin.H{"errorMessage": "INTERNAL_ERROR"},
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			// GIVEN
+			w := httptest.NewRecorder()
+			gin.SetMode(gin.TestMode)
+			c, _ := gin.CreateTestContext(w)
+
+			mockCtrl := gomock.NewController(t)
+			defer mockCtrl.Finish()
+			theatreController := mocks.NewMockTheatreControllerI(mockCtrl)
+
+			req, _ := http.NewRequest("GET", "/theatres/", nil)
+			req.Header.Set("Content-Type", "application/json")
+			c.Request = req
+
+			tc.setExpectations(theatreController)
+
+			// WHEN
+			handlers.GetTheatres(theatreController)(c)
+
+			// THEN
+			assert.Equal(t, tc.expectedStatus, w.Code, "wrong HTTP status code")
+			expectedResponseBody, _ := json.Marshal(tc.expectedBody)
+			assert.Equal(t, bytes.NewBuffer(expectedResponseBody).String(), w.Body.String(), "wrong response body")
+		})
+	}
+}

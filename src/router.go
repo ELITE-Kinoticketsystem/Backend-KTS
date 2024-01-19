@@ -81,7 +81,7 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 	}
 
 	eventSeatRepo := &repositories.EventSeatRepository{
-		DatabaseManager: databaseManager,
+		DatabaseManagerI: databaseManager,
 	}
 
 	orderRepo := repositories.OrderRepository{

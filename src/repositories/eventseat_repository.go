@@ -26,7 +26,7 @@ type EventSeatRepoI interface {
 }
 
 type EventSeatRepository struct {
-	DatabaseManager *managers.DatabaseManager
+	managers.DatabaseManagerI
 }
 
 func (esr *EventSeatRepository) GetEventSeats(eventId *uuid.UUID) (*[]models.GetEventSeatsDTO, *models.KTSError) {
@@ -43,7 +43,7 @@ func (esr *EventSeatRepository) GetEventSeats(eventId *uuid.UUID) (*[]models.Get
 		LEFT_JOIN(table.EventSeatCategories, table.EventSeatCategories.EventID.EQ(table.EventSeats.EventID).AND(table.EventSeatCategories.SeatCategoryID.EQ(table.Seats.SeatCategoryID)))).
 		WHERE(table.EventSeats.EventID.EQ(utils.MysqlUuid(eventId))).ORDER_BY(table.Seats.ColumnNr.ASC(), table.Seats.RowNr.ASC())
 
-	err := stmt.Query(esr.DatabaseManager.GetDatabaseConnection(), &eventSeats)
+	err := stmt.Query(esr.GetDatabaseConnection(), &eventSeats)
 
 	if err != nil {
 		return nil, kts_errors.KTS_INTERNAL_ERROR
@@ -64,14 +64,12 @@ func (esr *EventSeatRepository) BlockEventSeatIfAvailable(eventId *uuid.UUID, se
 			AND(table.EventSeats.Booked.EQ(mysql.Bool(false))).
 			AND(table.EventSeats.BlockedUntil.IS_NULL().OR(table.EventSeats.BlockedUntil.LT(utils.MysqlTimeNow())).OR(table.EventSeats.UserID.IS_NULL().OR(table.EventSeats.UserID.EQ(utils.MysqlUuid(userId))))))
 
-	result, err := stmt.Exec(esr.DatabaseManager.GetDatabaseConnection())
-
-	if err != nil {
+	result, kts_err := stmt.Exec(esr.GetDatabaseConnection())
+	if kts_err != nil {
 		return kts_errors.KTS_INTERNAL_ERROR
 	}
 
 	rowsAffected, err := result.RowsAffected()
-
 	if err != nil {
 		return kts_errors.KTS_INTERNAL_ERROR
 	}
@@ -88,14 +86,13 @@ func (esr *EventSeatRepository) UpdateBlockedUntilTimeForUserEventSeats(eventId 
 		SET(blockedUntil).
 		WHERE(table.EventSeats.EventID.EQ(utils.MysqlUuid(eventId)).AND(table.EventSeats.UserID.EQ(utils.MysqlUuid(userId))).AND(table.EventSeats.BlockedUntil.GT(utils.MysqlTimeNow())).AND(table.EventSeats.Booked.IS_FALSE()))
 
-	result, err := stmt.Exec(esr.DatabaseManager.GetDatabaseConnection())
+	result, kts_err := stmt.Exec(esr.GetDatabaseConnection())
 
-	if err != nil {
+	if kts_err != nil {
 		return 0, kts_errors.KTS_INTERNAL_ERROR
 	}
 
 	rowsAffected, err := result.RowsAffected()
-
 	if err != nil {
 		return 0, kts_errors.KTS_INTERNAL_ERROR
 	}
@@ -109,7 +106,7 @@ func (esr *EventSeatRepository) UnblockEventSeat(eventId *uuid.UUID, seatId *uui
 		WHERE(table.EventSeats.EventID.EQ(utils.MysqlUuid(eventId)).AND(table.EventSeats.ID.EQ(utils.MysqlUuid(seatId))).
 			AND(table.EventSeats.UserID.EQ(utils.MysqlUuid(userId))).AND(table.EventSeats.BlockedUntil.GT(utils.MysqlTimeNow())).AND(table.EventSeats.Booked.IS_FALSE()))
 
-	result, err := stmt.Exec(esr.DatabaseManager.GetDatabaseConnection())
+	result, err := stmt.Exec(esr.GetDatabaseConnection())
 
 	if err != nil {
 		return kts_errors.KTS_INTERNAL_ERROR
@@ -134,7 +131,7 @@ func (esr *EventSeatRepository) UnblockAllEventSeats(eventId *uuid.UUID, userId 
 		WHERE(table.EventSeats.EventID.EQ(utils.MysqlUuid(eventId)).
 			AND(table.EventSeats.UserID.EQ(utils.MysqlUuid(userId))).AND(table.EventSeats.BlockedUntil.GT(utils.MysqlTimeNow())).AND(table.EventSeats.Booked.IS_FALSE()))
 
-	result, err := stmt.Exec(esr.DatabaseManager.GetDatabaseConnection())
+	result, err := stmt.Exec(esr.GetDatabaseConnection())
 
 	if err != nil {
 		return kts_errors.KTS_INTERNAL_ERROR
@@ -176,7 +173,7 @@ func (esr *EventSeatRepository) GetSelectedSeats(eventId *uuid.UUID, userId *uui
 
 	log.Println(stmt.DebugSql())
 
-	err := stmt.Query(esr.DatabaseManager.GetDatabaseConnection(), &selectedSeats)
+	err := stmt.Query(esr.GetDatabaseConnection(), &selectedSeats)
 
 	if err != nil {
 		return nil, kts_errors.KTS_INTERNAL_ERROR
@@ -190,25 +187,26 @@ func (esr *EventSeatRepository) GetSelectedSeats(eventId *uuid.UUID, userId *uui
 }
 
 func (esr *EventSeatRepository) UpdateEventSeat(eventSeat *model.EventSeats) *models.KTSError {
-	stmt := table.EventSeats.UPDATE(table.EventSeats.AllColumns).
+	eventSeatBlockUnitl := *eventSeat.BlockedUntil
+
+	stmt := table.EventSeats.UPDATE().
 		SET(
-			utils.MysqlUuid(eventSeat.ID),
-			eventSeat.Booked,
-			eventSeat.BlockedUntil,
-			utils.MysqlUuid(eventSeat.UserID),
-			utils.MysqlUuid(eventSeat.SeatID),
-			utils.MysqlUuid(eventSeat.EventID),
-		).
-		WHERE(table.EventSeats.ID.EQ(utils.MysqlUuid(eventSeat.ID)))
+			table.EventSeats.Booked.SET(mysql.Bool(eventSeat.Booked)),
+			// Assuming BlockedUntil is a *time.Time
+			table.EventSeats.BlockedUntil.SET(mysql.DateTimeT(eventSeatBlockUnitl)),
+			table.EventSeats.UserID.SET(utils.MysqlUuid(eventSeat.UserID)),
+			table.EventSeats.SeatID.SET(utils.MysqlUuid(eventSeat.SeatID)),
+			table.EventSeats.EventID.SET(utils.MysqlUuid(eventSeat.EventID)),
+		).WHERE(
+		table.EventSeats.ID.EQ(utils.MysqlUuid(eventSeat.ID)),
+	)
 
-	result, err := stmt.Exec(esr.DatabaseManager.GetDatabaseConnection())
-
-	if err != nil {
+	result, kts_err := stmt.Exec(esr.GetDatabaseConnection())
+	if kts_err != nil {
 		return kts_errors.KTS_INTERNAL_ERROR
 	}
 
 	rowsAffected, err := result.RowsAffected()
-
 	if err != nil {
 		return kts_errors.KTS_INTERNAL_ERROR
 	}

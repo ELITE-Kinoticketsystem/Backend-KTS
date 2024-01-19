@@ -25,7 +25,6 @@ import (
 func GetEventSeatsHandler(eventSeatController controllers.EventSeatControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		eventSeatId, err := uuid.Parse(c.Param("eventId"))
-
 		if err != nil {
 			utils.HandleErrorAndAbort(c, kts_errors.KTS_BAD_REQUEST)
 			return

@@ -148,6 +148,7 @@ func (esc *EventSeatController) AreUserSeatsNextToEachOtherWithoutSeat(eventId *
 		return true, nil
 	}
 
+	// @Collin - I think this is not needed
 	if rowNr == -1 {
 		return true, nil
 	}
@@ -203,6 +204,7 @@ func (esc *EventSeatController) AreUserSeatsNextToEachOther(eventId *uuid.UUID, 
 		return false, kts_errors.KTS_NOT_FOUND
 	}
 
+	// @Collin - I think this is not needed
 	if rowNr == -1 {
 		return false, kts_errors.KTS_NOT_FOUND
 	}

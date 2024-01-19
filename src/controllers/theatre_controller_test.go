@@ -293,3 +293,46 @@ func TestGetCinemaHallsForTheatre(t *testing.T) {
 		})
 	}
 }
+
+func TestGetTheatres(t *testing.T) {
+	testCases := []struct {
+		name             string
+		userId           *uuid.UUID
+		setExpectations  func(mockRepo mocks.MockTheaterRepoI)
+		expectedTheaters *[]models.GetTheatreWithAddress
+		expectedError    *models.KTSError
+	}{
+		{
+			name:   "Failed",
+			userId: utils.NewUUID(),
+			setExpectations: func(mockRepo mocks.MockTheaterRepoI) {
+				mockRepo.EXPECT().GetTheatres().Return(nil, kts_errors.KTS_NOT_FOUND)
+			},
+			expectedTheaters: nil,
+			expectedError:    kts_errors.KTS_NOT_FOUND,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			// GIVEN
+			// create mock user repo
+			mockCtrl := gomock.NewController(t)
+			defer mockCtrl.Finish()
+			theatreRepo := mocks.NewMockTheaterRepoI(mockCtrl)
+			theatreController := TheatreController{
+				TheatreRepo: theatreRepo,
+			}
+
+			// define expectations
+			tc.setExpectations(*theatreRepo)
+
+			// WHEN
+			theatres, kts_err := theatreController.GetTheatres()
+
+			// THEN
+			assert.Equal(t, tc.expectedError, kts_err)
+			assert.Equal(t, tc.expectedTheaters, theatres)
+		})
+	}
+}

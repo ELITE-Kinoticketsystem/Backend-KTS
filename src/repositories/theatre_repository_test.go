@@ -537,3 +537,66 @@ func TestGetTheatres(t *testing.T) {
 	}
 
 }
+
+func TestCreateAddress(t *testing.T) {
+	sampleAddress := samples.GetSampleAddress()
+
+	query := "INSERT INTO `KinoTicketSystem`.addresses (id, street, street_nr, zipcode, city, country) VALUES (?, ?, ?, ?, ?, ?);"
+
+	testCases := []struct {
+		name              string
+		setExpectations   func(mock sqlmock.Sqlmock, address *model.Addresses)
+		expectedAddressId bool
+		expectedError     *models.KTSError
+	}{
+		{
+			name: "Address created",
+			setExpectations: func(mock sqlmock.Sqlmock, address *model.Addresses) {
+				mock.ExpectExec(query).WithArgs(sqlmock.AnyArg(), address.Street, address.StreetNr, address.Zipcode, address.City, address.Country).WillReturnResult(sqlmock.NewResult(1, 1))
+			},
+			expectedAddressId: true,
+			expectedError:     nil,
+		},
+		{
+			name: "Error while creating address",
+			setExpectations: func(mock sqlmock.Sqlmock, address *model.Addresses) {
+				mock.ExpectExec(query).WithArgs(sqlmock.AnyArg(), address.Street, address.StreetNr, address.Zipcode, address.City, address.Country).WillReturnError(sqlmock.ErrCancelled)
+			},
+			expectedAddressId: false,
+			expectedError:     kts_errors.KTS_INTERNAL_ERROR,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			// Create a new mock database connection
+			db, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
+			if err != nil {
+				t.Fatalf("Failed to create mock database connection: %v", err)
+			}
+			defer db.Close()
+
+			// Create a new instance of the AddressRepository with the mock database connection
+			theatreRepo := TheatreRepository{
+				DatabaseManagerI: &managers.DatabaseManager{
+					Connection: db,
+				},
+			}
+			mock.ExpectBegin()
+			tx, _ := db.Begin()
+
+			tc.setExpectations(mock, &sampleAddress)
+
+			// Call the method under test
+			kts_err := theatreRepo.CreateAddress(tx, sampleAddress)
+
+			// Verify the results
+			assert.Equal(t, tc.expectedError, kts_err)
+
+			if err := mock.ExpectationsWereMet(); err != nil {
+				t.Errorf("There were unfulfilled expectations: %s", err)
+			}
+
+		})
+	}
+}

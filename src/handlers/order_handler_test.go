@@ -25,16 +25,16 @@ func TestCreateOrderHandler(t *testing.T) {
 	orderId := utils.NewUUID()
 	tests := []struct {
 		name                 string
-		paramEventId         *uuid.UUID
-		setExpectations      func(mockOrderController *mocks.MockOrderControllerI, eventId *uuid.UUID, userId *uuid.UUID)
+		paramEventId         string
+		setExpectations      func(mockOrderController *mocks.MockOrderControllerI, eventId string, userId *uuid.UUID)
 		expectedResponseBody gin.H
 		expectedStatus       int
 		createOrderDTO       *models.CreateOrderDTO
 	}{
 		{
 			name:         "Success",
-			paramEventId: utils.NewUUID(),
-			setExpectations: func(mockOrderController *mocks.MockOrderControllerI, eventId *uuid.UUID, userId *uuid.UUID) {
+			paramEventId: utils.NewUUID().String(),
+			setExpectations: func(mockOrderController *mocks.MockOrderControllerI, eventId string, userId *uuid.UUID) {
 				mockOrderController.EXPECT().CreateOrder(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Return(
 					orderId,
 					nil,
@@ -48,8 +48,8 @@ func TestCreateOrderHandler(t *testing.T) {
 		},
 		{
 			name:         "Bad Request",
-			paramEventId: utils.NewUUID(),
-			setExpectations: func(mockOrderController *mocks.MockOrderControllerI, eventId *uuid.UUID, userId *uuid.UUID) {
+			paramEventId: utils.NewUUID().String(),
+			setExpectations: func(mockOrderController *mocks.MockOrderControllerI, eventId string, userId *uuid.UUID) {
 				mockOrderController.EXPECT().CreateOrder(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Return(
 					nil,
 					kts_errors.KTS_INTERNAL_ERROR,
@@ -61,18 +61,30 @@ func TestCreateOrderHandler(t *testing.T) {
 			expectedStatus: http.StatusInternalServerError,
 			createOrderDTO: samples.GetOrderDTO(),
 		},
+		{
+			name:         "Bad Request",
+			paramEventId: "",
+			setExpectations: func(mockOrderController *mocks.MockOrderControllerI, eventId string, userId *uuid.UUID) {
+
+			},
+			expectedResponseBody: gin.H{
+				"errorMessage": "BAD_REQUEST",
+			},
+			expectedStatus: http.StatusBadRequest,
+			createOrderDTO: nil,
+		},
 	}
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			// GIVEN
 			w := httptest.NewRecorder()
-			req, _ := http.NewRequest("POST", "/orders/"+tc.paramEventId.String(), nil)
+			req, _ := http.NewRequest("POST", "/orders/"+tc.paramEventId, nil)
 			gin.SetMode(gin.TestMode)
 
 			c, _ := gin.CreateTestContext(w)
 			c.Request = req
-			c.Params = []gin.Param{{Key: "eventId", Value: tc.paramEventId.String()}}
+			c.Params = []gin.Param{{Key: "eventId", Value: tc.paramEventId}}
 
 			userId := utils.NewUUID()
 
@@ -101,39 +113,48 @@ func TestCreateOrderHandler(t *testing.T) {
 	}
 }
 
-func TestGetOrderById(t *testing.T) {
+func TestGetOrderByIdHandler(t *testing.T) {
 	order := &(*samples.GetGetOrderDto())[0]
-	orderJson, _ := json.Marshal(order)
+
 	tests := []struct {
-		name               string
-		paramOrderId       *uuid.UUID
-		setExpectations    func(mockOrderController *mocks.MockOrderControllerI)
-		expectedStatus     int
-		ExpectedBodyString string
+		name            string
+		paramOrderId    string
+		setExpectations func(mockOrderController *mocks.MockOrderControllerI, orderId string)
+		expectedStatus  int
+		ExpectedBody    interface{}
 	}{
 		{
 			name:         "Success",
-			paramOrderId: utils.NewUUID(),
-			setExpectations: func(mockOrderController *mocks.MockOrderControllerI) {
+			paramOrderId: utils.NewUUID().String(),
+			setExpectations: func(mockOrderController *mocks.MockOrderControllerI, orderId string) {
 				mockOrderController.EXPECT().GetOrderById(gomock.Any(), gomock.Any()).Return(
 					order,
 					nil,
 				)
 			},
-			expectedStatus:     http.StatusOK,
-			ExpectedBodyString: string(orderJson),
+			expectedStatus: http.StatusOK,
+			ExpectedBody:   order,
 		},
 		{
 			name:         "Bad Request",
-			paramOrderId: utils.NewUUID(),
-			setExpectations: func(mockOrderController *mocks.MockOrderControllerI) {
+			paramOrderId: utils.NewUUID().String(),
+			setExpectations: func(mockOrderController *mocks.MockOrderControllerI, orderId string) {
 				mockOrderController.EXPECT().GetOrderById(gomock.Any(), gomock.Any()).Return(
 					nil,
 					kts_errors.KTS_INTERNAL_ERROR,
 				)
 			},
-			expectedStatus:     http.StatusInternalServerError,
-			ExpectedBodyString: "{\"errorMessage\":\"INTERNAL_ERROR\"}",
+			expectedStatus: http.StatusInternalServerError,
+			ExpectedBody:   gin.H{"errorMessage": "INTERNAL_ERROR"},
+		},
+		{
+			name:         "Bad Request",
+			paramOrderId: "",
+			setExpectations: func(mockOrderController *mocks.MockOrderControllerI, orderId string) {
+				
+			},
+			expectedStatus: http.StatusBadRequest,
+			ExpectedBody:   gin.H{"errorMessage": "BAD_REQUEST"},
 		},
 	}
 
@@ -141,12 +162,12 @@ func TestGetOrderById(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			// GIVEN
 			w := httptest.NewRecorder()
-			req, _ := http.NewRequest("POST", "/orders/"+tc.paramOrderId.String(), nil)
+			req, _ := http.NewRequest("POST", "/orders/"+tc.paramOrderId, nil)
 			gin.SetMode(gin.TestMode)
 
 			c, _ := gin.CreateTestContext(w)
 			c.Request = req
-			c.Params = []gin.Param{{Key: "orderId", Value: tc.paramOrderId.String()}}
+			c.Params = []gin.Param{{Key: "orderId", Value: tc.paramOrderId}}
 
 			userId := utils.NewUUID()
 
@@ -157,14 +178,15 @@ func TestGetOrderById(t *testing.T) {
 			defer mockCtrl.Finish()
 			orderController := mocks.NewMockOrderControllerI(mockCtrl)
 
-			tc.setExpectations(orderController)
+			tc.setExpectations(orderController, tc.paramOrderId)
 
 			// WHEN
 			GetOrderByIdHandler(orderController)(c)
 
 			// THEN
 			assert.Equal(t, tc.expectedStatus, w.Code, "wrong HTTP status code")
-			assert.Equal(t, tc.ExpectedBodyString, w.Body.String(), "wrong HTTP response body")
+			expectedResponseBody, _ := json.Marshal(tc.ExpectedBody)
+			assert.Equal(t, string(expectedResponseBody), w.Body.String(), "wrong HTTP response body")
 
 		})
 	}
