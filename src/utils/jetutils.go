@@ -17,7 +17,7 @@ func MysqlUuid(uuid *uuid.UUID) mysql.StringExpression {
 }
 
 func MysqlUuidOrNil(uuid *uuid.UUID) mysql.Expression {
-	if uuid == nil {
+	if uuid == nil {  // not going to happen 
 		return mysql.NULL
 	}
 	binary_id, _ := uuid.MarshalBinary()
@@ -33,7 +33,7 @@ func MySqlString(str string) mysql.StringExpression {
 }
 
 func MySqlStringPtr(str *string) mysql.StringExpression {
-	if str == nil || *str == "" {
+	if str == nil || *str == "" { // not going to happen
 		return nil
 	}
 	return mysql.String(*str)

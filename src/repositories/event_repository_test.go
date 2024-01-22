@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"database/sql"
+	"errors"
 	"reflect"
 	"testing"
 	"time"
@@ -125,6 +126,14 @@ func TestCreateEventSeatCategory(t *testing.T) {
 			name: "Create event seat category no rows affected",
 			setExpectations: func(mock sqlmock.Sqlmock) {
 				mock.ExpectExec("INSERT INTO `KinoTicketSystem`.event_seat_categories .*").WithArgs(sqlmock.AnyArg(), sqlmock.AnyArg(), eventSeatCategory.Price).WillReturnResult(sqlmock.NewResult(1, 0))
+			},
+			expectError:   true,
+			expectedError: kts_errors.KTS_INTERNAL_ERROR,
+		},
+		{
+			name: "Create event seat category failed during rows affected",
+			setExpectations: func(mock sqlmock.Sqlmock) {
+				mock.ExpectExec("INSERT INTO `KinoTicketSystem`.event_seat_categories .*").WithArgs(sqlmock.AnyArg(), sqlmock.AnyArg(), eventSeatCategory.Price).WillReturnResult(sqlmock.NewErrorResult(errors.New("rows affected conversion did not work")))
 			},
 			expectError:   true,
 			expectedError: kts_errors.KTS_INTERNAL_ERROR,

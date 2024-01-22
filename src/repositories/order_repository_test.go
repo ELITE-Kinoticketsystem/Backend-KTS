@@ -33,6 +33,14 @@ func TestCreateOrder(t *testing.T) {
 			expectedError: nil,
 		},
 		{
+			name: "Create order - MysqlUuidOrNil failed",
+			setExpectations: func(mock sqlmock.Sqlmock) {
+				mock.ExpectExec(query).WithArgs(sqlmock.AnyArg(), order.Totalprice, order.IsPaid, "", sqlmock.AnyArg()).WillReturnError(errors.New("error"))
+			},
+			expectOrderID: false,
+			expectedError: kts_errors.KTS_INTERNAL_ERROR,
+		},
+		{
 			name: "Create order - error",
 			setExpectations: func(mock sqlmock.Sqlmock) {
 				mock.ExpectExec(query).WithArgs(sqlmock.AnyArg(), order.Totalprice, order.IsPaid, sqlmock.AnyArg(), sqlmock.AnyArg()).WillReturnError(errors.New("error"))
