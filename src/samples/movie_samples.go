@@ -1,7 +1,6 @@
 package samples
 
 import (
-	"log"
 	"time"
 
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/gen/KinoTicketSystem/model"
@@ -50,10 +49,8 @@ func GetSampleMovies() *[]model.Movies {
 
 func GetSampleMovieById() *model.Movies {
 	modelMovies := model.Movies{}
-	uuid1, err := uuid.Parse("6ba7b826-9dad-11d1-80b4-00c04fd430c0")
-	if err != nil {
-		log.Print("GetSampleMovieById: Parsing UUID does not work")
-	}
+	uuid1, _ := uuid.Parse("6ba7b826-9dad-11d1-80b4-00c04fd430c0")
+
 	banner := ""
 	cover := ""
 	trailer := ""
@@ -103,106 +100,6 @@ func GetSampleGenre() *model.Genres {
 	}
 
 	return &modelGenres
-}
-
-func GetSampleMovieByIdWithGenre() *models.MovieWithGenres {
-	movieWithGenre := models.MovieWithGenres{}
-
-	uuid1 := uuid.MustParse("6ba7b827-9dad-11d1-80b4-00c04fd430c1")
-	uuid2 := uuid.MustParse("6ba7b820-9dad-11d1-80b4-00c04fd430c4")
-	uuid3 := uuid.MustParse("6ba7b821-9dad-11d1-80b4-00c04fd430c5")
-
-	banner := ""
-	cover := ""
-	trailer := ""
-	rating := 5.0
-
-	movieWithGenre = models.MovieWithGenres{
-		Movies: model.Movies{
-			ID:           &uuid1,
-			Title:        "Test Movie 1",
-			Description:  "Test Description 1",
-			BannerPicURL: &banner,
-			CoverPicURL:  &cover,
-			TrailerURL:   &trailer,
-			Rating:       &rating,
-			ReleaseDate:  time.Now(),
-			TimeInMin:    120,
-			Fsk:          18,
-		},
-		Genres: []struct {
-			model.Genres
-		}{
-			{
-				model.Genres{
-					ID:        &uuid2,
-					GenreName: "Action",
-				},
-			},
-			{
-				model.Genres{
-					ID:        &uuid3,
-					GenreName: "Drama",
-				},
-			},
-		},
-	}
-
-	return &movieWithGenre
-
-}
-
-func GetSampleGenreByNameWithMovies() *models.GenreWithMovies {
-	genreByNameWithMovies := models.GenreWithMovies{}
-
-	uuid1 := uuid.MustParse("6ba7b820-9dad-11d1-80b4-00c04fd430c4")
-	uuid2 := uuid.MustParse("6ba7b827-9dad-11d1-80b4-00c04fd430c1")
-	uuid3 := uuid.MustParse("6ba7b828-9dad-11d1-80b4-00c04fd430c2")
-	banner := ""
-	cover := ""
-	trailer := ""
-	rating := 5.0
-
-	genreByNameWithMovies = models.GenreWithMovies{
-		Genres: model.Genres{
-			ID:        &uuid1,
-			GenreName: "Action",
-		},
-		Movies: []struct {
-			model.Movies
-		}{
-			{
-				model.Movies{
-					ID:           &uuid2,
-					Title:        "Test Movie 1",
-					Description:  "Test Description 1",
-					BannerPicURL: &banner,
-					CoverPicURL:  &cover,
-					TrailerURL:   &trailer,
-					Rating:       &rating,
-					ReleaseDate:  time.Now(),
-					TimeInMin:    120,
-					Fsk:          18,
-				},
-			},
-			{
-				model.Movies{
-					ID:           &uuid3,
-					Title:        "Test Movie 2",
-					Description:  "Test Description 2",
-					BannerPicURL: &banner,
-					CoverPicURL:  &cover,
-					TrailerURL:   &trailer,
-					Rating:       &rating,
-					ReleaseDate:  time.Now(),
-					TimeInMin:    120,
-					Fsk:          18,
-				},
-			},
-		},
-	}
-
-	return &genreByNameWithMovies
 }
 
 func GetSampleGenresWithMovies() *[]models.GenreWithMovies {
