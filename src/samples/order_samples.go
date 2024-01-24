@@ -1,6 +1,8 @@
 package samples
 
 import (
+	"time"
+
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/gen/KinoTicketSystem/model"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
@@ -50,20 +52,31 @@ func GetGetOrderDto() *[]models.GetOrderDTO {
 		{
 			Order: model.Orders{
 				ID:         orderId,
-				Totalprice: 0,
+				Totalprice: 1000,
 				IsPaid:     false,
 			},
 			Tickets: []struct {
-				Ticket model.Tickets
-				Seat   model.Seats
+				Ticket        model.Tickets
+				PriceCategory model.PriceCategories
+				Seat          model.Seats
+				SeatCategory  model.SeatCategories
 			}{
 				{
 					Ticket: model.Tickets{
 						ID:      utils.NewUUID(),
 						OrderID: orderId,
 					},
+					PriceCategory: model.PriceCategories{
+						Price:        100,
+						CategoryName: "Test Price Category",
+						ID:           utils.NewUUID(),
+					},
 					Seat: model.Seats{
 						ID: utils.NewUUID(),
+					},
+					SeatCategory: model.SeatCategories{
+						CategoryName: "Test Seat Category",
+						ID:           utils.NewUUID(),
 					},
 				},
 			},
@@ -75,8 +88,10 @@ func GetGetOrderDto() *[]models.GetOrderDTO {
 				IsPaid:     false,
 			},
 			Tickets: []struct {
-				Ticket model.Tickets
-				Seat   model.Seats
+				Ticket        model.Tickets
+				PriceCategory model.PriceCategories
+				Seat          model.Seats
+				SeatCategory  model.SeatCategories
 			}{
 				{
 					Ticket: model.Tickets{
@@ -90,6 +105,65 @@ func GetGetOrderDto() *[]models.GetOrderDTO {
 			},
 		},
 	}
+}
+
+func GetOrderSample() models.GetOrderDTO {
+	return models.GetOrderDTO{
+		Order: model.Orders{
+			ID:         utils.NewUUID(),
+			Totalprice: 1000,
+			IsPaid:     false,
+		},
+		Event: model.Events{
+			ID:    utils.NewUUID(),
+			Title: "Test Event",
+			Start: time.Now(),
+			End:   time.Now(),
+			Is3d:  false,
+		},
+		CinemaHall: model.CinemaHalls{
+			ID:   utils.NewUUID(),
+			Name: "Test Cinema Hall",
+		},
+		Theatre: model.Theatres{
+			ID:   utils.NewUUID(),
+			Name: "Test Theatre",
+		},
+		Movies: []model.Movies{
+			{
+				ID:          utils.NewUUID(),
+				Title:       "Test Movie",
+				Description: "Test Description",
+			},
+		},
+		Tickets: []struct {
+			Ticket        model.Tickets
+			PriceCategory model.PriceCategories
+			Seat          model.Seats
+			SeatCategory  model.SeatCategories
+		}{
+			{
+				Ticket: model.Tickets{
+					ID: utils.NewUUID(),
+				},
+				PriceCategory: model.PriceCategories{
+					Price:        100,
+					CategoryName: "Test Price Category",
+					ID:           utils.NewUUID(),
+				},
+				Seat: model.Seats{
+					ID:       utils.NewUUID(),
+					RowNr:    1,
+					ColumnNr: 1,
+				},
+				SeatCategory: model.SeatCategories{
+					CategoryName: "Test Seat Category",
+					ID:           utils.NewUUID(),
+				},
+			},
+		},
+	}
+
 }
 
 func GetModelOrder() *model.Orders {

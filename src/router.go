@@ -48,6 +48,15 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 		Connection: dbConnection,
 	}
 
+	mgInstance := managers.InitializeMailgunClient()
+	if mgInstance == nil {
+		panic("Could not initialize Mailgun instance")
+	}
+
+	mailMgr := &managers.MailManager{
+		MailgunInstance: mgInstance,
+	}
+
 	userRepo := &repositories.UserRepository{
 		DatabaseManager: databaseManager,
 	}
@@ -115,6 +124,7 @@ func createRouter(dbConnection *sql.DB) *gin.Engine {
 	controller := Controllers{
 		UserController: &controllers.UserController{
 			UserRepo: userRepo,
+			MailMgr:  mailMgr,
 		},
 		MovieController: &controllers.MovieController{
 			MovieRepo:         movieRepo,

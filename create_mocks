@@ -27,3 +27,9 @@
 ~/go/bin/mockgen -source=./src/repositories/review_repository.go -destination=./src/mocks/review_repository_mock.go -package=mocks
 ~/go/bin/mockgen -source=./src/repositories/user_movies_repository.go -destination=./src/mocks/user_movies_repository_mock.go -package=mocks
 ~/go/bin/mockgen -source=./src/repositories/stats_repository.go -destination=./src/mocks/stats_repository_mock.go -package=mocks
+
+# utils 
+~/go/bin/mockgen -source=./src/utils/mailutils.go -destination=./src/mocks/mailutils_mock.go -package=mocks
+
+# managers 
+~/go/bin/mockgen -source=./src/managers/mail_manager.go -destination=./src/mocks/mail_manager_mock.go -package=mocks

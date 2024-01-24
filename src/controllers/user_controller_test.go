@@ -17,14 +17,14 @@ func TestRegisterUser(t *testing.T) {
 	testCases := []struct {
 		name             string
 		registrationData models.RegistrationRequest
-		setExpectations  func(mockRepo mocks.MockUserRepositoryI, registrationData models.RegistrationRequest)
+		setExpectations  func(mockRepo mocks.MockUserRepositoryI, mockMailMgr mocks.MockMailMgr, registrationData models.RegistrationRequest)
 		expectedResponse *models.LoginResponse
 		expectedError    *models.KTSError
 	}{
 		{
 			name:             "Email exists",
 			registrationData: samples.GetSampleRegistrationData(),
-			setExpectations: func(mockRepo mocks.MockUserRepositoryI, registrationData models.RegistrationRequest) {
+			setExpectations: func(mockRepo mocks.MockUserRepositoryI, mockMailMgr mocks.MockMailMgr, registrationData models.RegistrationRequest) {
 				mockRepo.EXPECT().CheckIfEmailExists(registrationData.Email).Return(kts_errors.KTS_EMAIL_EXISTS)
 			},
 			expectedResponse: nil,
@@ -33,7 +33,7 @@ func TestRegisterUser(t *testing.T) {
 		{
 			name:             "Email internal error",
 			registrationData: samples.GetSampleRegistrationData(),
-			setExpectations: func(mockRepo mocks.MockUserRepositoryI, registrationData models.RegistrationRequest) {
+			setExpectations: func(mockRepo mocks.MockUserRepositoryI, mockMailMgr mocks.MockMailMgr, registrationData models.RegistrationRequest) {
 				mockRepo.EXPECT().CheckIfEmailExists(registrationData.Email).Return(kts_errors.KTS_INTERNAL_ERROR)
 			},
 			expectedResponse: nil,
@@ -42,7 +42,7 @@ func TestRegisterUser(t *testing.T) {
 		{
 			name:             "CreateUser internal error",
 			registrationData: samples.GetSampleRegistrationData(),
-			setExpectations: func(mockRepo mocks.MockUserRepositoryI, registrationData models.RegistrationRequest) {
+			setExpectations: func(mockRepo mocks.MockUserRepositoryI, mockMailMgr mocks.MockMailMgr, registrationData models.RegistrationRequest) {
 				user := model.Users{
 					/* Id */
 					Username:  &registrationData.Username,
@@ -62,7 +62,7 @@ func TestRegisterUser(t *testing.T) {
 		{
 			name:             "Success",
 			registrationData: samples.GetSampleRegistrationData(),
-			setExpectations: func(mockRepo mocks.MockUserRepositoryI, registrationData models.RegistrationRequest) {
+			setExpectations: func(mockRepo mocks.MockUserRepositoryI, mockMailMgr mocks.MockMailMgr, registrationData models.RegistrationRequest) {
 				user := model.Users{
 					/* Id */
 					Username:  &registrationData.Username,
@@ -74,6 +74,8 @@ func TestRegisterUser(t *testing.T) {
 
 				mockRepo.EXPECT().CheckIfEmailExists(registrationData.Email).Return(nil)
 				mockRepo.EXPECT().CreateUser(utils.EqUserMatcher(user, registrationData.Password)).Return(nil)
+
+				mockMailMgr.EXPECT().SendWelcomeMail(registrationData.Email, registrationData.Username).Return(nil)
 			},
 			expectedResponse: &models.LoginResponse{
 				User: samples.GetSampleUser(),
@@ -91,15 +93,17 @@ func TestRegisterUser(t *testing.T) {
 			mockCtrl := gomock.NewController(t)
 			defer mockCtrl.Finish()
 			userRepoMock := mocks.NewMockUserRepositoryI(mockCtrl)
+			mailMgrMock := mocks.NewMockMailMgr(mockCtrl)
 			userController := UserController{
 				UserRepo: userRepoMock,
+				MailMgr:  mailMgrMock,
 			}
 
 			// create mock data
 			registrationData := tc.registrationData
 
 			// define expectations
-			tc.setExpectations(*userRepoMock, registrationData)
+			tc.setExpectations(*userRepoMock, *mailMgrMock, registrationData)
 
 			// WHEN
 			// call RegisterUser with registrationData

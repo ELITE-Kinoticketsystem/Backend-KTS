@@ -3,6 +3,7 @@ package controllers
 import (
 	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/gen/KinoTicketSystem/model"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/managers"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/repositories"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
@@ -20,6 +21,8 @@ type OrderController struct {
 	EventSeatRepo     repositories.EventSeatRepoI
 	PriceCategoryRepo repositories.PriceCategoryRepositoryI
 	TicketRepo        repositories.TicketRepositoryI
+	UserRepo          repositories.UserRepositoryI
+	MailMgr           managers.MailMgr
 }
 
 func (oc *OrderController) CreateOrder(createOrderDTO models.CreateOrderDTO, eventId *uuid.UUID, userId *uuid.UUID, isReservation bool) (*uuid.UUID, *models.KTSError) {
@@ -74,7 +77,26 @@ func (oc *OrderController) CreateOrder(createOrderDTO models.CreateOrderDTO, eve
 		}
 	}
 
+	oc.sendOrderConfirmationMail(orderId, userId)
+
 	return orderId, nil
+}
+
+func (oc *OrderController) sendOrderConfirmationMail(orderId *uuid.UUID, userId *uuid.UUID) {
+	order, kts_err := oc.OrderRepo.GetOrderById(orderId, userId)
+	if kts_err != nil {
+		return
+	}
+
+	user, kts_err := oc.UserRepo.GetUserById(userId)
+	if kts_err != nil {
+		return
+	}
+
+	kts_err = oc.MailMgr.SendOrderConfirmationMail(user.Email, *order)
+	if kts_err != nil {
+		return
+	}
 }
 
 func (oc *OrderController) GetOrderById(orderId *uuid.UUID, userId *uuid.UUID) (*models.GetOrderDTO, *models.KTSError) {

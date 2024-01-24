@@ -3,6 +3,7 @@ package controllers
 import (
 	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/gen/KinoTicketSystem/model"
+	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/managers"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/repositories"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
@@ -18,6 +19,7 @@ type UserControllerI interface {
 
 type UserController struct {
 	UserRepo repositories.UserRepositoryI
+	MailMgr  managers.MailMgr
 }
 
 func (uc *UserController) RegisterUser(registrationData models.RegistrationRequest) (*models.LoginResponse, *models.KTSError) {
@@ -50,6 +52,11 @@ func (uc *UserController) RegisterUser(registrationData models.RegistrationReque
 	token, refreshToken, err := utils.GenerateJWT(user.ID)
 	if err != nil {
 		return nil, kts_errors.KTS_UPSTREAM_ERROR
+	}
+
+	kts_err = uc.MailMgr.SendWelcomeMail(registrationData.Email, registrationData.Username)
+	if kts_err != nil {
+		return nil, kts_err
 	}
 
 	return &models.LoginResponse{
