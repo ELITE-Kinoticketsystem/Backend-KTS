@@ -124,6 +124,6 @@ func SetJWTCookies(c *gin.Context, token string, refreshToken string, expired bo
 	})
 
 	// for production
-	c.SetCookie("token", token, lifespan, "/", "cinemika.westeurope.cloudapp.azure.com", true, true)
-	c.SetCookie("refreshToken", refreshToken, refreshLifespan, "/", "cinemika.westeurope.cloudapp.azure.com", true, true)
+	c.SetCookie("token", token, lifespan, "/", "cinemika.germanywestcentral.cloudapp.azure.com", true, true)
+	c.SetCookie("refreshToken", refreshToken, refreshLifespan, "/", "cinemika.germanywestcentral.cloudapp.azure.com", true, true)
 }
