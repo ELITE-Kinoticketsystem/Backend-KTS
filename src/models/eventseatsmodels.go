@@ -35,9 +35,9 @@ type GetSeatsForSeatSelectorDTO struct {
 }
 
 type GetEventSeatsResponse struct {
-	BlockedUntil    *time.Time                      `json:"blockedUntil"`
-	CurrentUserSeat *[]GetSeatsForSeatSelectorDTO   `json:"currentUserSeats"`
-	SeatRows        *[][]GetSeatsForSeatSelectorDTO `json:"seat_rows"`
+	BlockedUntil    *time.Time                    `json:"blockedUntil"`
+	CurrentUserSeat *[]GetSeatsForSeatSelectorDTO `json:"currentUserSeats"`
+	Seats           *[]GetSeatsForSeatSelectorDTO `json:"seats"`
 }
 
 type PatchEventSeatResponse struct {

@@ -105,6 +105,8 @@ func TestCreateCinemaHall(t *testing.T) {
 			body: gin.H{
 				"hallName":  sampleCreateCinemaHall.HallName,
 				"seats":     sampleCreateCinemaHall.Seats,
+				"width":     sampleCreateCinemaHall.Width,
+				"height":    sampleCreateCinemaHall.Height,
 				"theatreId": sampleCreateCinemaHall.TheatreId,
 			},
 			setExpectations: func(mockController *mocks.MockTheatreControllerI) {
@@ -118,6 +120,8 @@ func TestCreateCinemaHall(t *testing.T) {
 			body: gin.H{
 				"hallName":  sampleCreateCinemaHall.HallName,
 				"seats":     sampleCreateCinemaHall.Seats,
+				"width":     sampleCreateCinemaHall.Width,
+				"height":    sampleCreateCinemaHall.Height,
 				"theatreId": sampleCreateCinemaHall.TheatreId,
 			},
 			setExpectations: func(mockController *mocks.MockTheatreControllerI) {
@@ -131,6 +135,8 @@ func TestCreateCinemaHall(t *testing.T) {
 			body: gin.H{
 				"HallName":  sampleCreateCinemaHall.HallName,
 				"TheatreId": "invalid id",
+				"width":     sampleCreateCinemaHall.Width,
+				"height":    sampleCreateCinemaHall.Height,
 				"Seats":     sampleCreateCinemaHall.Seats,
 			},
 			setExpectations: func(mockController *mocks.MockTheatreControllerI) {},
@@ -142,6 +148,8 @@ func TestCreateCinemaHall(t *testing.T) {
 			body: gin.H{
 				"HallName":  "",
 				"TheatreId": sampleCreateCinemaHall.TheatreId,
+				"width":     sampleCreateCinemaHall.Width,
+				"height":    sampleCreateCinemaHall.Height,
 				"Seats":     sampleCreateCinemaHall.Seats,
 			},
 			setExpectations: func(mockController *mocks.MockTheatreControllerI) {},

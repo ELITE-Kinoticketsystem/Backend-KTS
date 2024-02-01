@@ -32,14 +32,14 @@ func GetEventSeatsHandler(eventSeatController controllers.EventSeatControllerI) 
 
 		userId := c.Request.Context().Value(models.ContextKeyUserID).(*uuid.UUID)
 
-		seatMap, currentUserSeats, blockedUntil, kts_err := eventSeatController.GetEventSeats(&eventSeatId, userId)
+		seats, currentUserSeats, blockedUntil, kts_err := eventSeatController.GetEventSeats(&eventSeatId, userId)
 		if kts_err != nil {
 			utils.HandleErrorAndAbort(c, kts_err)
 			return
 		}
 
 		c.JSON(http.StatusOK, models.GetEventSeatsResponse{
-			SeatRows:        seatMap,
+			Seats:           seats,
 			CurrentUserSeat: currentUserSeats,
 			BlockedUntil:    blockedUntil})
 	}

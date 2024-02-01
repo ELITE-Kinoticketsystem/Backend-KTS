@@ -34,14 +34,14 @@ func TestGetEventSeatsHandler(t *testing.T) {
 			setExpectations: func(mockController *mocks.MockEventSeatControllerI, eventSeatId string, userId *uuid.UUID) {
 				mockController.EXPECT().GetEventSeats(gomock.Any(), gomock.Any()).Return(
 
-					&[][]models.GetSeatsForSeatSelectorDTO{},
+					&[]models.GetSeatsForSeatSelectorDTO{},
 					&[]models.GetSeatsForSeatSelectorDTO{},
 					nil,
 					nil)
 			},
 			expectedResponseBody: gin.H{
 				"blockedUntil":     nil,
-				"seat_rows":        []models.GetEventSeatsDTO{},
+				"seats":        []models.GetEventSeatsDTO{},
 				"currentUserSeats": []models.GetEventSeatsDTO{},
 			},
 			expectedStatus: http.StatusOK,

@@ -129,14 +129,10 @@ func TestEventSeatController_GetEventSeats(t *testing.T) {
 		},
 	}
 
-	expectedSeatRows := [][]models.GetSeatsForSeatSelectorDTO{
-		{
-			seatsSlice[0],
-			seatsSlice[1],
-		},
-		{
-			seatsSlice[2],
-		},
+	expectedSeatRows := []models.GetSeatsForSeatSelectorDTO{
+		seatsSlice[0],
+		seatsSlice[1],
+		seatsSlice[2],
 	}
 
 	expectedCurrentUserSeats := []models.GetSeatsForSeatSelectorDTO{
@@ -147,7 +143,7 @@ func TestEventSeatController_GetEventSeats(t *testing.T) {
 		name                     string
 		expectFuncs              func(mockEventSeatRepo *mocks.MockEventSeatRepoI, t *testing.T)
 		expectedError            *models.KTSError
-		expectedSeatRows         *[][]models.GetSeatsForSeatSelectorDTO
+		expectedSeatRows         *[]models.GetSeatsForSeatSelectorDTO
 		expectedCurrentUserSeats *[]models.GetSeatsForSeatSelectorDTO
 		BlockedUntil             *time.Time
 	}{

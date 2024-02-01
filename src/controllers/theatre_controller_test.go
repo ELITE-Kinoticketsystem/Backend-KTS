@@ -151,14 +151,44 @@ func TestCreateCinemaHall(t *testing.T) {
 		expectedError   *models.KTSError
 	}{
 		{
-			name:            "Hall not rectangular",
-			cinemaHallData:  samples.GetSampleCreateCinemaHallRequestNotRectangular(),
+			name:            "Invalid width",
+			cinemaHallData:  samples.GetSampleCreateCinemaHallRequestInvalidWidth(),
 			setExpectations: func(mockRepo mocks.MockTheaterRepoI, cinemaHallData models.CreateCinemaHallRequest) {},
 			expectedError:   kts_errors.KTS_BAD_REQUEST,
 		},
 		{
-			name:            "Invalid double seats",
-			cinemaHallData:  samples.GetSampleCreateCinemaHallRequestInvalidDoubleSeats(),
+			name:            "Empty seats",
+			cinemaHallData:  samples.GetSampleCreateCinemaHallRequestEmptySeats(),
+			setExpectations: func(mockRepo mocks.MockTheaterRepoI, cinemaHallData models.CreateCinemaHallRequest) {},
+			expectedError:   kts_errors.KTS_BAD_REQUEST,
+		},
+		{
+			name:            "Invalid coordinates",
+			cinemaHallData:  samples.GetSampleCreateCinemaHallRequestInvalidCoordinates(),
+			setExpectations: func(mockRepo mocks.MockTheaterRepoI, cinemaHallData models.CreateCinemaHallRequest) {},
+			expectedError:   kts_errors.KTS_BAD_REQUEST,
+		},
+		{
+			name:            "Seats not ascending",
+			cinemaHallData:  samples.GetSampleCreateCinemaHallRequestSeatsNotAscending(),
+			setExpectations: func(mockRepo mocks.MockTheaterRepoI, cinemaHallData models.CreateCinemaHallRequest) {},
+			expectedError:   kts_errors.KTS_BAD_REQUEST,
+		},
+		{
+			name:            "Double seat no space",
+			cinemaHallData:  samples.GetSampleCreateCinemaHallRequestDoubleNoSpace(),
+			setExpectations: func(mockRepo mocks.MockTheaterRepoI, cinemaHallData models.CreateCinemaHallRequest) {},
+			expectedError:   kts_errors.KTS_BAD_REQUEST,
+		},
+		{
+			name:            "Double seat at end",
+			cinemaHallData:  samples.GetSampleCreateCinemaHallRequestDoubleAtEnd(),
+			setExpectations: func(mockRepo mocks.MockTheaterRepoI, cinemaHallData models.CreateCinemaHallRequest) {},
+			expectedError:   kts_errors.KTS_BAD_REQUEST,
+		},
+		{
+			name:            "Rows not ascending",
+			cinemaHallData:  samples.GetSampleCreateCinemaHallRequestRowsNotAscending(),
 			setExpectations: func(mockRepo mocks.MockTheaterRepoI, cinemaHallData models.CreateCinemaHallRequest) {},
 			expectedError:   kts_errors.KTS_BAD_REQUEST,
 		},
@@ -205,7 +235,9 @@ func TestCreateCinemaHall(t *testing.T) {
 				mockRepo.EXPECT().CreateCinemaHall(utils.EqExceptUUIDs(sampleCinemaHall)).Return(nil)
 				mockRepo.EXPECT().GetSeatCategories().Return(sampleSeatCategories, nil)
 				mockRepo.EXPECT().CreateSeat(gomock.AssignableToTypeOf(model.Seats{})).
-					Times(len(sampleRequest.Seats) * len(sampleRequest.Seats[0])).Return(nil)
+					MinTimes(len(sampleRequest.Seats)).
+					MaxTimes(sampleRequest.Height * sampleRequest.Width).
+					Return(nil)
 			},
 			expectedError: nil,
 		},

@@ -71,10 +71,10 @@ func (mr *MockEventSeatControllerIMockRecorder) BlockEventSeat(eventId, eventSea
 }
 
 // GetEventSeats mocks base method.
-func (m *MockEventSeatControllerI) GetEventSeats(eventId, userId *uuid.UUID) (*[][]models.GetSeatsForSeatSelectorDTO, *[]models.GetSeatsForSeatSelectorDTO, *time.Time, *models.KTSError) {
+func (m *MockEventSeatControllerI) GetEventSeats(eventId, userId *uuid.UUID) (*[]models.GetSeatsForSeatSelectorDTO, *[]models.GetSeatsForSeatSelectorDTO, *time.Time, *models.KTSError) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetEventSeats", eventId, userId)
-	ret0, _ := ret[0].(*[][]models.GetSeatsForSeatSelectorDTO)
+	ret0, _ := ret[0].(*[]models.GetSeatsForSeatSelectorDTO)
 	ret1, _ := ret[1].(*[]models.GetSeatsForSeatSelectorDTO)
 	ret2, _ := ret[2].(*time.Time)
 	ret3, _ := ret[3].(*models.KTSError)
