@@ -78,11 +78,15 @@ func (tr *TheatreRepository) CreateCinemaHall(cinemaHall model.CinemaHalls) *mod
 		table.CinemaHalls.Name,
 		table.CinemaHalls.Capacity,
 		table.CinemaHalls.TheatreID,
+		table.CinemaHalls.Width,
+		table.CinemaHalls.Height,
 	).VALUES(
 		utils.MysqlUuid(cinemaHall.ID),
 		cinemaHall.Name,
 		cinemaHall.Capacity,
 		utils.MysqlUuid(cinemaHall.TheatreID),
+		cinemaHall.Width,
+		cinemaHall.Height,
 	)
 
 	_, err := stmt.Exec(tr.GetDatabaseConnection())
