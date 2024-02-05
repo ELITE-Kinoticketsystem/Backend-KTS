@@ -18,7 +18,7 @@ type MailgunInterface interface {
 	NewMessage(from, subject, text string, to ...string) *mailgun.Message
 }
 
-const welcomeEmailTmpl string = `<!DOCTYPE html>
+var welcomeEmailTmpl string = fmt.Sprintf(`<!DOCTYPE html>
 <html>
 <head>
   <title>Welcome to Cinemika</title>
@@ -34,11 +34,11 @@ const welcomeEmailTmpl string = `<!DOCTYPE html>
       
       <p>If you have any questions or need assistance, don't hesitate to reach out. Our team is always here to help you make the most of your experience with Cinemika.</p>
 
-      <p><a href="https://cinemika.westeurope.cloudapp.azure.com/auth/login" class="button" style="background-color: #89a3be; color: #FAFAFA; padding: 10px 20px; text-align: center; text-decoration: none; display: inline-block; border-radius: 5px;">Login to Your Account</a></p>
+      <p><a href="%s/auth/login" class="button" style="background-color: #89a3be; color: #FAFAFA; padding: 10px 20px; text-align: center; text-decoration: none; display: inline-block; border-radius: 5px;">Login to Your Account</a></p>
     </div>
   </div>
 </body>
-</html>`
+</html>`, URL)
 
 func PrepareWelcomeMailBody(username string) (string, error) {
 	t, err := template.New("welcomeEmail").Parse(welcomeEmailTmpl)
@@ -64,7 +64,7 @@ const orderConfirmationtmpl string = `<!DOCTYPE html>
   <title>Order Confirmation</title>
 </head>
 <body style="background-color: #1A1F25; color: #FAFAFA; font-family: Arial, sans-serif;">
-  <div class="container" style="margin: 0 auto; width: 100%; background-color: #2A313A; padding: 20px; border-radius: 10px;">
+  <div class="container" style="margin: 0 auto; width: 100%; background-color: #2A313A; border-radius: 10px;">
     <div class="header" style="color: #FAFAFA; padding: 10px; text-align: center; border-top-left-radius: 10px; border-top-right-radius: 10px;">
       <h1>Order Confirmation</h1>
     </div>
@@ -112,7 +112,7 @@ func prettierTime(time time.Time) string {
 func prettyPrice(price int32) string {
 	x := float64(price)
 	x = x / 100
-	return fmt.Sprintf("$%.2f", x)
+	return fmt.Sprintf("€%.2f", x)
 }
 
 func qrCodeSvgHtmlTemplate(orderId *uuid.UUID) template.HTML {

@@ -94,7 +94,7 @@ func SetJWTCookies(c *gin.Context, token string, refreshToken string, expired bo
 	var refreshLifespan int
 	if expired {
 		lifespan = expiredLifespan
-		refreshLifespan = expiredLifespan	
+		refreshLifespan = expiredLifespan
 	} else {
 		lifespan = tokenLifespan
 		refreshLifespan = refreshTokenLifeSpan
@@ -102,9 +102,9 @@ func SetJWTCookies(c *gin.Context, token string, refreshToken string, expired bo
 
 	// for development
 	http.SetCookie(c.Writer, &http.Cookie{
-		Name:     "token",
-		Value:    token,
-		Path:     "/",
+		Name:  "token",
+		Value: token,
+		Path:  "/",
 		/* Domain */
 		MaxAge:   lifespan,
 		Secure:   true,
@@ -113,9 +113,9 @@ func SetJWTCookies(c *gin.Context, token string, refreshToken string, expired bo
 	})
 
 	http.SetCookie(c.Writer, &http.Cookie{
-		Name:     "refreshToken",
-		Value:    refreshToken,
-		Path:     "/",
+		Name:  "refreshToken",
+		Value: refreshToken,
+		Path:  "/",
 		/* Domain */
 		MaxAge:   refreshLifespan,
 		Secure:   true,
@@ -124,6 +124,6 @@ func SetJWTCookies(c *gin.Context, token string, refreshToken string, expired bo
 	})
 
 	// for production
-	c.SetCookie("token", token, lifespan, "/", "cinemika.germanywestcentral.cloudapp.azure.com", true, true)
-	c.SetCookie("refreshToken", refreshToken, refreshLifespan, "/", "cinemika.germanywestcentral.cloudapp.azure.com", true, true)
+	c.SetCookie("token", token, lifespan, "/", URL, true, true)
+	c.SetCookie("refreshToken", refreshToken, refreshLifespan, "/", URL, true, true)
 }

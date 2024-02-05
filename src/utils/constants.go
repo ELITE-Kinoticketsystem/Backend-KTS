@@ -25,3 +25,5 @@ const (
 	SENIOR   PriceCategories = "pensioner"
 	STUDENT  PriceCategories = "student"
 )
+
+const URL = "cinemika.germanywestcentral.cloudapp.azure.com"

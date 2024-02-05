@@ -76,7 +76,6 @@ func (or *OrderRepository) GetOrderById(orderId *uuid.UUID, userId *uuid.UUID) (
 		).
 		WHERE(table.Orders.ID.EQ(utils.MysqlUuid(orderId)).AND(table.Orders.UserID.EQ(utils.MysqlUuid(userId))))
 
-	log.Println(stmt.DebugSql())
 	err := stmt.Query(or.DatabaseManager.GetDatabaseConnection(), &order)
 
 	if err != nil {
