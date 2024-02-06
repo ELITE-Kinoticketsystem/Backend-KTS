@@ -23,7 +23,6 @@ go.work
 # Env file
 .env
 
-go.mod
 go.sum
 
 # editor/IDE directories
