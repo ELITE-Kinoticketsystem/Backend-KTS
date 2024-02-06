@@ -89,16 +89,7 @@ func (mr *MovieRepository) CreateMovie(tx *sql.Tx, movie *model.Movies) (*uuid.U
 
 	// Create the insert statement
 	insertQuery := table.Movies.INSERT(
-		table.Movies.ID,
-		table.Movies.Title,
-		table.Movies.Description,
-		table.Movies.BannerPicURL,
-		table.Movies.CoverPicURL,
-		table.Movies.TrailerURL,
-		table.Movies.Rating,
-		table.Movies.ReleaseDate,
-		table.Movies.TimeInMin,
-		table.Movies.Fsk,
+		table.Movies.AllColumns,
 	).VALUES(
 		utils.MysqlUuid(movie.ID),
 		movie.Title,
