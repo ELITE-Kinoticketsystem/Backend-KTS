@@ -71,14 +71,16 @@ func (mr *MockEventSeatControllerIMockRecorder) BlockEventSeat(eventId, eventSea
 }
 
 // GetEventSeats mocks base method.
-func (m *MockEventSeatControllerI) GetEventSeats(eventId, userId *uuid.UUID) (*[]models.GetSeatsForSeatSelectorDTO, *[]models.GetSeatsForSeatSelectorDTO, *time.Time, *models.KTSError) {
+func (m *MockEventSeatControllerI) GetEventSeats(eventId, userId *uuid.UUID) (*[]models.GetSeatsForSeatSelectorDTO, *[]models.GetSeatsForSeatSelectorDTO, *time.Time, int32, int32, *models.KTSError) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetEventSeats", eventId, userId)
 	ret0, _ := ret[0].(*[]models.GetSeatsForSeatSelectorDTO)
 	ret1, _ := ret[1].(*[]models.GetSeatsForSeatSelectorDTO)
 	ret2, _ := ret[2].(*time.Time)
-	ret3, _ := ret[3].(*models.KTSError)
-	return ret0, ret1, ret2, ret3
+	ret3, _ := ret[3].(int32)
+	ret4, _ := ret[4].(int32)
+	ret5, _ := ret[5].(*models.KTSError)
+	return ret0, ret1, ret2, ret3, ret4, ret5
 }
 
 // GetEventSeats indicates an expected call of GetEventSeats.

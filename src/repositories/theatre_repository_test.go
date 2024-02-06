@@ -101,6 +101,8 @@ func TestCreateCinemaHall(t *testing.T) {
 					cinemaHall.Name,
 					cinemaHall.Capacity,
 					utils.EqUUID(cinemaHall.TheatreID),
+					cinemaHall.Width,
+					cinemaHall.Height,
 				).WillReturnResult(sqlmock.NewResult(1, 1))
 			},
 			expectedError: nil,
@@ -116,6 +118,8 @@ func TestCreateCinemaHall(t *testing.T) {
 					cinemaHall.Name,
 					cinemaHall.Capacity,
 					utils.EqUUID(cinemaHall.TheatreID),
+					cinemaHall.Width,
+					cinemaHall.Height,
 				).WillReturnError(sql.ErrConnDone)
 			},
 			expectedError: kts_errors.KTS_INTERNAL_ERROR,

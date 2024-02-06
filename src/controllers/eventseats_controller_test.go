@@ -151,6 +151,7 @@ func TestEventSeatController_GetEventSeats(t *testing.T) {
 			name: "Get event seats",
 			expectFuncs: func(mockEventSeatRepo *mocks.MockEventSeatRepoI, t *testing.T) {
 				mockEventSeatRepo.EXPECT().GetEventSeats(eventId).Return(&eventSeats, nil)
+				mockEventSeatRepo.EXPECT().GetHallDimensions(eventId).Return(int32(2), int32(2), nil)
 			},
 			expectedError:            nil,
 			expectedSeatRows:         &expectedSeatRows,
@@ -158,10 +159,20 @@ func TestEventSeatController_GetEventSeats(t *testing.T) {
 			BlockedUntil:             &blockedUntil,
 		},
 		{
+			name: "Dimensions error",
+			expectFuncs: func(mockEventSeatRepo *mocks.MockEventSeatRepoI, t *testing.T) {
+				mockEventSeatRepo.EXPECT().GetEventSeats(eventId).Return(&eventSeats, nil)
+				mockEventSeatRepo.EXPECT().GetHallDimensions(eventId).Return(int32(0), int32(0), kts_errors.KTS_INTERNAL_ERROR)
+			},
+			expectedError:            kts_errors.KTS_INTERNAL_ERROR,
+			expectedSeatRows:         nil,
+			expectedCurrentUserSeats: nil,
+			BlockedUntil:             nil,
+		},
+		{
 			name: "Get event seats - error",
 			expectFuncs: func(mockEventSeatRepo *mocks.MockEventSeatRepoI, t *testing.T) {
 				mockEventSeatRepo.EXPECT().GetEventSeats(eventId).Return(nil, kts_errors.KTS_INTERNAL_ERROR)
-
 			},
 			expectedError:            kts_errors.KTS_INTERNAL_ERROR,
 			expectedSeatRows:         nil,
@@ -186,7 +197,7 @@ func TestEventSeatController_GetEventSeats(t *testing.T) {
 
 			// When
 
-			seatMap, currentUserSeats, timeBlock, err := eventSeatController.GetEventSeats(eventId, userId)
+			seatMap, currentUserSeats, timeBlock, _, _, err := eventSeatController.GetEventSeats(eventId, userId)
 
 			// Then
 			if !reflect.DeepEqual(seatMap, tt.expectedSeatRows) {
