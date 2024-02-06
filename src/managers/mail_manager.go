@@ -21,9 +21,7 @@ type MailManager struct {
 	MailgunInstance utils.MailgunInterface
 }
 
-const retryMailCount = 3
 const emailSender = "Cinemika Team <team@cinemika.tech>"
-const emailReceiver = "team@cinemika.tech"
 
 func (mm *MailManager) SendWelcomeMail(to string, username string) *models.KTSError {
 	subject := "Welcome to Cinemika!"
