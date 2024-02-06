@@ -451,7 +451,6 @@ func GetSampleMovieDTOCreate() *models.MovieDTOCreate {
 	uuid1 := uuid.MustParse("6ba7b820-9dad-11d1-80b4-00c04fd430c4")
 	uuid2 := uuid.MustParse("6ba7b827-9dad-11d1-80b4-00c04fd430c1")
 	uuid5 := uuid.MustParse("6ba7b829-9dad-11d1-80b4-00c04fd430c3")
-	uuid7 := uuid.MustParse("6ba7b82b-9dad-11d1-80b4-00c04fd430c5")
 
 	banner := ""
 	cover := ""
@@ -483,13 +482,6 @@ func GetSampleMovieDTOCreate() *models.MovieDTOCreate {
 		}{
 			{
 				ID: &uuid5,
-			},
-		},
-		ProducersID: []struct {
-			ID *uuid.UUID
-		}{
-			{
-				ID: &uuid7,
 			},
 		},
 	}

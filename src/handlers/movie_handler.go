@@ -66,14 +66,6 @@ func CreateMovie(movieCtrl controllers.MovieControllerI) gin.HandlerFunc {
 			}
 		}
 
-		for _, producer := range movie.ProducersID {
-			if producer.ID == nil {
-				log.Print("Producer is empty")
-				utils.HandleErrorAndAbort(c, kts_errors.KTS_BAD_REQUEST)
-				return
-			}
-		}	
-
 		movieId, kts_err := movieCtrl.CreateMovie(&movie)
 		if kts_err != nil {
 			log.Print("Movie was not created")

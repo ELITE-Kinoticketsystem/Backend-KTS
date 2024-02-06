@@ -51,10 +51,6 @@ type MovieDTOCreate struct {
 	ActorsID []struct {
 		ID *uuid.UUID
 	}
-
-	ProducersID []struct {
-		ID *uuid.UUID
-	}
 }
 
 type CreateReviewRequest struct {

@@ -387,7 +387,6 @@ func TestCreateMovieHandler(t *testing.T) {
 				},
 				GenresID:    sampleCreateMovie.GenresID,
 				ActorsID:    sampleCreateMovie.ActorsID,
-				ProducersID: sampleCreateMovie.ProducersID,
 			},
 			setExpectations: func(mockController *mocks.MockMovieControllerI, movieData interface{}) {
 
@@ -401,7 +400,6 @@ func TestCreateMovieHandler(t *testing.T) {
 				Movies:      sampleCreateMovie.Movies,
 				GenresID:    []struct{ ID *uuid.UUID }{{ID: nil}},
 				ActorsID:    sampleCreateMovie.ActorsID,
-				ProducersID: sampleCreateMovie.ProducersID,
 			},
 			setExpectations: func(mockController *mocks.MockMovieControllerI, movieData interface{}) {
 
@@ -415,21 +413,6 @@ func TestCreateMovieHandler(t *testing.T) {
 				Movies:      sampleCreateMovie.Movies,
 				GenresID:    sampleCreateMovie.GenresID,
 				ActorsID:    []struct{ ID *uuid.UUID }{{ID: nil}},
-				ProducersID: sampleCreateMovie.ProducersID,
-			},
-			setExpectations: func(mockController *mocks.MockMovieControllerI, movieData interface{}) {
-
-			},
-			expectedStatus: http.StatusBadRequest,
-			expectedBody:   gin.H{"errorMessage": "BAD_REQUEST"},
-		},
-		{
-			name: "Producer Nil",
-			body: models.MovieDTOCreate{
-				Movies:      sampleCreateMovie.Movies,
-				GenresID:    sampleCreateMovie.GenresID,
-				ActorsID:    sampleCreateMovie.ActorsID,
-				ProducersID: []struct{ ID *uuid.UUID }{{ID: nil}},
 			},
 			setExpectations: func(mockController *mocks.MockMovieControllerI, movieData interface{}) {
 

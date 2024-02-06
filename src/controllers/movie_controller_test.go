@@ -340,7 +340,6 @@ func TestCreateMovie(t *testing.T) {
 
 				GenresID:    sampleMovie.GenresID,
 				ActorsID:    sampleMovie.ActorsID,
-				ProducersID: sampleMovie.ProducersID,
 			},
 			setExpectations: func(mockMovieRepo mocks.MockMovieRepositoryI, mockMovieGenreRepo mocks.MockMovieGenreRepositoryI, mockMovieActorRepo mocks.MockMovieActorRepositoryI, movie *models.MovieDTOCreate, db *sql.DB, dbMock sqlmock.Sqlmock) {
 				dbMock.ExpectBegin()
@@ -360,7 +359,6 @@ func TestCreateMovie(t *testing.T) {
 
 				GenresID:    sampleMovie.GenresID,
 				ActorsID:    sampleMovie.ActorsID,
-				ProducersID: sampleMovie.ProducersID,
 			},
 			setExpectations: func(mockMovieRepo mocks.MockMovieRepositoryI, mockMovieGenreRepo mocks.MockMovieGenreRepositoryI, mockMovieActorRepo mocks.MockMovieActorRepositoryI, movie *models.MovieDTOCreate, db *sql.DB, dbMock sqlmock.Sqlmock) {
 				dbMock.ExpectBegin()
@@ -381,7 +379,6 @@ func TestCreateMovie(t *testing.T) {
 
 				GenresID:    sampleMovie.GenresID,
 				ActorsID:    sampleMovie.ActorsID,
-				ProducersID: sampleMovie.ProducersID,
 			},
 			setExpectations: func(mockMovieRepo mocks.MockMovieRepositoryI, mockMovieGenreRepo mocks.MockMovieGenreRepositoryI, mockMovieActorRepo mocks.MockMovieActorRepositoryI, movie *models.MovieDTOCreate, db *sql.DB, dbMock sqlmock.Sqlmock) {
 				dbMock.ExpectBegin()
