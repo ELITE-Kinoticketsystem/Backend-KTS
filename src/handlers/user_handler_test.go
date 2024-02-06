@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
@@ -564,6 +565,86 @@ func TestLoggedInHandler(t *testing.T) {
 
 			expectedResponseBody, _ := json.Marshal(tc.expectedResponseBody)
 			assert.Equal(t, bytes.NewBuffer(expectedResponseBody).String(), w.Body.String(), "wrong response body")
+		})
+	}
+}
+
+func TestGetUserHandler(t *testing.T) {
+	user := samples.GetSampleUser()
+	testCases := []struct {
+		name                 string
+		setContextUser       bool
+		setExpectations      func(mockController *mocks.MockUserControllerI)
+		expectedStatus       int
+		expectedResponseBody interface{}
+	}{
+		{
+			name:           "Success",
+			setContextUser: true,
+			setExpectations: func(mockController *mocks.MockUserControllerI) {
+				mockController.EXPECT().GetUserById(user.ID).Return(&user, nil)
+			},
+			expectedStatus:       http.StatusOK,
+			expectedResponseBody: user,
+		},
+		{
+			name:                 "No user",
+			setContextUser:       false,
+			setExpectations:      func(mockController *mocks.MockUserControllerI) {},
+			expectedStatus:       http.StatusUnauthorized,
+			expectedResponseBody: gin.H{"errorMessage": "UNAUTHORIZED"},
+		},
+		{
+			name: "Internal Error",
+			setContextUser: true,
+			setExpectations: func(mockController *mocks.MockUserControllerI) {
+				mockController.EXPECT().GetUserById(user.ID).Return(nil, kts_errors.KTS_INTERNAL_ERROR)
+			},
+			expectedStatus:       http.StatusInternalServerError,
+			expectedResponseBody: gin.H{"errorMessage": "INTERNAL_ERROR"},
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			// GIVEN
+			// create mock context
+			w := httptest.NewRecorder()
+			gin.SetMode(gin.TestMode)
+			c, _ := gin.CreateTestContext(w)
+
+			// create mock controller
+			mockCtrl := gomock.NewController(t)
+			defer mockCtrl.Finish()
+			userController := mocks.NewMockUserControllerI(mockCtrl)
+
+			// create mock request
+			req := httptest.NewRequest("POST", "/auth/get-me", nil)
+			req.Header.Set("Content-Type", "application/json")
+
+			if tc.setContextUser {
+				ctx := context.WithValue(req.Context(), models.ContextKeyUserID, user.ID)
+				c.Request = req.WithContext(ctx)
+			} else {
+				c.Request = req
+			}
+
+			// define expectations
+			tc.setExpectations(userController)
+
+			// WHEN
+			// call GetUserHandler with mock context
+			GetUserHandler(userController)(c)
+
+			// THEN
+			// check the HTTP status code
+			assert.Equal(t, tc.expectedStatus, w.Code, "wrong HTTP status code")
+			if w.Body.Len() == 0 {
+				assert.True(t, tc.expectedResponseBody == nil, "expected empty response body")
+			} else {
+				expectedResponseBody, _ := json.Marshal(tc.expectedResponseBody)
+				assert.Equal(t, bytes.NewBuffer(expectedResponseBody).String(), w.Body.String(), "wrong response body")
+			}
 		})
 	}
 }

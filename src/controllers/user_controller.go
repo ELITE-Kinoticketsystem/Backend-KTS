@@ -15,6 +15,7 @@ type UserControllerI interface {
 	LoginUser(loginData models.LoginRequest) (*models.LoginResponse, *models.KTSError)
 	CheckEmail(email string) *models.KTSError
 	CheckUsername(username string) *models.KTSError
+	GetUserById(userId *uuid.UUID) (*model.Users, *models.KTSError)
 }
 
 type UserController struct {
@@ -95,4 +96,8 @@ func (uc *UserController) CheckEmail(email string) *models.KTSError {
 
 func (uc *UserController) CheckUsername(username string) *models.KTSError {
 	return uc.UserRepo.CheckIfUsernameExists(username)
+}
+
+func (uc *UserController) GetUserById(userId *uuid.UUID) (*model.Users, *models.KTSError) {
+	return uc.UserRepo.GetUserById(userId)
 }

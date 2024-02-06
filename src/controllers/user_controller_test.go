@@ -9,6 +9,7 @@ import (
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/models"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/samples"
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/utils"
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
 )
@@ -305,5 +306,59 @@ func TestCheckUsername(t *testing.T) {
 			assert.Equal(t, err, tc.expectedError, "wrong error")
 		})
 	}
+}
 
+func TestGetUserById(t *testing.T) {
+	user := samples.GetSampleUser()
+	testCases := []struct {
+		name            string
+		userId          *uuid.UUID
+		setExpectations func(mockRepo mocks.MockUserRepositoryI, userId *uuid.UUID)
+		expectedUser    *model.Users
+		expectedError   *models.KTSError
+	}{
+		{
+			name:   "Success",
+			userId: user.ID,
+			setExpectations: func(mockRepo mocks.MockUserRepositoryI, userId *uuid.UUID) {
+				mockRepo.EXPECT().GetUserById(userId).Return(&user, nil)
+			},
+			expectedUser:  &user,
+			expectedError: nil,
+		},
+		{
+			name:   "User not found",
+			userId: user.ID,
+			setExpectations: func(mockRepo mocks.MockUserRepositoryI, userId *uuid.UUID) {
+				mockRepo.EXPECT().GetUserById(userId).Return(nil, kts_errors.KTS_USER_NOT_FOUND)
+			},
+			expectedUser:  nil,
+			expectedError: kts_errors.KTS_USER_NOT_FOUND,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			// GIVEN
+			// create mock user repo
+			mockCtrl := gomock.NewController(t)
+			defer mockCtrl.Finish()
+			userRepoMock := mocks.NewMockUserRepositoryI(mockCtrl)
+			userController := UserController{
+				UserRepo: userRepoMock,
+			}
+
+			// define expectations
+			tc.setExpectations(*userRepoMock, tc.userId)
+
+			// WHEN
+			// call GetUserById with userId
+			user, err := userController.GetUserById(tc.userId)
+
+			// THEN
+			// check expected error
+			assert.Equal(t, err, tc.expectedError, "wrong error")
+			assert.Equal(t, user, tc.expectedUser, "wrong user")
+		})
+	}
 }
