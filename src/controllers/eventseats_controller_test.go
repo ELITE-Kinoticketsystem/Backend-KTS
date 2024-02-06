@@ -33,8 +33,8 @@ func TestEventSeatController_GetEventSeats(t *testing.T) {
 			},
 			Seat: model.Seats{
 				ID:             utils.NewUUID(),
-				RowNr:          0,
-				ColumnNr:       0,
+				Y:              0,
+				X:              0,
 				SeatCategoryID: utils.NewUUID(),
 			},
 			SeatCategory: model.SeatCategories{
@@ -58,8 +58,8 @@ func TestEventSeatController_GetEventSeats(t *testing.T) {
 			},
 			Seat: model.Seats{
 				ID:             utils.NewUUID(),
-				RowNr:          0,
-				ColumnNr:       1,
+				Y:              0,
+				X:              1,
 				SeatCategoryID: utils.NewUUID(),
 			},
 			SeatCategory: model.SeatCategories{
@@ -83,8 +83,8 @@ func TestEventSeatController_GetEventSeats(t *testing.T) {
 			},
 			Seat: model.Seats{
 				ID:             utils.NewUUID(),
-				RowNr:          1,
-				ColumnNr:       0,
+				Y:              1,
+				X:              0,
 				SeatCategoryID: utils.NewUUID(),
 			},
 			SeatCategory: model.SeatCategories{
@@ -102,8 +102,8 @@ func TestEventSeatController_GetEventSeats(t *testing.T) {
 	seatsSlice := []models.GetSeatsForSeatSelectorDTO{
 		{
 			ID:             eventSeats[0].EventSeat.ID,
-			RowNr:          eventSeats[0].Seat.RowNr,
-			ColumnNr:       eventSeats[0].Seat.ColumnNr,
+			RowNr:          eventSeats[0].Seat.Y,
+			ColumnNr:       eventSeats[0].Seat.X,
 			Available:      true,
 			BlockedByOther: false,
 			Category:       eventSeats[0].SeatCategory.CategoryName,
@@ -111,8 +111,8 @@ func TestEventSeatController_GetEventSeats(t *testing.T) {
 		},
 		{
 			ID:             eventSeats[1].EventSeat.ID,
-			RowNr:          eventSeats[1].Seat.RowNr,
-			ColumnNr:       eventSeats[1].Seat.ColumnNr,
+			RowNr:          eventSeats[1].Seat.Y,
+			ColumnNr:       eventSeats[1].Seat.X,
 			Available:      true,
 			BlockedByOther: false,
 			Category:       eventSeats[1].SeatCategory.CategoryName,
@@ -120,8 +120,8 @@ func TestEventSeatController_GetEventSeats(t *testing.T) {
 		},
 		{
 			ID:             eventSeats[2].EventSeat.ID,
-			RowNr:          eventSeats[2].Seat.RowNr,
-			ColumnNr:       eventSeats[2].Seat.ColumnNr,
+			RowNr:          eventSeats[2].Seat.Y,
+			ColumnNr:       eventSeats[2].Seat.X,
 			Available:      false,
 			BlockedByOther: false,
 			Category:       eventSeats[2].SeatCategory.CategoryName,
@@ -1082,7 +1082,7 @@ func TestGetSelectedSeats(t *testing.T) {
 				mockRepo.EXPECT().GetSelectedSeats(eventId, userId).Return(nil, kts_errors.KTS_NOT_FOUND)
 			},
 			expectedSlectedSeats: nil,
-			expectedError: kts_errors.KTS_NOT_FOUND,
+			expectedError:        kts_errors.KTS_NOT_FOUND,
 		},
 	}
 
