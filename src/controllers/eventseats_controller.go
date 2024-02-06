@@ -43,8 +43,8 @@ func (esc *EventSeatController) GetEventSeats(eventId *uuid.UUID, userId *uuid.U
 	for _, seat := range *seats {
 		currentSeat := models.GetSeatsForSeatSelectorDTO{
 			ID:             seat.EventSeat.ID,
-			RowNr:          seat.Seat.RowNr,
-			ColumnNr:       seat.Seat.ColumnNr,
+			RowNr:          seat.Seat.Y,
+			ColumnNr:       seat.Seat.X,
 			Available:      (seat.EventSeat.BlockedUntil == nil || seat.EventSeat.BlockedUntil.Before(time.Now()) || seat.EventSeat.UserID == nil) && !seat.EventSeat.Booked,
 			BlockedByOther: (seat.EventSeat.BlockedUntil != nil && (seat.EventSeat.BlockedUntil.After(time.Now()) && (seat.EventSeat.UserID != nil && *seat.EventSeat.UserID != *userId))) || seat.EventSeat.Booked,
 			Category:       seat.SeatCategory.CategoryName,
