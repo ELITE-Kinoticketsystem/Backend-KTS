@@ -175,9 +175,9 @@ func TestGetCinemaHallsForTheatre(t *testing.T) {
 				).WithArgs(
 					sqlmock.AnyArg(),
 				).WillReturnRows(
-					sqlmock.NewRows([]string{"cinema_halls.id", "cinema_halls.name", "cinema_halls.capacity", "cinema_halls.theatre_id"}).
-						AddRow(sampleCinemaHalls[0].ID, sampleCinemaHalls[0].Name, sampleCinemaHalls[0].Capacity, sampleCinemaHalls[0].TheatreID).
-						AddRow(sampleCinemaHalls[1].ID, sampleCinemaHalls[1].Name, sampleCinemaHalls[1].Capacity, sampleCinemaHalls[1].TheatreID),
+					sqlmock.NewRows([]string{"cinema_halls.id", "cinema_halls.name", "cinema_halls.capacity", "cinema_halls.width", "cinema_halls.height", "cinema_halls.theatre_id"}).
+						AddRow(sampleCinemaHalls[0].ID, sampleCinemaHalls[0].Name, sampleCinemaHalls[0].Capacity, sampleCinemaHalls[0].Width, sampleCinemaHalls[0].Height, sampleCinemaHalls[0].TheatreID).
+						AddRow(sampleCinemaHalls[1].ID, sampleCinemaHalls[1].Name, sampleCinemaHalls[1].Capacity, sampleCinemaHalls[1].Width, sampleCinemaHalls[1].Height, sampleCinemaHalls[1].TheatreID),
 				)
 			},
 			expectedCinemaHalls: &sampleCinemaHalls,
@@ -203,7 +203,7 @@ func TestGetCinemaHallsForTheatre(t *testing.T) {
 				).WithArgs(
 					sqlmock.AnyArg(),
 				).WillReturnRows(
-					sqlmock.NewRows([]string{"cinema_halls.id", "cinema_halls.name", "cinema_halls.capacity", "cinema_halls.theatre_id"}),
+					sqlmock.NewRows([]string{"cinema_halls.id", "cinema_halls.name", "cinema_halls.capacity", "cinema_halls.width", "cinema_halls.height", "cinema_halls.theatre_id"}),
 				)
 			},
 			expectedCinemaHalls: nil,

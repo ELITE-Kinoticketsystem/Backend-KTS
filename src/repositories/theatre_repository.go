@@ -103,6 +103,8 @@ func (tr *TheatreRepository) GetCinemaHallsForTheatre(theatreId *uuid.UUID) (*[]
 		table.CinemaHalls.ID,
 		table.CinemaHalls.Name,
 		table.CinemaHalls.Capacity,
+		table.CinemaHalls.Width,
+		table.CinemaHalls.Height,
 		table.CinemaHalls.TheatreID,
 	).FROM(
 		table.CinemaHalls,

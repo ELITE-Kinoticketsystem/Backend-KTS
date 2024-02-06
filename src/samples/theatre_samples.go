@@ -2100,12 +2100,16 @@ func GetSampleCinemaHalls() []model.CinemaHalls {
 			TheatreID: &theatreId,
 			Name:      "Hall 1",
 			Capacity:  100,
+			Width:    10,
+			Height:   10,
 		},
 		{
 			ID:        utils.NewUUID(),
 			TheatreID: &theatreId,
 			Name:      "Hall 2",
 			Capacity:  200,
+			Width:   20,
+			Height:  10,
 		},
 	}
 }
