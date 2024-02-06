@@ -45,7 +45,6 @@ func CreateMovie(movieCtrl controllers.MovieControllerI) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var movie models.MovieDTOCreate
 		err := c.ShouldBindJSON(&movie)
-		log.Println(movie.GenresID)
 		if err != nil ||
 			utils.ContainsEmptyString(
 				movie.Title,
@@ -78,7 +77,12 @@ func CreateMovie(movieCtrl controllers.MovieControllerI) gin.HandlerFunc {
 			}
 		}
 
-		log.Print("Passed validation")
+		if movie.Movies == (model.Movies{}) {
+			log.Print("Movie is nil")
+			utils.HandleErrorAndAbort(c, kts_errors.KTS_BAD_REQUEST)
+			return 
+		}		
+
 		movieId, kts_err := movieCtrl.CreateMovie(&movie)
 		if kts_err != nil {
 			log.Print("Movie was not created")
