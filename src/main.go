@@ -1,4 +1,5 @@
 package main
+
 import (
 	"context"
 	"log"
@@ -9,7 +10,6 @@ import (
 
 	"github.com/ELITE-Kinoticketsystem/Backend-KTS/src/managers"
 )
-
 
 func main() {
 	log.Println("Initializing database connection...")

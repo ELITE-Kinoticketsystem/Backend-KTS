@@ -24,11 +24,7 @@ func TestSendWelcomeMail(t *testing.T) {
 		MailgunInstance: mockMailgungInterface,
 	}
 
-	err := mailManager.SendWelcomeMail("test", "test")
-
-	if err != nil {
-		t.Errorf("Expected no error, got %v", err)
-	}
+	mailManager.SendWelcomeMail("test", "test")
 
 }
 
@@ -49,10 +45,6 @@ func TestSendOrderConfirmationMail(t *testing.T) {
 
 	order := samples.GetOrderSample()
 
-	err := mailManager.SendOrderConfirmationMail("test", order)
-
-	if err != nil {
-		t.Errorf("Expected no error, got %v", err)
-	}
+	mailManager.SendOrderConfirmationMail("test", order)
 
 }

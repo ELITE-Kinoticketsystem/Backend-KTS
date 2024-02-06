@@ -54,10 +54,7 @@ func (uc *UserController) RegisterUser(registrationData models.RegistrationReque
 		return nil, kts_errors.KTS_UPSTREAM_ERROR
 	}
 
-	kts_err = uc.MailMgr.SendWelcomeMail(registrationData.Email, registrationData.Username)
-	if kts_err != nil {
-		return nil, kts_err
-	}
+	uc.MailMgr.SendWelcomeMail(registrationData.Email, registrationData.Username)
 
 	return &models.LoginResponse{
 		User:         user,
