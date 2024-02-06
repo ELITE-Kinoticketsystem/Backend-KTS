@@ -52,11 +52,6 @@ func (mc *MovieController) GetMovieByName(name *string) (*model.Movies, *models.
 }
 
 func (mc *MovieController) CreateMovie(movie *models.MovieDTOCreate) (*uuid.UUID, *models.KTSError) {
-	if movie.Movies == (model.Movies{}) {
-		log.Print("Movie is nil")
-		return nil, kts_errors.KTS_BAD_REQUEST
-	}
-
 	tx, err := mc.MovieRepo.NewTransaction()
 	if err != nil {
 		return nil, kts_errors.KTS_INTERNAL_ERROR
