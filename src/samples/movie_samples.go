@@ -422,18 +422,6 @@ func GetSampleMovieByIdWithEverything() *models.MovieWithEverything {
 				&actor1PictureUrls,
 			},
 		},
-		Producers: []struct {
-			model.Producers
-		}{
-			{
-				model.Producers{
-					ID:          utils.NewUUID(),
-					Name:        "MaxProducer Mustermann",
-					Birthdate:   time.Now(),
-					Description: "This is a description",
-				},
-			},
-		},
 
 		Reviews: []struct {
 			Review   model.Reviews
