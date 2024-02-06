@@ -21,7 +21,24 @@ type GetOrderDTO struct {
 	Theatre    model.Theatres
 	Movies     []model.Movies
 	Tickets    []struct {
-		Ticket model.Tickets
-		Seat   model.Seats
+		Ticket        model.Tickets
+		PriceCategory model.PriceCategories
+		Seat          model.Seats
+		SeatCategory  model.SeatCategories
+	}
+}
+
+type OrderConfirmation struct {
+	OrderId        *uuid.UUID
+	EventTitle     string
+	CinemaHallName string
+	EventStart     string
+	TotalPrice     int32
+	TheatreName    string
+	Tickets        []struct {
+		PriceCategory string
+		SeatCategory  string
+		Row           int32
+		Column        int32
 	}
 }

@@ -1,6 +1,7 @@
 package repositories
 
 import (
+	"log"
 	"time"
 
 	kts_errors "github.com/ELITE-Kinoticketsystem/Backend-KTS/src/errors"
@@ -54,6 +55,7 @@ func (sr *StatsRepository) GetOrdersForStats() (*[]models.GetOrderDTO, *models.K
 	err := stmt.Query(sr.DatabaseManager.GetDatabaseConnection(), orders)
 
 	if err != nil {
+		log.Println(err)
 		return nil, kts_errors.KTS_INTERNAL_ERROR
 	}
 

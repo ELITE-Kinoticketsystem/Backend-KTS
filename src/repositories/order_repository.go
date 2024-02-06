@@ -54,7 +54,9 @@ func (or *OrderRepository) GetOrderById(orderId *uuid.UUID, userId *uuid.UUID) (
 	stmt := table.Orders.SELECT(
 		table.Orders.AllColumns,
 		table.Tickets.AllColumns,
+		table.PriceCategories.AllColumns,
 		table.Seats.AllColumns,
+		table.SeatCategories.AllColumns,
 		table.Events.AllColumns,
 		table.CinemaHalls.AllColumns,
 		table.Theatres.AllColumns,
@@ -62,8 +64,10 @@ func (or *OrderRepository) GetOrderById(orderId *uuid.UUID, userId *uuid.UUID) (
 	).
 		FROM(table.Orders.
 			LEFT_JOIN(table.Tickets, table.Tickets.OrderID.EQ(table.Orders.ID)).
+			LEFT_JOIN(table.PriceCategories, table.PriceCategories.ID.EQ(table.Tickets.PriceCategoryID)).
 			LEFT_JOIN(table.EventSeats, table.EventSeats.ID.EQ(table.Tickets.EventSeatID)).
 			LEFT_JOIN(table.Seats, table.Seats.ID.EQ(table.EventSeats.SeatID)).
+			LEFT_JOIN(table.SeatCategories, table.SeatCategories.ID.EQ(table.Seats.SeatCategoryID)).
 			LEFT_JOIN(table.Events, table.Events.ID.EQ(table.EventSeats.EventID)).
 			LEFT_JOIN(table.CinemaHalls, table.CinemaHalls.ID.EQ(table.Events.CinemaHallID)).
 			LEFT_JOIN(table.Theatres, table.Theatres.ID.EQ(table.CinemaHalls.TheatreID)).
@@ -87,7 +91,9 @@ func (or *OrderRepository) GetOrders(userId *uuid.UUID) (*[]models.GetOrderDTO, 
 	stmt := table.Orders.SELECT(
 		table.Orders.AllColumns,
 		table.Tickets.AllColumns,
+		table.PriceCategories.AllColumns,
 		table.Seats.AllColumns,
+		table.SeatCategories.AllColumns,
 		table.Events.AllColumns,
 		table.CinemaHalls.AllColumns,
 		table.Theatres.AllColumns,
@@ -95,8 +101,10 @@ func (or *OrderRepository) GetOrders(userId *uuid.UUID) (*[]models.GetOrderDTO, 
 	).
 		FROM(table.Orders.
 			LEFT_JOIN(table.Tickets, table.Tickets.OrderID.EQ(table.Orders.ID)).
+			LEFT_JOIN(table.PriceCategories, table.PriceCategories.ID.EQ(table.Tickets.PriceCategoryID)).
 			LEFT_JOIN(table.EventSeats, table.EventSeats.ID.EQ(table.Tickets.EventSeatID)).
 			LEFT_JOIN(table.Seats, table.Seats.ID.EQ(table.EventSeats.SeatID)).
+			LEFT_JOIN(table.SeatCategories, table.SeatCategories.ID.EQ(table.Seats.SeatCategoryID)).
 			LEFT_JOIN(table.Events, table.Events.ID.EQ(table.EventSeats.EventID)).
 			LEFT_JOIN(table.CinemaHalls, table.CinemaHalls.ID.EQ(table.Events.CinemaHallID)).
 			LEFT_JOIN(table.Theatres, table.Theatres.ID.EQ(table.CinemaHalls.TheatreID)).
