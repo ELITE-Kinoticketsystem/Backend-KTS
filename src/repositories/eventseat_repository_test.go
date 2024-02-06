@@ -160,6 +160,90 @@ func TestGetEventSeats(t *testing.T) {
 	}
 }
 
+func TestGetHallDimensions(t *testing.T) {
+	eventId := utils.NewUUID()
+	width := int32(10)
+	height := int32(10)
+
+	query := "SELECT cinema_halls.width, cinema_halls.height FROM events LEFT JOIN cinema_halls ON cinema_halls.id = events.cinema_hall_id WHERE events.id = ?"
+
+	testCases := []struct {
+		name            string
+		setExpectations func(mock sqlmock.Sqlmock)
+		expectedWidth   int32
+		expectedHeight  int32
+		expectedError   *models.KTSError
+	}{
+		{
+			name: "Success",
+			setExpectations: func(mock sqlmock.Sqlmock) {
+				mock.ExpectQuery(query).
+					WithArgs(eventId[:]).
+					WillReturnRows(sqlmock.NewRows([]string{"width", "height"}).
+						AddRow(width, height),
+					)
+			},
+			expectedWidth:  width,
+			expectedHeight: height,
+			expectedError:  nil,
+		},
+		{
+			name: "Internal error",
+			setExpectations: func(mock sqlmock.Sqlmock) {
+				mock.ExpectQuery(query).
+					WithArgs(eventId[:]).
+					WillReturnError(sqlmock.ErrCancelled)
+			},
+			expectedWidth:  0,
+			expectedHeight: 0,
+			expectedError:  kts_errors.KTS_INTERNAL_ERROR,
+		},
+		{
+			name: "No rows",
+			setExpectations: func(mock sqlmock.Sqlmock) {
+				mock.ExpectQuery(query).
+					WithArgs(eventId[:]).
+					WillReturnRows(sqlmock.NewRows([]string{"width", "height"}))
+			},
+			expectedWidth:  0,
+			expectedHeight: 0,
+			expectedError:  kts_errors.KTS_NOT_FOUND,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+
+			db, mock, err := sqlmock.New()
+			if err != nil {
+				t.Fatalf("Failed to create mock database connection: %v", err)
+			}
+			defer db.Close()
+
+			// Create a new instance of the EventSeatRepository with the mock database connection
+			eventSeatRepo := &EventSeatRepository{
+				DatabaseManagerI: &managers.DatabaseManager{
+					Connection: db,
+				},
+			}
+
+			tc.setExpectations(mock)
+
+			// When
+			width, height, kts_err := eventSeatRepo.GetHallDimensions(eventId)
+
+			// Then
+			if err := mock.ExpectationsWereMet(); err != nil {
+				t.Errorf("There were unfulfilled expectations: %s", err)
+			}
+
+			assert.Equal(t, tc.expectedError, kts_err)
+			assert.Equal(t, tc.expectedWidth, width)
+			assert.Equal(t, tc.expectedHeight, height)
+		})
+	}
+}
+
 func TestBlockEventSeatIfAvailable(t *testing.T) {
 	eventId := utils.NewUUID()
 	seatId := utils.NewUUID()

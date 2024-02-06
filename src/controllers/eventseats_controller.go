@@ -12,7 +12,7 @@ import (
 )
 
 type EventSeatControllerI interface {
-	GetEventSeats(eventId *uuid.UUID, userId *uuid.UUID) (*[]models.GetSeatsForSeatSelectorDTO, *[]models.GetSeatsForSeatSelectorDTO, *time.Time, *models.KTSError)
+	GetEventSeats(eventId *uuid.UUID, userId *uuid.UUID) (*[]models.GetSeatsForSeatSelectorDTO, *[]models.GetSeatsForSeatSelectorDTO, *time.Time, int32, int32, *models.KTSError)
 	BlockEventSeat(eventId *uuid.UUID, eventSeatId *uuid.UUID, userId *uuid.UUID) (*time.Time, *models.KTSError)
 	AreUserSeatsNextToEachOther(eventId *uuid.UUID, userId *uuid.UUID, eventSeatId *uuid.UUID) (bool, *models.KTSError)
 	UnblockEventSeat(eventId *uuid.UUID, eventSeatId *uuid.UUID, userId *uuid.UUID) (*time.Time, *models.KTSError)
@@ -24,11 +24,15 @@ type EventSeatController struct {
 	EventSeatRepo repositories.EventSeatRepoI
 }
 
-func (esc *EventSeatController) GetEventSeats(eventId *uuid.UUID, userId *uuid.UUID) (*[]models.GetSeatsForSeatSelectorDTO, *[]models.GetSeatsForSeatSelectorDTO, *time.Time, *models.KTSError) {
+func (esc *EventSeatController) GetEventSeats(eventId *uuid.UUID, userId *uuid.UUID) (*[]models.GetSeatsForSeatSelectorDTO, *[]models.GetSeatsForSeatSelectorDTO, *time.Time, int32, int32, *models.KTSError) {
 	seats, kts_err := esc.EventSeatRepo.GetEventSeats(eventId)
-
 	if kts_err != nil {
-		return nil, nil, nil, kts_err
+		return nil, nil, nil, 0, 0, kts_err
+	}
+
+	width, height, kts_err := esc.EventSeatRepo.GetHallDimensions(eventId)
+	if kts_err != nil {
+		return nil, nil, nil, 0, 0, kts_err
 	}
 
 	currentUserSeats := []models.GetSeatsForSeatSelectorDTO{}
@@ -57,7 +61,7 @@ func (esc *EventSeatController) GetEventSeats(eventId *uuid.UUID, userId *uuid.U
 		event_seats = append(event_seats, currentSeat)
 	}
 
-	return &event_seats, &currentUserSeats, blockedUntil, nil
+	return &event_seats, &currentUserSeats, blockedUntil, width, height, nil
 }
 
 func (esc *EventSeatController) BlockEventSeat(eventId *uuid.UUID, eventSeatId *uuid.UUID, userId *uuid.UUID) (*time.Time, *models.KTSError) {

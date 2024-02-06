@@ -70,6 +70,22 @@ func (mr *MockEventSeatRepoIMockRecorder) GetEventSeats(eventId any) *gomock.Cal
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetEventSeats", reflect.TypeOf((*MockEventSeatRepoI)(nil).GetEventSeats), eventId)
 }
 
+// GetHallDimensions mocks base method.
+func (m *MockEventSeatRepoI) GetHallDimensions(eventId *uuid.UUID) (int32, int32, *models.KTSError) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetHallDimensions", eventId)
+	ret0, _ := ret[0].(int32)
+	ret1, _ := ret[1].(int32)
+	ret2, _ := ret[2].(*models.KTSError)
+	return ret0, ret1, ret2
+}
+
+// GetHallDimensions indicates an expected call of GetHallDimensions.
+func (mr *MockEventSeatRepoIMockRecorder) GetHallDimensions(eventId any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetHallDimensions", reflect.TypeOf((*MockEventSeatRepoI)(nil).GetHallDimensions), eventId)
+}
+
 // GetSelectedSeats mocks base method.
 func (m *MockEventSeatRepoI) GetSelectedSeats(eventId, userId *uuid.UUID) (*[]models.GetSlectedSeatsDTO, *models.KTSError) {
 	m.ctrl.T.Helper()

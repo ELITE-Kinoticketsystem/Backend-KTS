@@ -37,12 +37,16 @@ func TestGetEventSeatsHandler(t *testing.T) {
 					&[]models.GetSeatsForSeatSelectorDTO{},
 					&[]models.GetSeatsForSeatSelectorDTO{},
 					nil,
+					int32(0),
+					int32(0),
 					nil)
 			},
 			expectedResponseBody: gin.H{
 				"blockedUntil":     nil,
-				"seats":        []models.GetEventSeatsDTO{},
+				"seats":            []models.GetEventSeatsDTO{},
 				"currentUserSeats": []models.GetEventSeatsDTO{},
+				"height":           int32(0),
+				"width":            int32(0),
 			},
 			expectedStatus: http.StatusOK,
 		},
@@ -54,6 +58,8 @@ func TestGetEventSeatsHandler(t *testing.T) {
 					nil,
 					nil,
 					nil,
+					int32(0),
+					int32(0),
 					kts_errors.KTS_INTERNAL_ERROR)
 			},
 			expectedResponseBody: gin.H{
@@ -69,6 +75,8 @@ func TestGetEventSeatsHandler(t *testing.T) {
 					nil,
 					nil,
 					nil,
+					int32(0),
+					int32(0),
 					kts_errors.KTS_NOT_FOUND)
 			},
 			expectedResponseBody: gin.H{
@@ -327,7 +335,6 @@ func TestUnblockEventSeatHandler(t *testing.T) {
 	}
 }
 
-
 func TestUnblockAllEventSeatsHandler(t *testing.T) {
 	testCases := []struct {
 		name            string
@@ -340,7 +347,7 @@ func TestUnblockAllEventSeatsHandler(t *testing.T) {
 			name:         "Success",
 			paramEventId: utils.NewUUID().String(),
 			setExpectations: func(mockController *mocks.MockEventSeatControllerI, eventId string, userId *uuid.UUID) {
-				mockController.EXPECT().UnblockAllEventSeats(gomock.Any(),  gomock.Any()).Return(nil)
+				mockController.EXPECT().UnblockAllEventSeats(gomock.Any(), gomock.Any()).Return(nil)
 			},
 			expectedStatus: http.StatusOK,
 			expectedBody:   nil,
@@ -358,7 +365,7 @@ func TestUnblockAllEventSeatsHandler(t *testing.T) {
 			name:         "Event seat not found",
 			paramEventId: utils.NewUUID().String(),
 			setExpectations: func(mockController *mocks.MockEventSeatControllerI, eventId string, userId *uuid.UUID) {
-				mockController.EXPECT().UnblockAllEventSeats(gomock.Any(),  gomock.Any()).Return(kts_errors.KTS_NOT_FOUND)
+				mockController.EXPECT().UnblockAllEventSeats(gomock.Any(), gomock.Any()).Return(kts_errors.KTS_NOT_FOUND)
 			},
 			expectedStatus: http.StatusNotFound,
 			expectedBody:   gin.H{"errorMessage": "NOT_FOUND"},
@@ -463,8 +470,8 @@ func TestGetSelectedSeatsHandler(t *testing.T) {
 			setExpectations: func(mockController *mocks.MockEventSeatControllerI, eventId string, userId *uuid.UUID) {
 
 			},
-			expectedStatus: http.StatusBadRequest,
-			expectedResponseBody:   gin.H{"errorMessage": "BAD_REQUEST"},
+			expectedStatus:       http.StatusBadRequest,
+			expectedResponseBody: gin.H{"errorMessage": "BAD_REQUEST"},
 		},
 	}
 

@@ -1,6 +1,7 @@
 package repositories
 
 import (
+	"database/sql"
 	"log"
 	"time"
 
@@ -17,6 +18,7 @@ import (
 
 type EventSeatRepoI interface {
 	GetEventSeats(eventId *uuid.UUID) (*[]models.GetEventSeatsDTO, *models.KTSError)
+	GetHallDimensions(eventId *uuid.UUID) (int32, int32, *models.KTSError)
 	BlockEventSeatIfAvailable(eventId *uuid.UUID, seatId *uuid.UUID, userId *uuid.UUID, blockedUntil *time.Time) *models.KTSError
 	UnblockEventSeat(eventId *uuid.UUID, seatId *uuid.UUID, userId *uuid.UUID) *models.KTSError
 	UnblockAllEventSeats(eventId *uuid.UUID, userId *uuid.UUID) *models.KTSError
@@ -54,6 +56,23 @@ func (esr *EventSeatRepository) GetEventSeats(eventId *uuid.UUID) (*[]models.Get
 	}
 
 	return &eventSeats, nil
+}
+
+func (esr *EventSeatRepository) GetHallDimensions(eventId *uuid.UUID) (int32, int32, *models.KTSError) {
+	var width int32
+	var height int32
+
+	query := "SELECT cinema_halls.width, cinema_halls.height FROM events LEFT JOIN cinema_halls ON cinema_halls.id = events.cinema_hall_id WHERE events.id = ?"
+
+	err := esr.GetDatabaseConnection().QueryRow(query, eventId[:]).Scan(&width, &height)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return 0, 0, kts_errors.KTS_NOT_FOUND
+		}
+		return 0, 0, kts_errors.KTS_INTERNAL_ERROR
+	}
+
+	return width, height, nil
 }
 
 func (esr *EventSeatRepository) BlockEventSeatIfAvailable(eventId *uuid.UUID, seatId *uuid.UUID, userId *uuid.UUID, blockedUntil *time.Time) *models.KTSError {
