@@ -9,6 +9,7 @@ import (
 	"testing"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
 
@@ -595,7 +596,7 @@ func TestGetUserHandler(t *testing.T) {
 			expectedResponseBody: gin.H{"errorMessage": "UNAUTHORIZED"},
 		},
 		{
-			name: "Internal Error",
+			name:           "Internal Error",
 			setContextUser: true,
 			setExpectations: func(mockController *mocks.MockUserControllerI) {
 				mockController.EXPECT().GetUserById(user.ID).Return(nil, kts_errors.KTS_INTERNAL_ERROR)
@@ -635,6 +636,74 @@ func TestGetUserHandler(t *testing.T) {
 			// WHEN
 			// call GetUserHandler with mock context
 			GetUserHandler(userController)(c)
+
+			// THEN
+			// check the HTTP status code
+			assert.Equal(t, tc.expectedStatus, w.Code, "wrong HTTP status code")
+			if w.Body.Len() == 0 {
+				assert.True(t, tc.expectedResponseBody == nil, "expected empty response body")
+			} else {
+				expectedResponseBody, _ := json.Marshal(tc.expectedResponseBody)
+				assert.Equal(t, bytes.NewBuffer(expectedResponseBody).String(), w.Body.String(), "wrong response body")
+			}
+		})
+	}
+}
+
+func TestIsAdmin(t *testing.T) {
+	userId := samples.GetSampleUser().ID
+	adminId := uuid.MustParse("dddddddd-dddd-dddd-dddd-dddddddddddd")
+	testCases := []struct {
+		name                 string
+		userId               *uuid.UUID
+		setContextUser       bool
+		expectedStatus       int
+		expectedResponseBody interface{}
+	}{
+		{
+			name:                 "Admin",
+			userId: 			 &adminId,
+			setContextUser:       true,
+			expectedStatus:       http.StatusOK,
+			expectedResponseBody: true,
+		},
+		{
+			name:                 "No admin",
+			userId:               userId,
+			setContextUser:       true,
+			expectedStatus:       http.StatusOK,
+			expectedResponseBody: false,
+		},
+		{
+			name:                 "No user",
+			setContextUser:       false,
+			expectedStatus:       http.StatusUnauthorized,
+			expectedResponseBody: gin.H{"errorMessage": "UNAUTHORIZED"},
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			// GIVEN
+			// create mock context
+			w := httptest.NewRecorder()
+			gin.SetMode(gin.TestMode)
+			c, _ := gin.CreateTestContext(w)
+
+			// create mock request
+			req := httptest.NewRequest("POST", "/auth/get-me", nil)
+			req.Header.Set("Content-Type", "application/json")
+
+			if tc.setContextUser {
+				ctx := context.WithValue(req.Context(), models.ContextKeyUserID, tc.userId)
+				c.Request = req.WithContext(ctx)
+			} else {
+				c.Request = req
+			}
+
+			// WHEN
+			// call GetUserHandler with mock context
+			IsAdminHandler(c)
 
 			// THEN
 			// check the HTTP status code

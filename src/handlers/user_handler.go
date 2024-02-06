@@ -193,3 +193,13 @@ func GetUserHandler(userCtrl controllers.UserControllerI) gin.HandlerFunc {
 		c.JSON(http.StatusOK, user)
 	}
 }
+
+func IsAdminHandler(c *gin.Context) {
+	userId, ok := c.Request.Context().Value(models.ContextKeyUserID).(*uuid.UUID)
+	if !ok {
+		utils.HandleErrorAndAbort(c, kts_errors.KTS_UNAUTHORIZED)
+		return
+	}
+	adminId := uuid.MustParse("dddddddd-dddd-dddd-dddd-dddddddddddd")
+	c.JSON(http.StatusOK, *userId == adminId)
+}
