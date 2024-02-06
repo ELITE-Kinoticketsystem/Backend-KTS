@@ -223,7 +223,6 @@ func (mr *MovieRepository) GetMovieById(movieId *uuid.UUID) (*models.MovieWithEv
 		table.Genres.AllColumns,
 		table.Actors.AllColumns,
 		table.ActorPictures.PicURL,
-		table.Producers.AllColumns,
 		table.Reviews.AllColumns,
 		table.Users.Username,
 	).FROM(
@@ -233,8 +232,6 @@ func (mr *MovieRepository) GetMovieById(movieId *uuid.UUID) (*models.MovieWithEv
 			LEFT_JOIN(table.MovieActors, table.MovieActors.MovieID.EQ(table.Movies.ID)).
 			LEFT_JOIN(table.Actors, table.Actors.ID.EQ(table.MovieActors.ActorID)).
 			LEFT_JOIN(table.ActorPictures, table.ActorPictures.ActorID.EQ(table.Actors.ID)).
-			LEFT_JOIN(table.MovieProducers, table.MovieProducers.MovieID.EQ(table.Movies.ID)).
-			LEFT_JOIN(table.Producers, table.Producers.ID.EQ(table.MovieProducers.ProducerID)).
 			LEFT_JOIN(table.Reviews, table.Reviews.MovieID.EQ(table.Movies.ID)).
 			LEFT_JOIN(table.Users, table.Users.ID.EQ(table.Reviews.UserID)),
 	).WHERE(

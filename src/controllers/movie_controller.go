@@ -31,9 +31,7 @@ type MovieController struct {
 	MovieRepo         repositories.MovieRepositoryI
 	MovieGenreRepo    repositories.MovieGenreRepositoryI
 	MovieActorRepo    repositories.MovieActorRepositoryI
-	MovieProducerRepo repositories.MovieProducerRepositoryI
 	ReviewRepo        repositories.ReviewRepositoryI
-	UserMovieRepo     repositories.UserMovieRepositoryI
 }
 
 // Movie
@@ -95,17 +93,6 @@ func (mc *MovieController) CreateMovie(movie *models.MovieDTOCreate) (*uuid.UUID
 		}
 	}
 
-	// Add producers to movie
-	movieProducers := movie.ProducersID
-	for _, movieProducer := range movieProducers {
-		kts_err := mc.MovieProducerRepo.AddMovieProducer(tx, movieId, movieProducer.ID)
-
-		if kts_err != nil {
-			log.Print("Producer was not added to movie")
-			return nil, kts_err
-		}
-	}
-
 	if err = tx.Commit(); err != nil {
 		return nil, kts_errors.KTS_INTERNAL_ERROR
 	}
@@ -131,20 +118,8 @@ func (mc *MovieController) DeleteMovie(movieId *uuid.UUID) *models.KTSError {
 		return kts_errors
 	}
 
-	// MovieProducer
-	kts_errors = mc.MovieProducerRepo.RemoveAllProducerCombinationWithMovie(movieId)
-	if kts_errors != nil {
-		return kts_errors
-	}
-
 	// Reviews
 	kts_errors = mc.ReviewRepo.DeleteReviewForMovie(movieId)
-	if kts_errors != nil {
-		return kts_errors
-	}
-
-	// UserMovies
-	kts_errors = mc.UserMovieRepo.RemoveAllUserMovieCombinationWithMovie(movieId)
 	if kts_errors != nil {
 		return kts_errors
 	}

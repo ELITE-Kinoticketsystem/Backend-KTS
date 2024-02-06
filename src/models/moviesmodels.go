@@ -35,10 +35,6 @@ type MovieWithEverything struct {
 		ActorPictureUrls *string `alias:"actor_pictures.pic_url"`
 	}
 
-	Producers []struct {
-		model.Producers
-	}
-
 	Reviews []struct {
 		Review   model.Reviews
 		Username string `alias:"users.username"`
