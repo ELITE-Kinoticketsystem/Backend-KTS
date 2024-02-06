@@ -83,7 +83,8 @@ func (mr *MovieRepository) GetMovieByName(movieName *string) (*model.Movies, *mo
 	return &movie, nil
 }
 
-func (mr *MovieRepository) CreateMovie(tx *sql.Tx, movie *model.Movies) (*uuid.UUID, *models.KTSError) {
+func (mr *MovieRepository) CreateMovie(tx *sql.Tx, movie *model.Movies) 
+					(*uuid.UUID, *models.KTSError) {
 	newId := uuid.New()
 	movie.ID = &newId
 
