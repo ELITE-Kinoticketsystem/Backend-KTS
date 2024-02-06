@@ -177,7 +177,7 @@ func TestGetTotalVisits(t *testing.T) {
 			setExpectations: func(mock sqlmock.Sqlmock, startTime time.Time, endTime time.Time, in string) {
 				mock.ExpectQuery(
 					"SELECT COUNT(tickets.id), MIN(events.end), SUM(orders.totalprice) FROM `KinoTicketSystem`.tickets LEFT JOIN `KinoTicketSystem`.orders ON (orders.id = tickets.order_id) LEFT JOIN `KinoTicketSystem`.event_seats ON (event_seats.id = tickets.event_seat_id) LEFT JOIN `KinoTicketSystem`.events ON (events.id = event_seats.event_id) WHERE events.end BETWEEN CAST(? AS DATETIME) AND CAST(? AS DATETIME) GROUP BY DAY(events.end) ORDER BY MIN(events.end);",
-				).WithArgs().WillReturnError(sqlmock.ErrCancelled)
+				).WithArgs(sqlmock.AnyArg(), sqlmock.AnyArg()).WillReturnError(sqlmock.ErrCancelled)
 			},
 			expectedStats: nil,
 			expectedError: kts_errors.KTS_INTERNAL_ERROR,
