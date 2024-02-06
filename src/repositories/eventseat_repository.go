@@ -43,7 +43,7 @@ func (esr *EventSeatRepository) GetEventSeats(eventId *uuid.UUID) (*[]models.Get
 		LEFT_JOIN(table.Seats, table.EventSeats.SeatID.EQ(table.Seats.ID)).
 		LEFT_JOIN(table.SeatCategories, table.Seats.SeatCategoryID.EQ(table.SeatCategories.ID)).
 		LEFT_JOIN(table.EventSeatCategories, table.EventSeatCategories.EventID.EQ(table.EventSeats.EventID).AND(table.EventSeatCategories.SeatCategoryID.EQ(table.Seats.SeatCategoryID)))).
-		WHERE(table.EventSeats.EventID.EQ(utils.MysqlUuid(eventId))).ORDER_BY(table.Seats.ColumnNr.ASC(), table.Seats.RowNr.ASC())
+		WHERE(table.EventSeats.EventID.EQ(utils.MysqlUuid(eventId))).ORDER_BY(table.Seats.RowNr.ASC(), table.Seats.ColumnNr.ASC())
 
 	err := stmt.Query(esr.GetDatabaseConnection(), &eventSeats)
 
