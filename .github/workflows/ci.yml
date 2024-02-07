@@ -36,7 +36,7 @@ jobs:
       - name: Update coverage report
         uses: ncruces/go-coverage-report@v0
         with:
-          coverage-files: ./src/handlers ./src/controllers ./src/repositories
+          coverage-files: ./src/handlers ./src/controllers ./src/repositories ./src/docs ./src/errors ./src/managers ./src/middlewares ./src/models ./src/samples ./src/utils
           badge-style: flat-square
           report: true
           chart: true
