@@ -24,10 +24,14 @@ type MovieGenreRepository struct {
 }
 
 // Combine Movie and Genre
-func (mgr *MovieGenreRepository) AddMovieGenre(tx *sql.Tx, movieId *uuid.UUID, genreId *uuid.UUID) *models.KTSError {
+func (mgr *MovieGenreRepository) AddMovieGenre(tx *sql.Tx, movieId *uuid.UUID, genreId *uuid.UUID) 
+										*models.KTSError {
 	// Create the insert statement
-	insertQuery := table.MovieGenres.INSERT(table.MovieGenres.MovieID, table.MovieGenres.GenreID).
-		VALUES(utils.MysqlUuid(movieId), utils.MysqlUuid(genreId))
+	insertQuery := table.MovieGenres.INSERT(
+		table.MovieGenres.MovieID, table.MovieGenres.GenreID
+	).VALUES(
+		utils.MysqlUuid(movieId), utils.MysqlUuid(genreId)
+	)
 
 	// Execute the query
 	rows, err := insertQuery.Exec(tx)
