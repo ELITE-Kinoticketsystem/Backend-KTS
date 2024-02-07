@@ -102,7 +102,7 @@ func PrepareOrderConfirmationBody(order models.GetOrderDTO) (string, error) {
 					Instructions: "You can check your order and more in your dashboard:",
 					Button: hermes.Button{
 						Text:  "Go to Dashboard",
-						Link:  URL + "/dashboard",
+						Link:  "https://" + URL + "/dashboard",
 						Color: "#334155",
 					},
 				},
