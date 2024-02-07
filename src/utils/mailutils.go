@@ -30,7 +30,7 @@ func PrepareWelcomeMailBody(username string) (string, error) {
 		Body: hermes.Body{
 			Name: username,
 			Intros: []string{
-				fmt.Sprintf("Welcome to Costventures, %v! We're very excited to have you on board.", username),
+				fmt.Sprintf("Welcome to Cinemika, %v! We're very excited to have you on board.", username),
 			},
 			Outros: []string{
 				"Need help, or have questions? Just reply to this email, we'd love to help.",
